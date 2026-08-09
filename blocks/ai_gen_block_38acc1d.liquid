@@ -442,8 +442,8 @@
 {%- assign img6 = block.settings.image_6 -%}
 
 {%- comment -%} High Contrast Text Colors per product card {%- endcomment -%}
-{%- assign raw_card_text = block.settings.card_text_color | default: '#171717' -%}
-{%- if raw_card_text == blank or raw_card_text == 'transparent' or raw_card_text == '#ffffff' or raw_card_text == '#fff' -%}
+{%- assign raw_card_text = block.settings.card_text_color | downcase | default: '#171717' -%}
+{%- if raw_card_text == blank or raw_card_text == 'transparent' or raw_card_text == '#ffffff' or raw_card_text == '#fff' or raw_card_text == 'rgba(0,0,0,0)' -%}
   {%- assign raw_card_text = '#171717' -%}
 {%- endif -%}
 

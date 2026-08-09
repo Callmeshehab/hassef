@@ -536,72 +536,70 @@
       <div class="wp-products-col-{{ section_id }}">
         
         <!-- Product 1 -->
-        <div class="wp-product-card-{{ section_id }}">
+        <div class="wp-product-card-{{ section_id }}" style="position:relative;">
           {%- if p1 != blank -%}
-            <a href="{{ p1.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-              <div class="wp-product-header-{{ section_id }}">
-                <h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c1 }};">{{ p1.title }}</h4>
+            <a href="{{ p1.url }}" aria-label="{{ p1.title | escape }}" style="position:absolute;inset:0;z-index:1;border-radius:inherit;"></a>
+            <div class="wp-product-header-{{ section_id }}">
+              <h4 class="wp-product-title-{{ section_id }}" style="color: {% if txt_c1 == '#ffffff' or txt_c1 == '#FFFFFF' or txt_c1 == blank %}#171717{% else %}{{ txt_c1 }}{% endif %} !important;">{{ p1.title }}</h4>
+            </div>
+            <div class="wp-product-img-wrap-{{ section_id }}">
+              {%- if img1 != blank -%}
+                <img src="{{ img1 | image_url: width: 400 }}" alt="{{ p1.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+              {%- elsif p1.featured_image -%}
+                <img src="{{ p1.featured_image | image_url: width: 400 }}" alt="{{ p1.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag }}
+              {%- endif -%}
+            </div>
+            <div class="wp-product-footer-{{ section_id }}">
+              <div class="wp-product-price-{{ section_id }}" style="color: {% if txt_c1 == '#ffffff' or txt_c1 == '#FFFFFF' or txt_c1 == blank %}#171717{% else %}{{ txt_c1 }}{% endif %} !important;">
+                {{ p1.price | money }}
+                {%- if p1.compare_at_price > p1.price -%}<span class="wp-product-compare-{{ section_id }}">{{ p1.compare_at_price | money }}</span>{%- endif -%}
               </div>
-              <div class="wp-product-img-wrap-{{ section_id }}">
-                {%- if img1 != blank -%}
-                  <img src="{{ img1 | image_url: width: 400 }}" alt="{{ p1.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                {%- elsif p1.featured_image -%}
-                  <img src="{{ p1.featured_image | image_url: width: 400 }}" alt="{{ p1.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                {%- else -%}
-                  {{ 'product-1' | placeholder_svg_tag }}
-                {%- endif -%}
-              </div>
-              <div class="wp-product-footer-{{ section_id }}">
-                <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c1 }};">
-                  {{ p1.price | money }}
-                  {%- if p1.compare_at_price > p1.price -%}<span class="wp-product-compare-{{ section_id }}">{{ p1.compare_at_price | money }}</span>{%- endif -%}
-                </div>
-            </a>
-                {%- if section.settings.show_add_button -%}
-                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p1.first_available_variant.id | default: p1.variants.first.id }}" aria-label="+">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </button>
-                {%- endif -%}
-              </div>
+              {%- if section.settings.show_add_button -%}
+                <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p1.first_available_variant.id | default: p1.variants.first.id }}" aria-label="+" style="position:relative;z-index:2;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+              {%- endif -%}
+            </div>
           {%- else -%}
-            <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c1 }};">اختر المنتج 1</h4></div>
+            <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: #171717 !important;">اختر المنتج 1</h4></div>
             <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-1' | placeholder_svg_tag }}</div>
-            <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c1 }};">350 ج.م</div></div>
+            <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: #171717 !important;">350 ج.م</div></div>
           {%- endif -%}
         </div>
 
         <!-- Product 2 -->
-        <div class="wp-product-card-{{ section_id }}">
+        <div class="wp-product-card-{{ section_id }}" style="position:relative;">
           {%- if p2 != blank -%}
-            <a href="{{ p2.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-              <div class="wp-product-header-{{ section_id }}">
-                <h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c2 }};">{{ p2.title }}</h4>
+            <a href="{{ p2.url }}" aria-label="{{ p2.title | escape }}" style="position:absolute;inset:0;z-index:1;border-radius:inherit;"></a>
+            <div class="wp-product-header-{{ section_id }}">
+              <h4 class="wp-product-title-{{ section_id }}" style="color: {% if txt_c2 == '#ffffff' or txt_c2 == '#FFFFFF' or txt_c2 == blank %}#171717{% else %}{{ txt_c2 }}{% endif %} !important;">{{ p2.title }}</h4>
+            </div>
+            <div class="wp-product-img-wrap-{{ section_id }}">
+              {%- if img2 != blank -%}
+                <img src="{{ img2 | image_url: width: 400 }}" alt="{{ p2.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+              {%- elsif p2.featured_image -%}
+                <img src="{{ p2.featured_image | image_url: width: 400 }}" alt="{{ p2.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+              {%- else -%}
+                {{ 'product-2' | placeholder_svg_tag }}
+              {%- endif -%}
+            </div>
+            <div class="wp-product-footer-{{ section_id }}">
+              <div class="wp-product-price-{{ section_id }}" style="color: {% if txt_c2 == '#ffffff' or txt_c2 == '#FFFFFF' or txt_c2 == blank %}#171717{% else %}{{ txt_c2 }}{% endif %} !important;">
+                {{ p2.price | money }}
+                {%- if p2.compare_at_price > p2.price -%}<span class="wp-product-compare-{{ section_id }}">{{ p2.compare_at_price | money }}</span>{%- endif -%}
               </div>
-              <div class="wp-product-img-wrap-{{ section_id }}">
-                {%- if img2 != blank -%}
-                  <img src="{{ img2 | image_url: width: 400 }}" alt="{{ p2.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                {%- elsif p2.featured_image -%}
-                  <img src="{{ p2.featured_image | image_url: width: 400 }}" alt="{{ p2.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                {%- else -%}
-                  {{ 'product-2' | placeholder_svg_tag }}
-                {%- endif -%}
-              </div>
-              <div class="wp-product-footer-{{ section_id }}">
-                <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c2 }};">
-                  {{ p2.price | money }}
-                  {%- if p2.compare_at_price > p2.price -%}<span class="wp-product-compare-{{ section_id }}">{{ p2.compare_at_price | money }}</span>{%- endif -%}
-                </div>
-            </a>
-                {%- if section.settings.show_add_button -%}
-                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p2.first_available_variant.id | default: p2.variants.first.id }}" aria-label="+">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  </button>
-                {%- endif -%}
-              </div>
+              {%- if section.settings.show_add_button -%}
+                <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p2.first_available_variant.id | default: p2.variants.first.id }}" aria-label="+" style="position:relative;z-index:2;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+              {%- endif -%}
+            </div>
           {%- else -%}
-            <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c2 }};">اختر المنتج 2</h4></div>
+            <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: #171717 !important;">اختر المنتج 2</h4></div>
             <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-2' | placeholder_svg_tag }}</div>
-            <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c2 }};">350 ج.م</div></div>
+            <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: #171717 !important;">350 ج.م</div></div>
           {%- endif -%}
         </div>
 
@@ -612,58 +610,56 @@
         <div class="wp-products-col-{{ section_id }}">
           
           <!-- Product 3 -->
-          <div class="wp-product-card-{{ section_id }}">
+          <div class="wp-product-card-{{ section_id }}" style="position:relative;">
             {%- if p3 != blank -%}
-              <a href="{{ p3.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c3 }};">{{ p3.title }}</h4></div>
-                <div class="wp-product-img-wrap-{{ section_id }}">
-                  {%- if img3 != blank -%}
-                    <img src="{{ img3 | image_url: width: 400 }}" alt="{{ p3.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- elsif p3.featured_image -%}
-                    <img src="{{ p3.featured_image | image_url: width: 400 }}" alt="{{ p3.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- endif -%}
-                </div>
-                <div class="wp-product-footer-{{ section_id }}">
-                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c3 }};">{{ p3.price | money }}</div>
-              </a>
-                  {%- if section.settings.show_add_button -%}
-                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p3.first_available_variant.id | default: p3.variants.first.id }}" aria-label="+">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    </button>
-                  {%- endif -%}
-                </div>
+              <a href="{{ p3.url }}" aria-label="{{ p3.title | escape }}" style="position:absolute;inset:0;z-index:1;border-radius:inherit;"></a>
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {% if txt_c3 == '#ffffff' or txt_c3 == '#FFFFFF' or txt_c3 == blank %}#171717{% else %}{{ txt_c3 }}{% endif %} !important;">{{ p3.title }}</h4></div>
+              <div class="wp-product-img-wrap-{{ section_id }}">
+                {%- if img3 != blank -%}
+                  <img src="{{ img3 | image_url: width: 400 }}" alt="{{ p3.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- elsif p3.featured_image -%}
+                  <img src="{{ p3.featured_image | image_url: width: 400 }}" alt="{{ p3.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- endif -%}
+              </div>
+              <div class="wp-product-footer-{{ section_id }}">
+                <div class="wp-product-price-{{ section_id }}" style="color: {% if txt_c3 == '#ffffff' or txt_c3 == '#FFFFFF' or txt_c3 == blank %}#171717{% else %}{{ txt_c3 }}{% endif %} !important;">{{ p3.price | money }}</div>
+                {%- if section.settings.show_add_button -%}
+                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p3.first_available_variant.id | default: p3.variants.first.id }}" aria-label="+" style="position:relative;z-index:2;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                {%- endif -%}
+              </div>
             {%- else -%}
-              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c3 }};">اختر المنتج 3</h4></div>
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: #171717 !important;">اختر المنتج 3</h4></div>
               <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-3' | placeholder_svg_tag }}</div>
-              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c3 }};">150 ج.م</div></div>
+              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: #171717 !important;">150 ج.م</div></div>
             {%- endif -%}
           </div>
 
           <!-- Product 4 -->
-          <div class="wp-product-card-{{ section_id }}">
+          <div class="wp-product-card-{{ section_id }}" style="position:relative;">
             {%- if p4 != blank -%}
-              <a href="{{ p4.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c4 }};">{{ p4.title }}</h4></div>
-                <div class="wp-product-img-wrap-{{ section_id }}">
-                  {%- if img4 != blank -%}
-                    <img src="{{ img4 | image_url: width: 400 }}" alt="{{ p4.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- elsif p4.featured_image -%}
-                    <img src="{{ p4.featured_image | image_url: width: 400 }}" alt="{{ p4.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- endif -%}
-                </div>
-                <div class="wp-product-footer-{{ section_id }}">
-                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c4 }};">{{ p4.price | money }}</div>
-              </a>
-                  {%- if section.settings.show_add_button -%}
-                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p4.first_available_variant.id | default: p4.variants.first.id }}" aria-label="+">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    </button>
-                  {%- endif -%}
-                </div>
+              <a href="{{ p4.url }}" aria-label="{{ p4.title | escape }}" style="position:absolute;inset:0;z-index:1;border-radius:inherit;"></a>
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {% if txt_c4 == '#ffffff' or txt_c4 == '#FFFFFF' or txt_c4 == blank %}#171717{% else %}{{ txt_c4 }}{% endif %} !important;">{{ p4.title }}</h4></div>
+              <div class="wp-product-img-wrap-{{ section_id }}">
+                {%- if img4 != blank -%}
+                  <img src="{{ img4 | image_url: width: 400 }}" alt="{{ p4.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- elsif p4.featured_image -%}
+                  <img src="{{ p4.featured_image | image_url: width: 400 }}" alt="{{ p4.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- endif -%}
+              </div>
+              <div class="wp-product-footer-{{ section_id }}">
+                <div class="wp-product-price-{{ section_id }}" style="color: {% if txt_c4 == '#ffffff' or txt_c4 == '#FFFFFF' or txt_c4 == blank %}#171717{% else %}{{ txt_c4 }}{% endif %} !important;">{{ p4.price | money }}</div>
+                {%- if section.settings.show_add_button -%}
+                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p4.first_available_variant.id | default: p4.variants.first.id }}" aria-label="+" style="position:relative;z-index:2;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                {%- endif -%}
+              </div>
             {%- else -%}
-              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c4 }};">اختر المنتج 4</h4></div>
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: #171717 !important;">اختر المنتج 4</h4></div>
               <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-4' | placeholder_svg_tag }}</div>
-              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c4 }};">150 ج.م</div></div>
+              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: #171717 !important;">150 ج.م</div></div>
             {%- endif -%}
           </div>
 
@@ -675,54 +671,52 @@
         <div class="wp-products-col-{{ section_id }}">
           
           <!-- Product 5 -->
-          <div class="wp-product-card-{{ section_id }}">
+          <div class="wp-product-card-{{ section_id }}" style="position:relative;">
             {%- if p5 != blank -%}
-              <a href="{{ p5.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c5 }};">{{ p5.title }}</h4></div>
-                <div class="wp-product-img-wrap-{{ section_id }}">
-                  {%- if img5 != blank -%}
-                    <img src="{{ img5 | image_url: width: 400 }}" alt="{{ p5.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- elsif p5.featured_image -%}
-                    <img src="{{ p5.featured_image | image_url: width: 400 }}" alt="{{ p5.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- endif -%}
-                </div>
-                <div class="wp-product-footer-{{ section_id }}">
-                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c5 }};">{{ p5.price | money }}</div>
-              </a>
-                  {%- if section.settings.show_add_button -%}
-                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p5.first_available_variant.id | default: p5.variants.first.id }}" aria-label="+">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    </button>
-                  {%- endif -%}
-                </div>
+              <a href="{{ p5.url }}" aria-label="{{ p5.title | escape }}" style="position:absolute;inset:0;z-index:1;border-radius:inherit;"></a>
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {% if txt_c5 == '#ffffff' or txt_c5 == '#FFFFFF' or txt_c5 == blank %}#171717{% else %}{{ txt_c5 }}{% endif %} !important;">{{ p5.title }}</h4></div>
+              <div class="wp-product-img-wrap-{{ section_id }}">
+                {%- if img5 != blank -%}
+                  <img src="{{ img5 | image_url: width: 400 }}" alt="{{ p5.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- elsif p5.featured_image -%}
+                  <img src="{{ p5.featured_image | image_url: width: 400 }}" alt="{{ p5.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- endif -%}
+              </div>
+              <div class="wp-product-footer-{{ section_id }}">
+                <div class="wp-product-price-{{ section_id }}" style="color: {% if txt_c5 == '#ffffff' or txt_c5 == '#FFFFFF' or txt_c5 == blank %}#171717{% else %}{{ txt_c5 }}{% endif %} !important;">{{ p5.price | money }}</div>
+                {%- if section.settings.show_add_button -%}
+                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p5.first_available_variant.id | default: p5.variants.first.id }}" aria-label="+" style="position:relative;z-index:2;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                {%- endif -%}
+              </div>
             {%- else -%}
-              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c5 }};">اختر المنتج 5</h4></div>
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: #171717 !important;">اختر المنتج 5</h4></div>
               <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-5' | placeholder_svg_tag }}</div>
-              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c5 }};">200 ج.م</div></div>
+              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: #171717 !important;">200 ج.م</div></div>
             {%- endif -%}
           </div>
 
           <!-- Product 6 -->
           {%- if p6 != blank -%}
-            <div class="wp-product-card-{{ section_id }}">
-              <a href="{{ p6.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c6 }};">{{ p6.title }}</h4></div>
-                <div class="wp-product-img-wrap-{{ section_id }}">
-                  {%- if img6 != blank -%}
-                    <img src="{{ img6 | image_url: width: 400 }}" alt="{{ p6.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- elsif p6.featured_image -%}
-                    <img src="{{ p6.featured_image | image_url: width: 400 }}" alt="{{ p6.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
-                  {%- endif -%}
-                </div>
-                <div class="wp-product-footer-{{ section_id }}">
-                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c6 }};">{{ p6.price | money }}</div>
-              </a>
-                  {%- if section.settings.show_add_button -%}
-                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p6.first_available_variant.id | default: p6.variants.first.id }}" aria-label="+">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    </button>
-                  {%- endif -%}
-                </div>
+            <div class="wp-product-card-{{ section_id }}" style="position:relative;">
+              <a href="{{ p6.url }}" aria-label="{{ p6.title | escape }}" style="position:absolute;inset:0;z-index:1;border-radius:inherit;"></a>
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {% if txt_c6 == '#ffffff' or txt_c6 == '#FFFFFF' or txt_c6 == blank %}#171717{% else %}{{ txt_c6 }}{% endif %} !important;">{{ p6.title }}</h4></div>
+              <div class="wp-product-img-wrap-{{ section_id }}">
+                {%- if img6 != blank -%}
+                  <img src="{{ img6 | image_url: width: 400 }}" alt="{{ p6.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- elsif p6.featured_image -%}
+                  <img src="{{ p6.featured_image | image_url: width: 400 }}" alt="{{ p6.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- endif -%}
+              </div>
+              <div class="wp-product-footer-{{ section_id }}">
+                <div class="wp-product-price-{{ section_id }}" style="color: {% if txt_c6 == '#ffffff' or txt_c6 == '#FFFFFF' or txt_c6 == blank %}#171717{% else %}{{ txt_c6 }}{% endif %} !important;">{{ p6.price | money }}</div>
+                {%- if section.settings.show_add_button -%}
+                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p6.first_available_variant.id | default: p6.variants.first.id }}" aria-label="+" style="position:relative;z-index:2;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                {%- endif -%}
+              </div>
             </div>
           {%- endif -%}
 
