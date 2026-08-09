@@ -1,0 +1,1023 @@
+{% comment %}
+  Section: مختارات هذا الأسبوع (Weekly Picks)
+  Apple-like Minimal Editorial & Product Showcase Section
+  Designed for Hassef Store (الحصيف)
+{% endcomment %}
+
+{%- assign section_id = section.id | replace: '_', '' | replace: '-', '' | downcase -%}
+
+{% style %}
+/* ── SECTION BASE & CONTAINER ── */
+.weekly-picks-{{ section_id }} {
+  display: block;
+  width: 100%;
+  max-width: {{ section.settings.max_width }}px;
+  margin: {{ section.settings.margin_top }}px auto {{ section.settings.margin_bottom }}px;
+  padding: {{ section.settings.padding_vertical }}px {{ section.settings.padding_horizontal }}px;
+  background-color: {{ section.settings.section_bg_color }};
+  box-sizing: border-box;
+  direction: {{ request.locale.iso_code | default: 'ar' | replace: 'ar', 'rtl' | replace: 'en', 'ltr' }};
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.wp-header-{{ section_id }} {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: {{ section.settings.header_margin_bottom }}px;
+}
+
+.wp-titles-{{ section_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wp-subtitle-{{ section_id }} {
+  font-size: {{ section.settings.subtitle_size }}px;
+  font-weight: 600;
+  color: {{ section.settings.accent_color }};
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.wp-title-{{ section_id }} {
+  font-size: {{ section.settings.title_size }}px;
+  font-weight: 700;
+  color: {{ section.settings.text_color }};
+  margin: 0;
+  line-height: 1.2;
+}
+
+.wp-view-all-{{ section_id }} {
+  font-size: 14px;
+  font-weight: 600;
+  color: {{ section.settings.accent_color }};
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.wp-view-all-{{ section_id }}:hover {
+  opacity: 0.8;
+}
+
+/* ── CAROUSEL TRACK ── */
+.wp-carousel-wrapper-{{ section_id }} {
+  position: relative;
+  width: 100%;
+}
+
+.wp-track-{{ section_id }} {
+  display: flex;
+  gap: {{ section.settings.slide_gap }}px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0 12px;
+}
+
+.wp-track-{{ section_id }}::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── SLIDE ITEM ── */
+.wp-slide-{{ section_id }} {
+  flex: 0 0 100%;
+  max-width: 100%;
+  scroll-snap-align: start;
+  display: grid;
+  grid-template-columns: calc(50% - ({{ section.settings.card_gap }}px / 2)) calc(50% - ({{ section.settings.card_gap }}px / 2));
+  gap: {{ section.settings.card_gap }}px;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 750px) {
+  .wp-slide-{{ section_id }} {
+    flex: 0 0 calc(50% - ({{ section.settings.slide_gap }}px / 2));
+    max-width: calc(50% - ({{ section.settings.slide_gap }}px / 2));
+  }
+}
+
+@media screen and (min-width: 1100px) {
+  .wp-slide-{{ section_id }} {
+    flex: 0 0 calc(33.333% - ({{ section.settings.slide_gap }}px * 2 / 3));
+    max-width: calc(33.333% - ({{ section.settings.slide_gap }}px * 2 / 3));
+  }
+}
+
+/* ── EDITORIAL CARD ── */
+.wp-editorial-card-{{ section_id }} {
+  position: relative;
+  border-radius: {{ section.settings.card_border_radius }}px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: {{ section.settings.editorial_padding }}px;
+  box-sizing: border-box;
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background-size: cover;
+  background-position: center;
+}
+
+.wp-editorial-card-{{ section_id }}:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.wp-editorial-overlay-{{ section_id }} {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wp-editorial-content-{{ section_id }} {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wp-editorial-label-{{ section_id }} {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.wp-editorial-heading-{{ section_id }} {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.wp-editorial-desc-{{ section_id }} {
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.wp-editorial-image-wrap-{{ section_id }} {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.wp-editorial-img-{{ section_id }} {
+  max-width: 80%;
+  max-height: 160px;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.wp-editorial-card-{{ section_id }}:hover .wp-editorial-img-{{ section_id }} {
+  transform: scale(1.05);
+}
+
+.wp-editorial-cta-{{ section_id }} {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+/* ── STACKED PRODUCTS COLUMN ── */
+.wp-products-col-{{ section_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: {{ section.settings.card_gap }}px;
+  justify-content: space-between;
+}
+
+/* ── PRODUCT CARD ── */
+.wp-product-card-{{ section_id }} {
+  flex: 1;
+  border-radius: {{ section.settings.card_border_radius }}px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  text-decoration: none;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  min-height: 160px;
+}
+
+.wp-product-card-{{ section_id }}:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.wp-product-header-{{ section_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.wp-product-title-{{ section_id }} {
+  font-size: 14px;
+  font-weight: 700;
+  color: #171717;
+  margin: 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.wp-product-meta-{{ section_id }} {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #737373;
+  font-weight: 500;
+}
+
+.wp-product-img-wrap-{{ section_id }} {
+  width: 100%;
+  height: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+}
+
+.wp-product-img-{{ section_id }} {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.wp-product-card-{{ section_id }}:hover .wp-product-img-{{ section_id }} {
+  transform: scale(1.06);
+}
+
+.wp-product-footer-{{ section_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 4px;
+}
+
+.wp-product-price-{{ section_id }} {
+  font-size: 14px;
+  font-weight: 700;
+  color: #171717;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.wp-product-compare-{{ section_id }} {
+  font-size: 11px;
+  color: #a3a3a3;
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+.wp-add-btn-{{ section_id }} {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  color: #171717;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  outline: none;
+}
+
+.wp-add-btn-{{ section_id }}:hover {
+  background: {{ section.settings.accent_color }};
+  color: #ffffff;
+  border-color: {{ section.settings.accent_color }};
+  transform: scale(1.1);
+}
+
+.wp-add-btn-{{ section_id }}.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.wp-add-btn-{{ section_id }}.is-added {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
+}
+
+/* ── PAGINATION DOTS ── */
+.wp-dots-{{ section_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: {{ section.settings.dots_margin_top }}px;
+}
+
+.wp-dot-{{ section_id }} {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wp-dot-{{ section_id }}.is-active {
+  background: {{ section.settings.accent_color }};
+  width: 22px;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 480px) {
+  .wp-slide-{{ section_id }} {
+    grid-template-columns: calc(50% - ({{ section.settings.card_gap }}px / 2)) calc(50% - ({{ section.settings.card_gap }}px / 2));
+  }
+  .wp-product-card-{{ section_id }} {
+    padding: 10px 12px;
+  }
+  .wp-product-title-{{ section_id }} {
+    font-size: 12px;
+  }
+  .wp-product-img-wrap-{{ section_id }} {
+    height: 70px;
+  }
+}
+{% endstyle %}
+
+<div class="weekly-picks-{{ section_id }}" id="WeeklyPicks-{{ section_id }}">
+  {%- if section.settings.title != blank -%}
+    <div class="wp-header-{{ section_id }}">
+      <div class="wp-titles-{{ section_id }}">
+        {%- if section.settings.subtitle != blank -%}
+          <span class="wp-subtitle-{{ section_id }}">{{ section.settings.subtitle }}</span>
+        {%- endif -%}
+        <h2 class="wp-title-{{ section_id }}">{{ section.settings.title }}</h2>
+      </div>
+
+      {%- if section.settings.show_view_all and section.settings.collection_url != blank -%}
+        <a href="{{ section.settings.collection_url }}" class="wp-view-all-{{ section_id }}">
+          {{ section.settings.view_all_text | default: 'عرض الكل' }}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="wp-carousel-wrapper-{{ section_id }}">
+    <div class="wp-track-{{ section_id }}" id="WpTrack-{{ section_id }}">
+      
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'slide' -%}
+            
+            {%- comment -%} Determine auto palette color if enabled {%- endcomment -%}
+            {%- assign color_index = forloop.index0 | modulo: 5 -%}
+            {%- assign auto_card_bg = section.settings.fixed_card_bg -%}
+            {%- if section.settings.enable_auto_colors -%}
+              {%- case color_index -%}
+                {%- when 0 -%}{%- assign auto_card_bg = section.settings.color_1 -%}
+                {%- when 1 -%}{%- assign auto_card_bg = section.settings.color_2 -%}
+                {%- when 2 -%}{%- assign auto_card_bg = section.settings.color_3 -%}
+                {%- when 3 -%}{%- assign auto_card_bg = section.settings.color_4 -%}
+                {%- when 4 -%}{%- assign auto_card_bg = section.settings.color_5 -%}
+              {%- endcase -%}
+            {%- endif -%}
+
+            <div class="wp-slide-{{ section_id }}" {{ block.shopify_attributes }}>
+              
+              {%- comment -%} 1) EDITORIAL LARGE CARD {%- endcomment -%}
+              <a
+                href="{{ block.settings.cta_url | default: '#' }}"
+                class="wp-editorial-card-{{ section_id }}"
+                style="
+                  background-color: {{ block.settings.card_bg_color | default: '#5B171C' }};
+                  color: {{ block.settings.card_text_color | default: '#ffffff' }};
+                  {% if block.settings.bg_image != blank %}background-image: url('{{ block.settings.bg_image | image_url: width: 800 }}');{% endif %}
+                "
+              >
+                {%- if block.settings.overlay_opacity > 0 -%}
+                  <div
+                    class="wp-editorial-overlay-{{ section_id }}"
+                    style="background: {{ block.settings.overlay_color | default: '#000000' }}; opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};"
+                  ></div>
+                {%- endif -%}
+
+                <div class="wp-editorial-content-{{ section_id }}">
+                  {%- if block.settings.label != blank -%}
+                    <span class="wp-editorial-label-{{ section_id }}">{{ block.settings.label }}</span>
+                  {%- endif -%}
+                  {%- if block.settings.heading != blank -%}
+                    <h3 class="wp-editorial-heading-{{ section_id }}">{{ block.settings.heading }}</h3>
+                  {%- endif -%}
+                  {%- if block.settings.description != blank -%}
+                    <p class="wp-editorial-desc-{{ section_id }}">{{ block.settings.description }}</p>
+                  {%- endif -%}
+                </div>
+
+                {%- if block.settings.image != blank -%}
+                  <div class="wp-editorial-image-wrap-{{ section_id }}">
+                    <img
+                      src="{{ block.settings.image | image_url: width: 600 }}"
+                      alt="{{ block.settings.heading | escape }}"
+                      class="wp-editorial-img-{{ section_id }}"
+                      loading="lazy"
+                    >
+                  </div>
+                {%- endif -%}
+
+                {%- if block.settings.cta_text != blank -%}
+                  <div class="wp-editorial-cta-{{ section_id }}" style="color: {{ block.settings.card_accent_color | default: '#ffffff' }}">
+                    {{ block.settings.cta_text }}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+                  </div>
+                {%- endif -%}
+              </a>
+
+              {%- comment -%} 2) STACKED PRODUCTS COLUMN {%- endcomment -%}
+              <div class="wp-products-col-{{ section_id }}">
+                
+                {%- for i in (1..2) -%}
+                  {%- if i == 1 -%}
+                    {%- assign p_obj = block.settings.product_1 -%}
+                  {%- else -%}
+                    {%- assign p_obj = block.settings.product_2 -%}
+                  {%- endif -%}
+
+                  <div
+                    class="wp-product-card-{{ section_id }}"
+                    style="background-color: {{ auto_card_bg | default: '#ffffff' }};"
+                  >
+                    {%- if p_obj != blank -%}
+                      <a href="{{ p_obj.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                        <div class="wp-product-header-{{ section_id }}">
+                          <h4 class="wp-product-title-{{ section_id }}">{{ p_obj.title }}</h4>
+                          <div class="wp-product-meta-{{ section_id }}">
+                            {%- if section.settings.show_vendor and p_obj.vendor != blank -%}
+                              <span>{{ p_obj.vendor }}</span>
+                            {%- endif -%}
+                            {%- if section.settings.show_year -%}
+                              {%- assign p_year = p_obj.metafields.custom.year | default: p_obj.metafields.my_fields.year | default: p_obj.published_at | date: '%Y' -%}
+                              {%- if p_year != blank -%}
+                                <span>• {{ p_year }}</span>
+                              {%- endif -%}
+                            {%- endif -%}
+                          </div>
+                        </div>
+
+                        <div class="wp-product-img-wrap-{{ section_id }}">
+                          {%- if p_obj.featured_image -%}
+                            <img
+                              src="{{ p_obj.featured_image | image_url: width: 400 }}"
+                              alt="{{ p_obj.title | escape }}"
+                              class="wp-product-img-{{ section_id }}"
+                              loading="lazy"
+                            >
+                          {%- else -%}
+                            {{ 'product-1' | placeholder_svg_tag: 'wp-product-img-' | append: section_id }}
+                          {%- endif -%}
+                        </div>
+
+                        <div class="wp-product-footer-{{ section_id }}">
+                          <div class="wp-product-price-{{ section_id }}">
+                            {{ p_obj.price | money }}
+                            {%- if p_obj.compare_at_price > p_obj.price -%}
+                              <span class="wp-product-compare-{{ section_id }}">{{ p_obj.compare_at_price | money }}</span>
+                            {%- endif -%}
+                          </div>
+                      </a>
+                          {%- if section.settings.show_add_button -%}
+                            <button
+                              type="button"
+                              class="wp-add-btn-{{ section_id }}"
+                              data-variant-id="{{ p_obj.first_available_variant.id }}"
+                              aria-label="إضافة للسلة"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            </button>
+                          {%- endif -%}
+                        </div>
+
+                    {%- else -%}
+                      {%- comment -%} Placeholder when no product chosen {%- endcomment -%}
+                      <div class="wp-product-header-{{ section_id }}">
+                        <h4 class="wp-product-title-{{ section_id }}">اسم المنتج {{ i }}</h4>
+                        <div class="wp-product-meta-{{ section_id }}">المؤلف / الفنان • 1978</div>
+                      </div>
+                      <div class="wp-product-img-wrap-{{ section_id }}">
+                        {{ 'product-1' | placeholder_svg_tag }}
+                      </div>
+                      <div class="wp-product-footer-{{ section_id }}">
+                        <div class="wp-product-price-{{ section_id }}">350 ج.م</div>
+                        <button type="button" class="wp-add-btn-{{ section_id }}">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                      </div>
+                    {%- endif -%}
+                  </div>
+
+                {%- endfor -%}
+
+              </div>
+
+            </div>
+
+        {%- endcase -%}
+      {%- endfor -%}
+
+    </div>
+
+    {%- if section.settings.show_dots and section.blocks.size > 1 -%}
+      <div class="wp-dots-{{ section_id }}" id="WpDots-{{ section_id }}">
+        {%- for block in section.blocks -%}
+          <button
+            type="button"
+            class="wp-dot-{{ section_id }}{% if forloop.first %} is-active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            aria-label="Slide {{ forloop.index }}"
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+(function() {
+  const sectionId = '{{ section_id }}';
+  const track = document.getElementById('WpTrack-' + sectionId);
+  const dotsContainer = document.getElementById('WpDots-' + sectionId);
+  
+  if (!track) return;
+
+  // Pagination Dots Sync
+  if (dotsContainer) {
+    const dots = dotsContainer.querySelectorAll('.wp-dot-' + sectionId);
+    
+    // Click to scroll
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', () => {
+        const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 300;
+        const gap = {{ section.settings.slide_gap | default: 16 }};
+        track.scrollTo({
+          left: idx * (slideWidth + gap),
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Scroll listener for active dot
+    let scrollTimeout;
+    track.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 300;
+        const gap = {{ section.settings.slide_gap | default: 16 }};
+        const currentIdx = Math.round(track.scrollLeft / (slideWidth + gap));
+        
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle('is-active', idx === currentIdx);
+        });
+      }, 50);
+    }, { passive: true });
+  }
+
+  // AJAX Add to Cart Buttons
+  const addButtons = document.querySelectorAll('#WeeklyPicks-' + sectionId + ' .wp-add-btn-' + sectionId);
+  addButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const variantId = this.getAttribute('data-variant-id');
+      if (!variantId) return;
+
+      const self = this;
+      self.classList.add('is-loading');
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
+      })
+      .then(res => res.json())
+      .then(data => {
+        self.classList.remove('is-loading');
+        self.classList.add('is-added');
+        setTimeout(() => self.classList.remove('is-added'), 2000);
+
+        // Refresh cart count or open cart drawer if present
+        if (window.Shopify && Shopify.onItemAdded) {
+          Shopify.onItemAdded(data);
+        }
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: data }));
+        fetch('/cart.js')
+          .then(r => r.json())
+          .then(cart => {
+            const countEl = document.getElementById('hfCartCount');
+            if (countEl) {
+              countEl.textContent = cart.item_count;
+              countEl.style.display = cart.item_count > 0 ? 'inline-flex' : 'none';
+            }
+          }).catch(() => {});
+      })
+      .catch(() => {
+        self.classList.remove('is-loading');
+      });
+    });
+  });
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "مختارات هذا الأسبوع",
+  "tag": "section",
+  "class": "weekly-picks-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "إعدادات القسم الرئيسية"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "عنوان القسم",
+      "default": "مختارات هذا الأسبوع"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "العنوان الفرعي",
+      "default": "قطع نادرة وقصص مميزة"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "إظهار رابط 'عرض الكل'",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "نص رابط عرض الكل",
+      "default": "عرض الكل"
+    },
+    {
+      "type": "url",
+      "id": "collection_url",
+      "label": "رابط المجموعة"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "لون خلفية القسم",
+      "default": "#F7F6F2"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النصوص الرئيسية",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "لون التمييز (Accent Color)",
+      "default": "#5B171C"
+    },
+    {
+      "type": "header",
+      "content": "نظام الألوان التلقائي للبطاقات"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_auto_colors",
+      "label": "تغيير ألوان البطاقات تلقائيًا",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "color_1",
+      "label": "اللون 1",
+      "default": "#FAF9F5"
+    },
+    {
+      "type": "color",
+      "id": "color_2",
+      "label": "اللون 2",
+      "default": "#F5F6F0"
+    },
+    {
+      "type": "color",
+      "id": "color_3",
+      "label": "اللون 3",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "color_4",
+      "label": "اللون 4",
+      "default": "#F0F3F6"
+    },
+    {
+      "type": "color",
+      "id": "color_5",
+      "label": "اللون 5",
+      "default": "#F0F5F4"
+    },
+    {
+      "type": "color",
+      "id": "fixed_card_bg",
+      "label": "خلفية البطاقات الثابتة (في حال إيقاف التلقائي)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "إعدادات بطاقة المنتج"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "إظهار اسم المؤلف / الفنان",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_year",
+      "label": "إظهار سنة الإصدار",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_button",
+      "label": "إظهار زر الإضافة للسلة (+)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "إعدادات العرض والأبعاد"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "أقصى عرض للقسم",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1300
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "المسافة بين البطاقات داخل المقطع",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "slide_gap",
+      "label": "المسافة بين الشرائح (Slides)",
+      "min": 12,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "استدارة زوايا البطاقات",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "إظهار نقاط الترقيم (Pagination Dots)",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "dots_margin_top",
+      "label": "مسافة النقاط من الأعلى",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "label": "الحشوة العمودية للقسم",
+      "min": 16,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "الحشوة الأفقية للقسم",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "الهامش العلوي",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "الهامش السفلي",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "شريحة (Slide)",
+      "settings": [
+        {
+          "type": "header",
+          "content": "البطاقة الترويجية الكبيرة (Editorial)"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "الشارة العلوية (Label)",
+          "default": "مختارات هذا الأسبوع"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "العنوان الرئيسي",
+          "default": "أشياء تستحق أن تُحفظ."
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "الوصف",
+          "default": "قطع نادرة وقصص لا تُنسى"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "نص زر الاكتشاف",
+          "default": "اكتشف المزيد"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "رابط زر الاكتشاف"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "صورة داخلية للبطاقة"
+        },
+        {
+          "type": "image_picker",
+          "id": "bg_image",
+          "label": "صورة خلفية للبطاقة"
+        },
+        {
+          "type": "color",
+          "id": "card_bg_color",
+          "label": "لون خلفية البطاقة الترويجية",
+          "default": "#5B171C"
+        },
+        {
+          "type": "color",
+          "id": "card_text_color",
+          "label": "لون النص في البطاقة الترويجية",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "card_accent_color",
+          "label": "لون زر/رابط الترويج",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "label": "شفافية طبقة التظليل",
+          "min": 0,
+          "max": 90,
+          "step": 5,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "لون طبقة التظليل",
+          "default": "#000000"
+        },
+        {
+          "type": "header",
+          "content": "المنتجات المصاحبة"
+        },
+        {
+          "type": "product",
+          "id": "product_1",
+          "label": "المنتج الأول (العلوي)"
+        },
+        {
+          "type": "product",
+          "id": "product_2",
+          "label": "المنتج الثاني (السفلي)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "مختارات هذا الأسبوع",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "label": "مختارات هذا الأسبوع",
+            "heading": "أشياء تستحق أن تُحفظ.",
+            "description": "قطع نادرة، قصص لا تُنسى.",
+            "cta_text": "اكتشف المزيد"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "إصدارات نادرة",
+            "heading": "للقراء الذين لا يمرون سريعًا.",
+            "description": "عناوين وكتب قيمة تم اختيارها بعناية.",
+            "cta_text": "تصفح الكتب"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
