@@ -49,7 +49,7 @@
         "ai_gen_block_38acc1d_HGz7KD": {
           "type": "ai_gen_block_38acc1d",
           "settings": {
-            "title": "مختارات هذا الأسبوع",
+            "title": "مختارات الأسبوع",
             "subtitle": "قطع نادرة وقصص مميزة",
             "block_title_size": 32,
             "subtitle_size": 13,
@@ -74,10 +74,10 @@
               "باك-مزيج-قديم"
             ],
             "editorial_width": 300,
-            "editorial_label": "مختارات هذا الأسبوع",
-            "editorial_heading": "أشياء تستحق أن تُحفظ.",
+            "editorial_label": "",
+            "editorial_heading": "أشياء تستحق أن تُحفظ",
             "editorial_heading_size": 24,
-            "editorial_desc": "قطع نادرة، قصص لا تُنسى.",
+            "editorial_desc": "قطع نادرة .. قصص لا تُنسى",
             "editorial_cta_text": "اكتشف المزيد",
             "editorial_cta_url": "",
             "editorial_bg_color": "#2695D5",
