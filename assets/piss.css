@@ -30,9 +30,14 @@
    GLOBAL DIRECTION & TYPOGRAPHY
    ============================================================ */
 
-html {
+html[dir="rtl"] {
   direction: rtl;
   text-align: right;
+}
+
+html[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
 }
 
 body,
@@ -41,7 +46,7 @@ p, span, a, button, input,
 textarea, select, label,
 .h0, .h1, .h2, .h3, .h4, .h5 {
   font-family: var(--font-body) !important;
-  direction: rtl;
+  /* direction inherited from html[dir] */
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -2914,162 +2919,115 @@ body:has(#FacetFiltersForm .facets__display:not([style*="display: none"])) .sect
 
 /* ============================================================
    6. تبديل اتجاه الموقع مع اللغة (RTL ↔ LTR)
+   المبدأ: RTL هو الافتراضي، LTR هو الاستثناء
    ============================================================ */
 
-/* الإعداد الافتراضي: عربي = RTL */
-html {
+/* RTL - Default */
+html[dir="rtl"] {
   direction: rtl;
   text-align: right;
 }
 
-/* عند اختيار لغة LTR (إنجليزي وغيره) */
-html[lang="en"],
-html[lang="fr"],
-html[lang="de"],
-html[lang="es"],
-html[lang="it"],
-html[lang="pt"],
-html[lang="nl"],
-html[lang="ru"],
-html[lang="tr"],
-html[lang="ja"],
-html[lang="ko"],
-html[lang="zh"] {
+html[dir="rtl"] body,
+html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3,
+html[dir="rtl"] p, html[dir="rtl"] span, html[dir="rtl"] a,
+html[dir="rtl"] button, html[dir="rtl"] input {
+  direction: rtl;
+}
+
+/* LTR - Exception */
+html[dir="ltr"] {
   direction: ltr !important;
   text-align: left !important;
 }
 
-html[lang="en"] body,
-html[lang="fr"] body,
-html[lang="de"] body,
-html[lang="es"] body,
-html[lang="it"] body,
-html[lang="pt"] body,
-html[lang="nl"] body,
-html[lang="ru"] body {
+html[dir="ltr"] body {
   direction: ltr !important;
   text-align: left !important;
 }
 
-/* ── الهيدر في LTR ── */
-html[lang="en"] .hf-header,
-html[lang="fr"] .hf-header,
-html[lang="de"] .hf-header {
+/* ── Header in LTR ── */
+html[dir="ltr"] .hf-header {
   direction: ltr !important;
 }
 
-html[lang="en"] .hf-header__top,
-html[lang="fr"] .hf-header__top,
-html[lang="de"] .hf-header__top {
-  flex-direction: row-reverse !important; /* الشعار يسار، السلة يمين */
+html[dir="ltr"] .hf-header__top {
+  flex-direction: row-reverse !important; /* Logo left, cart right */
 }
 
-html[lang="en"] .hf-header__nav,
-html[lang="fr"] .hf-header__nav,
-html[lang="de"] .hf-header__nav {
+html[dir="ltr"] .hf-header__nav {
   direction: ltr !important;
   justify-content: flex-start !important;
 }
 
-html[lang="en"] .hf-nav-link::after,
-html[lang="fr"] .hf-nav-link::after,
-html[lang="de"] .hf-nav-link::after {
+html[dir="ltr"] .hf-nav-link::after {
   right: auto !important;
   left: 13px !important;
 }
 
-/* ── Sections عامة في LTR ── */
-html[lang="en"] .card__information,
-html[lang="en"] .card__content,
-html[lang="en"] .card__heading,
-html[lang="fr"] .card__information,
-html[lang="fr"] .card__content,
-html[lang="fr"] .card__heading {
+/* ── General Sections in LTR ── */
+html[dir="ltr"] .card__information,
+html[dir="ltr"] .card__content,
+html[dir="ltr"] .card__heading {
   direction: ltr !important;
   text-align: left !important;
 }
 
-html[lang="en"] .price,
-html[lang="fr"] .price {
+html[dir="ltr"] .price {
   direction: ltr !important;
 }
 
-/* ── Section Hero / Banner / Slideshow في LTR ── */
-html[lang="en"] .banner__content,
-html[lang="en"] .slideshow__content,
-html[lang="en"] .image-banner__content,
-html[lang="en"] [class*="section"] .rte,
-html[lang="fr"] .banner__content,
-html[lang="fr"] [class*="section"] .rte {
+/* ── Hero / Banner / Slideshow in LTR ── */
+html[dir="ltr"] .banner__content,
+html[dir="ltr"] .slideshow__content,
+html[dir="ltr"] .image-banner__content,
+html[dir="ltr"] [class*="section"] .rte {
   direction: ltr !important;
   text-align: left !important;
 }
 
-/* ── أسهم في LTR: إعادة الاتجاه الطبيعي ── */
-html[lang="en"] .icon-arrow,
-html[lang="fr"] .icon-arrow {
+/* ── Arrows in LTR ── */
+html[dir="ltr"] .icon-arrow,
+html[dir="ltr"] .pagination__item .icon-arrow,
+html[dir="ltr"] .slider-button--prev .icon,
+html[dir="ltr"] .slider-button--next .icon {
   transform: none !important;
 }
 
-html[lang="en"] .pagination__item .icon-arrow,
-html[lang="fr"] .pagination__item .icon-arrow {
-  transform: none !important;
-}
-
-html[lang="en"] .slider-button--prev .icon,
-html[lang="fr"] .slider-button--prev .icon {
-  transform: none !important;
-}
-
-html[lang="en"] .slider-button--next .icon,
-html[lang="fr"] .slider-button--next .icon {
-  transform: none !important;
-}
-
-/* ── Facets في LTR ── */
-html[lang="en"] .facets__display,
-html[lang="en"] .facets-wrapper,
-html[lang="fr"] .facets__display {
+/* ── Facets in LTR ── */
+html[dir="ltr"] .facets__display,
+html[dir="ltr"] .facets-wrapper {
   direction: ltr !important;
   text-align: left !important;
 }
 
-/* ── الفوتر في LTR ── */
-html[lang="en"] footer,
-html[lang="en"] .footer,
-html[lang="fr"] footer,
-html[lang="fr"] .footer {
+/* ── Footer in LTR ── */
+html[dir="ltr"] footer,
+html[dir="ltr"] .footer {
   direction: ltr !important;
   text-align: left !important;
 }
 
-/* ── الفورمز والإنبوت في LTR ── */
-html[lang="en"] input,
-html[lang="en"] textarea,
-html[lang="en"] select,
-html[lang="fr"] input,
-html[lang="fr"] textarea,
-html[lang="fr"] select {
+/* ── Forms / Inputs in LTR ── */
+html[dir="ltr"] input,
+html[dir="ltr"] textarea,
+html[dir="ltr"] select {
   direction: ltr !important;
   text-align: left !important;
 }
 
-/* ── Arabic stays RTL ── */
-html[lang="ar"] {
-  direction: rtl !important;
-  text-align: right !important;
-}
-
-html[lang="ar"] .hf-header__top {
+/* ── Arabic header top stays RTL ── */
+html[dir="rtl"] .hf-header__top {
   flex-direction: row !important;
 }
 
-html[lang="ar"] .icon-arrow {
+/* ── Arrows flip in RTL ── */
+html[dir="rtl"] .icon-arrow {
   transform: scaleX(-1) !important;
 }
 
-html[lang="ar"] .slider-button--prev .icon,
-html[lang="ar"] .slider-button--next .icon {
+html[dir="rtl"] .slider-button--prev .icon,
+html[dir="rtl"] .slider-button--next .icon {
   transform: scaleX(-1) !important;
 }
 

@@ -1,14 +1,14 @@
 <!doctype html>
 {%- liquid
   assign locale_code = request.locale.iso_code | downcase | split: '-' | first | default: 'ar'
-  assign rtl_langs = 'ar,he,fa,ur'
-  assign is_rtl = false
-  if rtl_langs contains locale_code
-    assign is_rtl = true
+  assign ltr_langs = 'en,fr,de,es,it,pt,nl,ru,tr,ja,ko,zh'
+  assign is_rtl = true
+  if ltr_langs contains locale_code
+    assign is_rtl = false
   endif
-  assign page_dir = 'ltr'
-  if is_rtl
-    assign page_dir = 'rtl'
+  assign page_dir = 'rtl'
+  if is_rtl == false
+    assign page_dir = 'ltr'
   endif
 -%}
 <html dir="{{ page_dir }}" lang="{{ locale_code }}">
