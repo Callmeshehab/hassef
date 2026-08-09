@@ -408,26 +408,14 @@ html[dir="ltr"] .hf-logo-img-scrolled { right: auto; left: 0; }
   padding: 0 14px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 2px;
   overflow-x: auto;
   scrollbar-width: none;
   scroll-behavior: smooth;
-  direction: rtl;
-  /* Animation properties */
-  transition:
-    top var(--hf-duration) var(--hf-transition),
-    left var(--hf-duration) var(--hf-transition),
-    right var(--hf-duration) var(--hf-transition),
-    transform var(--hf-duration) var(--hf-transition),
-    opacity var(--hf-duration) var(--hf-transition),
-    border-color var(--hf-duration) var(--hf-transition),
-    padding var(--hf-duration) var(--hf-transition),
-    margin-bottom var(--hf-duration) var(--hf-transition);
   will-change: transform, opacity;
   position: relative;
   z-index: 1;
-  /* Ensure no height collapse using height animation instead of display */
   max-height: 50px;
   overflow: hidden;
   transition:
@@ -437,10 +425,15 @@ html[dir="ltr"] .hf-logo-img-scrolled { right: auto; left: 0; }
     max-height var(--hf-duration) var(--hf-transition);
 }
 
+/* Arabic: nav starts from right */
+html[dir="rtl"] .hf-header__nav {
+  direction: rtl;
+}
+
+/* English: nav starts from left */
 html[dir="ltr"] .hf-header__nav,
 [dir="ltr"] .hf-header__nav {
-  direction: ltr !important;
-  justify-content: flex-start !important;
+  direction: ltr;
 }
 .hf-header__nav::-webkit-scrollbar { display: none; }
 
@@ -1137,13 +1130,9 @@ html[dir="ltr"] .hf-mobile-drawer__link { direction: ltr; text-align: left; }
         {%- if shop.customer_accounts_enabled -%}
           <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="hf-btn-login">
             {%- if customer -%}
-              {%- if request.locale.iso_code == 'ar' -%}حسابي{%- else -%}{{ 'customer.account.title' | t | default: 'My Account' }}{%- endif -%}
+              {{ 'customer.account.title' | t }}
             {%- else -%}
-              {%- if request.locale.iso_code == 'ar' -%}
-                تسجيل الدخول
-              {%- else -%}
-                Log in
-              {%- endif -%}
+              {{ 'customer.login.title' | t }}
             {%- endif -%}
           </a>
         {%- endif -%}

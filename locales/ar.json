@@ -4609,5 +4609,13 @@
   },
   "newsletter": {
     "label": "بريد إلكتروني"
+  },
+  "customer": {
+    "login": {
+      "title": "تسجيل الدخول"
+    },
+    "account": {
+      "title": "حسابي"
+    }
   }
 }
