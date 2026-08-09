@@ -775,6 +775,7 @@
         "customer_validation_error": "أدخل بريدًا إلكترونيًا أو رقم طلب صحيحًا.",
         "customer_validation_error_phone": "أدخل رقم هاتف أو رقم طلب صحيح.",
         "login": "تسجيل الدخول",
+
         "unfulfilled_items_title": "الاستعداد للشحن",
         "unfulfilled_items_description": "نقوم حاليًا بتجهيز هذه المنتجات للشحن.",
         "marker": {
