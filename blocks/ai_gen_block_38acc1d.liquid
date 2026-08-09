@@ -1,1275 +1,940 @@
 {% doc %}
   @prompt
-    بلوك عرض منتجات مينيمل فاخر — Apple Design Language
-    Fully bilingual (AR/EN), responsive, schema-rich, premium micro-animations
+    مختارات هذا الأسبوع — Apple Editorial & Product Showcase Block
+    Large Editorial Card + 2 Stacked Product Cards Carousel
 {% enddoc %}
 
 {%- assign ai_gen_id = block.id | replace: '_', '' | downcase -%}
 {%- assign is_rtl = request.locale.iso_code | default: 'ar' -%}
-{%- assign card_aspect = block.settings.card_aspect_ratio -%}
-
-{%- capture shop_btn_label -%}
-  {%- if is_rtl == 'ar' -%}{{ block.settings.cta_label_ar | default: 'تسوق الآن' }}{%- else -%}{{ block.settings.cta_label_en | default: 'Shop Now' }}{%- endif -%}
-{%- endcapture -%}
-
-{%- capture empty_msg -%}
-  {%- if is_rtl == 'ar' -%}أضف منتجاتك لعرضها هنا{%- else -%}Add products to display here{%- endif -%}
-{%- endcapture -%}
 
 {% style %}
-
-/* ─── KEYFRAMES ─────────────────────────────────────────── */
-@keyframes apb-fade-up-{{ ai_gen_id }} {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-@keyframes apb-shimmer-{{ ai_gen_id }} {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0;  }
-}
-@keyframes apb-dot-pulse-{{ ai_gen_id }} {
-  0%, 100% { transform: scale(1);   opacity: 0.4; }
-  50%       { transform: scale(1.4); opacity: 1;   }
-}
-
-/* ─── SECTION WRAPPER ───────────────────────────────────── */
-.apb-section-{{ ai_gen_id }} {
+/* ── MAIN BLOCK WRAPPER ── */
+.wp-block-{{ ai_gen_id }} {
   display: block;
-  width: {{ block.settings.section_width }}%;
+  width: {{ block.settings.block_width_percent }}%;
   max-width: 100%;
-  margin: {{ block.settings.section_margin_v }}px auto;
-  padding: {{ block.settings.padding_v }}px {{ block.settings.padding_h }}px;
-  background: {{ block.settings.background_color }};
-  border-radius: {{ block.settings.section_radius }}px;
+  margin: {{ block.settings.margin_top }}px auto {{ block.settings.margin_bottom }}px;
+  padding: {{ block.settings.padding_vertical }}px {{ block.settings.padding_horizontal }}px;
+  background-color: {{ block.settings.background_color }};
+  border-radius: {{ block.settings.block_radius }}px;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-               "Helvetica Neue", "IBM Plex Sans Arabic", "Segoe UI", Arial, sans-serif;
+  direction: {{ request.locale.iso_code | default: 'ar' | replace: 'ar', 'rtl' | replace: 'en', 'ltr' }};
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
 }
 
-/* subtle grain texture overlay */
-{% if block.settings.show_grain %}
-.apb-section-{{ ai_gen_id }}::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  border-radius: inherit;
-  z-index: 0;
-}
-{% endif %}
-
-/* ─── SECTION HEADER ────────────────────────────────────── */
-.apb-header-{{ ai_gen_id }} {
+/* Header */
+.wp-header-{{ ai_gen_id }} {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   margin-bottom: {{ block.settings.header_gap }}px;
   padding: 0 2px;
+}
+
+.wp-titles-{{ ai_gen_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wp-subtitle-{{ ai_gen_id }} {
+  font-size: {{ block.settings.subtitle_size }}px;
+  font-weight: 600;
+  color: {{ block.settings.accent_color }};
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.wp-title-{{ ai_gen_id }} {
+  font-size: {{ block.settings.title_size }}px;
+  font-weight: 700;
+  color: {{ block.settings.title_color }};
+  margin: 0;
+  line-height: 1.2;
+}
+
+.wp-view-all-{{ ai_gen_id }} {
+  font-size: 14px;
+  font-weight: 600;
+  color: {{ block.settings.accent_color }};
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.wp-view-all-{{ ai_gen_id }}:hover {
+  opacity: 0.8;
+}
+
+/* ── CAROUSEL TRACK ── */
+.wp-carousel-container-{{ ai_gen_id }} {
   position: relative;
+  width: 100%;
+}
+
+.wp-track-{{ ai_gen_id }} {
+  display: flex;
+  gap: {{ block.settings.slide_gap }}px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0 12px;
+}
+
+.wp-track-{{ ai_gen_id }}::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── SLIDE GROUP (Editorial + 2 Stacked Products) ── */
+.wp-slide-{{ ai_gen_id }} {
+  flex: 0 0 100%;
+  max-width: 100%;
+  scroll-snap-align: start;
+  display: grid;
+  grid-template-columns: calc(48% - ({{ block.settings.card_gap }}px / 2)) calc(52% - ({{ block.settings.card_gap }}px / 2));
+  gap: {{ block.settings.card_gap }}px;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 750px) {
+  .wp-slide-{{ ai_gen_id }} {
+    flex: 0 0 calc(50% - ({{ block.settings.slide_gap }}px / 2));
+    max-width: calc(50% - ({{ block.settings.slide_gap }}px / 2));
+  }
+}
+
+@media screen and (min-width: 1100px) {
+  .wp-slide-{{ ai_gen_id }} {
+    flex: 0 0 calc(33.333% - ({{ block.settings.slide_gap }}px * 2 / 3));
+    max-width: calc(33.333% - ({{ block.settings.slide_gap }}px * 2 / 3));
+  }
+}
+
+/* ── LARGE EDITORIAL CARD ── */
+.wp-editorial-card-{{ ai_gen_id }} {
+  position: relative;
+  border-radius: {{ block.settings.card_radius }}px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: {{ block.settings.editorial_padding }}px;
+  box-sizing: border-box;
+  text-decoration: none;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+}
+
+.wp-editorial-card-{{ ai_gen_id }}:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.09);
+}
+
+.wp-editorial-overlay-{{ ai_gen_id }} {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   z-index: 1;
 }
 
-.apb-titles-{{ ai_gen_id }} {
+.wp-editorial-content-{{ ai_gen_id }} {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.apb-eyebrow-{{ ai_gen_id }} {
-  font-size: {{ block.settings.eyebrow_size }}px;
-  font-weight: 600;
-  color: {{ block.settings.eyebrow_color }};
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: apb-fade-up-{{ ai_gen_id }} 0.6s cubic-bezier(0.16,1,0.3,1) 0.05s forwards;
-}
-
-.apb-heading-{{ ai_gen_id }} {
-  font-size: {{ block.settings.heading_size }}px;
-  font-weight: {{ block.settings.heading_weight }};
-  color: {{ block.settings.heading_color }};
-  margin: 0;
-  line-height: 1.18;
-  letter-spacing: -0.025em;
-  opacity: 0;
-  animation: apb-fade-up-{{ ai_gen_id }} 0.65s cubic-bezier(0.16,1,0.3,1) 0.12s forwards;
-}
-
-/* ─── NAV BUTTONS ───────────────────────────────────────── */
-.apb-controls-{{ ai_gen_id }} {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.apb-nav-btn-{{ ai_gen_id }} {
-  width: {{ block.settings.nav_btn_size }}px;
-  height: {{ block.settings.nav_btn_size }}px;
-  border-radius: 50%;
-  background: {{ block.settings.nav_bg }};
-  border: 1px solid rgba(0,0,0,0.09);
-  color: {{ block.settings.nav_icon_color }};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    transform  0.28s cubic-bezier(0.34,1.56,0.64,1),
-    box-shadow 0.28s ease,
-    background 0.2s ease,
-    opacity    0.2s ease;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  outline: none;
-}
-
-.apb-nav-btn-{{ ai_gen_id }}:hover:not(:disabled) {
-  transform: scale(1.1);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-  background: #fff;
-}
-
-.apb-nav-btn-{{ ai_gen_id }}:active:not(:disabled) {
-  transform: scale(0.94);
-}
-
-.apb-nav-btn-{{ ai_gen_id }}:disabled {
-  opacity: 0.25;
-  cursor: default;
-  pointer-events: none;
-}
-
-.apb-nav-btn-{{ ai_gen_id }} svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  flex-shrink: 0;
-}
-
-/* ─── TRACK ─────────────────────────────────────────────── */
-.apb-track-{{ ai_gen_id }} {
-  position: relative;
-  overflow: hidden;
-  margin: 0 -6px;
-  padding: 8px 6px {{ block.settings.card_shadow_space }}px;
-}
-
-/* edge fade masks */
-{% if block.settings.show_edge_fade %}
-.apb-track-{{ ai_gen_id }}::before,
-.apb-track-{{ ai_gen_id }}::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 48px;
-  z-index: 3;
-  pointer-events: none;
-}
-[dir="rtl"] .apb-track-{{ ai_gen_id }}::before,
-.apb-track-{{ ai_gen_id }}::before {
-  right: 0;
-  background: linear-gradient(to left, {{ block.settings.background_color }}, transparent);
-}
-[dir="rtl"] .apb-track-{{ ai_gen_id }}::after,
-.apb-track-{{ ai_gen_id }}::after {
-  left: 0;
-  background: linear-gradient(to right, {{ block.settings.background_color }}, transparent);
-}
-{% endif %}
-
-.apb-rail-{{ ai_gen_id }} {
-  display: flex;
-  gap: {{ block.settings.card_gap }}px;
-  transition: transform 0.65s cubic-bezier(0.16,1,0.3,1);
-  will-change: transform;
-}
-
-/* ─── CARD ───────────────────────────────────────────────── */
-.apb-card-{{ ai_gen_id }} {
-  flex: 0 0 {{ block.settings.card_width }}px;
-  width: {{ block.settings.card_width }}px;
-  background: {{ block.settings.card_bg }};
-  border-radius: {{ block.settings.card_radius }}px;
-  overflow: hidden;
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  border: {{ block.settings.card_border_width }}px solid {{ block.settings.card_border_color }};
-  box-shadow: {{ block.settings.card_shadow }};
-  transition:
-    transform  0.45s cubic-bezier(0.16,1,0.3,1),
-    box-shadow 0.45s cubic-bezier(0.16,1,0.3,1),
-    border-color 0.3s ease;
-  opacity: 0;
-  animation: apb-fade-up-{{ ai_gen_id }} 0.55s cubic-bezier(0.16,1,0.3,1) calc(var(--apb-delay,0) * 1ms) forwards;
-}
-
-.apb-card-{{ ai_gen_id }}:hover {
-  transform: translateY({{ block.settings.card_hover_lift | prepend: '-' }}px) scale(1.015);
-  box-shadow: {{ block.settings.card_shadow_hover }};
-  border-color: rgba(0,0,0,0.1);
-}
-
-.apb-card-{{ ai_gen_id }}:active {
-  transform: translateY(-2px) scale(0.99);
-}
-
-/* ─── BADGE ─────────────────────────────────────────────── */
-.apb-badge-{{ ai_gen_id }} {
-  position: absolute;
-  top: 12px;
-  inset-inline-start: 12px;
-  font-size: 10.5px;
+.wp-editorial-label-{{ ai_gen_id }} {
+  font-size: 11px;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 30px;
-  letter-spacing: 0.01em;
-  z-index: 4;
-  line-height: 1;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.85;
 }
 
-.apb-badge-sale-{{ ai_gen_id }} {
-  background: rgba(255,59,48,0.9);
-  color: #fff;
+.wp-editorial-heading-{{ ai_gen_id }} {
+  font-size: {{ block.settings.editorial_heading_size }}px;
+  font-weight: 700;
+  line-height: 1.22;
+  margin: 0;
+  letter-spacing: -0.015em;
 }
 
-.apb-badge-new-{{ ai_gen_id }} {
-  background: rgba(255,255,255,0.88);
-  color: #1d1d1f;
-  border: 1px solid rgba(0,0,0,0.06);
+.wp-editorial-desc-{{ ai_gen_id }} {
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.9;
+  margin: 0;
 }
 
-/* ─── IMAGE ─────────────────────────────────────────────── */
-.apb-img-wrap-{{ ai_gen_id }} {
+.wp-editorial-img-wrap-{{ ai_gen_id }} {
   position: relative;
+  z-index: 2;
   width: 100%;
-  aspect-ratio: {{ card_aspect }};
-  overflow: hidden;
-  background: {{ block.settings.img_bg }};
-  flex-shrink: 0;
-}
-
-.apb-img-{{ ai_gen_id }} {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: {{ block.settings.img_fit }};
-  object-position: center;
-  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
-  display: block;
-}
-
-.apb-card-{{ ai_gen_id }}:hover .apb-img-{{ ai_gen_id }} {
-  transform: scale({{ block.settings.img_hover_scale }});
-}
-
-/* shimmer placeholder */
-.apb-img-placeholder-{{ ai_gen_id }} {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg,
-    {{ block.settings.img_bg }} 0px,
-    rgba(255,255,255,0.5) 100px,
-    {{ block.settings.img_bg }} 200px);
-  background-size: 400px 100%;
-  animation: apb-shimmer-{{ ai_gen_id }} 1.6s infinite linear;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 10px 0;
 }
 
-.apb-img-placeholder-{{ ai_gen_id }} svg {
-  width: 36%;
-  height: 36%;
-  opacity: 0.15;
+.wp-editorial-img-{{ ai_gen_id }} {
+  max-width: 85%;
+  max-height: 150px;
+  object-fit: contain;
+  transition: transform 0.4s ease;
 }
 
-/* ─── CARD BODY ─────────────────────────────────────────── */
-.apb-body-{{ ai_gen_id }} {
-  padding: {{ block.settings.card_pad_v }}px {{ block.settings.card_pad_h }}px;
+.wp-editorial-card-{{ ai_gen_id }}:hover .wp-editorial-img-{{ ai_gen_id }} {
+  transform: scale(1.06);
+}
+
+.wp-editorial-cta-{{ ai_gen_id }} {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+/* ── STACKED PRODUCTS COLUMN ── */
+.wp-products-col-{{ ai_gen_id }} {
   display: flex;
   flex-direction: column;
+  gap: {{ block.settings.card_gap }}px;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* ── PRODUCT CARD ── */
+.wp-product-card-{{ ai_gen_id }} {
   flex: 1;
-  gap: {{ block.settings.body_gap }}px;
+  border-radius: {{ block.settings.card_radius }}px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  text-decoration: none;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
 }
 
-.apb-vendor-{{ ai_gen_id }} {
-  font-size: {{ block.settings.vendor_size }}px;
-  font-weight: 600;
-  color: {{ block.settings.vendor_color }};
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  line-height: 1;
+.wp-product-card-{{ ai_gen_id }}:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
-.apb-title-{{ ai_gen_id }} {
-  font-size: {{ block.settings.title_size }}px;
-  font-weight: {{ block.settings.title_weight }};
-  color: {{ block.settings.title_color }};
-  line-height: 1.35;
-  letter-spacing: -0.012em;
+.wp-product-header-{{ ai_gen_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.wp-product-title-{{ ai_gen_id }} {
+  font-size: 13px;
+  font-weight: 700;
+  color: #171717;
   margin: 0;
+  line-height: 1.3;
   overflow: hidden;
+  text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: {{ block.settings.title_lines }};
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-/* ─── CARD FOOTER (price + cta) ─────────────────────────── */
-.apb-footer-{{ ai_gen_id }} {
+.wp-product-meta-{{ ai_gen_id }} {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: {{ block.settings.footer_pad_top }}px;
-  {% if block.settings.footer_divider %}
-  border-top: 1px solid rgba(0,0,0,0.06);
-  {% endif %}
+  gap: 6px;
+  font-size: 11px;
+  color: #737373;
+  font-weight: 500;
 }
 
-.apb-price-wrap-{{ ai_gen_id }} {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.apb-price-{{ ai_gen_id }} {
-  font-size: {{ block.settings.price_size }}px;
-  font-weight: 700;
-  color: {{ block.settings.price_color }};
-  letter-spacing: -0.015em;
-  line-height: 1.1;
-}
-
-.apb-compare-{{ ai_gen_id }} {
-  font-size: {{ block.settings.price_size | minus: 2 }}px;
-  color: {{ block.settings.compare_color }};
-  font-weight: 400;
-  text-decoration: line-through;
-  opacity: 0.7;
-}
-
-.apb-cta-{{ ai_gen_id }} {
-  font-size: {{ block.settings.cta_size }}px;
-  font-weight: 600;
-  color: {{ block.settings.cta_color }};
-  background: {{ block.settings.cta_bg }};
-  padding: {{ block.settings.cta_pad_v }}px {{ block.settings.cta_pad_h }}px;
-  border-radius: {{ block.settings.cta_radius }}px;
-  transition:
-    background 0.22s ease,
-    color 0.22s ease,
-    transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  line-height: 1;
-}
-
-.apb-card-{{ ai_gen_id }}:hover .apb-cta-{{ ai_gen_id }} {
-  background: {{ block.settings.cta_hover_bg }};
-  color: {{ block.settings.cta_hover_color }};
-  transform: scale(1.04);
-}
-
-/* ─── DOTS (pagination) ─────────────────────────────────── */
-.apb-dots-{{ ai_gen_id }} {
+.wp-product-img-wrap-{{ ai_gen_id }} {
+  width: 100%;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 20px;
+  margin: 4px 0;
 }
 
-.apb-dot-{{ ai_gen_id }} {
-  width: 6px;
-  height: 6px;
+.wp-product-img-{{ ai_gen_id }} {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.wp-product-card-{{ ai_gen_id }}:hover .wp-product-img-{{ ai_gen_id }} {
+  transform: scale(1.06);
+}
+
+.wp-product-footer-{{ ai_gen_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.wp-product-price-{{ ai_gen_id }} {
+  font-size: 13px;
+  font-weight: 700;
+  color: #171717;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.wp-product-compare-{{ ai_gen_id }} {
+  font-size: 11px;
+  color: #a3a3a3;
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+.wp-add-btn-{{ ai_gen_id }} {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: {{ block.settings.dot_color }};
-  opacity: 0.3;
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1), width 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  color: #171717;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  outline: none;
+}
+
+.wp-add-btn-{{ ai_gen_id }}:hover {
+  background: {{ block.settings.accent_color }};
+  color: #ffffff;
+  border-color: {{ block.settings.accent_color }};
+  transform: scale(1.12);
+}
+
+.wp-add-btn-{{ ai_gen_id }}.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.wp-add-btn-{{ ai_gen_id }}.is-added {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
+}
+
+/* ── PAGINATION DOTS ── */
+.wp-dots-{{ ai_gen_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: {{ block.settings.dots_margin_top }}px;
+}
+
+.wp-dot-{{ ai_gen_id }} {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
   border: none;
   padding: 0;
-  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.apb-dot-{{ ai_gen_id }}.active {
-  opacity: 1;
-  width: 18px;
-  border-radius: 3px;
-  transform: scaleY(1.1);
+.wp-dot-{{ ai_gen_id }}.is-active {
+  background: {{ block.settings.accent_color }};
+  width: 22px;
+  border-radius: 4px;
 }
 
-/* ─── EMPTY STATE ───────────────────────────────────────── */
-.apb-empty-{{ ai_gen_id }} {
-  text-align: center;
-  padding: 64px 24px;
-  color: #86868b;
-  font-size: 15px;
-  letter-spacing: -0.01em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.apb-empty-{{ ai_gen_id }} svg {
-  opacity: 0.2;
-  width: 48px;
-  height: 48px;
-}
-
-/* ─── RESPONSIVE ────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .apb-card-{{ ai_gen_id }} {
-    flex: 0 0 {{ block.settings.card_width_tablet }}px;
-    width: {{ block.settings.card_width_tablet }}px;
+/* Mobile Small Responsive */
+@media screen and (max-width: 480px) {
+  .wp-product-card-{{ ai_gen_id }} {
+    padding: 10px;
+  }
+  .wp-product-title-{{ ai_gen_id }} {
+    font-size: 12px;
+  }
+  .wp-product-img-wrap-{{ ai_gen_id }} {
+    height: 65px;
   }
 }
-
-@media (max-width: 749px) {
-  .apb-section-{{ ai_gen_id }} {
-    padding: {{ block.settings.padding_v | times: 0.7 | round }}px {{ block.settings.padding_h_mobile }}px;
-    border-radius: {{ block.settings.section_radius | times: 0.7 | round }}px;
-    margin: {{ block.settings.section_margin_v | times: 0.5 | round }}px auto;
-  }
-
-  .apb-heading-{{ ai_gen_id }} {
-    font-size: {{ block.settings.heading_size | times: 0.78 | round }}px;
-  }
-
-  .apb-eyebrow-{{ ai_gen_id }} {
-    font-size: {{ block.settings.eyebrow_size | times: 0.92 | round }}px;
-  }
-
-  .apb-card-{{ ai_gen_id }} {
-    flex: 0 0 {{ block.settings.card_width_mobile }}px;
-    width: {{ block.settings.card_width_mobile }}px;
-  }
-
-  .apb-header-{{ ai_gen_id }} {
-    margin-bottom: {{ block.settings.header_gap | times: 0.75 | round }}px;
-  }
-
-  .apb-nav-btn-{{ ai_gen_id }} {
-    width: {{ block.settings.nav_btn_size | minus: 4 }}px;
-    height: {{ block.settings.nav_btn_size | minus: 4 }}px;
-  }
-}
-
-@media (max-width: 480px) {
-  .apb-card-{{ ai_gen_id }} {
-    flex: 0 0 {{ block.settings.card_width_mobile | times: 0.9 | round }}px;
-    width: {{ block.settings.card_width_mobile | times: 0.9 | round }}px;
-  }
-}
-
-/* ─── RTL / LTR DIRECTION ───────────────────────────────── */
-[dir="rtl"] .apb-section-{{ ai_gen_id }},
-.apb-section-{{ ai_gen_id }}[dir="rtl"] {
-  direction: rtl;
-}
-
-[dir="ltr"] .apb-section-{{ ai_gen_id }},
-.apb-section-{{ ai_gen_id }}[dir="ltr"] {
-  direction: ltr;
-}
-
 {% endstyle %}
 
-<apb-showcase-{{ ai_gen_id }}
-  class="apb-section-{{ ai_gen_id }}"
-  dir="{{ request.locale.iso_code | default: 'ar' | replace: 'ar', 'rtl' | replace: 'en', 'ltr' }}"
-  data-card-width="{{ block.settings.card_width }}"
-  data-card-width-tablet="{{ block.settings.card_width_tablet }}"
-  data-card-width-mobile="{{ block.settings.card_width_mobile }}"
-  data-gap="{{ block.settings.card_gap }}"
-  data-visible="{{ block.settings.visible_cards }}"
-  data-visible-tablet="{{ block.settings.visible_cards_tablet }}"
-  data-visible-mobile="{{ block.settings.visible_cards_mobile }}"
-  data-autoplay="{{ block.settings.autoplay }}"
-  data-autoplay-speed="{{ block.settings.autoplay_speed }}"
-  {{ block.shopify_attributes }}
->
-
-  {%- if block.settings.products.count > 0 -%}
-
-    {%- comment -%} ── HEADER ── {%- endcomment -%}
-    <div class="apb-header-{{ ai_gen_id }}">
-      <div class="apb-titles-{{ ai_gen_id }}">
-        {%- if block.settings.eyebrow != blank -%}
-          <span class="apb-eyebrow-{{ ai_gen_id }}">{{ block.settings.eyebrow }}</span>
+<div class="wp-block-{{ ai_gen_id }}" id="WpBlock-{{ ai_gen_id }}">
+  {%- if block.settings.title != blank -%}
+    <div class="wp-header-{{ ai_gen_id }}">
+      <div class="wp-titles-{{ ai_gen_id }}">
+        {%- if block.settings.subtitle != blank -%}
+          <span class="wp-subtitle-{{ ai_gen_id }}">{{ block.settings.subtitle }}</span>
         {%- endif -%}
-        {%- if block.settings.heading != blank -%}
-          <h2 class="apb-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
-        {%- endif -%}
+        <h2 class="wp-title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
       </div>
 
-      <div class="apb-controls-{{ ai_gen_id }}">
-        <button class="apb-nav-btn-{{ ai_gen_id }}" id="apbPrev{{ ai_gen_id }}" aria-label="previous" disabled>
-          <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="apb-nav-btn-{{ ai_gen_id }}" id="apbNext{{ ai_gen_id }}" aria-label="next">
-          <svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-    </div>
-
-    {%- comment -%} ── RAIL ── {%- endcomment -%}
-    <div class="apb-track-{{ ai_gen_id }}">
-      <div class="apb-rail-{{ ai_gen_id }}" id="apbRail{{ ai_gen_id }}">
-        {%- for product in block.settings.products -%}
-          {%- assign card_delay = forloop.index0 | times: 60 | plus: 120 -%}
-          <a
-            href="{{ product.url }}"
-            class="apb-card-{{ ai_gen_id }}"
-            style="--apb-delay: {{ card_delay }}"
-            aria-label="{{ product.title | escape }}"
-          >
-
-            {%- comment -%} Badge {%- endcomment -%}
-            {%- if product.compare_at_price > product.price -%}
-              {%- assign save_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
-              <span class="apb-badge-{{ ai_gen_id }} apb-badge-sale-{{ ai_gen_id }}">−{{ save_pct }}%</span>
-            {%- elsif block.settings.show_new_badge and forloop.index <= block.settings.new_badge_count -%}
-              <span class="apb-badge-{{ ai_gen_id }} apb-badge-new-{{ ai_gen_id }}">
-                {%- if is_rtl == 'ar' -%}{{ block.settings.badge_new_ar | default: 'جديد' }}{%- else -%}{{ block.settings.badge_new_en | default: 'New' }}{%- endif -%}
-              </span>
-            {%- endif -%}
-
-            {%- comment -%} Image {%- endcomment -%}
-            <div class="apb-img-wrap-{{ ai_gen_id }}">
-              {%- if product.featured_image -%}
-                <img
-                  class="apb-img-{{ ai_gen_id }}"
-                  src="{{ product.featured_image | image_url: width: 600 }}"
-                  srcset="
-                    {{ product.featured_image | image_url: width: 400 }} 400w,
-                    {{ product.featured_image | image_url: width: 600 }} 600w,
-                    {{ product.featured_image | image_url: width: 800 }} 800w"
-                  sizes="(max-width:480px) 80vw, (max-width:749px) {{ block.settings.card_width_mobile }}px, {{ block.settings.card_width }}px"
-                  alt="{{ product.featured_image.alt | escape | default: product.title | escape }}"
-                  loading="lazy"
-                  width="600"
-                  height="600"
-                >
-              {%- else -%}
-                <div class="apb-img-placeholder-{{ ai_gen_id }}">
-                  {{ 'product-1' | placeholder_svg_tag }}
-                </div>
-              {%- endif -%}
-            </div>
-
-            {%- comment -%} Card Body {%- endcomment -%}
-            <div class="apb-body-{{ ai_gen_id }}">
-              {%- if block.settings.show_vendor and product.vendor != blank -%}
-                <span class="apb-vendor-{{ ai_gen_id }}">{{ product.vendor }}</span>
-              {%- endif -%}
-
-              <h3 class="apb-title-{{ ai_gen_id }}">{{ product.title }}</h3>
-
-              <div class="apb-footer-{{ ai_gen_id }}">
-                <div class="apb-price-wrap-{{ ai_gen_id }}">
-                  <span class="apb-price-{{ ai_gen_id }}">{{ product.price | money }}</span>
-                  {%- if product.compare_at_price > product.price -%}
-                    <span class="apb-compare-{{ ai_gen_id }}">{{ product.compare_at_price | money }}</span>
-                  {%- endif -%}
-                </div>
-
-                {%- if block.settings.show_cta -%}
-                  <span class="apb-cta-{{ ai_gen_id }}">{{ shop_btn_label | strip }}</span>
-                {%- endif -%}
-              </div>
-            </div>
-
-          </a>
-        {%- endfor -%}
-      </div>
-    </div>
-
-    {%- comment -%} ── DOTS ── {%- endcomment -%}
-    {%- if block.settings.show_dots -%}
-      <div class="apb-dots-{{ ai_gen_id }}" id="apbDots{{ ai_gen_id }}" role="tablist"></div>
-    {%- endif -%}
-
-  {%- else -%}
-    <div class="apb-empty-{{ ai_gen_id }}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5">
-        <rect x="2" y="3" width="20" height="14" rx="3"/><path d="M8 21h8M12 17v4"/>
-      </svg>
-      {{ empty_msg | strip }}
+      {%- if block.settings.show_view_all and block.settings.collection_url != blank -%}
+        <a href="{{ block.settings.collection_url }}" class="wp-view-all-{{ ai_gen_id }}">
+          {{ block.settings.view_all_text | default: 'عرض الكل' }}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+      {%- endif -%}
     </div>
   {%- endif -%}
 
-</apb-showcase-{{ ai_gen_id }}>
+  <div class="wp-carousel-container-{{ ai_gen_id }}">
+    <div class="wp-track-{{ ai_gen_id }}" id="WpTrack-{{ ai_gen_id }}">
+      
+      {%- assign products_list = block.settings.products -%}
+      {%- assign total_products = products_list.count -%}
+      
+      {%- comment -%} Determine number of slides (each slide takes 2 products) {%- endcomment -%}
+      {%- assign slide_count = 2 -%}
+      {%- if total_products > 0 -%}
+        {%- assign slide_count = total_products | divided_by: 2 -%}
+        {%- assign rem = total_products | modulo: 2 -%}
+        {%- if rem > 0 -%}{%- assign slide_count = slide_count | plus: 1 -%}{%- endif -%}
+      {%- endif -%}
+
+      {%- for s in (1..slide_count) -%}
+        {%- assign idx1 = s | minus: 1 | times: 2 -%}
+        {%- assign idx2 = idx1 | plus: 1 -%}
+        {%- assign p1 = products_list[idx1] -%}
+        {%- assign p2 = products_list[idx2] -%}
+
+        {%- comment -%} Auto Color Palette calculation {%- endcomment -%}
+        {%- assign color_idx = s | minus: 1 | modulo: 5 -%}
+        {%- assign card_bg = block.settings.fixed_card_bg -%}
+        {%- if block.settings.enable_auto_colors -%}
+          {%- case color_idx -%}
+            {%- when 0 -%}{%- assign card_bg = block.settings.color_1 -%}
+            {%- when 1 -%}{%- assign card_bg = block.settings.color_2 -%}
+            {%- when 2 -%}{%- assign card_bg = block.settings.color_3 -%}
+            {%- when 3 -%}{%- assign card_bg = block.settings.color_4 -%}
+            {%- when 4 -%}{%- assign card_bg = block.settings.color_5 -%}
+          {%- endcase -%}
+        {%- endif -%}
+
+        <div class="wp-slide-{{ ai_gen_id }}">
+          
+          {%- comment -%} 1) LARGE EDITORIAL CARD {%- endcomment -%}
+          <a
+            href="{{ block.settings.editorial_cta_url | default: '#' }}"
+            class="wp-editorial-card-{{ ai_gen_id }}"
+            style="
+              background-color: {{ block.settings.editorial_bg_color | default: '#5B171C' }};
+              color: {{ block.settings.editorial_text_color | default: '#ffffff' }};
+              {% if block.settings.editorial_bg_image != blank %}background-image: url('{{ block.settings.editorial_bg_image | image_url: width: 800 }}');{% endif %}
+            "
+          >
+            {%- if block.settings.overlay_opacity > 0 -%}
+              <div
+                class="wp-editorial-overlay-{{ ai_gen_id }}"
+                style="background: {{ block.settings.overlay_color | default: '#000000' }}; opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};"
+              ></div>
+            {%- endif -%}
+
+            <div class="wp-editorial-content-{{ ai_gen_id }}">
+              {%- if block.settings.editorial_label != blank -%}
+                <span class="wp-editorial-label-{{ ai_gen_id }}">{{ block.settings.editorial_label }}</span>
+              {%- endif -%}
+              {%- if block.settings.editorial_heading != blank -%}
+                <h3 class="wp-editorial-heading-{{ ai_gen_id }}">{{ block.settings.editorial_heading }}</h3>
+              {%- endif -%}
+              {%- if block.settings.editorial_desc != blank -%}
+                <p class="wp-editorial-desc-{{ ai_gen_id }}">{{ block.settings.editorial_desc }}</p>
+              {%- endif -%}
+            </div>
+
+            {%- if block.settings.editorial_image != blank -%}
+              <div class="wp-editorial-img-wrap-{{ ai_gen_id }}">
+                <img
+                  src="{{ block.settings.editorial_image | image_url: width: 600 }}"
+                  alt="{{ block.settings.editorial_heading | escape }}"
+                  class="wp-editorial-img-{{ ai_gen_id }}"
+                  loading="lazy"
+                >
+              </div>
+            {%- endif -%}
+
+            {%- if block.settings.editorial_cta_text != blank -%}
+              <div class="wp-editorial-cta-{{ ai_gen_id }}" style="color: {{ block.settings.editorial_accent_color | default: '#ffffff' }}">
+                {{ block.settings.editorial_cta_text }}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+              </div>
+            {%- endif -%}
+          </a>
+
+          {%- comment -%} 2) STACKED PRODUCTS COLUMN {%- endcomment -%}
+          <div class="wp-products-col-{{ ai_gen_id }}">
+            
+            {%- for k in (1..2) -%}
+              {%- if k == 1 -%}
+                {%- assign current_p = p1 -%}
+              {%- else -%}
+                {%- assign current_p = p2 -%}
+              {%- endif -%}
+
+              <div
+                class="wp-product-card-{{ ai_gen_id }}"
+                style="background-color: {{ card_bg | default: '#ffffff' }};"
+              >
+                {%- if current_p != blank -%}
+                  <a href="{{ current_p.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                    <div class="wp-product-header-{{ ai_gen_id }}">
+                      <h4 class="wp-product-title-{{ ai_gen_id }}">{{ current_p.title }}</h4>
+                      <div class="wp-product-meta-{{ ai_gen_id }}">
+                        {%- if block.settings.show_vendor and current_p.vendor != blank -%}
+                          <span>{{ current_p.vendor }}</span>
+                        {%- endif -%}
+                        {%- if block.settings.show_year -%}
+                          {%- assign p_year = current_p.metafields.custom.year | default: current_p.metafields.my_fields.year | default: current_p.published_at | date: '%Y' -%}
+                          {%- if p_year != blank -%}
+                            <span>• {{ p_year }}</span>
+                          {%- endif -%}
+                        {%- endif -%}
+                      </div>
+                    </div>
+
+                    <div class="wp-product-img-wrap-{{ ai_gen_id }}">
+                      {%- if current_p.featured_image -%}
+                        <img
+                          src="{{ current_p.featured_image | image_url: width: 400 }}"
+                          alt="{{ current_p.title | escape }}"
+                          class="wp-product-img-{{ ai_gen_id }}"
+                          loading="lazy"
+                        >
+                      {%- else -%}
+                        {{ 'product-1' | placeholder_svg_tag }}
+                      {%- endif -%}
+                    </div>
+
+                    <div class="wp-product-footer-{{ ai_gen_id }}">
+                      <div class="wp-product-price-{{ ai_gen_id }}">
+                        {{ current_p.price | money }}
+                        {%- if current_p.compare_at_price > current_p.price -%}
+                          <span class="wp-product-compare-{{ ai_gen_id }}">{{ current_p.compare_at_price | money }}</span>
+                        {%- endif -%}
+                      </div>
+                  </a>
+                      {%- if block.settings.show_add_button -%}
+                        <button
+                          type="button"
+                          class="wp-add-btn-{{ ai_gen_id }}"
+                          data-variant-id="{{ current_p.first_available_variant.id }}"
+                          aria-label="إضافة للسلة"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                      {%- endif -%}
+                    </div>
+
+                {%- else -%}
+                  {%- comment -%} Placeholder when no product chosen {%- endcomment -%}
+                  <div class="wp-product-header-{{ ai_gen_id }}">
+                    <h4 class="wp-product-title-{{ ai_gen_id }}">اسم المنتج {{ k }}</h4>
+                    <div class="wp-product-meta-{{ ai_gen_id }}">نجيب محفوظ • 1978</div>
+                  </div>
+                  <div class="wp-product-img-wrap-{{ ai_gen_id }}">
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  </div>
+                  <div class="wp-product-footer-{{ ai_gen_id }}">
+                    <div class="wp-product-price-{{ ai_gen_id }}">350 ج.م</div>
+                    <button type="button" class="wp-add-btn-{{ ai_gen_id }}">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                  </div>
+                {%- endif -%}
+              </div>
+
+            {%- endfor -%}
+
+          </div>
+
+        </div>
+
+      {%- endfor -%}
+
+    </div>
+
+    {%- if block.settings.show_dots and slide_count > 1 -%}
+      <div class="wp-dots-{{ ai_gen_id }}" id="WpDots-{{ ai_gen_id }}">
+        {%- for s in (1..slide_count) -%}
+          <button
+            type="button"
+            class="wp-dot-{{ ai_gen_id }}{% if forloop.first %} is-active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            aria-label="Slide {{ forloop.index }}"
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
 
 <script>
-(function () {
-  'use strict';
+(function() {
+  const blockId = '{{ ai_gen_id }}';
+  const track = document.getElementById('WpTrack-' + blockId);
+  const dotsContainer = document.getElementById('WpDots-' + blockId);
+  
+  if (!track) return;
 
-  const ID = '{{ ai_gen_id }}';
-
-  class ApbShowcase extends HTMLElement {
-    constructor () {
-      super();
-      this._idx    = 0;
-      this._total  = 0;
-      this._max    = 0;
-      this._vis    = 4;
-      this._w      = 280;
-      this._gap    = 20;
-      this._timer  = null;
-      this._startX = 0;
-      this._dragging = false;
-      this._isRTL  = false;
-    }
-
-    connectedCallback () {
-      this._rail  = this.querySelector(`#apbRail${ID}`);
-      this._prev  = this.querySelector(`#apbPrev${ID}`);
-      this._next  = this.querySelector(`#apbNext${ID}`);
-      this._dotsC = this.querySelector(`#apbDots${ID}`);
-      this._cards = this.querySelectorAll(`.apb-card-${ID}`);
-
-      if (!this._rail || !this._cards.length) return;
-
-      this._total   = this._cards.length;
-      this._isRTL   = this.dir === 'rtl' || getComputedStyle(this).direction === 'rtl';
-      this._autoplay = this.dataset.autoplay === 'true';
-      this._autoSpeed= parseInt(this.dataset.autoplaySpeed, 10) || 4000;
-
-      this._buildDots();
-      this._onResize();
-      this._listen();
-
-      window.addEventListener('resize', () => this._onResize(), { passive: true });
-      if (this._autoplay) this._startAutoplay();
-
-      /* Pause autoplay on hover */
-      this.addEventListener('mouseenter', () => this._stopAutoplay());
-      this.addEventListener('mouseleave', () => { if (this._autoplay) this._startAutoplay(); });
-    }
-
-    disconnectedCallback () { this._stopAutoplay(); }
-
-    _onResize () {
-      const vw = window.innerWidth;
-      if (vw <= 480) {
-        this._w   = parseFloat(this.dataset.cardWidthMobile) * 0.9 || 200;
-        this._vis = parseInt(this.dataset.visibleMobile, 10)  || 1;
-      } else if (vw <= 749) {
-        this._w   = parseFloat(this.dataset.cardWidthMobile)  || 230;
-        this._vis = parseInt(this.dataset.visibleMobile, 10)  || 1;
-      } else if (vw <= 1024) {
-        this._w   = parseFloat(this.dataset.cardWidthTablet)  || 260;
-        this._vis = parseInt(this.dataset.visibleTablet, 10)  || 2;
-      } else {
-        this._w   = parseFloat(this.dataset.cardWidth)        || 280;
-        this._vis = parseInt(this.dataset.visible, 10)        || 4;
-      }
-      this._gap  = parseFloat(this.dataset.gap) || 20;
-      this._max  = Math.max(0, this._total - Math.min(this._vis, this._total));
-      this._idx  = Math.min(this._idx, this._max);
-      this._render();
-    }
-
-    _listen () {
-      this._prev?.addEventListener('click', () => this._go(this._idx - 1));
-      this._next?.addEventListener('click', () => this._go(this._idx + 1));
-
-      /* Touch / Pointer swipe */
-      this._rail.addEventListener('touchstart',   e => this._tStart(e), { passive: true });
-      this._rail.addEventListener('touchend',     e => this._tEnd(e),   { passive: true });
-      this._rail.addEventListener('pointerdown',  e => this._tStart(e), { passive: true });
-      this._rail.addEventListener('pointerup',    e => this._tEnd(e),   { passive: true });
-
-      /* Keyboard */
-      this.setAttribute('tabindex', '0');
-      this.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft')  this._go(this._isRTL ? this._idx + 1 : this._idx - 1);
-        if (e.key === 'ArrowRight') this._go(this._isRTL ? this._idx - 1 : this._idx + 1);
+  // Pagination Dots Sync
+  if (dotsContainer) {
+    const dots = dotsContainer.querySelectorAll('.wp-dot-' + blockId);
+    
+    // Click to scroll
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', () => {
+        const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 300;
+        const gap = {{ block.settings.slide_gap | default: 16 }};
+        track.scrollTo({
+          left: idx * (slideWidth + gap),
+          behavior: 'smooth'
+        });
       });
-    }
+    });
 
-    _tStart (e) {
-      this._startX   = (e.touches?.[0] || e).clientX;
-      this._dragging = true;
-    }
-
-    _tEnd (e) {
-      if (!this._dragging) return;
-      const dx = (e.changedTouches?.[0] || e).clientX - this._startX;
-      if (Math.abs(dx) > 36) {
-        const fwd = this._isRTL ? dx > 0 : dx < 0;
-        this._go(fwd ? this._idx + 1 : this._idx - 1);
-      }
-      this._dragging = false;
-    }
-
-    _go (n) {
-      this._idx = Math.max(0, Math.min(n, this._max));
-      this._render();
-      this._resetAutoplay();
-    }
-
-    _render () {
-      const step   = this._w + this._gap;
-      const offset = this._isRTL ? this._idx * step : -(this._idx * step);
-      this._rail.style.transform = `translateX(${offset}px)`;
-
-      if (this._prev) this._prev.disabled = this._idx === 0;
-      if (this._next) this._next.disabled = this._idx >= this._max;
-
-      this._updateDots();
-    }
-
-    /* ── Dots ── */
-    _buildDots () {
-      if (!this._dotsC || this._total <= 1) return;
-      this._dotsC.innerHTML = '';
-      for (let i = 0; i <= this._max; i++) {
-        const d = document.createElement('button');
-        d.className = `apb-dot-${ID}`;
-        d.setAttribute('role', 'tab');
-        d.setAttribute('aria-label', `${i + 1}`);
-        d.addEventListener('click', () => this._go(i));
-        this._dotsC.appendChild(d);
-      }
-    }
-
-    _updateDots () {
-      if (!this._dotsC) return;
-      this._dotsC.querySelectorAll(`.apb-dot-${ID}`).forEach((d, i) => {
-        d.classList.toggle('active', i === this._idx);
-        d.setAttribute('aria-selected', i === this._idx);
-      });
-    }
-
-    /* ── Autoplay ── */
-    _startAutoplay () {
-      this._stopAutoplay();
-      this._timer = setInterval(() => {
-        this._go(this._idx >= this._max ? 0 : this._idx + 1);
-      }, this._autoSpeed);
-    }
-
-    _stopAutoplay () {
-      if (this._timer) { clearInterval(this._timer); this._timer = null; }
-    }
-
-    _resetAutoplay () {
-      if (this._autoplay) { this._stopAutoplay(); this._startAutoplay(); }
-    }
+    // Scroll listener for active dot
+    let scrollTimeout;
+    track.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 300;
+        const gap = {{ block.settings.slide_gap | default: 16 }};
+        const currentIdx = Math.round(track.scrollLeft / (slideWidth + gap));
+        
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle('is-active', idx === currentIdx);
+        });
+      }, 50);
+    }, { passive: true });
   }
 
-  if (!customElements.get(`apb-showcase-${ID}`)) {
-    customElements.define(`apb-showcase-${ID}`, ApbShowcase);
-  }
+  // AJAX Add to Cart Buttons
+  const addButtons = document.querySelectorAll('#WpBlock-' + blockId + ' .wp-add-btn-' + blockId);
+  addButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const variantId = this.getAttribute('data-variant-id');
+      if (!variantId) return;
+
+      const self = this;
+      self.classList.add('is-loading');
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
+      })
+      .then(res => res.json())
+      .then(data => {
+        self.classList.remove('is-loading');
+        self.classList.add('is-added');
+        setTimeout(() => self.classList.remove('is-added'), 2000);
+
+        if (window.Shopify && Shopify.onItemAdded) {
+          Shopify.onItemAdded(data);
+        }
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: data }));
+        fetch('/cart.js')
+          .then(r => r.json())
+          .then(cart => {
+            const countEl = document.getElementById('hfCartCount');
+            if (countEl) {
+              countEl.textContent = cart.item_count;
+              countEl.style.display = cart.item_count > 0 ? 'inline-flex' : 'none';
+            }
+          }).catch(() => {});
+      })
+      .catch(() => {
+        self.classList.remove('is-loading');
+      });
+    });
+  });
+
 })();
 </script>
 
 {% schema %}
 {
-  "name": "عرض منتجات — Apple Style",
+  "name": "مختارات هذا الأسبوع",
   "settings": [
     {
       "type": "header",
-      "content": "✦ النصوص والعناوين"
+      "content": "العناوين الرئيسية للبلوك"
     },
     {
       "type": "text",
-      "id": "eyebrow",
-      "label": "النص العلوي الصغير (Eyebrow)",
-      "default": "المنتجات المميزة"
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_size",
-      "label": "حجم الـ Eyebrow",
-      "min": 10,
-      "max": 16,
-      "step": 1,
-      "unit": "px",
-      "default": 12
-    },
-    {
-      "type": "color",
-      "id": "eyebrow_color",
-      "label": "لون الـ Eyebrow",
-      "default": "#86868b"
+      "id": "title",
+      "label": "عنوان البلوك",
+      "default": "مختارات هذا الأسبوع"
     },
     {
       "type": "text",
-      "id": "heading",
-      "label": "العنوان الرئيسي",
-      "default": "مصمَّم بعناية."
-    },
-    {
-      "type": "range",
-      "id": "heading_size",
-      "label": "حجم العنوان الرئيسي",
-      "min": 18,
-      "max": 56,
-      "step": 2,
-      "unit": "px",
-      "default": 36
-    },
-    {
-      "type": "select",
-      "id": "heading_weight",
-      "label": "سُمك العنوان",
-      "options": [
-        { "value": "400", "label": "عادي" },
-        { "value": "500", "label": "متوسط" },
-        { "value": "600", "label": "شبه عريض" },
-        { "value": "700", "label": "عريض" },
-        { "value": "800", "label": "أعرض" }
-      ],
-      "default": "700"
-    },
-    {
-      "type": "color",
-      "id": "heading_color",
-      "label": "لون العنوان",
-      "default": "#1d1d1f"
-    },
-    {
-      "type": "range",
-      "id": "header_gap",
-      "label": "مسافة العنوان عن البطاقات",
-      "min": 12,
-      "max": 56,
-      "step": 4,
-      "unit": "px",
-      "default": 28
-    },
-    {
-      "type": "header",
-      "content": "✦ المنتجات"
-    },
-    {
-      "type": "product_list",
-      "id": "products",
-      "label": "قائمة المنتجات",
-      "limit": 12
-    },
-    {
-      "type": "header",
-      "content": "✦ عدد البطاقات المرئية"
-    },
-    {
-      "type": "range",
-      "id": "visible_cards",
-      "label": "ديسكتوب ( >1024px )",
-      "min": 2,
-      "max": 6,
-      "step": 1,
-      "default": 4
-    },
-    {
-      "type": "range",
-      "id": "visible_cards_tablet",
-      "label": "تابلت ( 750–1024px )",
-      "min": 1,
-      "max": 4,
-      "step": 1,
-      "default": 3
-    },
-    {
-      "type": "range",
-      "id": "visible_cards_mobile",
-      "label": "موبايل ( <750px )",
-      "min": 1,
-      "max": 3,
-      "step": 1,
-      "default": 1
-    },
-    {
-      "type": "header",
-      "content": "✦ أبعاد البطاقة"
-    },
-    {
-      "type": "range",
-      "id": "card_width",
-      "label": "عرض البطاقة — ديسكتوب",
-      "min": 180,
-      "max": 480,
-      "step": 10,
-      "unit": "px",
-      "default": 280
-    },
-    {
-      "type": "range",
-      "id": "card_width_tablet",
-      "label": "عرض البطاقة — تابلت",
-      "min": 160,
-      "max": 380,
-      "step": 10,
-      "unit": "px",
-      "default": 250
-    },
-    {
-      "type": "range",
-      "id": "card_width_mobile",
-      "label": "عرض البطاقة — موبايل",
-      "min": 140,
-      "max": 320,
-      "step": 10,
-      "unit": "px",
-      "default": 240
-    },
-    {
-      "type": "select",
-      "id": "card_aspect_ratio",
-      "label": "نسبة ارتفاع الصورة",
-      "options": [
-        { "value": "1 / 1",   "label": "مربع (1:1)" },
-        { "value": "4 / 3",   "label": "أفقي (4:3)" },
-        { "value": "3 / 4",   "label": "عمودي (3:4)" },
-        { "value": "16 / 9",  "label": "سينمائي (16:9)" },
-        { "value": "5 / 6",   "label": "طولي (5:6)" }
-      ],
-      "default": "1 / 1"
-    },
-    {
-      "type": "range",
-      "id": "card_gap",
-      "label": "المسافة بين البطاقات",
-      "min": 8,
-      "max": 48,
-      "step": 4,
-      "unit": "px",
-      "default": 20
-    },
-    {
-      "type": "range",
-      "id": "card_radius",
-      "label": "استدارة زوايا البطاقة",
-      "min": 0,
-      "max": 36,
-      "step": 2,
-      "unit": "px",
-      "default": 20
-    },
-    {
-      "type": "header",
-      "content": "✦ ألوان وحدود البطاقة"
-    },
-    {
-      "type": "color",
-      "id": "card_bg",
-      "label": "خلفية البطاقة",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "card_border_color",
-      "label": "لون حدود البطاقة",
-      "default": "rgba(0,0,0,0.06)"
-    },
-    {
-      "type": "range",
-      "id": "card_border_width",
-      "label": "سُمك حدود البطاقة",
-      "min": 0,
-      "max": 3,
-      "step": 1,
-      "unit": "px",
-      "default": 1
-    },
-    {
-      "type": "text",
-      "id": "card_shadow",
-      "label": "ظل البطاقة (CSS box-shadow)",
-      "default": "0 4px 24px rgba(0,0,0,0.04)"
-    },
-    {
-      "type": "text",
-      "id": "card_shadow_hover",
-      "label": "ظل البطاقة عند التمرير",
-      "default": "0 20px 48px rgba(0,0,0,0.10)"
-    },
-    {
-      "type": "range",
-      "id": "card_hover_lift",
-      "label": "ارتفاع البطاقة عند التمرير",
-      "min": 0,
-      "max": 16,
-      "step": 1,
-      "unit": "px",
-      "default": 8
-    },
-    {
-      "type": "range",
-      "id": "card_shadow_space",
-      "label": "مساحة الـ overflow للظل",
-      "min": 8,
-      "max": 32,
-      "step": 4,
-      "unit": "px",
-      "default": 16
-    },
-    {
-      "type": "header",
-      "content": "✦ الصورة"
-    },
-    {
-      "type": "color",
-      "id": "img_bg",
-      "label": "خلفية منطقة الصورة",
-      "default": "#f5f5f7"
-    },
-    {
-      "type": "select",
-      "id": "img_fit",
-      "label": "ملاءمة الصورة",
-      "options": [
-        { "value": "cover",   "label": "تغطية (cover)"   },
-        { "value": "contain", "label": "احتواء (contain)" },
-        { "value": "fill",    "label": "ملء (fill)"       }
-      ],
-      "default": "cover"
-    },
-    {
-      "type": "select",
-      "id": "img_hover_scale",
-      "label": "تكبير الصورة عند التمرير",
-      "options": [
-        { "value": "1",    "label": "بلا تكبير" },
-        { "value": "1.03", "label": "خفيف جداً (3%)" },
-        { "value": "1.05", "label": "خفيف (5%)"      },
-        { "value": "1.08", "label": "متوسط (8%)"     },
-        { "value": "1.12", "label": "ظاهر (12%)"     }
-      ],
-      "default": "1.05"
-    },
-    {
-      "type": "header",
-      "content": "✦ نصوص البطاقة"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_vendor",
-      "label": "إظهار اسم المورد",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "vendor_size",
-      "label": "حجم اسم المورد",
-      "min": 9,
-      "max": 14,
-      "step": 1,
-      "unit": "px",
-      "default": 11
-    },
-    {
-      "type": "color",
-      "id": "vendor_color",
-      "label": "لون اسم المورد",
-      "default": "#86868b"
+      "id": "subtitle",
+      "label": "العنوان الفرعي",
+      "default": "قطع نادرة وقصص مميزة"
     },
     {
       "type": "range",
       "id": "title_size",
-      "label": "حجم اسم المنتج",
-      "min": 12,
-      "max": 22,
-      "step": 1,
+      "label": "حجم العنوان الرئيسي",
+      "min": 20,
+      "max": 48,
+      "step": 2,
       "unit": "px",
-      "default": 15
+      "default": 32
     },
     {
-      "type": "select",
-      "id": "title_weight",
-      "label": "سُمك اسم المنتج",
-      "options": [
-        { "value": "400", "label": "عادي"       },
-        { "value": "500", "label": "متوسط"      },
-        { "value": "600", "label": "شبه عريض"   },
-        { "value": "700", "label": "عريض"       }
-      ],
-      "default": "600"
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم العنوان الفرعي",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
     },
     {
       "type": "color",
       "id": "title_color",
-      "label": "لون اسم المنتج",
-      "default": "#1d1d1f"
-    },
-    {
-      "type": "range",
-      "id": "title_lines",
-      "label": "عدد سطور الاسم",
-      "min": 1,
-      "max": 4,
-      "step": 1,
-      "default": 2
-    },
-    {
-      "type": "header",
-      "content": "✦ السعر"
-    },
-    {
-      "type": "range",
-      "id": "price_size",
-      "label": "حجم السعر",
-      "min": 12,
-      "max": 22,
-      "step": 1,
-      "unit": "px",
-      "default": 15
+      "label": "لون العنوان",
+      "default": "#171717"
     },
     {
       "type": "color",
-      "id": "price_color",
-      "label": "لون السعر",
-      "default": "#1d1d1f"
-    },
-    {
-      "type": "color",
-      "id": "compare_color",
-      "label": "لون السعر القديم",
-      "default": "#86868b"
-    },
-    {
-      "type": "header",
-      "content": "✦ محتوى البطاقة (Padding)"
-    },
-    {
-      "type": "range",
-      "id": "card_pad_v",
-      "label": "حشوة داخلية عمودية",
-      "min": 8,
-      "max": 32,
-      "step": 2,
-      "unit": "px",
-      "default": 16
-    },
-    {
-      "type": "range",
-      "id": "card_pad_h",
-      "label": "حشوة داخلية أفقية",
-      "min": 8,
-      "max": 32,
-      "step": 2,
-      "unit": "px",
-      "default": 18
-    },
-    {
-      "type": "range",
-      "id": "body_gap",
-      "label": "مسافة بين عناصر البطاقة",
-      "min": 4,
-      "max": 24,
-      "step": 2,
-      "unit": "px",
-      "default": 10
-    },
-    {
-      "type": "range",
-      "id": "footer_pad_top",
-      "label": "مسافة السعر/CTA عن الأعلى",
-      "min": 4,
-      "max": 24,
-      "step": 2,
-      "unit": "px",
-      "default": 10
+      "id": "accent_color",
+      "label": "لون التمييز (Accent Color)",
+      "default": "#5B171C"
     },
     {
       "type": "checkbox",
-      "id": "footer_divider",
-      "label": "خط فاصل فوق السعر",
-      "default": false
-    },
-    {
-      "type": "header",
-      "content": "✦ زر الشراء (CTA)"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_cta",
-      "label": "إظهار زر الشراء",
+      "id": "show_view_all",
+      "label": "إظهار رابط 'عرض الكل'",
       "default": true
     },
     {
       "type": "text",
-      "id": "cta_label_ar",
-      "label": "نص الزر — عربي",
-      "default": "تسوق"
+      "id": "view_all_text",
+      "label": "نص رابط عرض الكل",
+      "default": "عرض الكل"
+    },
+    {
+      "type": "url",
+      "id": "collection_url",
+      "label": "رابط المجموعة"
+    },
+    {
+      "type": "header",
+      "content": "قائمة المنتجات"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "اختيار المنتجات",
+      "limit": 12
+    },
+    {
+      "type": "header",
+      "content": "البطاقة الترويجية الكبيرة (Editorial)"
     },
     {
       "type": "text",
-      "id": "cta_label_en",
-      "label": "نص الزر — إنجليزي",
-      "default": "Shop"
+      "id": "editorial_label",
+      "label": "الشارة العلوية للبطاقة الكبيرة",
+      "default": "مختارات هذا الأسبوع"
+    },
+    {
+      "type": "text",
+      "id": "editorial_heading",
+      "label": "عنوان البطاقة الكبيرة",
+      "default": "أشياء تستحق أن تُحفظ."
     },
     {
       "type": "range",
-      "id": "cta_size",
-      "label": "حجم خط الزر",
-      "min": 10,
-      "max": 15,
-      "step": 1,
+      "id": "editorial_heading_size",
+      "label": "حجم عنوان البطاقة الكبيرة",
+      "min": 16,
+      "max": 36,
+      "step": 2,
       "unit": "px",
-      "default": 12
+      "default": 24
+    },
+    {
+      "type": "textarea",
+      "id": "editorial_desc",
+      "label": "وصف البطاقة الكبيرة",
+      "default": "قطع نادرة، قصص لا تُنسى."
+    },
+    {
+      "type": "text",
+      "id": "editorial_cta_text",
+      "label": "نص زر الإكتشاف",
+      "default": "اكتشف المزيد"
+    },
+    {
+      "type": "url",
+      "id": "editorial_cta_url",
+      "label": "رابط زر الإكتشاف"
+    },
+    {
+      "type": "image_picker",
+      "id": "editorial_image",
+      "label": "صورة داخلية للبطاقة الكبيرة"
+    },
+    {
+      "type": "image_picker",
+      "id": "editorial_bg_image",
+      "label": "صورة خلفية للبطاقة الكبيرة"
     },
     {
       "type": "color",
-      "id": "cta_color",
-      "label": "لون نص الزر",
-      "default": "#0071e3"
+      "id": "editorial_bg_color",
+      "label": "لون خلفية البطاقة الكبيرة",
+      "default": "#5B171C"
     },
     {
       "type": "color",
-      "id": "cta_bg",
-      "label": "خلفية الزر",
-      "default": "rgba(0,113,227,0.09)"
+      "id": "editorial_text_color",
+      "label": "لون النص في البطاقة الكبيرة",
+      "default": "#FFFFFF"
     },
     {
       "type": "color",
-      "id": "cta_hover_color",
-      "label": "لون نص الزر عند التمرير",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "cta_hover_bg",
-      "label": "خلفية الزر عند التمرير",
-      "default": "#0071e3"
+      "id": "editorial_accent_color",
+      "label": "لون التمييز في البطاقة الكبيرة",
+      "default": "#FFFFFF"
     },
     {
       "type": "range",
-      "id": "cta_pad_v",
-      "label": "حشوة الزر عمودي",
-      "min": 4,
-      "max": 14,
-      "step": 1,
-      "unit": "px",
-      "default": 7
+      "id": "overlay_opacity",
+      "label": "شفافية طبقة التظليل",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "لون طبقة التظليل",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "نظام الألوان التلقائي لبطاقات المنتجات"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_auto_colors",
+      "label": "تغيير ألوان البطاقات تلقائيًا",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "color_1",
+      "label": "اللون 1",
+      "default": "#FAF9F5"
+    },
+    {
+      "type": "color",
+      "id": "color_2",
+      "label": "اللون 2",
+      "default": "#F5F6F0"
+    },
+    {
+      "type": "color",
+      "id": "color_3",
+      "label": "اللون 3",
+      "default": "#F9F6F0"
+    },
+    {
+      "type": "color",
+      "id": "color_4",
+      "label": "اللون 4",
+      "default": "#F0F3F6"
+    },
+    {
+      "type": "color",
+      "id": "color_5",
+      "label": "اللون 5",
+      "default": "#F0F5F4"
+    },
+    {
+      "type": "color",
+      "id": "fixed_card_bg",
+      "label": "خلفية البطاقات الثابتة",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "إعدادات بطاقة المنتج"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "إظهار اسم المؤلف / الفنان",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_year",
+      "label": "إظهار سنة الإصدار",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_add_button",
+      "label": "إظهار زر الإضافة للسلة (+)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد والحشوات"
     },
     {
       "type": "range",
-      "id": "cta_pad_h",
-      "label": "حشوة الزر أفقي",
+      "id": "block_width_percent",
+      "label": "عرض البلوك الكلي",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "المسافة بين البطاقات داخل المقطع",
       "min": 8,
       "max": 24,
       "step": 2,
@@ -1278,200 +943,116 @@
     },
     {
       "type": "range",
-      "id": "cta_radius",
-      "label": "استدارة زوايا الزر",
-      "min": 0,
-      "max": 30,
+      "id": "slide_gap",
+      "label": "المسافة بين الشرائح (Slides)",
+      "min": 12,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "استدارة زوايا البطاقات",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "editorial_padding",
+      "label": "حشوة البطاقة الكبيرة",
+      "min": 12,
+      "max": 36,
       "step": 2,
       "unit": "px",
       "default": 20
     },
     {
-      "type": "header",
-      "content": "✦ الشارات (Badges)"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_new_badge",
-      "label": "إظهار شارة 'جديد'",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "new_badge_count",
-      "label": "عدد البطاقات التي تحمل شارة جديد",
-      "min": 1,
-      "max": 6,
-      "step": 1,
-      "default": 1
-    },
-    {
-      "type": "text",
-      "id": "badge_new_ar",
-      "label": "نص شارة جديد — عربي",
-      "default": "جديد"
-    },
-    {
-      "type": "text",
-      "id": "badge_new_en",
-      "label": "نص شارة جديد — إنجليزي",
-      "default": "New"
-    },
-    {
-      "type": "header",
-      "content": "✦ أزرار التنقل"
-    },
-    {
-      "type": "range",
-      "id": "nav_btn_size",
-      "label": "حجم زر التنقل",
-      "min": 28,
-      "max": 56,
-      "step": 2,
-      "unit": "px",
-      "default": 38
-    },
-    {
-      "type": "color",
-      "id": "nav_bg",
-      "label": "خلفية زر التنقل",
-      "default": "rgba(255,255,255,0.90)"
-    },
-    {
-      "type": "color",
-      "id": "nav_icon_color",
-      "label": "لون سهم التنقل",
-      "default": "#1d1d1f"
-    },
-    {
-      "type": "header",
-      "content": "✦ نقاط التنقل (Dots)"
-    },
-    {
       "type": "checkbox",
       "id": "show_dots",
-      "label": "إظهار نقاط التنقل",
+      "label": "إظهار نقاط الترقيم (Pagination Dots)",
       "default": true
     },
     {
-      "type": "color",
-      "id": "dot_color",
-      "label": "لون نقاط التنقل",
-      "default": "#1d1d1f"
-    },
-    {
-      "type": "header",
-      "content": "✦ التشغيل التلقائي"
-    },
-    {
-      "type": "checkbox",
-      "id": "autoplay",
-      "label": "تشغيل تلقائي",
-      "default": false
-    },
-    {
       "type": "range",
-      "id": "autoplay_speed",
-      "label": "مدة كل شريحة (ميلي ثانية)",
-      "min": 2000,
-      "max": 8000,
-      "step": 500,
-      "unit": "ms",
-      "default": 4000
-    },
-    {
-      "type": "header",
-      "content": "✦ القسم الخارجي"
-    },
-    {
-      "type": "range",
-      "id": "section_width",
-      "label": "عرض القسم",
-      "min": 50,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "default": 100
-    },
-    {
-      "type": "range",
-      "id": "section_margin_v",
-      "label": "هامش عمودي خارجي",
-      "min": 0,
-      "max": 80,
+      "id": "dots_margin_top",
+      "label": "مسافة النقاط من الأعلى",
+      "min": 8,
+      "max": 32,
       "step": 4,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding_v",
-      "label": "حشوة داخلية عمودية",
-      "min": 16,
-      "max": 100,
-      "step": 4,
-      "unit": "px",
-      "default": 48
-    },
-    {
-      "type": "range",
-      "id": "padding_h",
-      "label": "حشوة داخلية أفقية — ديسكتوب",
-      "min": 0,
-      "max": 80,
-      "step": 4,
-      "unit": "px",
-      "default": 32
-    },
-    {
-      "type": "range",
-      "id": "padding_h_mobile",
-      "label": "حشوة داخلية أفقية — موبايل",
-      "min": 0,
-      "max": 40,
-      "step": 2,
       "unit": "px",
       "default": 16
     },
     {
       "type": "range",
-      "id": "section_radius",
-      "label": "استدارة زوايا القسم",
-      "min": 0,
-      "max": 48,
+      "id": "padding_vertical",
+      "label": "الحشوة العمودية للبلوك",
+      "min": 16,
+      "max": 80,
       "step": 4,
       "unit": "px",
-      "default": 24
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "الحشوة الأفقية للبلوك",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "الهامش العلوي للبلوك",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "الهامش السفلي للبلوك",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 16
     },
     {
       "type": "color",
       "id": "background_color",
-      "label": "لون خلفية القسم",
-      "default": "#f5f5f7"
+      "label": "لون خلفية البلوك",
+      "default": "#F7F6F2"
     },
     {
-      "type": "header",
-      "content": "✦ تأثيرات إضافية"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_grain",
-      "label": "تأثير الحبيبات (Grain Texture)",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "show_edge_fade",
-      "label": "تلاشي الحواف (Edge Fade)",
-      "default": true
+      "type": "range",
+      "id": "block_radius",
+      "label": "استدارة زوايا البلوك الكلي",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 24
     }
   ],
   "presets": [
     {
-      "name": "عرض منتجات — Apple Style",
+      "name": "مختارات هذا الأسبوع (أبل أنيق)",
       "settings": {
-        "heading": "مصمَّم بعناية.",
-        "eyebrow": "المنتجات المميزة"
+        "title": "مختارات هذا الأسبوع",
+        "subtitle": "قطع نادرة وقصص مميزة",
+        "editorial_label": "مختارات هذا الأسبوع",
+        "editorial_heading": "أشياء تستحق أن تُحفظ.",
+        "editorial_desc": "قطع نادرة، قصص لا تُنسى."
       }
     }
   ]
