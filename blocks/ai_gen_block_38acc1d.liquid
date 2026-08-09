@@ -22,8 +22,7 @@
   background-color: {{ block.settings.background_color }};
   border-radius: {{ block.settings.block_radius }}px;
   box-sizing: border-box;
-  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %} !important;
-  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
+  /* Direction and text-align inherited from html[dir] */
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
@@ -80,7 +79,7 @@
 .wp-carousel-container-{{ ai_gen_id }} {
   position: relative;
   width: 100%;
-  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
+  /* Direction inherited */
 }
 
 .wp-track-{{ ai_gen_id }} {
@@ -93,7 +92,7 @@
   scrollbar-width: none;
   padding: 4px 0 12px;
   align-items: stretch;
-  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
+  /* Direction inherited */
 }
 
 .wp-track-{{ ai_gen_id }}::-webkit-scrollbar {
@@ -233,7 +232,7 @@
   flex-direction: column;
   gap: 2px;
   margin-bottom: 6px;
-  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
+  text-align: start !important;
 }
 
 .wp-product-title-{{ ai_gen_id }} {
@@ -249,7 +248,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   visibility: visible !important;
-  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
+  text-align: start !important;
 }
 
 .wp-product-img-wrap-{{ ai_gen_id }} {
@@ -277,7 +276,7 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 6px;
-  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
+  /* Direction inherited */
 }
 
 .wp-product-price-{{ ai_gen_id }} {
@@ -289,7 +288,7 @@
   gap: 4px;
   opacity: 1 !important;
   visibility: visible !important;
-  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
+  text-align: start !important;
 }
 
 .wp-product-compare-{{ ai_gen_id }} {
@@ -763,34 +762,40 @@
   
   if (!track) return;
 
-  // Pagination Dots Sync
+  // Pagination Dots Sync (RTL Safe using IntersectionObserver & scrollIntoView)
   if (dotsContainer) {
-    const dots = dotsContainer.querySelectorAll('.wp-dot-' + blockId);
+    const dots = Array.from(dotsContainer.querySelectorAll('.wp-dot-' + blockId));
+    const slides = Array.from(track.children).filter(child => 
+      child.classList.contains('wp-editorial-card-' + blockId) || 
+      child.classList.contains('wp-products-col-' + blockId)
+    );
     
+    // 1. Click to scroll
     dots.forEach((dot, idx) => {
       dot.addEventListener('click', () => {
-        const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 300;
-        const gap = {{ block.settings.slide_gap | default: 16 }};
-        track.scrollTo({
-          left: idx * (slideWidth + gap * 2),
-          behavior: 'smooth'
-        });
+        if (slides[idx]) {
+          slides[idx].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+        }
       });
     });
 
-    let scrollTimeout;
-    track.addEventListener('scroll', () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 300;
-        const gap = {{ block.settings.slide_gap | default: 16 }};
-        const currentIdx = Math.round(track.scrollLeft / (slideWidth + gap));
-        
-        dots.forEach((dot, idx) => {
-          dot.classList.toggle('is-active', idx === currentIdx);
-        });
-      }, 50);
-    }, { passive: true });
+    // 2. Observe scrolling to update dots
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const slideIdx = slides.indexOf(entry.target);
+          if (slideIdx !== -1 && dots[slideIdx]) {
+            dots.forEach(d => d.classList.remove('is-active'));
+            dots[slideIdx].classList.add('is-active');
+          }
+        }
+      });
+    }, {
+      root: track,
+      threshold: 0.5 // trigger when 50% of the slide is visible
+    });
+
+    slides.forEach(slide => observer.observe(slide));
   }
 
   // AJAX Add to Cart Buttons

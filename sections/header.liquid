@@ -94,7 +94,6 @@
   -webkit-backdrop-filter: blur(var(--hf-blur)) saturate(180%);
   border-bottom: 1px solid var(--hf-border, rgba(0,0,0,0.08));
   font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
-  direction: rtl !important;
   position: relative;
   will-change: backdrop-filter, background;
   transition:
@@ -425,25 +424,7 @@ html[dir="ltr"] .hf-logo-img-scrolled { right: auto; left: 0; }
     max-height var(--hf-duration) var(--hf-transition);
 }
 
-/* Arabic & RTL: nav starts from right */
-html[dir="rtl"] .hf-header__nav,
-body[dir="rtl"] .hf-header__nav,
-.hf-header__nav[dir="rtl"] {
-  direction: rtl !important;
-  justify-content: flex-start !important;
-}
-html[dir="rtl"] .hf-header__nav .hf-nav-link:first-child,
-body[dir="rtl"] .hf-header__nav .hf-nav-link:first-child {
-  margin-right: 0 !important;
-}
-
-/* English & LTR: nav starts from left */
-html[dir="ltr"] .hf-header__nav,
-body[dir="ltr"] .hf-header__nav,
-.hf-header__nav[dir="ltr"] {
-  direction: ltr !important;
-  justify-content: flex-start !important;
-}
+/* Direction inheritance handles flex-start automatically (starts right in RTL, left in LTR) */
 .hf-header__nav::-webkit-scrollbar { display: none; }
 
 .hf-nav-link {
