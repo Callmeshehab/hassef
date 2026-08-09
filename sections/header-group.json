@@ -1,1 +1,175 @@
-{"name":"t:sections.header.name","type":"header","sections":{"announcement-bar":{"type":"announcement-bar","blocks":{"announcement-bar-0":{"type":"announcement","settings":{"text":"مرحباً بك في الحصيف !","link":""}}},"block_order":["announcement-bar-0"],"settings":{"auto_rotate":false,"change_slides_speed":5,"color_scheme":"scheme-4","show_line_separator":true,"show_social":false,"enable_country_selector":false,"enable_language_selector":false}},"header":{"type":"header","custom_css":[],"settings":{"header_bg":"#f2efdd","header_border":"#e0dbd0","logo_color":"#111111","nav_color":"#555555","nav_hover_bg":"#e0dbd0","btn_login_bg":"#ffffff","btn_login_text":"#111111","btn_login_border":"#cccccc","btn_cart_bg":"#710c31","btn_cart_text":"#ffffff","cart_label":"السلة","badge_bg":"#c8a030","badge_text":"#ffffff","logo_size_desktop":80,"logo_size_mobile":60,"btn_radius":12,"logo_text_ltr":"","hide_search":false,"hide_login":false,"hide_cart":false,"hide_nav":false,"menu":"main-menu","search_placeholder":"ابحث عن منتج أو قسم...","enable_predictive_search":false,"products_title":"منتجات مقترحة","show_categories_section":false,"categories_title":"الأقسام","category_title_1":"1","category_url_1":"","category_title_2":"2","category_url_2":"","category_title_3":"3","category_url_3":"","category_title_4":"4","category_url_4":"","category_title_5":"5","category_url_5":"","category_title_6":"6","category_url_6":"","category_title_7":"7","category_url_7":"","category_title_8":"8","category_url_8":"","category_title_9":"9","category_url_9":"","category_title_10":"10","category_url_10":"","show_artists_section":false,"artists_title":"تصفح حسب الفنانين","artist_collections":[],"sticky_header_type":"always","color_scheme":"","margin_bottom":0,"logo_position":"middle-left","menu_type_desktop":"drawer"}},"1771529522a11ad311":{"type":"apps","settings":{"include_margins":true}},"177152955188c9555d":{"type":"_blocks","blocks":{"ai_gen_block_428489d_KWkBjG":{"type":"ai_gen_block_428489d","settings":{"radio_name":"إذاعة الحصيف","volume":70,"static_volume":30,"station_1_name":"المحطة الأولى","station_1_file":"https:\/\/cdn.shopify.com\/s\/files\/1\/0976\/1321\/8111\/files\/1752618580.mp3?v=1774649598","station_2_name":"المحطة الثانية","station_2_file":"https:\/\/cdn.shopify.com\/s\/files\/1\/0976\/1321\/8111\/files\/7elo_neji_ya_-_-1230328843.mp3?v=1774649599","station_3_name":"المحطة الثالثة","station_3_file":"https:\/\/cdn.shopify.com\/s\/files\/1\/0976\/1321\/8111\/files\/534000940.mp3?v=1774705936","station_4_name":"المحطة الرابعة","station_4_file":"https:\/\/cdn.shopify.com\/s\/files\/1\/0976\/1321\/8111\/files\/2147451423.mp3?v=1774706043","station_5_name":"","station_5_file":"","position":"right","bottom_position":30,"side_position":30,"fab_size":60,"fab_background":"#910f3f","fab_icon_color":"#f2efdd","fab_border_color":"#3d081b","fab_border_thickness":2,"panel_width":320,"panel_background":"#f2efdd","panel_text_color":"#3d081b","panel_border_color":"#3d081b","panel_border_thickness":2,"panel_radius":12,"panel_padding":20,"station_background":"#faf9e1","station_hover_background":"#ffffff","station_active_background":"#ffffff","station_border_color":"#3d081b","station_radius":8,"control_button_background":"#faf9e1","control_button_hover_background":"#3d081b","control_button_icon_color":"#3d081b","control_button_border":"#3d081b","title_size":18,"station_name_size":14,"stopped_text":"متوقف","playing_text":"يتم التشغيل","loading_text":"جاري التحميل...","tuning_text":"جاري التنقل...","error_text":"خطأ في التشغيل"},"blocks":{}}},"block_order":["ai_gen_block_428489d_KWkBjG"],"settings":{}}},"order":["announcement-bar","header","1771529522a11ad311","177152955188c9555d"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement-bar-0": {
+          "type": "announcement",
+          "settings": {
+            "text": "مرحباً بك في الحصيف !",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement-bar-0"
+      ],
+      "settings": {
+        "auto_rotate": false,
+        "change_slides_speed": 5,
+        "color_scheme": "scheme-4",
+        "show_line_separator": true,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "custom_css": [],
+      "settings": {
+        "header_bg": "#f2efdd",
+        "header_border": "#e0dbd0",
+        "logo_color": "#111111",
+        "nav_color": "#555555",
+        "nav_hover_bg": "#e0dbd0",
+        "glass_opacity": 82,
+        "glass_blur": 20,
+        "glass_saturate": 180,
+        "btn_login_bg": "#ffffff",
+        "btn_login_text": "#111111",
+        "btn_login_border": "#cccccc",
+        "btn_cart_bg": "#710c31",
+        "btn_cart_text": "#ffffff",
+        "cart_label": "السلة",
+        "badge_bg": "#c8a030",
+        "badge_text": "#ffffff",
+        "logo_size_desktop": 80,
+        "logo_size_mobile": 60,
+        "btn_radius": 12,
+        "logo_text_ltr": "",
+        "hide_search": false,
+        "hide_login": false,
+        "hide_cart": false,
+        "hide_nav": false,
+        "menu": "main-menu",
+        "search_placeholder": "ابحث عن منتج أو قسم...",
+        "search_suggestions": "روايات تاريخية, تطوير الذات, أدب مترجم, أشرطة كاسيت",
+        "enable_predictive_search": false,
+        "products_title": "منتجات مقترحة",
+        "show_categories_section": false,
+        "categories_title": "الأقسام",
+        "category_title_1": "1",
+        "category_url_1": "",
+        "category_title_2": "2",
+        "category_url_2": "",
+        "category_title_3": "3",
+        "category_url_3": "",
+        "category_title_4": "4",
+        "category_url_4": "",
+        "category_title_5": "5",
+        "category_url_5": "",
+        "category_title_6": "6",
+        "category_url_6": "",
+        "category_title_7": "7",
+        "category_url_7": "",
+        "category_title_8": "8",
+        "category_url_8": "",
+        "category_title_9": "9",
+        "category_url_9": "",
+        "category_title_10": "10",
+        "category_url_10": "",
+        "show_artists_section": false,
+        "artists_title": "تصفح حسب الفنانين",
+        "artist_collections": [],
+        "sticky_header_type": "always",
+        "color_scheme": "",
+        "margin_bottom": 0,
+        "logo_position": "middle-left",
+        "menu_type_desktop": "drawer"
+      }
+    },
+    "1771529522a11ad311": {
+      "type": "apps",
+      "settings": {
+        "include_margins": true
+      }
+    },
+    "177152955188c9555d": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_428489d_KWkBjG": {
+          "type": "ai_gen_block_428489d",
+          "settings": {
+            "radio_name": "إذاعة الحصيف",
+            "volume": 70,
+            "static_volume": 30,
+            "station_1_name": "المحطة الأولى",
+            "station_1_file": "https://cdn.shopify.com/s/files/1/0976/1321/8111/files/1752618580.mp3?v=1774649598",
+            "station_2_name": "المحطة الثانية",
+            "station_2_file": "https://cdn.shopify.com/s/files/1/0976/1321/8111/files/7elo_neji_ya_-_-1230328843.mp3?v=1774649599",
+            "station_3_name": "المحطة الثالثة",
+            "station_3_file": "https://cdn.shopify.com/s/files/1/0976/1321/8111/files/534000940.mp3?v=1774705936",
+            "station_4_name": "المحطة الرابعة",
+            "station_4_file": "https://cdn.shopify.com/s/files/1/0976/1321/8111/files/2147451423.mp3?v=1774706043",
+            "station_5_name": "",
+            "station_5_file": "",
+            "position": "right",
+            "bottom_position": 30,
+            "side_position": 30,
+            "fab_size": 60,
+            "fab_background": "#910f3f",
+            "fab_icon_color": "#f2efdd",
+            "fab_border_color": "#3d081b",
+            "fab_border_thickness": 2,
+            "panel_width": 320,
+            "panel_background": "#f2efdd",
+            "panel_text_color": "#3d081b",
+            "panel_border_color": "#3d081b",
+            "panel_border_thickness": 2,
+            "panel_radius": 12,
+            "panel_padding": 20,
+            "station_background": "#faf9e1",
+            "station_hover_background": "#ffffff",
+            "station_active_background": "#ffffff",
+            "station_border_color": "#3d081b",
+            "station_radius": 8,
+            "control_button_background": "#faf9e1",
+            "control_button_hover_background": "#3d081b",
+            "control_button_icon_color": "#3d081b",
+            "control_button_border": "#3d081b",
+            "title_size": 18,
+            "station_name_size": 14,
+            "stopped_text": "متوقف",
+            "playing_text": "يتم التشغيل",
+            "loading_text": "جاري التحميل...",
+            "tuning_text": "جاري التنقل...",
+            "error_text": "خطأ في التشغيل"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_428489d_KWkBjG"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header",
+    "1771529522a11ad311",
+    "177152955188c9555d"
+  ]
+}

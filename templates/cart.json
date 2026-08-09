@@ -1,1 +1,244 @@
-{"sections":{"cart-items":{"type":"main-cart-items","settings":{"color_scheme":"scheme-1","padding_top":0,"padding_bottom":24}},"cart-footer":{"type":"main-cart-footer","blocks":{"subtotal":{"type":"subtotal","settings":{}},"buttons":{"type":"buttons","settings":{}}},"block_order":["subtotal","buttons"],"settings":{"color_scheme":"scheme-1","padding_top":20,"padding_bottom":40}}},"order":["cart-items","cart-footer"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "cart-items": {
+      "type": "main-cart-items",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "padding_top": 0,
+        "padding_bottom": 24
+      }
+    },
+    "cart-footer": {
+      "type": "main-cart-footer",
+      "blocks": {
+        "subtotal": {
+          "type": "subtotal",
+          "settings": {}
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "subtotal",
+        "buttons"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "padding_top": 20,
+        "padding_bottom": 40
+      }
+    },
+    "multicolumn_CbRmiw": {
+      "type": "multicolumn",
+      "blocks": {
+        "artist_wfeDzd": {
+          "type": "artist",
+          "settings": {
+            "name": "وردة الجزائرية",
+            "card_label": "وردة",
+            "description": "أميرة الغناء العربي بصوت خلّد الزمن.",
+            "genre": "طرب",
+            "color": "#910f3f",
+            "preview_audio": "",
+            "collection": "",
+            "collection_url": "",
+            "product_1": "",
+            "product_2": "",
+            "product_3": "",
+            "product_4": ""
+          }
+        },
+        "artist_Uwmnmz": {
+          "type": "artist",
+          "settings": {
+            "name": "عبدالحليم حافظ",
+            "card_label": "العندليب",
+            "description": "العندليب الأسمر وصوت جيل لا يُنسى.",
+            "genre": "طرب",
+            "color": "#7a3b0e",
+            "preview_audio": "",
+            "collection": "",
+            "collection_url": "",
+            "product_1": "",
+            "product_2": "",
+            "product_3": "",
+            "product_4": ""
+          }
+        },
+        "artist_RccRDV": {
+          "type": "artist",
+          "settings": {
+            "name": "فيروز",
+            "card_label": "فيروز",
+            "description": "عندليب الشرق وصوت لبنان الخالد للأبد.",
+            "genre": "كلاسيكي",
+            "color": "#1a3a5c",
+            "preview_audio": "",
+            "collection": "",
+            "collection_url": "",
+            "product_1": "",
+            "product_2": "",
+            "product_3": "",
+            "product_4": ""
+          }
+        },
+        "artist_xfatfL": {
+          "type": "artist",
+          "settings": {
+            "name": "محمد عبده",
+            "card_label": "عبده",
+            "description": "أسطورة الطرب الخليجي وعميد الفن.",
+            "genre": "خليجي",
+            "color": "#4a2c0a",
+            "preview_audio": "",
+            "collection": "",
+            "collection_url": "",
+            "product_1": "",
+            "product_2": "",
+            "product_3": "",
+            "product_4": ""
+          }
+        }
+      },
+      "block_order": [
+        "artist_wfeDzd",
+        "artist_Uwmnmz",
+        "artist_RccRDV",
+        "artist_xfatfL"
+      ],
+      "disabled": true,
+      "name": "🎧 ARC Radio v3.3",
+      "settings": {
+        "eyebrow": "اختر فنانك المفضل",
+        "title_before": "اكتشف",
+        "title_hl": "فنانك",
+        "title_after": "المفضل",
+        "mini_cta_text": "تصفح منتجات مطربك ←",
+        "cta_text": "تصفح المزيد",
+        "prod_link_text": "▶ استمع الآن",
+        "atc_text": "أضف للسلة",
+        "atc_added_text": "تمت الإضافة ✓",
+        "color_bg": "#F2EFDD",
+        "color_primary": "#910F3F",
+        "color_accent": "#3D081B",
+        "color_text": "#3D081B",
+        "color_card_bg": "#FAF9E1",
+        "color_card_border": "#3D081B",
+        "use_artist_color": true,
+        "color_pattern1": "#910F3F",
+        "color_pattern2": "#3D081B",
+        "color_pattern3": "#F9E547",
+        "pattern_h": 7,
+        "pattern_stripe": 10,
+        "sz_eyebrow": 12,
+        "sz_title": 38,
+        "sz_artname": 30,
+        "sz_cardname": 12,
+        "sz_genre": 12,
+        "sz_desc": 13,
+        "sz_minicta": 13,
+        "sz_cta": 15,
+        "sz_prod_name": 12,
+        "sz_prod_price": 14,
+        "sz_prod_link": 12,
+        "sz_atc": 11,
+        "img_fit": "contain",
+        "prod_img_fit": "contain",
+        "prod_img_position": "center",
+        "prod_img_ratio": "100%",
+        "img_h": 60,
+        "center_size": 190,
+        "side_size": 120,
+        "arc_drop": 60,
+        "card_step": 140,
+        "arc_height": 270,
+        "side_opacity": 55,
+        "active_zoom": 105,
+        "ring_inset": 6,
+        "card_border_w": 2,
+        "play_btn_sz": 40,
+        "play_btn_bot": 15,
+        "drag_speed": 100,
+        "friction": 93,
+        "snap_ms": 320,
+        "enable_audio": true,
+        "auto_play": true,
+        "master_vol": 65,
+        "fade_in": 0.7,
+        "fade_out": 0.5,
+        "enable_noise": true,
+        "enable_tick": true,
+        "show_progress": true,
+        "prog_max_w": 280,
+        "prog_h": 3,
+        "prog_knob": 10,
+        "show_genre": true,
+        "show_description": true,
+        "show_products": true,
+        "show_cta": true,
+        "disable_grain": false,
+        "desc_max_w": 400,
+        "prod_count": 4,
+        "prod_min_w": 200,
+        "prod_gap": 14,
+        "prod_radius": 10,
+        "prod_scroll_pb": 8,
+        "prod_h": 280,
+        "sp_section_t": 44,
+        "sp_section_b": 48,
+        "sp_section_h": 16,
+        "sp_section_h_mob": 12,
+        "sp_header_b": 24,
+        "sp_info_t": 20,
+        "sp_info_b": 16,
+        "sp_info_gap": 10,
+        "sp_prod_b": 16,
+        "sp_max_w": 720,
+        "sp_card_name_gap": 8,
+        "sp_card_p": 12,
+        "tape_w": 190,
+        "tape_h": 2,
+        "title_deco_w": 50,
+        "title_deco_h": 2,
+        "title_deco_gap": 18,
+        "cta_bg": "#F9E547",
+        "cta_text_color": "#3D081B",
+        "cta_border_color": "#3D081B",
+        "cta_shadow_color": "#3D081B",
+        "cta_hover_bg": "#910F3F",
+        "cta_hover_text": "#F2EFDD",
+        "cta_radius": 6,
+        "cta_border_w": 2,
+        "cta_shadow_x": 4,
+        "cta_shadow_y": 4,
+        "cta_pv": 15,
+        "cta_ph": 32,
+        "atc_pv": 8,
+        "atc_ph": 12,
+        "cta_pt": 16,
+        "cta_offset_y": 16,
+        "cta_align": "center",
+        "atc_w": 120,
+        "atc_h": 38,
+        "atc_align": "flex-end",
+        "cta_pb": 8
+      }
+    }
+  },
+  "order": [
+    "cart-items",
+    "cart-footer",
+    "multicolumn_CbRmiw"
+  ]
+}
