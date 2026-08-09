@@ -5,9 +5,10 @@
 {% endcomment %}
 
 {%- assign section_id = section.id | replace: '_', '' | replace: '-', '' | downcase -%}
+{%- assign is_rtl = request.locale.iso_code | default: 'ar' -%}
 
 {% style %}
-/* ── SECTION BASE & CONTAINER ── */
+/* ── MAIN SECTION WRAPPER ── */
 .weekly-picks-{{ section_id }} {
   display: block;
   width: 100%;
@@ -19,6 +20,8 @@
   direction: {{ request.locale.iso_code | default: 'ar' | replace: 'ar', 'rtl' | replace: 'en', 'ltr' }};
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Header */
@@ -26,7 +29,8 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: {{ section.settings.header_margin_bottom }}px;
+  margin-bottom: {{ section.settings.header_gap }}px;
+  padding: 0 2px;
 }
 
 .wp-titles-{{ section_id }} {
@@ -67,7 +71,7 @@
 }
 
 /* ── CAROUSEL TRACK ── */
-.wp-carousel-wrapper-{{ section_id }} {
+.wp-carousel-container-{{ section_id }} {
   position: relative;
   width: 100%;
 }
@@ -81,39 +85,18 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 4px 0 12px;
+  align-items: stretch;
 }
 
 .wp-track-{{ section_id }}::-webkit-scrollbar {
   display: none;
 }
 
-/* ── SLIDE ITEM ── */
-.wp-slide-{{ section_id }} {
-  flex: 0 0 100%;
-  max-width: 100%;
-  scroll-snap-align: start;
-  display: grid;
-  grid-template-columns: calc(50% - ({{ section.settings.card_gap }}px / 2)) calc(50% - ({{ section.settings.card_gap }}px / 2));
-  gap: {{ section.settings.card_gap }}px;
-  box-sizing: border-box;
-}
-
-@media screen and (min-width: 750px) {
-  .wp-slide-{{ section_id }} {
-    flex: 0 0 calc(50% - ({{ section.settings.slide_gap }}px / 2));
-    max-width: calc(50% - ({{ section.settings.slide_gap }}px / 2));
-  }
-}
-
-@media screen and (min-width: 1100px) {
-  .wp-slide-{{ section_id }} {
-    flex: 0 0 calc(33.333% - ({{ section.settings.slide_gap }}px * 2 / 3));
-    max-width: calc(33.333% - ({{ section.settings.slide_gap }}px * 2 / 3));
-  }
-}
-
-/* ── EDITORIAL CARD ── */
+/* ── LARGE EDITORIAL CARD (Appears ONLY ONCE at the start) ── */
 .wp-editorial-card-{{ section_id }} {
+  flex: 0 0 {{ section.settings.editorial_width }}px;
+  width: {{ section.settings.editorial_width }}px;
+  scroll-snap-align: start;
   position: relative;
   border-radius: {{ section.settings.card_border_radius }}px;
   overflow: hidden;
@@ -123,7 +106,7 @@
   padding: {{ section.settings.editorial_padding }}px;
   box-sizing: border-box;
   text-decoration: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
   background-size: cover;
   background-position: center;
@@ -131,7 +114,7 @@
 
 .wp-editorial-card-{{ section_id }}:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.09);
 }
 
 .wp-editorial-overlay-{{ section_id }} {
@@ -146,7 +129,7 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .wp-editorial-label-{{ section_id }} {
@@ -158,11 +141,11 @@
 }
 
 .wp-editorial-heading-{{ section_id }} {
-  font-size: 22px;
+  font-size: {{ section.settings.editorial_heading_size }}px;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.22;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .wp-editorial-desc-{{ section_id }} {
@@ -172,25 +155,25 @@
   margin: 0;
 }
 
-.wp-editorial-image-wrap-{{ section_id }} {
+.wp-editorial-img-wrap-{{ section_id }} {
   position: relative;
   z-index: 2;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 12px 0;
+  margin: 10px 0;
 }
 
 .wp-editorial-img-{{ section_id }} {
-  max-width: 80%;
-  max-height: 160px;
+  max-width: 85%;
+  max-height: 150px;
   object-fit: contain;
   transition: transform 0.4s ease;
 }
 
 .wp-editorial-card-{{ section_id }}:hover .wp-editorial-img-{{ section_id }} {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
 .wp-editorial-cta-{{ section_id }} {
@@ -202,11 +185,14 @@
   font-size: 13px;
   font-weight: 600;
   margin-top: auto;
-  padding-top: 12px;
+  padding-top: 8px;
 }
 
-/* ── STACKED PRODUCTS COLUMN ── */
+/* ── STACKED PRODUCTS COLUMN (2 Products Stacked) ── */
 .wp-products-col-{{ section_id }} {
+  flex: 0 0 {{ section.settings.col_width }}px;
+  width: {{ section.settings.col_width }}px;
+  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   gap: {{ section.settings.card_gap }}px;
@@ -217,7 +203,7 @@
 .wp-product-card-{{ section_id }} {
   flex: 1;
   border-radius: {{ section.settings.card_border_radius }}px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -225,8 +211,8 @@
   position: relative;
   text-decoration: none;
   border: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: {{ section.settings.fixed_card_bg }};
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
-  min-height: 160px;
 }
 
 .wp-product-card-{{ section_id }}:hover {
@@ -238,13 +224,12 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .wp-product-title-{{ section_id }} {
-  font-size: 14px;
+  font-size: {{ section.settings.card_title_size }}px;
   font-weight: 700;
-  color: #171717;
   margin: 0;
   line-height: 1.3;
   overflow: hidden;
@@ -254,28 +239,19 @@
   -webkit-box-orient: vertical;
 }
 
-.wp-product-meta-{{ section_id }} {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #737373;
-  font-weight: 500;
-}
-
 .wp-product-img-wrap-{{ section_id }} {
-  width: 100%;
-  height: 85px;
+  width: {{ section.settings.img_width_percent }}%;
+  height: {{ section.settings.img_height }}px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 4px 0;
+  margin: 4px auto;
 }
 
 .wp-product-img-{{ section_id }} {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
+  object-fit: {{ section.settings.img_fit }};
   transition: transform 0.3s ease;
 }
 
@@ -288,13 +264,11 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 4px;
-  padding-top: 4px;
 }
 
 .wp-product-price-{{ section_id }} {
-  font-size: 14px;
+  font-size: {{ section.settings.card_price_size }}px;
   font-weight: 700;
-  color: #171717;
   display: flex;
   align-items: baseline;
   gap: 4px;
@@ -308,8 +282,8 @@
 }
 
 .wp-add-btn-{{ section_id }} {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.12);
   background: #ffffff;
@@ -327,7 +301,7 @@
   background: {{ section.settings.accent_color }};
   color: #ffffff;
   border-color: {{ section.settings.accent_color }};
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
 .wp-add-btn-{{ section_id }}.is-loading {
@@ -339,6 +313,64 @@
   background: #22c55e;
   color: #ffffff;
   border-color: #22c55e;
+}
+
+/* ── BROWSE MORE CARD (Centered Circular Icon Button at End) ── */
+.wp-browse-col-{{ section_id }} {
+  flex: 0 0 160px;
+  width: 160px;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wp-browse-card-{{ section_id }} {
+  width: 100%;
+  height: 100%;
+  border-radius: {{ section.settings.card_border_radius }}px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  color: {{ section.settings.accent_color }};
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.wp-browse-card-{{ section_id }}:hover {
+  transform: scale(1.04);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.wp-browse-circle-{{ section_id }} {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: {{ section.settings.accent_color }};
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.wp-browse-card-{{ section_id }}:hover .wp-browse-circle-{{ section_id }} {
+  transform: scale(1.1);
+}
+
+.wp-browse-title-{{ section_id }} {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  color: #171717;
 }
 
 /* ── PAGINATION DOTS ── */
@@ -367,22 +399,50 @@
   border-radius: 4px;
 }
 
-/* Responsive adjustments */
-@media screen and (max-width: 480px) {
-  .wp-slide-{{ section_id }} {
-    grid-template-columns: calc(50% - ({{ section.settings.card_gap }}px / 2)) calc(50% - ({{ section.settings.card_gap }}px / 2));
+/* Mobile Responsive */
+@media screen and (max-width: 749px) {
+  .wp-editorial-card-{{ section_id }} {
+    flex: 0 0 240px;
+    width: 240px;
   }
-  .wp-product-card-{{ section_id }} {
-    padding: 10px 12px;
-  }
-  .wp-product-title-{{ section_id }} {
-    font-size: 12px;
-  }
-  .wp-product-img-wrap-{{ section_id }} {
-    height: 70px;
+  .wp-products-col-{{ section_id }} {
+    flex: 0 0 220px;
+    width: 220px;
   }
 }
 {% endstyle %}
+
+{%- comment -%} Determine Product Objects (Pickers 1-6 or Product List) {%- endcomment -%}
+{%- assign p1 = section.settings.product_1 | default: section.settings.products[0] -%}
+{%- assign p2 = section.settings.product_2 | default: section.settings.products[1] -%}
+{%- assign p3 = section.settings.product_3 | default: section.settings.products[2] -%}
+{%- assign p4 = section.settings.product_4 | default: section.settings.products[3] -%}
+{%- assign p5 = section.settings.product_5 | default: section.settings.products[4] -%}
+{%- assign p6 = section.settings.product_6 | default: section.settings.products[5] -%}
+
+{%- assign img1 = section.settings.image_1 -%}
+{%- assign img2 = section.settings.image_2 -%}
+{%- assign img3 = section.settings.image_3 -%}
+{%- assign img4 = section.settings.image_4 -%}
+{%- assign img5 = section.settings.image_5 -%}
+{%- assign img6 = section.settings.image_6 -%}
+
+{%- comment -%} Automatic Text Color Cycling per product card {%- endcomment -%}
+{%- assign txt_c1 = section.settings.card_text_color -%}
+{%- assign txt_c2 = section.settings.card_text_color -%}
+{%- assign txt_c3 = section.settings.card_text_color -%}
+{%- assign txt_c4 = section.settings.card_text_color -%}
+{%- assign txt_c5 = section.settings.card_text_color -%}
+{%- assign txt_c6 = section.settings.card_text_color -%}
+
+{%- if section.settings.enable_auto_colors -%}
+  {%- assign txt_c1 = section.settings.color_1 -%}
+  {%- assign txt_c2 = section.settings.color_2 -%}
+  {%- assign txt_c3 = section.settings.color_3 -%}
+  {%- assign txt_c4 = section.settings.color_4 -%}
+  {%- assign txt_c5 = section.settings.color_5 -%}
+  {%- assign txt_c6 = section.settings.color_1 -%}
+{%- endif -%}
 
 <div class="weekly-picks-{{ section_id }}" id="WeeklyPicks-{{ section_id }}">
   {%- if section.settings.title != blank -%}
@@ -403,181 +463,282 @@
     </div>
   {%- endif -%}
 
-  <div class="wp-carousel-wrapper-{{ section_id }}">
+  <div class="wp-carousel-container-{{ section_id }}">
     <div class="wp-track-{{ section_id }}" id="WpTrack-{{ section_id }}">
       
-      {%- for block in section.blocks -%}
-        {%- case block.type -%}
-          {%- when 'slide' -%}
-            
-            {%- comment -%} Determine auto palette color if enabled {%- endcomment -%}
-            {%- assign color_index = forloop.index0 | modulo: 5 -%}
-            {%- assign auto_card_bg = section.settings.fixed_card_bg -%}
-            {%- if section.settings.enable_auto_colors -%}
-              {%- case color_index -%}
-                {%- when 0 -%}{%- assign auto_card_bg = section.settings.color_1 -%}
-                {%- when 1 -%}{%- assign auto_card_bg = section.settings.color_2 -%}
-                {%- when 2 -%}{%- assign auto_card_bg = section.settings.color_3 -%}
-                {%- when 3 -%}{%- assign auto_card_bg = section.settings.color_4 -%}
-                {%- when 4 -%}{%- assign auto_card_bg = section.settings.color_5 -%}
-              {%- endcase -%}
-            {%- endif -%}
+      <!-- 1) EDITORIAL LARGE CARD (Renders ONLY ONCE at the start) -->
+      <a
+        href="{{ section.settings.editorial_cta_url | default: '#' }}"
+        class="wp-editorial-card-{{ section_id }}"
+        style="
+          background-color: {{ section.settings.editorial_bg_color | default: '#5B171C' }};
+          color: {{ section.settings.editorial_text_color | default: '#ffffff' }};
+          {% if section.settings.editorial_bg_image != blank %}background-image: url('{{ section.settings.editorial_bg_image | image_url: width: 800 }}');{% endif %}
+        "
+      >
+        {%- if section.settings.overlay_opacity > 0 -%}
+          <div
+            class="wp-editorial-overlay-{{ section_id }}"
+            style="background: {{ section.settings.overlay_color | default: '#000000' }}; opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"
+          ></div>
+        {%- endif -%}
 
-            <div class="wp-slide-{{ section_id }}" {{ block.shopify_attributes }}>
-              
-              {%- comment -%} 1) EDITORIAL LARGE CARD {%- endcomment -%}
-              <a
-                href="{{ block.settings.cta_url | default: '#' }}"
-                class="wp-editorial-card-{{ section_id }}"
-                style="
-                  background-color: {{ block.settings.card_bg_color | default: '#5B171C' }};
-                  color: {{ block.settings.card_text_color | default: '#ffffff' }};
-                  {% if block.settings.bg_image != blank %}background-image: url('{{ block.settings.bg_image | image_url: width: 800 }}');{% endif %}
-                "
-              >
-                {%- if block.settings.overlay_opacity > 0 -%}
-                  <div
-                    class="wp-editorial-overlay-{{ section_id }}"
-                    style="background: {{ block.settings.overlay_color | default: '#000000' }}; opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};"
-                  ></div>
+        <div class="wp-editorial-content-{{ section_id }}">
+          {%- if section.settings.editorial_label != blank -%}
+            <span class="wp-editorial-label-{{ section_id }}">{{ section.settings.editorial_label }}</span>
+          {%- endif -%}
+          {%- if section.settings.editorial_heading != blank -%}
+            <h3 class="wp-editorial-heading-{{ section_id }}">{{ section.settings.editorial_heading }}</h3>
+          {%- endif -%}
+          {%- if section.settings.editorial_desc != blank -%}
+            <p class="wp-editorial-desc-{{ section_id }}">{{ section.settings.editorial_desc }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.editorial_image != blank -%}
+          <div class="wp-editorial-img-wrap-{{ section_id }}">
+            <img
+              src="{{ section.settings.editorial_image | image_url: width: 600 }}"
+              alt="{{ section.settings.editorial_heading | escape }}"
+              class="wp-editorial-img-{{ section_id }}"
+              loading="lazy"
+            >
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.editorial_cta_text != blank -%}
+          <div class="wp-editorial-cta-{{ section_id }}" style="color: {{ section.settings.editorial_accent_color | default: '#ffffff' }}">
+            {{ section.settings.editorial_cta_text }}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+          </div>
+        {%- endif -%}
+      </a>
+
+      <!-- 2) STACKED COLUMN 1 (Products 1 & 2) -->
+      <div class="wp-products-col-{{ section_id }}">
+        
+        <!-- Product 1 -->
+        <div class="wp-product-card-{{ section_id }}">
+          {%- if p1 != blank -%}
+            <a href="{{ p1.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+              <div class="wp-product-header-{{ section_id }}">
+                <h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c1 }};">{{ p1.title }}</h4>
+              </div>
+              <div class="wp-product-img-wrap-{{ section_id }}">
+                {%- if img1 != blank -%}
+                  <img src="{{ img1 | image_url: width: 400 }}" alt="{{ p1.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- elsif p1.featured_image -%}
+                  <img src="{{ p1.featured_image | image_url: width: 400 }}" alt="{{ p1.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag }}
                 {%- endif -%}
+              </div>
+              <div class="wp-product-footer-{{ section_id }}">
+                <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c1 }};">
+                  {{ p1.price | money }}
+                  {%- if p1.compare_at_price > p1.price -%}<span class="wp-product-compare-{{ section_id }}">{{ p1.compare_at_price | money }}</span>{%- endif -%}
+                </div>
+            </a>
+                {%- if section.settings.show_add_button -%}
+                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p1.first_available_variant.id | default: p1.variants.first.id }}" aria-label="+">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                {%- endif -%}
+              </div>
+          {%- else -%}
+            <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c1 }};">اختر المنتج 1</h4></div>
+            <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-1' | placeholder_svg_tag }}</div>
+            <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c1 }};">350 ج.م</div></div>
+          {%- endif -%}
+        </div>
 
-                <div class="wp-editorial-content-{{ section_id }}">
-                  {%- if block.settings.label != blank -%}
-                    <span class="wp-editorial-label-{{ section_id }}">{{ block.settings.label }}</span>
-                  {%- endif -%}
-                  {%- if block.settings.heading != blank -%}
-                    <h3 class="wp-editorial-heading-{{ section_id }}">{{ block.settings.heading }}</h3>
-                  {%- endif -%}
-                  {%- if block.settings.description != blank -%}
-                    <p class="wp-editorial-desc-{{ section_id }}">{{ block.settings.description }}</p>
+        <!-- Product 2 -->
+        <div class="wp-product-card-{{ section_id }}">
+          {%- if p2 != blank -%}
+            <a href="{{ p2.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+              <div class="wp-product-header-{{ section_id }}">
+                <h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c2 }};">{{ p2.title }}</h4>
+              </div>
+              <div class="wp-product-img-wrap-{{ section_id }}">
+                {%- if img2 != blank -%}
+                  <img src="{{ img2 | image_url: width: 400 }}" alt="{{ p2.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- elsif p2.featured_image -%}
+                  <img src="{{ p2.featured_image | image_url: width: 400 }}" alt="{{ p2.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                {%- else -%}
+                  {{ 'product-2' | placeholder_svg_tag }}
+                {%- endif -%}
+              </div>
+              <div class="wp-product-footer-{{ section_id }}">
+                <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c2 }};">
+                  {{ p2.price | money }}
+                  {%- if p2.compare_at_price > p2.price -%}<span class="wp-product-compare-{{ section_id }}">{{ p2.compare_at_price | money }}</span>{%- endif -%}
+                </div>
+            </a>
+                {%- if section.settings.show_add_button -%}
+                  <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p2.first_available_variant.id | default: p2.variants.first.id }}" aria-label="+">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                {%- endif -%}
+              </div>
+          {%- else -%}
+            <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c2 }};">اختر المنتج 2</h4></div>
+            <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-2' | placeholder_svg_tag }}</div>
+            <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c2 }};">350 ج.م</div></div>
+          {%- endif -%}
+        </div>
+
+      </div>
+
+      <!-- 3) STACKED COLUMN 2 (Products 3 & 4) -->
+      {%- if p3 != blank or p4 != blank or p5 != blank or p6 != blank -%}
+        <div class="wp-products-col-{{ section_id }}">
+          
+          <!-- Product 3 -->
+          <div class="wp-product-card-{{ section_id }}">
+            {%- if p3 != blank -%}
+              <a href="{{ p3.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c3 }};">{{ p3.title }}</h4></div>
+                <div class="wp-product-img-wrap-{{ section_id }}">
+                  {%- if img3 != blank -%}
+                    <img src="{{ img3 | image_url: width: 400 }}" alt="{{ p3.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                  {%- elsif p3.featured_image -%}
+                    <img src="{{ p3.featured_image | image_url: width: 400 }}" alt="{{ p3.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
                   {%- endif -%}
                 </div>
-
-                {%- if block.settings.image != blank -%}
-                  <div class="wp-editorial-image-wrap-{{ section_id }}">
-                    <img
-                      src="{{ block.settings.image | image_url: width: 600 }}"
-                      alt="{{ block.settings.heading | escape }}"
-                      class="wp-editorial-img-{{ section_id }}"
-                      loading="lazy"
-                    >
-                  </div>
-                {%- endif -%}
-
-                {%- if block.settings.cta_text != blank -%}
-                  <div class="wp-editorial-cta-{{ section_id }}" style="color: {{ block.settings.card_accent_color | default: '#ffffff' }}">
-                    {{ block.settings.cta_text }}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
-                  </div>
-                {%- endif -%}
+                <div class="wp-product-footer-{{ section_id }}">
+                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c3 }};">{{ p3.price | money }}</div>
               </a>
-
-              {%- comment -%} 2) STACKED PRODUCTS COLUMN {%- endcomment -%}
-              <div class="wp-products-col-{{ section_id }}">
-                
-                {%- for i in (1..2) -%}
-                  {%- if i == 1 -%}
-                    {%- assign p_obj = block.settings.product_1 -%}
-                  {%- else -%}
-                    {%- assign p_obj = block.settings.product_2 -%}
+                  {%- if section.settings.show_add_button -%}
+                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p3.first_available_variant.id | default: p3.variants.first.id }}" aria-label="+">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
                   {%- endif -%}
+                </div>
+            {%- else -%}
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c3 }};">اختر المنتج 3</h4></div>
+              <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-3' | placeholder_svg_tag }}</div>
+              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c3 }};">150 ج.م</div></div>
+            {%- endif -%}
+          </div>
 
-                  <div
-                    class="wp-product-card-{{ section_id }}"
-                    style="background-color: {{ auto_card_bg | default: '#ffffff' }};"
-                  >
-                    {%- if p_obj != blank -%}
-                      <a href="{{ p_obj.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-                        <div class="wp-product-header-{{ section_id }}">
-                          <h4 class="wp-product-title-{{ section_id }}">{{ p_obj.title }}</h4>
-                          <div class="wp-product-meta-{{ section_id }}">
-                            {%- if section.settings.show_vendor and p_obj.vendor != blank -%}
-                              <span>{{ p_obj.vendor }}</span>
-                            {%- endif -%}
-                            {%- if section.settings.show_year -%}
-                              {%- assign p_year = p_obj.metafields.custom.year | default: p_obj.metafields.my_fields.year | default: p_obj.published_at | date: '%Y' -%}
-                              {%- if p_year != blank -%}
-                                <span>• {{ p_year }}</span>
-                              {%- endif -%}
-                            {%- endif -%}
-                          </div>
-                        </div>
+          <!-- Product 4 -->
+          <div class="wp-product-card-{{ section_id }}">
+            {%- if p4 != blank -%}
+              <a href="{{ p4.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c4 }};">{{ p4.title }}</h4></div>
+                <div class="wp-product-img-wrap-{{ section_id }}">
+                  {%- if img4 != blank -%}
+                    <img src="{{ img4 | image_url: width: 400 }}" alt="{{ p4.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                  {%- elsif p4.featured_image -%}
+                    <img src="{{ p4.featured_image | image_url: width: 400 }}" alt="{{ p4.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                  {%- endif -%}
+                </div>
+                <div class="wp-product-footer-{{ section_id }}">
+                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c4 }};">{{ p4.price | money }}</div>
+              </a>
+                  {%- if section.settings.show_add_button -%}
+                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p4.first_available_variant.id | default: p4.variants.first.id }}" aria-label="+">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                  {%- endif -%}
+                </div>
+            {%- else -%}
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c4 }};">اختر المنتج 4</h4></div>
+              <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-4' | placeholder_svg_tag }}</div>
+              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c4 }};">150 ج.م</div></div>
+            {%- endif -%}
+          </div>
 
-                        <div class="wp-product-img-wrap-{{ section_id }}">
-                          {%- if p_obj.featured_image -%}
-                            <img
-                              src="{{ p_obj.featured_image | image_url: width: 400 }}"
-                              alt="{{ p_obj.title | escape }}"
-                              class="wp-product-img-{{ section_id }}"
-                              loading="lazy"
-                            >
-                          {%- else -%}
-                            {{ 'product-1' | placeholder_svg_tag: 'wp-product-img-' | append: section_id }}
-                          {%- endif -%}
-                        </div>
+        </div>
+      {%- endif -%}
 
-                        <div class="wp-product-footer-{{ section_id }}">
-                          <div class="wp-product-price-{{ section_id }}">
-                            {{ p_obj.price | money }}
-                            {%- if p_obj.compare_at_price > p_obj.price -%}
-                              <span class="wp-product-compare-{{ section_id }}">{{ p_obj.compare_at_price | money }}</span>
-                            {%- endif -%}
-                          </div>
-                      </a>
-                          {%- if section.settings.show_add_button -%}
-                            <button
-                              type="button"
-                              class="wp-add-btn-{{ section_id }}"
-                              data-variant-id="{{ p_obj.first_available_variant.id }}"
-                              aria-label="إضافة للسلة"
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            </button>
-                          {%- endif -%}
-                        </div>
+      <!-- 4) STACKED COLUMN 3 (Products 5 & 6) -->
+      {%- if p5 != blank or p6 != blank -%}
+        <div class="wp-products-col-{{ section_id }}">
+          
+          <!-- Product 5 -->
+          <div class="wp-product-card-{{ section_id }}">
+            {%- if p5 != blank -%}
+              <a href="{{ p5.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c5 }};">{{ p5.title }}</h4></div>
+                <div class="wp-product-img-wrap-{{ section_id }}">
+                  {%- if img5 != blank -%}
+                    <img src="{{ img5 | image_url: width: 400 }}" alt="{{ p5.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                  {%- elsif p5.featured_image -%}
+                    <img src="{{ p5.featured_image | image_url: width: 400 }}" alt="{{ p5.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                  {%- endif -%}
+                </div>
+                <div class="wp-product-footer-{{ section_id }}">
+                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c5 }};">{{ p5.price | money }}</div>
+              </a>
+                  {%- if section.settings.show_add_button -%}
+                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p5.first_available_variant.id | default: p5.variants.first.id }}" aria-label="+">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                  {%- endif -%}
+                </div>
+            {%- else -%}
+              <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c5 }};">اختر المنتج 5</h4></div>
+              <div class="wp-product-img-wrap-{{ section_id }}">{{ 'product-5' | placeholder_svg_tag }}</div>
+              <div class="wp-product-footer-{{ section_id }}"><div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c5 }};">200 ج.م</div></div>
+            {%- endif -%}
+          </div>
 
-                    {%- else -%}
-                      {%- comment -%} Placeholder when no product chosen {%- endcomment -%}
-                      <div class="wp-product-header-{{ section_id }}">
-                        <h4 class="wp-product-title-{{ section_id }}">اسم المنتج {{ i }}</h4>
-                        <div class="wp-product-meta-{{ section_id }}">المؤلف / الفنان • 1978</div>
-                      </div>
-                      <div class="wp-product-img-wrap-{{ section_id }}">
-                        {{ 'product-1' | placeholder_svg_tag }}
-                      </div>
-                      <div class="wp-product-footer-{{ section_id }}">
-                        <div class="wp-product-price-{{ section_id }}">350 ج.م</div>
-                        <button type="button" class="wp-add-btn-{{ section_id }}">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        </button>
-                      </div>
-                    {%- endif -%}
-                  </div>
-
-                {%- endfor -%}
-
-              </div>
-
+          <!-- Product 6 -->
+          {%- if p6 != blank -%}
+            <div class="wp-product-card-{{ section_id }}">
+              <a href="{{ p6.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                <div class="wp-product-header-{{ section_id }}"><h4 class="wp-product-title-{{ section_id }}" style="color: {{ txt_c6 }};">{{ p6.title }}</h4></div>
+                <div class="wp-product-img-wrap-{{ section_id }}">
+                  {%- if img6 != blank -%}
+                    <img src="{{ img6 | image_url: width: 400 }}" alt="{{ p6.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                  {%- elsif p6.featured_image -%}
+                    <img src="{{ p6.featured_image | image_url: width: 400 }}" alt="{{ p6.title | escape }}" class="wp-product-img-{{ section_id }}" loading="lazy" width="400" height="400">
+                  {%- endif -%}
+                </div>
+                <div class="wp-product-footer-{{ section_id }}">
+                  <div class="wp-product-price-{{ section_id }}" style="color: {{ txt_c6 }};">{{ p6.price | money }}</div>
+              </a>
+                  {%- if section.settings.show_add_button -%}
+                    <button type="button" class="wp-add-btn-{{ section_id }}" data-variant-id="{{ p6.first_available_variant.id | default: p6.variants.first.id }}" aria-label="+">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                  {%- endif -%}
+                </div>
             </div>
+          {%- endif -%}
 
-        {%- endcase -%}
-      {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <!-- 5) BROWSE MORE CARD (Centered Circular Icon Button at End) -->
+      <div class="wp-browse-col-{{ section_id }}">
+        <a href="{{ section.settings.collection_url | default: '#' }}" class="wp-browse-card-{{ section_id }}">
+          <div class="wp-browse-circle-{{ section_id }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              {% if is_rtl == 'ar' %}
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              {% else %}
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              {% endif %}
+            </svg>
+          </div>
+          <span class="wp-browse-title-{{ section_id }}">تصفح المزيد</span>
+        </a>
+      </div>
 
     </div>
 
-    {%- if section.settings.show_dots and section.blocks.size > 1 -%}
+    {%- if section.settings.show_dots -%}
       <div class="wp-dots-{{ section_id }}" id="WpDots-{{ section_id }}">
-        {%- for block in section.blocks -%}
-          <button
-            type="button"
-            class="wp-dot-{{ section_id }}{% if forloop.first %} is-active{% endif %}"
-            data-index="{{ forloop.index0 }}"
-            aria-label="Slide {{ forloop.index }}"
-          ></button>
-        {%- endfor -%}
+        <button type="button" class="wp-dot-{{ section_id }} is-active" data-index="0" aria-label="Slide 1"></button>
+        <button type="button" class="wp-dot-{{ section_id }}" data-index="1" aria-label="Slide 2"></button>
+        {%- if p5 != blank or p6 != blank -%}
+          <button type="button" class="wp-dot-{{ section_id }}" data-index="2" aria-label="Slide 3"></button>
+        {%- endif -%}
       </div>
     {%- endif -%}
+
   </div>
 </div>
 
@@ -593,19 +754,17 @@
   if (dotsContainer) {
     const dots = dotsContainer.querySelectorAll('.wp-dot-' + sectionId);
     
-    // Click to scroll
     dots.forEach((dot, idx) => {
       dot.addEventListener('click', () => {
         const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 300;
         const gap = {{ section.settings.slide_gap | default: 16 }};
         track.scrollTo({
-          left: idx * (slideWidth + gap),
+          left: idx * (slideWidth + gap * 2),
           behavior: 'smooth'
         });
       });
     });
 
-    // Scroll listener for active dot
     let scrollTimeout;
     track.addEventListener('scroll', () => {
       clearTimeout(scrollTimeout);
@@ -645,7 +804,6 @@
         self.classList.add('is-added');
         setTimeout(() => self.classList.remove('is-added'), 2000);
 
-        // Refresh cart count or open cart drawer if present
         if (window.Shopify && Shopify.onItemAdded) {
           Shopify.onItemAdded(data);
         }
@@ -677,7 +835,7 @@
   "settings": [
     {
       "type": "header",
-      "content": "إعدادات القسم الرئيسية"
+      "content": "العناوين الرئيسية للقسم"
     },
     {
       "type": "text",
@@ -690,6 +848,38 @@
       "id": "subtitle",
       "label": "العنوان الفرعي",
       "default": "قطع نادرة وقصص مميزة"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان الرئيسي",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم العنوان الفرعي",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "لون التمييز (Accent Color)",
+      "default": "#5B171C"
     },
     {
       "type": "checkbox",
@@ -706,87 +896,266 @@
     {
       "type": "url",
       "id": "collection_url",
-      "label": "رابط المجموعة"
-    },
-    {
-      "type": "color",
-      "id": "section_bg_color",
-      "label": "لون خلفية القسم",
-      "default": "#F7F6F2"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "لون النصوص الرئيسية",
-      "default": "#171717"
-    },
-    {
-      "type": "color",
-      "id": "accent_color",
-      "label": "لون التمييز (Accent Color)",
-      "default": "#5B171C"
+      "label": "رابط المجموعة / تصفح المزيد"
     },
     {
       "type": "header",
-      "content": "نظام الألوان التلقائي للبطاقات"
+      "content": "اختيار المنتجات يدوياً (حتى 6 منتجات مع صورة خاصة لكل منتج)"
+    },
+    {
+      "type": "product",
+      "id": "product_1",
+      "label": "المنتج 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "صورة خاصة للمنتج 1 (اختياري)"
+    },
+    {
+      "type": "product",
+      "id": "product_2",
+      "label": "المنتج 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "صورة خاصة للمنتج 2 (اختياري)"
+    },
+    {
+      "type": "product",
+      "id": "product_3",
+      "label": "المنتج 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "صورة خاصة للمنتج 3 (اختياري)"
+    },
+    {
+      "type": "product",
+      "id": "product_4",
+      "label": "المنتج 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "صورة خاصة للمنتج 4 (اختياري)"
+    },
+    {
+      "type": "product",
+      "id": "product_5",
+      "label": "المنتج 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_5",
+      "label": "صورة خاصة للمنتج 5 (اختياري)"
+    },
+    {
+      "type": "product",
+      "id": "product_6",
+      "label": "المنتج 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_6",
+      "label": "صورة خاصة للمنتج 6 (اختياري)"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "أو اختيار قائمة منتجات مجمعة (Product List)",
+      "limit": 6
+    },
+    {
+      "type": "header",
+      "content": "البطاقة الترويجية الكبيرة (تظهر مرة واحدة فقط في البداية)"
+    },
+    {
+      "type": "range",
+      "id": "editorial_width",
+      "label": "عرض البطاقة الكبيرة (px)",
+      "min": 200,
+      "max": 450,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "text",
+      "id": "editorial_label",
+      "label": "الشارة العلوية للبطاقة الكبيرة",
+      "default": "مختارات هذا الأسبوع"
+    },
+    {
+      "type": "text",
+      "id": "editorial_heading",
+      "label": "عنوان البطاقة الكبيرة",
+      "default": "أشياء تستحق أن تُحفظ."
+    },
+    {
+      "type": "range",
+      "id": "editorial_heading_size",
+      "label": "حجم عنوان البطاقة الكبيرة",
+      "min": 16,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "textarea",
+      "id": "editorial_desc",
+      "label": "وصف البطاقة الكبيرة",
+      "default": "قطع نادرة، قصص لا تُنسى."
+    },
+    {
+      "type": "text",
+      "id": "editorial_cta_text",
+      "label": "نص زر الإكتشاف",
+      "default": "اكتشف المزيد"
+    },
+    {
+      "type": "url",
+      "id": "editorial_cta_url",
+      "label": "رابط زر الإكتشاف"
+    },
+    {
+      "type": "image_picker",
+      "id": "editorial_image",
+      "label": "صورة داخلية للبطاقة الكبيرة"
+    },
+    {
+      "type": "image_picker",
+      "id": "editorial_bg_image",
+      "label": "صورة خلفية للبطاقة الكبيرة"
+    },
+    {
+      "type": "color",
+      "id": "editorial_bg_color",
+      "label": "لون خلفية البطاقة الكبيرة",
+      "default": "#5B171C"
+    },
+    {
+      "type": "color",
+      "id": "editorial_text_color",
+      "label": "لون النص في البطاقة الكبيرة",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "editorial_accent_color",
+      "label": "لون التمييز في البطاقة الكبيرة",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "شفافية طبقة التظليل",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "لون طبقة التظليل",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "نظام الألوان التلقائي لنصوص المنتجات (تطبيق لون النص لكل بطاقة بشكل دوري)"
     },
     {
       "type": "checkbox",
       "id": "enable_auto_colors",
-      "label": "تغيير ألوان البطاقات تلقائيًا",
+      "label": "تغيير لون النص لكل بطاقة بشكل دوري",
       "default": true
     },
     {
       "type": "color",
       "id": "color_1",
-      "label": "اللون 1",
-      "default": "#FAF9F5"
+      "label": "لون النص 1",
+      "default": "#5B171C"
     },
     {
       "type": "color",
       "id": "color_2",
-      "label": "اللون 2",
-      "default": "#F5F6F0"
+      "label": "لون النص 2",
+      "default": "#263A50"
     },
     {
       "type": "color",
       "id": "color_3",
-      "label": "اللون 3",
-      "default": "#F9F6F0"
+      "label": "لون النص 3",
+      "default": "#596044"
     },
     {
       "type": "color",
       "id": "color_4",
-      "label": "اللون 4",
-      "default": "#F0F3F6"
+      "label": "لون النص 4",
+      "default": "#B88632"
     },
     {
       "type": "color",
       "id": "color_5",
-      "label": "اللون 5",
-      "default": "#F0F5F4"
+      "label": "لون النص 5",
+      "default": "#52716F"
     },
     {
       "type": "color",
       "id": "fixed_card_bg",
-      "label": "خلفية البطاقات الثابتة (في حال إيقاف التلقائي)",
+      "label": "لون خلفية بطاقات المنتجات",
       "default": "#FFFFFF"
     },
     {
       "type": "header",
-      "content": "إعدادات بطاقة المنتج"
+      "content": "إعدادات نصوص وأبعاد بطاقة المنتج"
     },
     {
-      "type": "checkbox",
-      "id": "show_vendor",
-      "label": "إظهار اسم المؤلف / الفنان",
-      "default": true
+      "type": "range",
+      "id": "col_width",
+      "label": "عرض عمود منتجين (px)",
+      "min": 180,
+      "max": 350,
+      "step": 10,
+      "unit": "px",
+      "default": 260
     },
     {
-      "type": "checkbox",
-      "id": "show_year",
-      "label": "إظهار سنة الإصدار",
-      "default": true
+      "type": "range",
+      "id": "card_title_size",
+      "label": "حجم عنوان المنتج",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "لون عنوان المنتج الثابت",
+      "default": "#171717"
+    },
+    {
+      "type": "range",
+      "id": "card_price_size",
+      "label": "حجم السعر",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "card_price_color",
+      "label": "لون السعر الثابت",
+      "default": "#171717"
     },
     {
       "type": "checkbox",
@@ -796,7 +1165,41 @@
     },
     {
       "type": "header",
-      "content": "إعدادات العرض والأبعاد"
+      "content": "خيارات أبعاد وصور المنتجات"
+    },
+    {
+      "type": "range",
+      "id": "img_height",
+      "label": "ارتفاع صورة المنتج",
+      "min": 60,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "default": 85
+    },
+    {
+      "type": "range",
+      "id": "img_width_percent",
+      "label": "عرض صورة المنتج (%)",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "img_fit",
+      "label": "طريقة احتواء الصورة",
+      "options": [
+        { "value": "contain", "label": "احتواء كامل (Contain)" },
+        { "value": "cover", "label": "تغطية (Cover)" }
+      ],
+      "default": "contain"
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد والحشوات القسم"
     },
     {
       "type": "range",
@@ -811,7 +1214,7 @@
     {
       "type": "range",
       "id": "card_gap",
-      "label": "المسافة بين البطاقات داخل المقطع",
+      "label": "المسافة بين البطاقات العمودية",
       "min": 8,
       "max": 24,
       "step": 2,
@@ -821,7 +1224,7 @@
     {
       "type": "range",
       "id": "slide_gap",
-      "label": "المسافة بين الشرائح (Slides)",
+      "label": "المسافة بين الأعمدة",
       "min": 12,
       "max": 40,
       "step": 4,
@@ -837,6 +1240,16 @@
       "step": 2,
       "unit": "px",
       "default": 18
+    },
+    {
+      "type": "range",
+      "id": "editorial_padding",
+      "label": "حشوة البطاقة الكبيرة",
+      "min": 12,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20
     },
     {
       "type": "checkbox",
@@ -893,130 +1306,24 @@
       "step": 4,
       "unit": "px",
       "default": 20
-    }
-  ],
-  "blocks": [
+    },
     {
-      "type": "slide",
-      "name": "شريحة (Slide)",
-      "settings": [
-        {
-          "type": "header",
-          "content": "البطاقة الترويجية الكبيرة (Editorial)"
-        },
-        {
-          "type": "text",
-          "id": "label",
-          "label": "الشارة العلوية (Label)",
-          "default": "مختارات هذا الأسبوع"
-        },
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "العنوان الرئيسي",
-          "default": "أشياء تستحق أن تُحفظ."
-        },
-        {
-          "type": "textarea",
-          "id": "description",
-          "label": "الوصف",
-          "default": "قطع نادرة وقصص لا تُنسى"
-        },
-        {
-          "type": "text",
-          "id": "cta_text",
-          "label": "نص زر الاكتشاف",
-          "default": "اكتشف المزيد"
-        },
-        {
-          "type": "url",
-          "id": "cta_url",
-          "label": "رابط زر الاكتشاف"
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "صورة داخلية للبطاقة"
-        },
-        {
-          "type": "image_picker",
-          "id": "bg_image",
-          "label": "صورة خلفية للبطاقة"
-        },
-        {
-          "type": "color",
-          "id": "card_bg_color",
-          "label": "لون خلفية البطاقة الترويجية",
-          "default": "#5B171C"
-        },
-        {
-          "type": "color",
-          "id": "card_text_color",
-          "label": "لون النص في البطاقة الترويجية",
-          "default": "#FFFFFF"
-        },
-        {
-          "type": "color",
-          "id": "card_accent_color",
-          "label": "لون زر/رابط الترويج",
-          "default": "#FFFFFF"
-        },
-        {
-          "type": "range",
-          "id": "overlay_opacity",
-          "label": "شفافية طبقة التظليل",
-          "min": 0,
-          "max": 90,
-          "step": 5,
-          "unit": "%",
-          "default": 0
-        },
-        {
-          "type": "color",
-          "id": "overlay_color",
-          "label": "لون طبقة التظليل",
-          "default": "#000000"
-        },
-        {
-          "type": "header",
-          "content": "المنتجات المصاحبة"
-        },
-        {
-          "type": "product",
-          "id": "product_1",
-          "label": "المنتج الأول (العلوي)"
-        },
-        {
-          "type": "product",
-          "id": "product_2",
-          "label": "المنتج الثاني (السفلي)"
-        }
-      ]
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "لون خلفية القسم",
+      "default": "#F7F6F2"
     }
   ],
   "presets": [
     {
       "name": "مختارات هذا الأسبوع",
-      "blocks": [
-        {
-          "type": "slide",
-          "settings": {
-            "label": "مختارات هذا الأسبوع",
-            "heading": "أشياء تستحق أن تُحفظ.",
-            "description": "قطع نادرة، قصص لا تُنسى.",
-            "cta_text": "اكتشف المزيد"
-          }
-        },
-        {
-          "type": "slide",
-          "settings": {
-            "label": "إصدارات نادرة",
-            "heading": "للقراء الذين لا يمرون سريعًا.",
-            "description": "عناوين وكتب قيمة تم اختيارها بعناية.",
-            "cta_text": "تصفح الكتب"
-          }
-        }
-      ]
+      "settings": {
+        "title": "مختارات هذا الأسبوع",
+        "subtitle": "قطع نادرة وقصص مميزة",
+        "editorial_label": "مختارات هذا الأسبوع",
+        "editorial_heading": "أشياء تستحق أن تُحفظ.",
+        "editorial_desc": "قطع نادرة، قصص لا تُنسى."
+      }
     }
   ]
 }
