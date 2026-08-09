@@ -408,6 +408,7 @@ html[dir="ltr"] .hf-logo-img-scrolled { right: auto; left: 0; }
   padding: 0 14px;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 2px;
   overflow-x: auto;
   scrollbar-width: none;
@@ -437,7 +438,10 @@ html[dir="ltr"] .hf-logo-img-scrolled { right: auto; left: 0; }
 }
 
 html[dir="ltr"] .hf-header__nav,
-[dir="ltr"] .hf-header__nav { direction: ltr !important; }
+[dir="ltr"] .hf-header__nav {
+  direction: ltr !important;
+  justify-content: flex-start !important;
+}
 .hf-header__nav::-webkit-scrollbar { display: none; }
 
 .hf-nav-link {
@@ -1133,13 +1137,13 @@ html[dir="ltr"] .hf-mobile-drawer__link { direction: ltr; text-align: left; }
         {%- if shop.customer_accounts_enabled -%}
           <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="hf-btn-login">
             {%- if customer -%}
-              {{ 'customer.account.title' | t | default: 'حسابي' }}
+              {%- if request.locale.iso_code == 'ar' -%}حسابي{%- else -%}{{ 'customer.account.title' | t | default: 'My Account' }}{%- endif -%}
             {%- else -%}
-              {%- assign login_lbl = 'customer.login.title' | t -%}
-              {%- if login_lbl contains 'missing' or login_lbl contains 't:' or login_lbl contains 'customer.login' -%}
-                {%- assign login_lbl = 'تسجيل الدخول' -%}
+              {%- if request.locale.iso_code == 'ar' -%}
+                تسجيل الدخول
+              {%- else -%}
+                Log in
               {%- endif -%}
-              {{ login_lbl }}
             {%- endif -%}
           </a>
         {%- endif -%}
@@ -1196,11 +1200,11 @@ html[dir="ltr"] .hf-mobile-drawer__link { direction: ltr; text-align: left; }
     {%- if shop.customer_accounts_enabled -%}
       <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
          style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#444;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;font-weight:600;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,0.04);">
-        {%- assign mob_login_lbl = 'customer.login.title' | t -%}
-        {%- if mob_login_lbl contains 'missing' or mob_login_lbl contains 't:' or mob_login_lbl contains 'customer.login' -%}
-          {%- assign mob_login_lbl = 'تسجيل الدخول' -%}
+        {%- if request.locale.iso_code == 'ar' -%}
+          تسجيل الدخول
+        {%- else -%}
+          Log in
         {%- endif -%}
-        {{ mob_login_lbl }}
       </a>
     {%- endif -%}
   </div>
