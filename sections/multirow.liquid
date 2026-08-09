@@ -1,0 +1,83 @@
+{% comment %}
+  🎬 Scroll Frames Animation - نسخة بـ Blocks (أكثر استقرارًا)
+{% endcomment %}
+
+<style>
+  .scroll-frames-section { position: relative; height: var(--scroll-height, 800vh); }
+  .sticky-wrapper { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  .frames-container { position: absolute; inset: 0; }
+  .frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 100ms linear; }
+  .frame.active { opacity: 1; }
+  .overlay-container { position: absolute; inset: 0; pointer-events: none; }
+</style>
+
+<section id="scroll-frames-{{ section.id }}" class="scroll-frames-section" style="--scroll-height: {{ section.settings.scroll_height }}vh;">
+
+  <div class="sticky-wrapper">
+    <div class="frames-container" id="frames">
+      {% for block in section.blocks %}
+        {% if block.type == 'frame' %}
+          <img 
+            src="{{ block.settings.image | image_url: width: 1920 }}" 
+            class="frame" 
+            data-index="{{ forloop.index0 }}"
+            alt="Frame {{ forloop.index }}"
+            loading="lazy">
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- النصوص والأزرار هتضيفها بعدين -->
+  </div>
+</section>
+
+<script>
+  const frames = document.querySelectorAll('#frames .frame');
+  const total = frames.length;
+
+  function updateFrame() {
+    const progress = Math.min(1, Math.max(0, (window.scrollY - document.getElementById('scroll-frames-{{ section.id }}').offsetTop + window.innerHeight) / (document.getElementById('scroll-frames-{{ section.id }}').offsetHeight - window.innerHeight)));
+    const index = Math.floor(progress * (total - 1));
+    frames.forEach((f, i) => f.classList.toggle('active', i === index));
+  }
+
+  window.addEventListener('scroll', () => requestAnimationFrame(updateFrame), { passive: true });
+  setTimeout(updateFrame, 200);
+</script>
+
+{% schema %}
+{
+  "name": "🎬 Scroll Frames Animation",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "scroll_height",
+      "label": "ارتفاع منطقة السكرول (vh)",
+      "min": 300,
+      "max": 1500,
+      "step": 50,
+      "default": 800
+    }
+  ],
+  "blocks": [
+    {
+      "type": "frame",
+      "name": "🖼 فريم صورة",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "اختر الفريم"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scroll Frames Animation",
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}

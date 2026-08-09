@@ -1,0 +1,182 @@
+
+
+<!-- Search Overlay -->
+<div class="hf-search-overlay" id="hfSearchOverlay">
+  <div class="hf-search-panel">
+
+    <!-- حقل البحث -->
+    <div class="hf-search-field">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      <input
+        class="hf-search-input"
+        id="hfSearchInput"
+        type="text"
+        placeholder="ابحث عن منتج أو قسم..."
+        autocomplete="off"
+      >
+      <button class="hf-search-clear" id="hfSearchClear">×</button>
+    </div>
+
+    <!-- النتائج -->
+    <div class="hf-search-results" id="hfSearchResults"></div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+
+  const btn      = document.getElementById('hfSearchToggle');
+  const overlay  = document.getElementById('hfSearchOverlay');
+  const input    = document.getElementById('hfSearchInput');
+  const results  = document.getElementById('hfSearchResults');
+  const clearBtn = document.getElementById('hfSearchClear');
+
+  let debounceTimer;
+
+  // ── فتح/إغلاق ──
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const isOpen = overlay.classList.toggle('open');
+    btn.classList.toggle('active', isOpen);
+    if (isOpen) {
+      setTimeout(() => input.focus(), 80);
+      showDefaultState();
+    } else {
+      input.value = '';
+      results.innerHTML = '';
+    }
+  });
+
+  // إغلاق عند الضغط خارج البانل
+  overlay.addEventListener('click', function(e) {
+    if (!e.target.closest('.hf-search-panel')) {
+      closeSearch();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  function closeSearch() {
+    overlay.classList.remove('open');
+    btn.classList.remove('active');
+    input.value = '';
+    results.innerHTML = '';
+  }
+
+  // ── مسح ──
+  clearBtn.addEventListener('click', function() {
+    input.value = '';
+    input.focus();
+    showDefaultState();
+  });
+
+  // ── البحث ──
+  input.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    const q = this.value.trim();
+    if (q.length < 2) { showDefaultState(); return; }
+    debounceTimer = setTimeout(() => doSearch(q), 320);
+  });
+
+  // ── الحالة الافتراضية: عرض الكولكشنز ──
+  function showDefaultState() {
+    results.innerHTML = '<div class="hf-loading">جارٍ التحميل...</div>';
+    fetch('/collections.json?limit=8')
+      .then(r => r.json())
+      .then(data => {
+        const cols = data.collections || [];
+        if (!cols.length) { results.innerHTML = ''; return; }
+        let html = `
+          <div class="hf-results-section">
+            <div class="hf-results-label">الأقسام</div>
+            <div class="hf-collections-wrap">
+              ${cols.map(c => `
+                <a href="/collections/${c.handle}" class="hf-result-collection">
+                  ${c.title}
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        results.innerHTML = html;
+      })
+      .catch(() => { results.innerHTML = ''; });
+  }
+
+  // ── البحث الفعلي ──
+  function doSearch(q) {
+    results.innerHTML = '<div class="hf-loading">جارٍ البحث...</div>';
+
+    const productsUrl    = `/search/suggest.json?q=${encodeURIComponent(q)}&resources[type]=product&resources[limit]=5`;
+    const collectionsUrl = `/search/suggest.json?q=${encodeURIComponent(q)}&resources[type]=collection&resources[limit]=4`;
+
+    Promise.all([
+      fetch(productsUrl).then(r => r.json()),
+      fetch(collectionsUrl).then(r => r.json())
+    ]).then(([prodData, colData]) => {
+
+      const products    = prodData?.resources?.results?.products    || [];
+      const collections = colData?.resources?.results?.collections  || [];
+
+      if (!products.length && !collections.length) {
+        results.innerHTML = `<div class="hf-empty">لا توجد نتائج لـ "${q}"</div>`;
+        return;
+      }
+
+      let html = '';
+
+      // الأقسام
+      if (collections.length) {
+        html += `
+          <div class="hf-results-section">
+            <div class="hf-results-label">الأقسام</div>
+            <div class="hf-collections-wrap">
+              ${collections.map(c => `
+                <a href="${c.url}" class="hf-result-collection">
+                  ${c.title}
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // المنتجات
+      if (products.length) {
+        html += `
+          <div class="hf-results-section">
+            <div class="hf-results-label">المنتجات</div>
+            ${products.map(p => {
+              const img = p.featured_image?.url
+                ? `<img class="hf-result-img" src="${p.featured_image.url}&width=120" alt="${p.title}" loading="lazy">`
+                : `<div class="hf-result-img-placeholder">📼</div>`;
+              const price = p.price ? `${(p.price / 100).toFixed(0)} ر.س` : '';
+              return `
+                <a href="${p.url}" class="hf-result-product">
+                  ${img}
+                  <div class="hf-result-info">
+                    <div class="hf-result-title">${p.title}</div>
+                    ${price ? `<div class="hf-result-price">${price}</div>` : ''}
+                  </div>
+                </a>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      // زر عرض الكل
+      html += `<a href="/search?q=${encodeURIComponent(q)}" class="hf-view-all">عرض كل النتائج</a>`;
+
+      results.innerHTML = html;
+
+    }).catch(() => {
+      results.innerHTML = `<div class="hf-empty">حدث خطأ، حاول مجدداً</div>`;
+    });
+  }
+
+})();
+</script>

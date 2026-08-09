@@ -1,0 +1,818 @@
+{% comment %}
+  ركن المجتمع — Community Corner Section
+  الحصيف للكتب
+  
+  طريقة الاستخدام:
+  1. ارفع هذا الملف إلى: Themes > Edit code > Sections
+  2. أنشئ صفحة جديدة: Online Store > Pages > Add page
+  3. في قسم "Template" اختر: page.community (أو استخدم page.liquid وأضف الـ section يدوياً)
+  4. أو أضفه مباشرة من Theme Editor كـ Custom Section
+{% endcomment %}
+
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+.cc-wrap {
+  --ink: #1a1410;
+  --parchment: #f5ede0;
+  --parchment-deep: #ecdcc8;
+  --gold: #b8892a;
+  --gold-light: #d4a843;
+  --rust: #8b3a2a;
+  --cream: #fdf8f0;
+  --shadow: rgba(26,20,16,0.12);
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.cc-hero {
+  position: relative;
+  background: var(--ink);
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 80px 24px 100px;
+}
+.cc-hero-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(184,137,42,0.06) 28px, rgba(184,137,42,0.06) 29px),
+    repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(184,137,42,0.06) 28px, rgba(184,137,42,0.06) 29px);
+}
+.cc-hero-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 700px;
+}
+.cc-hero-ornament {
+  font-family: 'Amiri', serif;
+  color: var(--gold);
+  font-size: 2.2rem;
+  letter-spacing: 0.3em;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: ccFadeUp 0.8s 0.2s forwards;
+}
+.cc-hero-title {
+  font-family: 'Amiri', serif;
+  font-size: clamp(2.8rem, 6vw, 4.5rem);
+  color: var(--parchment);
+  line-height: 1.25;
+  font-weight: 700;
+  opacity: 0;
+  animation: ccFadeUp 0.8s 0.4s forwards;
+}
+.cc-hero-title span { color: var(--gold-light); }
+.cc-hero-subtitle {
+  margin-top: 22px;
+  color: rgba(245,237,224,0.7);
+  font-size: 1.1rem;
+  font-weight: 300;
+  line-height: 2;
+  opacity: 0;
+  animation: ccFadeUp 0.8s 0.6s forwards;
+}
+.cc-hero-divider {
+  margin: 32px auto 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  animation: ccFadeUp 0.8s 0.8s forwards;
+}
+
+/* ── WAVE ── */
+.cc-wave { display: block; width: 100%; background: var(--ink); line-height: 0; }
+.cc-wave svg { display: block; }
+
+/* ── QUOTE BAND ── */
+.cc-quote-band {
+  background: var(--parchment-deep);
+  border-top: 1px solid rgba(184,137,42,0.25);
+  border-bottom: 1px solid rgba(184,137,42,0.25);
+  padding: 48px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cc-quote-band::before,
+.cc-quote-band::after {
+  content: '❧';
+  font-family: 'Amiri', serif;
+  font-size: 4rem;
+  color: rgba(184,137,42,0.15);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.cc-quote-band::before { right: 40px; }
+.cc-quote-band::after  { left: 40px; transform: translateY(-50%) scaleX(-1); }
+.cc-quote-text {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.8;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.cc-quote-source {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+
+/* ── SECTION WRAPPER ── */
+.cc-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+.cc-section-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 48px;
+}
+.cc-section-label {
+  font-family: 'Amiri', serif;
+  font-size: 1.9rem;
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cc-section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+.cc-section-icon { color: var(--gold); font-size: 1.4rem; }
+
+/* ── SPOTLIGHT ── */
+.cc-spotlight {
+  background: var(--parchment);
+  border-right: 4px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  align-items: start;
+  margin-bottom: 80px;
+  position: relative;
+  overflow: hidden;
+}
+.cc-spotlight::after {
+  content: 'ابن خلدون';
+  font-family: 'Amiri', serif;
+  font-size: 8rem;
+  color: rgba(184,137,42,0.06);
+  position: absolute;
+  bottom: -20px;
+  left: 20px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+  .cc-spotlight { grid-template-columns: 1fr; padding: 32px 24px; }
+  .cc-spotlight::after { font-size: 4rem; }
+}
+.cc-spotlight-badge {
+  background: var(--rust);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 4px 12px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.cc-spotlight-book {
+  font-family: 'Amiri', serif;
+  font-size: 2.2rem;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.cc-spotlight-author { color: var(--gold); font-size: 1rem; font-weight: 500; }
+.cc-stars { color: var(--gold); font-size: 0.95rem; letter-spacing: 0.1em; margin-top: 10px; }
+.cc-spotlight-meta {
+  margin-top: 18px;
+  font-size: 0.85rem;
+  color: #9a8e84;
+  line-height: 1.7;
+}
+.cc-spotlight-body p {
+  font-size: 1rem;
+  line-height: 2;
+  color: #3d3328;
+  margin-bottom: 16px;
+}
+.cc-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.cc-read-more:hover { color: var(--rust); border-color: var(--rust); }
+
+/* ── REVIEW CARDS ── */
+.cc-reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+}
+.cc-review-card {
+  background: #fff;
+  border: 1px solid var(--parchment-deep);
+  border-radius: 4px;
+  padding: 32px 28px;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cc-review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px var(--shadow);
+}
+.cc-review-card::before {
+  content: '"';
+  font-family: 'Amiri', serif;
+  font-size: 6rem;
+  color: var(--parchment-deep);
+  position: absolute;
+  top: -14px;
+  right: 22px;
+  line-height: 1;
+  pointer-events: none;
+}
+.cc-review-card.cc-featured {
+  background: var(--ink);
+  border-color: var(--gold);
+  grid-column: span 2;
+}
+.cc-review-card.cc-featured::before { color: rgba(184,137,42,0.2); }
+@media (max-width: 700px) {
+  .cc-review-card.cc-featured { grid-column: span 1; }
+}
+.cc-book-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 3px 10px;
+  border-radius: 2px;
+  margin-bottom: 18px;
+}
+.cc-featured .cc-book-tag { color: var(--gold-light); border-color: var(--gold-light); }
+.cc-review-title {
+  font-family: 'Amiri', serif;
+  font-size: 1.35rem;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.cc-featured .cc-review-title { color: var(--parchment); font-size: 1.6rem; }
+.cc-review-excerpt { font-size: 0.95rem; line-height: 1.9; color: #5a4e44; }
+.cc-featured .cc-review-excerpt { color: rgba(245,237,224,0.75); }
+.cc-review-meta { margin-top: 20px; display: flex; align-items: center; gap: 10px; }
+.cc-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--parchment-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Amiri', serif; font-size: 1rem;
+  color: var(--gold); border: 1px solid var(--gold);
+  flex-shrink: 0;
+}
+.cc-featured .cc-avatar { background: rgba(184,137,42,0.15); }
+.cc-reviewer-name { font-size: 0.88rem; font-weight: 500; color: var(--ink); }
+.cc-featured .cc-reviewer-name { color: var(--parchment); }
+.cc-reviewer-date { font-size: 0.78rem; color: #9a8e84; margin-top: 2px; }
+.cc-featured .cc-reviewer-date { color: rgba(245,237,224,0.45); }
+
+/* ── MOSAIC ── */
+.cc-mosaic {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 700px) { .cc-mosaic { grid-template-columns: 1fr 1fr; } }
+.cc-mosaic-card {
+  aspect-ratio: 3/4;
+  border-radius: 4px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 22px 18px;
+  position: relative; overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.cc-mosaic-card:hover { transform: scale(1.02); }
+.cc-mosaic-card:hover .cc-mosaic-overlay { opacity: 0.7; }
+.cc-mosaic-pattern {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 30% 30%, rgba(184,137,42,0.12) 0%, transparent 60%),
+    radial-gradient(circle at 70% 70%, rgba(255,255,255,0.04) 0%, transparent 50%);
+}
+.cc-mosaic-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(26,20,16,0.85) 0%, rgba(26,20,16,0.2) 60%, transparent 100%);
+  z-index: 1; transition: opacity 0.3s;
+}
+.cc-mosaic-content { position: relative; z-index: 2; }
+.cc-mosaic-quote {
+  font-family: 'Amiri', serif;
+  font-size: 0.95rem; color: var(--parchment);
+  line-height: 1.7; font-style: italic; margin-bottom: 8px;
+}
+.cc-mosaic-credit { font-size: 0.72rem; color: var(--gold-light); letter-spacing: 0.08em; }
+.cc-m1 { background: linear-gradient(135deg, #2c1810 0%, #4a2e1a 100%); }
+.cc-m2 { background: linear-gradient(135deg, #1a2c20 0%, #2e4a32 100%); }
+.cc-m3 { background: linear-gradient(135deg, #1a1a2c 0%, #2e2e4a 100%); }
+.cc-m4 { background: linear-gradient(135deg, #2c2010 0%, #4a3820 100%); }
+.cc-m5 { background: linear-gradient(135deg, #2c1a1a 0%, #4a2828 100%); }
+.cc-m6 { background: linear-gradient(135deg, #10202c 0%, #1a3040 100%); }
+
+/* ── SUBMIT SECTION ── */
+.cc-submit-section {
+  background: var(--ink);
+  padding: 80px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cc-submit-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.cc-submit-bg-text {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Amiri', serif; font-size: 14rem;
+  color: rgba(255,255,255,0.02);
+  white-space: nowrap; pointer-events: none; user-select: none;
+}
+.cc-submit-inner { position: relative; z-index: 1; max-width: 580px; margin: 0 auto; }
+.cc-submit-ornament {
+  font-family: 'Amiri', serif; color: var(--gold);
+  font-size: 1.8rem; letter-spacing: 0.4em;
+  display: block; margin-bottom: 18px;
+}
+.cc-submit-title {
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--parchment); font-weight: 700; line-height: 1.4; margin-bottom: 16px;
+}
+.cc-submit-desc { color: rgba(245,237,224,0.65); font-size: 1rem; line-height: 1.9; margin-bottom: 40px; }
+.cc-submit-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 24px; margin-bottom: 48px; text-align: right;
+}
+@media (max-width: 600px) { .cc-submit-steps { grid-template-columns: 1fr; } }
+.cc-step {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(184,137,42,0.2);
+  border-radius: 4px; padding: 22px 18px;
+}
+.cc-step-num {
+  font-family: 'Amiri', serif; font-size: 2rem;
+  color: var(--gold); display: block; margin-bottom: 8px;
+}
+.cc-step-text { font-size: 0.88rem; color: rgba(245,237,224,0.7); line-height: 1.7; }
+.cc-btn-submit {
+  display: inline-block;
+  background: var(--gold); color: var(--ink);
+  font-size: 1rem; font-weight: 700;
+  padding: 16px 48px; border-radius: 2px;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.25s, transform 0.2s;
+  letter-spacing: 0.05em;
+  font-family: 'Tajawal', sans-serif;
+}
+.cc-btn-submit:hover { background: var(--gold-light); transform: translateY(-2px); color: var(--ink); }
+
+/* ── FOOTER STRIP ── */
+.cc-footer-strip {
+  background: var(--parchment-deep);
+  padding: 24px; text-align: center;
+  font-size: 0.82rem; color: #9a8e84;
+  border-top: 1px solid rgba(184,137,42,0.2);
+}
+.cc-footer-strip a { color: var(--gold); text-decoration: none; }
+
+/* ── ANIMATIONS ── */
+@keyframes ccFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cc-reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.cc-reveal.cc-visible { opacity: 1; transform: translateY(0); }
+</style>
+
+<div class="cc-wrap">
+
+  <!-- HERO -->
+  <section class="cc-hero">
+    <div class="cc-hero-pattern"></div>
+    <div class="cc-hero-inner">
+      <span class="cc-hero-ornament">✦ ✦ ✦</span>
+      <h1 class="cc-hero-title">ركن <span>المجتمع</span></h1>
+      <p class="cc-hero-subtitle">
+        {{ section.settings.hero_subtitle | default: 'مساحة لمشاركة شغفكم بالقراءة' }}<br>
+        هنا تلتقي الأفكار، وتُنشر المراجعات، ويُخلَّد الأثر
+      </p>
+      <div class="cc-hero-divider"></div>
+    </div>
+  </section>
+
+  <div class="cc-wave">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" height="60">
+      <path d="M0,40 C360,70 1080,10 1440,40 L1440,0 L0,0 Z" fill="#1a1410"/>
+    </svg>
+  </div>
+
+  <!-- QUOTE BAND -->
+  <div class="cc-quote-band cc-reveal">
+    <p class="cc-quote-text">{{ section.settings.quote_text | default: 'كتابٌ يبقى.. أثرٌ لا يزول' }}</p>
+    <p class="cc-quote-source">— {{ section.settings.quote_source | default: 'مجتمع الحصيف القرائي' }}</p>
+  </div>
+
+  <!-- SPOTLIGHT: IBN KHALDUN -->
+  <div class="cc-section" style="padding-bottom: 0;">
+    <div class="cc-section-header cc-reveal">
+      <span class="cc-section-icon">◈</span>
+      <h2 class="cc-section-label">جديد المراجعات</h2>
+      <div class="cc-section-line"></div>
+    </div>
+  </div>
+
+  <div class="cc-section" style="padding-top: 0;">
+    <div class="cc-spotlight cc-reveal">
+      <div>
+        <span class="cc-spotlight-badge">وقفة مع كتاب</span>
+        <div class="cc-spotlight-book">{{ section.settings.spotlight_book | default: 'مقدمة ابن خلدون' }}</div>
+        <div class="cc-spotlight-author">{{ section.settings.spotlight_author | default: 'عبدالرحمن بن خلدون' }}</div>
+        <div class="cc-stars">★★★★★</div>
+        <p class="cc-spotlight-meta">
+          {{ section.settings.spotlight_tags | default: 'فلسفة التاريخ · علم الاجتماع · الحضارة' }}<br>
+          {{ section.settings.spotlight_pages | default: '٦٨٨ صفحة · دار الهلال' }}
+        </p>
+      </div>
+      <div>
+        <p>{{ section.settings.spotlight_body_1 | default: 'حين تفتح مقدمة ابن خلدون، لا تقرأ تاريخاً مضى، بل تُمسك بمرآةٍ عمرها ستة قرون لا تزال تعكس واقعنا بدقةٍ مذهلة. يُعيد ابن خلدون تعريف كيف تولد الحضارات وكيف تنهار، لا باعتبارها حوادث عابرة بل دوراتٍ لها قوانين وآليات.' }}</p>
+        <p>{{ section.settings.spotlight_body_2 | default: 'ما يُدهشك هو حداثة التفكير في نصٍّ قديم: مفهوم العصبية، ودورة الدول، وتأثير البيئة في الإنسان — كلها أفكارٌ تجدها اليوم في علم الاجتماع والاقتصاد السياسي.' }}</p>
+        <a href="{{ section.settings.spotlight_link | default: '#' }}" class="cc-read-more">قراءة المراجعة كاملةً ←</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY REVIEWS -->
+  <div class="cc-section" style="padding-top: 40px;">
+    <div class="cc-section-header cc-reveal">
+      <span class="cc-section-icon">◈</span>
+      <h2 class="cc-section-label">مراجعات أصدقاء الحصيف</h2>
+      <div class="cc-section-line"></div>
+    </div>
+
+    <div class="cc-reviews-grid">
+
+      {% for block in section.blocks %}
+        {% if block.type == 'review' %}
+          <div class="cc-review-card {% if block.settings.featured %}cc-featured{% endif %} cc-reveal" {{ block.shopify_attributes }}>
+            <span class="cc-book-tag">{{ block.settings.tag | default: 'مراجعة' }}</span>
+            <h3 class="cc-review-title">{{ block.settings.title }}</h3>
+            <p class="cc-review-excerpt">{{ block.settings.excerpt }}</p>
+            <div class="cc-review-meta">
+              <div class="cc-avatar">{{ block.settings.reviewer_name | slice: 0 }}</div>
+              <div>
+                <div class="cc-reviewer-name">{{ block.settings.reviewer_name }}</div>
+                <div class="cc-reviewer-date">{{ block.settings.review_date }}</div>
+                <div class="cc-stars">
+                  {% assign rating = block.settings.rating | default: 5 %}
+                  {% for i in (1..5) %}{% if i <= rating %}★{% else %}☆{% endif %}{% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <!-- Default reviews when no blocks added -->
+        <div class="cc-review-card cc-featured cc-reveal">
+          <span class="cc-book-tag">المراجعة المميزة</span>
+          <h3 class="cc-review-title">ألف شمس مشرقة — خالد حسيني</h3>
+          <p class="cc-review-excerpt">رواية تكسر قلبك وتُعيد بناءه في آنٍ واحد. حسيني لا يكتب أحداثاً، يكتب أرواحاً. قرأتها مرتين ولم أستطع أن أضع الكتاب قبل أن أنهيه — وهذا نادرٌ جداً بالنسبة لي.</p>
+          <div class="cc-review-meta">
+            <div class="cc-avatar">ن</div>
+            <div>
+              <div class="cc-reviewer-name">نورة العتيبي</div>
+              <div class="cc-reviewer-date">مارس ٢٠٢٥</div>
+              <div class="cc-stars">★★★★★</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc-review-card cc-reveal">
+          <span class="cc-book-tag">أدب عالمي</span>
+          <h3 class="cc-review-title">الجريمة والعقاب</h3>
+          <p class="cc-review-excerpt">دوستويفسكي يحفر عميقاً في النفس البشرية. ليس كتاباً سهلاً لكنه من أكثر ما قرأت تأثيراً — وقفت عند مقاطع كثيرة أُفكر فيها طويلاً.</p>
+          <div class="cc-review-meta">
+            <div class="cc-avatar">م</div>
+            <div>
+              <div class="cc-reviewer-name">محمد القحطاني</div>
+              <div class="cc-reviewer-date">فبراير ٢٠٢٥</div>
+              <div class="cc-stars">★★★★★</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc-review-card cc-reveal">
+          <span class="cc-book-tag">تنمية بشرية</span>
+          <h3 class="cc-review-title">العادات الذرية — جيمس كلير</h3>
+          <p class="cc-review-excerpt">نصائح قابلة للتطبيق الفوري. أعدت ترتيب روتيني الصباحي بعده وشعرت بفرق حقيقي في الأسابيع التالية.</p>
+          <div class="cc-review-meta">
+            <div class="cc-avatar">س</div>
+            <div>
+              <div class="cc-reviewer-name">سارة الدوسري</div>
+              <div class="cc-reviewer-date">يناير ٢٠٢٥</div>
+              <div class="cc-stars">★★★★☆</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc-review-card cc-reveal">
+          <span class="cc-book-tag">فلسفة</span>
+          <h3 class="cc-review-title">إرادة القوة — نيتشه</h3>
+          <p class="cc-review-excerpt">كتابٌ يُربكك ثم يُنيرك. أنصح بقراءته ببطء وتأمل، لا بعقلية الإنجاز. كل فصل يستحق وقفة.</p>
+          <div class="cc-review-meta">
+            <div class="cc-avatar">ع</div>
+            <div>
+              <div class="cc-reviewer-name">عبدالله الشمري</div>
+              <div class="cc-reviewer-date">ديسمبر ٢٠٢٤</div>
+              <div class="cc-stars">★★★★☆</div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+
+  <!-- VISUAL MOSAIC -->
+  <div class="cc-section" style="padding-top: 40px;">
+    <div class="cc-section-header cc-reveal">
+      <span class="cc-section-icon">◈</span>
+      <h2 class="cc-section-label">إلهام بصري — مقتطفات مصورة</h2>
+      <div class="cc-section-line"></div>
+    </div>
+    <div class="cc-mosaic cc-reveal">
+      {% assign mosaic_colors = 'cc-m1,cc-m2,cc-m3,cc-m4,cc-m5,cc-m6' | split: ',' %}
+      {% for block in section.blocks %}
+        {% if block.type == 'mosaic_quote' %}
+          <div class="cc-mosaic-card {{ mosaic_colors[forloop.index0 | modulo: 6] }}" {{ block.shopify_attributes }}>
+            <div class="cc-mosaic-pattern"></div>
+            <div class="cc-mosaic-overlay"></div>
+            <div class="cc-mosaic-content">
+              <p class="cc-mosaic-quote">«{{ block.settings.quote }}»</p>
+              <span class="cc-mosaic-credit">— {{ block.settings.credit }}</span>
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="cc-mosaic-card cc-m1"><div class="cc-mosaic-pattern"></div><div class="cc-mosaic-overlay"></div><div class="cc-mosaic-content"><p class="cc-mosaic-quote">«الكتاب خيرُ جليسٍ في الزمان»</p><span class="cc-mosaic-credit">— نورة، عضوة الحصيف</span></div></div>
+        <div class="cc-mosaic-card cc-m2"><div class="cc-mosaic-pattern"></div><div class="cc-mosaic-overlay"></div><div class="cc-mosaic-content"><p class="cc-mosaic-quote">«لكل كتاب قرأته أثرٌ لا يُمحى»</p><span class="cc-mosaic-credit">— محمد، عضو الحصيف</span></div></div>
+        <div class="cc-mosaic-card cc-m3"><div class="cc-mosaic-pattern"></div><div class="cc-mosaic-overlay"></div><div class="cc-mosaic-content"><p class="cc-mosaic-quote">«القراءة سفرٌ بلا جواز»</p><span class="cc-mosaic-credit">— سارة، عضوة الحصيف</span></div></div>
+        <div class="cc-mosaic-card cc-m4"><div class="cc-mosaic-pattern"></div><div class="cc-mosaic-overlay"></div><div class="cc-mosaic-content"><p class="cc-mosaic-quote">«الصفحة الأخيرة بداية حوار داخلي لا ينتهي»</p><span class="cc-mosaic-credit">— عبدالله، عضو الحصيف</span></div></div>
+        <div class="cc-mosaic-card cc-m5"><div class="cc-mosaic-pattern"></div><div class="cc-mosaic-overlay"></div><div class="cc-mosaic-content"><p class="cc-mosaic-quote">«أجمل لحظات قراءتي حين أنسى الوقت»</p><span class="cc-mosaic-credit">— ريم، عضوة الحصيف</span></div></div>
+        <div class="cc-mosaic-card cc-m6"><div class="cc-mosaic-pattern"></div><div class="cc-mosaic-overlay"></div><div class="cc-mosaic-content"><p class="cc-mosaic-quote">«كتابٌ واحد يُغير زاوية نظر كاملة»</p><span class="cc-mosaic-credit">— فيصل، عضو الحصيف</span></div></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- SUBMIT CTA -->
+  <section class="cc-submit-section">
+    <div class="cc-submit-bg-text">شاركونا</div>
+    <div class="cc-submit-inner">
+      <span class="cc-submit-ornament">✦</span>
+      <h2 class="cc-submit-title">شاركونا مراجعاتكم<br>لتُنشر هنا</h2>
+      <p class="cc-submit-desc">
+        أثرت بكتاب؟ وجدت في صفحاته ما يستحق المشاركة؟<br>
+        نحن نريد أن نسمعكم — مراجعاتكم تُثري هذا الركن وتُلهم الآخرين
+      </p>
+      <div class="cc-submit-steps">
+        <div class="cc-step"><span class="cc-step-num">١</span><p class="cc-step-text">اختر كتاباً قرأته وتركَ أثراً فيك</p></div>
+        <div class="cc-step"><span class="cc-step-num">٢</span><p class="cc-step-text">اكتب مراجعتك بأسلوبك الخاص</p></div>
+        <div class="cc-step"><span class="cc-step-num">٣</span><p class="cc-step-text">أرسلها وسنختار لنشرها هنا</p></div>
+      </div>
+      <a href="{{ section.settings.submit_link | default: '/pages/submit-review' }}" class="cc-btn-submit">
+        {{ section.settings.submit_btn_text | default: 'أرسل مراجعتك ←' }}
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER STRIP -->
+  <div class="cc-footer-strip">
+    ركن المجتمع — <a href="/">{{ shop.name }}</a> &nbsp;|&nbsp; كتابٌ يبقى.. أثرٌ لا يزول
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var reveals = document.querySelectorAll('.cc-reveal');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e, i) {
+        if (e.isIntersecting) {
+          setTimeout(function() { e.target.classList.add('cc-visible'); }, i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(function(el) { observer.observe(el); });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "ركن المجتمع",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "إعدادات الهيرو"
+    },
+    {
+      "type": "text",
+      "id": "hero_subtitle",
+      "label": "نص الهيرو الفرعي",
+      "default": "مساحة لمشاركة شغفكم بالقراءة"
+    },
+    {
+      "type": "header",
+      "content": "الاقتباس المميز"
+    },
+    {
+      "type": "text",
+      "id": "quote_text",
+      "label": "نص الاقتباس",
+      "default": "كتابٌ يبقى.. أثرٌ لا يزول"
+    },
+    {
+      "type": "text",
+      "id": "quote_source",
+      "label": "مصدر الاقتباس",
+      "default": "مجتمع الحصيف القرائي"
+    },
+    {
+      "type": "header",
+      "content": "المراجعة المضيئة (Spotlight)"
+    },
+    {
+      "type": "text",
+      "id": "spotlight_book",
+      "label": "اسم الكتاب",
+      "default": "مقدمة ابن خلدون"
+    },
+    {
+      "type": "text",
+      "id": "spotlight_author",
+      "label": "اسم المؤلف",
+      "default": "عبدالرحمن بن خلدون"
+    },
+    {
+      "type": "text",
+      "id": "spotlight_tags",
+      "label": "التصنيفات",
+      "default": "فلسفة التاريخ · علم الاجتماع · الحضارة"
+    },
+    {
+      "type": "text",
+      "id": "spotlight_pages",
+      "label": "تفاصيل الكتاب",
+      "default": "٦٨٨ صفحة · دار الهلال"
+    },
+    {
+      "type": "textarea",
+      "id": "spotlight_body_1",
+      "label": "الفقرة الأولى من المراجعة"
+    },
+    {
+      "type": "textarea",
+      "id": "spotlight_body_2",
+      "label": "الفقرة الثانية من المراجعة"
+    },
+    {
+      "type": "url",
+      "id": "spotlight_link",
+      "label": "رابط المراجعة الكاملة"
+    },
+    {
+      "type": "header",
+      "content": "زر الإرسال"
+    },
+    {
+      "type": "url",
+      "id": "submit_link",
+      "label": "رابط صفحة إرسال المراجعة"
+    },
+    {
+      "type": "text",
+      "id": "submit_btn_text",
+      "label": "نص الزر",
+      "default": "أرسل مراجعتك ←"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "مراجعة",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "مراجعة مميزة (تأخذ عرضاً أكبر)",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "التصنيف",
+          "default": "أدب"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "اسم الكتاب والمؤلف"
+        },
+        {
+          "type": "textarea",
+          "id": "excerpt",
+          "label": "مقتطف المراجعة"
+        },
+        {
+          "type": "text",
+          "id": "reviewer_name",
+          "label": "اسم المراجع"
+        },
+        {
+          "type": "text",
+          "id": "review_date",
+          "label": "تاريخ المراجعة"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "التقييم",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        }
+      ]
+    },
+    {
+      "type": "mosaic_quote",
+      "name": "مقتطف مصوّر",
+      "settings": [
+        {
+          "type": "text",
+          "id": "quote",
+          "label": "الاقتباس"
+        },
+        {
+          "type": "text",
+          "id": "credit",
+          "label": "صاحب الاقتباس"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "ركن المجتمع",
+      "category": "صفحات مخصصة"
+    }
+  ]
+}
+{% endschema %}

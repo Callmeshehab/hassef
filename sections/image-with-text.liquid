@@ -1,0 +1,687 @@
+{% comment %}
+  ╔══════════════════════════════════════════════════════════════╗
+  ║   SECTION 2: Stacked Scroll Reveal — "Open the Box"         ║
+  ║   متجر الريترو - كشف الصور المتراكمة مع سرد القصة           ║
+  ╚══════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Bebas+Neue&display=swap');
+
+  :root {
+    --sk-cream:    #F5EDD6;
+    --sk-dark:     #100C06;
+    --sk-burgundy: #7B1C2E;
+    --sk-gold:     #C9A84C;
+    --sk-brown:    #3D2210;
+    --sk-tape:     #1E3550;
+    --sk-light:    rgba(245,237,214,0.08);
+  }
+
+  /* ─── Section wrapper ─── */
+  #skr-{{ section.id }} {
+    position: relative;
+    background: var(--sk-dark);
+    direction: rtl;
+  }
+
+  /* ─── Sticky viewport ─── */
+  .skr-viewport {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ─── Stack container ─── */
+  .skr-stack {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ─── Each card ─── */
+  .skr-card {
+    position: absolute;
+    inset: 0;
+    will-change: transform, opacity;
+    overflow: hidden;
+  }
+
+  .skr-card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform-origin: center bottom;
+    will-change: transform;
+    transition: none;
+  }
+
+  /* ─── Card overlay gradient ─── */
+  .skr-card-grad {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(10,6,2,0.92) 0%,
+      rgba(10,6,2,0.3) 40%,
+      transparent 70%
+    );
+    z-index: 1;
+  }
+
+  /* ─── Card content ─── */
+  .skr-card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 40px 60px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .skr-card.skr-active .skr-card-content {
+    transform: translateY(0);
+    opacity: 1;
+    transition-delay: 0.15s;
+  }
+
+  .skr-card-chapter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--sk-gold);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .skr-card-chapter::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--sk-gold);
+    opacity: 0.5;
+  }
+
+  .skr-card-title {
+    font-family: 'Tajawal', sans-serif;
+    font-size: clamp(22px, 4vw, 48px);
+    font-weight: 900;
+    color: var(--sk-cream);
+    line-height: 1.2;
+    margin: 0 0 10px;
+  }
+
+  .skr-card-desc {
+    font-family: 'Tajawal', sans-serif;
+    font-size: clamp(14px, 1.5vw, 18px);
+    color: rgba(245,237,214,0.7);
+    font-weight: 300;
+    margin: 0;
+    max-width: 520px;
+  }
+
+  /* ─── Grain texture ─── */
+  .skr-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.12;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px;
+    mix-blend-mode: overlay;
+  }
+
+  /* ─── Page count ─── */
+  .skr-pager {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+  .skr-pager-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(245,237,214,0.25);
+    transition: all 0.4s ease;
+  }
+  .skr-pager-dot.skr-active-dot {
+    background: var(--sk-gold);
+    transform: scaleX(3);
+    border-radius: 3px;
+  }
+
+  /* ─── Scroll progress line ─── */
+  .skr-progress-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 0%;
+    background: linear-gradient(to bottom, var(--sk-gold), var(--sk-burgundy));
+    z-index: 10;
+    transition: height 0.1s linear;
+  }
+
+  /* ─── REVEAL panel (final) ─── */
+  .skr-reveal {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: var(--sk-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+    overflow: hidden;
+  }
+  .skr-reveal.skr-show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Reveal background pattern */
+  .skr-reveal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 40px,
+        rgba(201,168,76,0.03) 40px,
+        rgba(201,168,76,0.03) 41px
+      );
+  }
+
+  /* Reveal headline */
+  .skr-reveal-headline {
+    text-align: center;
+    z-index: 1;
+  }
+  .skr-reveal-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.4em;
+    color: var(--sk-gold);
+    opacity: 0.8;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .skr-reveal-title {
+    font-family: 'Tajawal', sans-serif;
+    font-size: clamp(32px, 6vw, 80px);
+    font-weight: 900;
+    color: var(--sk-cream);
+    line-height: 1.1;
+    margin: 0;
+  }
+  .skr-reveal-title span {
+    color: var(--sk-gold);
+  }
+
+  /* Reveal product grid */
+  .skr-product-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    z-index: 1;
+    max-width: 700px;
+    padding: 0 20px;
+  }
+  .skr-product-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.06);
+    border-radius: 3px;
+    color: var(--sk-cream);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease, background 0.3s, border-color 0.3s;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .skr-product-tag:hover {
+    background: rgba(201,168,76,0.15);
+    border-color: var(--sk-gold);
+  }
+  .skr-reveal.skr-show .skr-product-tag {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .skr-product-tag:nth-child(1) { transition-delay: 0.1s; }
+  .skr-product-tag:nth-child(2) { transition-delay: 0.2s; }
+  .skr-product-tag:nth-child(3) { transition-delay: 0.3s; }
+  .skr-product-tag:nth-child(4) { transition-delay: 0.4s; }
+  .skr-product-tag:nth-child(5) { transition-delay: 0.5s; }
+  .skr-product-tag:nth-child(6) { transition-delay: 0.6s; }
+
+  /* BIG CTA */
+  .skr-big-cta {
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 48px;
+    background: var(--sk-gold);
+    color: var(--sk-dark);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    text-decoration: none;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.6s ease 0.7s, transform 0.6s cubic-bezier(0.22,1,0.36,1) 0.7s;
+    letter-spacing: 0.02em;
+  }
+  .skr-reveal.skr-show .skr-big-cta {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .skr-big-cta::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.2);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .skr-big-cta:hover::after { transform: translateX(0); }
+
+  /* ─── Scroll hint arrow ─── */
+  .skr-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: rgba(245,237,214,0.45);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    transition: opacity 0.4s;
+    animation: skrBounce 2s ease infinite;
+  }
+  .skr-hint.skr-gone { opacity: 0; }
+  @keyframes skrBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ─── Top decorative border ─── */
+  .skr-deco-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--sk-burgundy), var(--sk-gold), var(--sk-tape), var(--sk-gold), var(--sk-burgundy));
+    z-index: 15;
+  }
+
+  @media (max-width: 768px) {
+    .skr-card-content { padding: 24px 24px 40px; }
+    .skr-pager { top: 20px; right: 20px; }
+    .skr-big-cta { padding: 16px 32px; font-size: 16px; }
+  }
+</style>
+
+{%- assign slide_blocks = section.blocks | where: 'type', 'slide' -%}
+{%- assign slide_count  = slide_blocks | size -%}
+{%- assign scroll_vh    = slide_count | times: 100 | plus: 200 -%}
+
+<div id="skr-{{ section.id }}">
+  <!-- Scroll spacer -->
+  <div style="height: {{ scroll_vh }}vh" id="skrSpace-{{ section.id }}"></div>
+
+  <!-- Sticky viewport -->
+  <div class="skr-viewport" id="skrView-{{ section.id }}">
+
+    <!-- Top decorative border -->
+    <div class="skr-deco-top"></div>
+
+    <!-- Progress line -->
+    <div class="skr-progress-line" id="skrProg-{{ section.id }}"></div>
+
+    <!-- Pager dots -->
+    <div class="skr-pager" id="skrPager-{{ section.id }}">
+      {%- for block in slide_blocks -%}
+        <div class="skr-pager-dot{% if forloop.first %} skr-active-dot{% endif %}"></div>
+      {%- endfor -%}
+    </div>
+
+    <!-- Stack of cards -->
+    <div class="skr-stack" id="skrStack-{{ section.id }}">
+      {%- assign zi = slide_count -%}
+      {%- for block in slide_blocks -%}
+        <div
+          class="skr-card{% if forloop.first %} skr-active{% endif %}"
+          data-index="{{ forloop.index0 }}"
+          style="z-index: {{ zi }};"
+        >
+          {%- if block.settings.image != blank -%}
+            <img
+              class="skr-card-img"
+              src="{{ block.settings.image | image_url: width: 1920 }}"
+              alt="{{ block.settings.title | escape }}"
+              loading="{% if forloop.index <= 3 %}eager{% else %}lazy{% endif %}"
+              decoding="async"
+            >
+          {%- endif -%}
+          <div class="skr-card-grad"></div>
+          <div class="skr-card-content">
+            <div class="skr-card-chapter">الفصل {{ forloop.index | prepend: '0' | slice: -2, 2 }}</div>
+            <h2 class="skr-card-title">{{ block.settings.title }}</h2>
+            {%- if block.settings.desc != blank -%}
+              <p class="skr-card-desc">{{ block.settings.desc }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- assign zi = zi | minus: 1 -%}
+      {%- endfor -%}
+    </div>
+
+    <!-- Grain overlay -->
+    <div class="skr-grain"></div>
+
+    <!-- FINAL REVEAL -->
+    <div class="skr-reveal" id="skrReveal-{{ section.id }}">
+      <div class="skr-reveal-headline">
+        <span class="skr-reveal-label">{{ section.settings.reveal_label }}</span>
+        <h2 class="skr-reveal-title">{{ section.settings.reveal_title | replace: '[gold]', '<span>' | replace: '[/gold]', '</span>' }}</h2>
+      </div>
+
+      <div class="skr-product-grid">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'product_tag' -%}
+            <a href="{{ block.settings.link }}" class="skr-product-tag">
+              <span>{{ block.settings.icon }}</span>
+              {{ block.settings.label }}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <a href="{{ section.settings.cta_link }}" class="skr-big-cta">
+        <span>{{ section.settings.cta_icon }}</span>
+        {{ section.settings.cta_text }}
+      </a>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="skr-hint" id="skrHint-{{ section.id }}">
+      ▾ مرر للأسفل ▾
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const SEC_ID  = '{{ section.id }}';
+  const wrapper = document.getElementById('skr-' + SEC_ID);
+  const stack   = document.getElementById('skrStack-' + SEC_ID);
+  const reveal  = document.getElementById('skrReveal-' + SEC_ID);
+  const prog    = document.getElementById('skrProg-' + SEC_ID);
+  const hint    = document.getElementById('skrHint-' + SEC_ID);
+  const pagerEl = document.getElementById('skrPager-' + SEC_ID);
+
+  if (!wrapper || !stack) return;
+
+  const cards = Array.from(stack.querySelectorAll('.skr-card'));
+  const dots  = pagerEl ? Array.from(pagerEl.querySelectorAll('.skr-pager-dot')) : [];
+  const N     = cards.length;
+  if (!N) return;
+
+  /* Each slide occupies 100vh of scroll space, plus 200vh for reveal */
+  const SLIDE_VH  = 100;
+  const REVEAL_VH = 200;
+
+  let currentActive = 0;
+
+  function setActive(idx) {
+    if (idx === currentActive) return;
+    cards[currentActive]?.classList.remove('skr-active');
+    dots[currentActive]?.classList.remove('skr-active-dot');
+    currentActive = idx;
+    cards[currentActive]?.classList.add('skr-active');
+    dots[currentActive]?.classList.add('skr-active-dot');
+  }
+
+  function onScroll() {
+    const rect    = wrapper.getBoundingClientRect();
+    const scrolled = -rect.top;
+    const totalH   = wrapper.offsetHeight - window.innerHeight;
+    if (totalH <= 0) return;
+
+    const pct = Math.max(0, Math.min(1, scrolled / totalH));
+    if (prog) prog.style.height = (pct * 100) + '%';
+
+    const slideTotal = N * SLIDE_VH * window.innerHeight / 100;
+    const revealStart = slideTotal;
+
+    /* ── Reveal phase ── */
+    if (scrolled >= revealStart) {
+      const revPct = Math.min(1, (scrolled - revealStart) / (REVEAL_VH * window.innerHeight / 100));
+      if (revPct > 0.15) {
+        reveal?.classList.add('skr-show');
+        /* push all cards off */
+        cards.forEach((c, i) => {
+          c.style.transform = 'translateY(-110%)';
+          c.style.opacity = '0';
+        });
+        return;
+      }
+    } else {
+      reveal?.classList.remove('skr-show');
+    }
+
+    /* ── Slides phase ── */
+    const slideIdx = Math.min(N - 1, Math.floor(scrolled / (SLIDE_VH * window.innerHeight / 100)));
+    const slideProgress = (scrolled % (SLIDE_VH * window.innerHeight / 100)) / (SLIDE_VH * window.innerHeight / 100);
+
+    setActive(slideIdx);
+
+    cards.forEach((card, i) => {
+      if (i < slideIdx) {
+        /* already revealed — slide off top */
+        card.style.transform = 'translateY(-105%) scale(0.95)';
+        card.style.opacity = '0';
+        const img = card.querySelector('.skr-card-img');
+        if (img) img.style.transform = 'scale(1.05)';
+      } else if (i === slideIdx) {
+        /* current — slides up as user scrolls */
+        const lift  = slideProgress * 105;
+        const sc    = 1 - slideProgress * 0.05;
+        card.style.transform = `translateY(-${lift}%) scale(${sc})`;
+        card.style.opacity = '1';
+        const img = card.querySelector('.skr-card-img');
+        if (img) img.style.transform = `scale(${1 + slideProgress * 0.06})`;
+      } else {
+        /* upcoming */
+        card.style.transform = 'translateY(0) scale(1)';
+        card.style.opacity = '1';
+        const img = card.querySelector('.skr-card-img');
+        if (img) img.style.transform = 'scale(1)';
+      }
+    });
+
+    /* Hint */
+    if (scrolled > window.innerHeight * 0.3) hint?.classList.add('skr-gone');
+    else hint?.classList.remove('skr-gone');
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "📦 Stacked Scroll Reveal",
+  "tag": "section",
+  "class": "retro-stacked-reveal",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎬 شاشة الكشف النهائي"
+    },
+    {
+      "type": "text",
+      "id": "reveal_label",
+      "label": "التسمية العلوية",
+      "default": "المجموعة الكاملة"
+    },
+    {
+      "type": "textarea",
+      "id": "reveal_title",
+      "label": "العنوان الكبير (ضع [gold]نص[/gold] للتلوين)",
+      "default": "اكتشف [gold]التحف[/gold] النادرة"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "نص زر CTA",
+      "default": "تسوّق المجموعة الآن"
+    },
+    {
+      "type": "text",
+      "id": "cta_icon",
+      "label": "أيقونة زر CTA",
+      "default": "🛍"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "رابط زر CTA"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "🖼 شريحة",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "صورة الشريحة"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "العنوان",
+          "default": "فصل جديد"
+        },
+        {
+          "type": "textarea",
+          "id": "desc",
+          "label": "الوصف (اختياري)",
+          "default": "كل قطعة تحمل ذاكرة وحكاية."
+        }
+      ]
+    },
+    {
+      "type": "product_tag",
+      "name": "🏷 تاج منتج",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "اسم الفئة",
+          "default": "كاسيتات"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "أيقونة (إيموجي)",
+          "default": "📼"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "الرابط"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "📦 Stacked Scroll Reveal",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "title": "الذاكرة في صندوق",
+            "desc": "رحلة إلى زمن الكاسيت والأثير."
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "title": "قصص مطوية",
+            "desc": "كتب قديمة، كل صفحة تحكي حياة."
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "title": "تحف لا تُنسى",
+            "desc": "أشياء قديمة تستحق أن تُعاش من جديد."
+          }
+        },
+        {
+          "type": "product_tag",
+          "settings": { "label": "كاسيتات", "icon": "📼" }
+        },
+        {
+          "type": "product_tag",
+          "settings": { "label": "كتب قديمة", "icon": "📚" }
+        },
+        {
+          "type": "product_tag",
+          "settings": { "label": "تحف نادرة", "icon": "🏺" }
+        },
+        {
+          "type": "product_tag",
+          "settings": { "label": "مجموعات ريترو", "icon": "🎞" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,857 @@
+<link rel="stylesheet" href="{{ 'component-list-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-cart-notification.css' | asset_url }}" media="print" onload="this.media='all'">
+
+{%- if settings.predictive_search_enabled -%}
+  <link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+
+{%- if section.settings.menu_type_desktop == 'mega' -%}
+  <link rel="stylesheet" href="{{ 'component-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+
+<script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+  /* ── متغيرات الألوان من إعدادات الثيم ── */
+  .hf-header {
+    --hf-bg:              {{ section.settings.header_bg }};
+    --hf-border:          {{ section.settings.header_border }};
+    --hf-logo-color:      {{ section.settings.logo_color }};
+    --hf-nav-color:       {{ section.settings.nav_color }};
+    --hf-nav-hover-bg:    {{ section.settings.nav_hover_bg }};
+    --hf-btn-login-bg:    {{ section.settings.btn_login_bg }};
+    --hf-btn-login-text:  {{ section.settings.btn_login_text }};
+    --hf-btn-login-border:{{ section.settings.btn_login_border }};
+    --hf-btn-cart-bg:     {{ section.settings.btn_cart_bg }};
+    --hf-btn-cart-text:   {{ section.settings.btn_cart_text }};
+    --hf-badge-bg:        {{ section.settings.badge_bg }};
+    --hf-badge-text:      {{ section.settings.badge_text }};
+    --hf-search-bg:       {{ section.settings.search_panel_bg }};
+    --hf-logo-size-desktop: {{ section.settings.logo_size_desktop }}px;
+    --hf-logo-size-mobile:  {{ section.settings.logo_size_mobile }}px;
+    --hf-header-radius:   {{ section.settings.btn_radius }}px;
+  }
+
+  .section-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-bottom: {{ section.settings.margin_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-header { margin-bottom: {{ section.settings.margin_bottom }}px; }
+  }
+{%- endstyle -%}
+
+<style>
+/* ════════════════════════════════
+   هيدر الحصيف
+════════════════════════════════ */
+.hf-header {
+  background: var(--hf-bg, #f5f2ec);
+  border-bottom: 1px solid var(--hf-border, rgba(0,0,0,0.08));
+  font-family: 'Cairo','Tajawal',sans-serif;
+  direction: rtl;
+}
+
+/* ── الصف الأول ── */
+.hf-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  gap: 12px;
+}
+
+/* يمين: شعار + بحث */
+.hf-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* الشعار */
+.hf-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--hf-logo-color, #111);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.hf-logo img {
+  height: var(--hf-logo-size-desktop, 36px);
+  width: auto;
+  display: block;
+  transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
+}
+.hf-logo:hover img { transform: scale(1.06); }
+
+@media screen and (max-width: 749px) {
+  .hf-logo img { height: var(--hf-logo-size-mobile, 28px); }
+}
+
+/* زر البحث */
+.hf-search-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  border-radius: 10px;
+  transition: background 0.18s, box-shadow 0.18s;
+  flex-shrink: 0;
+}
+.hf-search-btn:hover { background: rgba(0,0,0,0.07); }
+.hf-search-btn.active {
+  background: rgba(0,0,0,0.11);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.13);
+}
+.hf-search-btn svg {
+  width: 22px; height: 22px;
+  stroke: currentColor; fill: none; stroke-width: 1.8;
+}
+
+/* يسار: أزرار */
+.hf-header__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* زر الدخول */
+.hf-btn-login {
+  display: inline-flex;
+  align-items: center;
+  background: var(--hf-btn-login-bg, #fff);
+  color: var(--hf-btn-login-text, #111);
+  border: 1.5px solid var(--hf-btn-login-border, rgba(0,0,0,0.18));
+  border-radius: var(--hf-header-radius, 12px);
+  padding: 9px 18px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.18s, background 0.18s;
+}
+.hf-btn-login:hover { border-color: #111; }
+
+/* زر السلة */
+.hf-btn-subscribe {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--hf-btn-cart-bg, #111);
+  color: var(--hf-btn-cart-text, #fff);
+  border: none;
+  border-radius: var(--hf-header-radius, 12px);
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.18s, transform 0.15s;
+  position: relative;
+}
+.hf-btn-subscribe:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.hf-btn-subscribe svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* رقم السلة */
+.hf-cart-count {
+  background: var(--hf-badge-bg, #c8a030);
+  color: var(--hf-badge-text, #fff);
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 3px;
+}
+
+/* ── القائمة ── */
+.hf-header__nav {
+  border-top: 1px solid var(--hf-border, rgba(0,0,0,0.07));
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hf-header__nav::-webkit-scrollbar { display: none; }
+
+.hf-nav-link {
+  display: inline-block;
+  text-decoration: none;
+  color: var(--hf-nav-color, #555);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 11px 13px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.hf-nav-link:hover { color: #111; background: var(--hf-nav-hover-bg, rgba(0,0,0,0.05)); }
+.hf-nav-link.active { color: #111; font-weight: 700; background: var(--hf-nav-hover-bg, rgba(0,0,0,0.06)); }
+
+/* ── إخفاء الهيدر الأصلي ── */
+.header-wrapper .header,
+.header-wrapper .header * {
+  display: none !important;
+}
+.header-wrapper {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+/* ════════════════════════════════
+   Search Overlay
+════════════════════════════════ */
+.hf-search-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0,0,0,0.28);
+  animation: hfFadeIn 0.18s ease;
+}
+.hf-search-overlay.open { display: block; }
+
+@keyframes hfFadeIn { from{opacity:0} to{opacity:1} }
+
+.hf-search-panel {
+  background: var(--hf-search-bg, #f5f2ec);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding: 16px 20px 20px;
+  direction: rtl;
+  animation: hfSlideDown 0.22s cubic-bezier(0.34,1.2,0.64,1);
+}
+@keyframes hfSlideDown {
+  from { transform: translateY(-10px); opacity:0; }
+  to   { transform: translateY(0);     opacity:1; }
+}
+
+.hf-search-field {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  gap: 10px;
+  transition: border-color 0.18s;
+}
+.hf-search-field:focus-within { border-color: #111; }
+.hf-search-field > svg { width:18px; height:18px; stroke:#999; fill:none; stroke-width:1.8; flex-shrink:0; }
+
+.hf-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Cairo','Tajawal',sans-serif;
+  font-size: 15px;
+  color: #111;
+  outline: none;
+  text-align: right;
+  direction: rtl;
+}
+.hf-search-input::placeholder { color: #bbb; }
+
+.hf-search-clear {
+  background: none; border: none; cursor: pointer;
+  color: #bbb; font-size: 20px; line-height:1; padding: 0 2px;
+  display: none; transition: color 0.15s;
+}
+.hf-search-clear:hover { color: #333; }
+
+.hf-search-results {
+  margin-top: 14px;
+  max-height: 62vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.hf-results-section { margin-bottom: 18px; }
+
+.hf-results-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.hf-result-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 6px;
+  text-decoration: none;
+  color: #111;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+  transition: background 0.15s, padding 0.15s;
+}
+.hf-result-product:hover { background: rgba(0,0,0,0.04); padding-right: 10px; }
+
+.hf-result-img {
+  width: 50px; height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #e8e4dc;
+  flex-shrink: 0;
+}
+.hf-result-img-ph {
+  width: 50px; height: 50px;
+  border-radius: 8px;
+  background: #e8e4dc;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 22px;
+}
+
+.hf-result-info { flex:1; min-width:0; }
+.hf-result-title { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hf-result-price { font-size:12px; color:#888; margin-top:2px; }
+
+.hf-collections-wrap { display:flex; flex-wrap:wrap; gap:6px; }
+.hf-result-col {
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.hf-result-col:hover { border-color: #111; }
+
+.hf-status { text-align:center; padding:22px; color:#bbb; font-size:13px; }
+
+.hf-view-all {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  padding: 12px;
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Cairo','Tajawal',sans-serif;
+  transition: background 0.18s;
+}
+.hf-view-all:hover { background: #333; }
+
+/* موبايل */
+@media screen and (max-width: 749px) {
+  .hf-header__top { padding: 10px 14px; }
+  .hf-btn-login { padding: 8px 13px; }
+  .hf-btn-subscribe { padding: 9px 14px; }
+  .hf-header__nav { padding: 0 10px; }
+  .hf-search-panel { padding: 14px 14px 18px; }
+}
+</style>
+
+<!-- ════ الهيدر ════ -->
+<div class="hf-header">
+
+  <div class="hf-header__top">
+
+    <!-- يمين: شعار + بحث -->
+    <div class="hf-header__right">
+      <a href="{{ routes.root_url }}" class="hf-logo">
+        {%- if settings.logo != blank -%}
+          {{ settings.logo | image_url: width: 400 | image_tag: loading: 'eager', alt: shop.name }}
+        {%- else -%}
+          {{ shop.name }}
+        {%- endif -%}
+      </a>
+
+      {%- unless section.settings.hide_search -%}
+        <button class="hf-search-btn" id="hfSearchToggle" aria-label="بحث">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+        </button>
+      {%- endunless -%}
+    </div>
+
+    <!-- يسار: أزرار -->
+    <div class="hf-header__left">
+      {%- unless section.settings.hide_login -%}
+        {%- if shop.customer_accounts_enabled -%}
+          <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="hf-btn-login">
+            {%- if customer -%}حسابي{%- else -%}الدخول{%- endif -%}
+          </a>
+        {%- endif -%}
+      {%- endunless -%}
+
+      {%- unless section.settings.hide_cart -%}
+        <a href="{{ routes.cart_url }}" class="hf-btn-subscribe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          {{ section.settings.cart_label | default: 'السلة' }}
+          {%- if cart.item_count > 0 -%}
+            <span class="hf-cart-count">{{ cart.item_count }}</span>
+          {%- endif -%}
+        </a>
+      {%- endunless -%}
+    </div>
+
+  </div>
+
+  <!-- القائمة -->
+  {%- unless section.settings.hide_nav -%}
+    <nav class="hf-header__nav">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}" class="hf-nav-link{% if link.active %} active{% endif %}">
+          {{ link.title }}
+        </a>
+      {%- endfor -%}
+    </nav>
+  {%- endunless -%}
+
+</div>
+
+<!-- ════ Search Overlay ════ -->
+{%- unless section.settings.hide_search -%}
+<div class="hf-search-overlay" id="hfSearchOverlay">
+  <div class="hf-search-panel">
+    <div class="hf-search-field">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      <input class="hf-search-input" id="hfSearchInput" type="text" placeholder="ابحث عن منتج أو قسم..." autocomplete="off">
+      <button class="hf-search-clear" id="hfSearchClear">×</button>
+    </div>
+    <div class="hf-search-results" id="hfSearchResults"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var btn     = document.getElementById('hfSearchToggle');
+  var overlay = document.getElementById('hfSearchOverlay');
+  var input   = document.getElementById('hfSearchInput');
+  var results = document.getElementById('hfSearchResults');
+  var clearBtn= document.getElementById('hfSearchClear');
+  if(!btn||!overlay) return;
+
+  var timer;
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var isOpen = overlay.classList.toggle('open');
+    btn.classList.toggle('active', isOpen);
+    if(isOpen){ setTimeout(function(){ input.focus(); },80); loadCollections(); }
+    else { reset(); }
+  });
+
+  overlay.addEventListener('click', function(e){
+    if(!e.target.closest('.hf-search-panel')) close();
+  });
+
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  clearBtn.addEventListener('click', function(){
+    input.value=''; clearBtn.style.display='none'; input.focus(); loadCollections();
+  });
+
+  input.addEventListener('input', function(){
+    clearBtn.style.display = this.value ? 'block' : 'none';
+    clearTimeout(timer);
+    var q = this.value.trim();
+    if(q.length < 2){ loadCollections(); return; }
+    timer = setTimeout(function(){ doSearch(q); }, 300);
+  });
+
+  function close(){ overlay.classList.remove('open'); btn.classList.remove('active'); reset(); }
+  function reset(){ input.value=''; clearBtn.style.display='none'; results.innerHTML=''; }
+
+  function loadCollections(){
+    results.innerHTML = '<div class="hf-status">جارٍ التحميل...</div>';
+    fetch('/collections.json?limit=10')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var cols = d.collections||[];
+        if(!cols.length){ results.innerHTML=''; return; }
+        results.innerHTML = '<div class="hf-results-section"><div class="hf-results-label">الأقسام</div><div class="hf-collections-wrap">'
+          + cols.map(function(c){ return '<a href="/collections/'+c.handle+'" class="hf-result-col">'+c.title+'</a>'; }).join('')
+          + '</div></div>';
+      })
+      .catch(function(){ results.innerHTML=''; });
+  }
+
+  function doSearch(q){
+    results.innerHTML = '<div class="hf-status">جارٍ البحث...</div>';
+    Promise.all([
+      fetch('/search/suggest.json?q='+encodeURIComponent(q)+'&resources[type]=product&resources[limit]=5').then(function(r){return r.json();}),
+      fetch('/search/suggest.json?q='+encodeURIComponent(q)+'&resources[type]=collection&resources[limit]=4').then(function(r){return r.json();})
+    ]).then(function(arr){
+      var prods = (arr[0].resources&&arr[0].resources.results&&arr[0].resources.results.products)||[];
+      var cols  = (arr[1].resources&&arr[1].resources.results&&arr[1].resources.results.collections)||[];
+
+      if(!prods.length && !cols.length){
+        results.innerHTML='<div class="hf-status">لا توجد نتائج لـ "'+q+'"</div>'; return;
+      }
+
+      var html='';
+
+      if(cols.length){
+        html+='<div class="hf-results-section"><div class="hf-results-label">الأقسام</div><div class="hf-collections-wrap">'
+          +cols.map(function(c){ return '<a href="'+c.url+'" class="hf-result-col">'+c.title+'</a>'; }).join('')
+          +'</div></div>';
+      }
+
+      if(prods.length){
+        html+='<div class="hf-results-section"><div class="hf-results-label">المنتجات</div>'
+          +prods.map(function(p){
+            var img = p.featured_image&&p.featured_image.url
+              ? '<img class="hf-result-img" src="'+p.featured_image.url+'&width=120" alt="'+p.title+'" loading="lazy">'
+              : '<div class="hf-result-img-ph">📼</div>';
+            var price = p.price ? Math.round(p.price/100)+' ر.س' : '';
+            return '<a href="'+p.url+'" class="hf-result-product">'+img
+              +'<div class="hf-result-info"><div class="hf-result-title">'+p.title+'</div>'
+              +(price?'<div class="hf-result-price">'+price+'</div>':'')
+              +'</div></a>';
+          }).join('')
+          +'</div>';
+      }
+
+      html+='<a href="/search?q='+encodeURIComponent(q)+'" class="hf-view-all">عرض كل النتائج</a>';
+      results.innerHTML=html;
+    }).catch(function(){ results.innerHTML='<div class="hf-status">حدث خطأ، حاول مجدداً</div>'; });
+  }
+})();
+</script>
+{%- endunless -%}
+
+<!-- الهيدر الأصلي مخفي لكن ضروري لـ Shopify -->
+<div style="display:none">
+{%- liquid
+  assign header_tag = 'div'
+  if section.settings.sticky_header_type != 'none'
+    assign header_tag = 'sticky-header'
+  endif
+-%}
+<{{ header_tag }}
+  {% if header_tag == 'sticky-header' %}data-sticky-type="{{ section.settings.sticky_header_type }}"{% endif %}
+  class="header-wrapper color-{{ section.settings.color_scheme }} gradient">
+  <header class="header page-width"></header>
+</{{ header_tag }}>
+</div>
+
+{%- if settings.cart_type == 'notification' -%}
+  {%- render 'cart-notification', color_scheme: section.settings.color_scheme, desktop_menu_type: section.settings.menu_type_desktop -%}
+{%- endif -%}
+
+{% javascript %}
+  class StickyHeader extends HTMLElement {
+    constructor() { super(); }
+    connectedCallback() {
+      this.header = document.querySelector('.section-header');
+      this.headerIsAlwaysSticky = this.getAttribute('data-sticky-type') === 'always' || this.getAttribute('data-sticky-type') === 'reduce-logo-size';
+      this.headerBounds = {};
+      this.setHeaderHeight();
+      window.matchMedia('(max-width: 990px)').addEventListener('change', this.setHeaderHeight.bind(this));
+      if (this.headerIsAlwaysSticky) this.header.classList.add('shopify-section-header-sticky');
+      this.currentScrollTop = 0;
+      this.preventReveal = false;
+      this.onScrollHandler = this.onScroll.bind(this);
+      this.hideHeaderOnScrollUp = () => (this.preventReveal = true);
+      this.addEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+      window.addEventListener('scroll', this.onScrollHandler, false);
+      this.createObserver();
+    }
+    setHeaderHeight() {
+      document.documentElement.style.setProperty('--header-height', `${this.header.offsetHeight}px`);
+    }
+    disconnectedCallback() {
+      this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+      window.removeEventListener('scroll', this.onScrollHandler);
+    }
+    createObserver() {
+      let observer = new IntersectionObserver((entries, observer) => {
+        this.headerBounds = entries[0].intersectionRect;
+        observer.disconnect();
+      });
+      observer.observe(this.header);
+    }
+    onScroll() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+        this.header.classList.add('scrolled-past-header');
+        if (!this.preventHide) requestAnimationFrame(this.hide.bind(this));
+      } else if (scrollTop < this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+        this.header.classList.add('scrolled-past-header');
+        if (!this.preventReveal) requestAnimationFrame(this.reveal.bind(this));
+        else {
+          window.clearTimeout(this.isScrolling);
+          this.isScrolling = setTimeout(() => { this.preventReveal = false; }, 66);
+          requestAnimationFrame(this.hide.bind(this));
+        }
+      } else if (scrollTop <= this.headerBounds.top) {
+        this.header.classList.remove('scrolled-past-header');
+        requestAnimationFrame(this.reset.bind(this));
+      }
+      this.currentScrollTop = scrollTop;
+    }
+    hide() { if (this.headerIsAlwaysSticky) return; this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky'); }
+    reveal() { if (this.headerIsAlwaysSticky) return; this.header.classList.add('shopify-section-header-sticky', 'animate'); this.header.classList.remove('shopify-section-header-hidden'); }
+    reset() { if (this.headerIsAlwaysSticky) return; this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-header-sticky', 'animate'); }
+  }
+  customElements.define('sticky-header', StickyHeader);
+{% endjavascript %}
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": {{ shop.name | json }},
+  {% if settings.logo %}"logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},{% endif %}
+  "url": {{ request.origin | append: page.url | json }}
+}
+</script>
+
+{% schema %}
+{
+  "name": "الحصيف — هيدر",
+  "class": "section-header",
+  "max_blocks": 3,
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "🎨 الألوان"
+    },
+    {
+      "type": "color",
+      "id": "header_bg",
+      "label": "خلفية الهيدر",
+      "default": "#f5f2ec"
+    },
+    {
+      "type": "color",
+      "id": "header_border",
+      "label": "لون الحدود",
+      "default": "#e0dbd0"
+    },
+    {
+      "type": "color",
+      "id": "logo_color",
+      "label": "لون اسم المتجر (نص)",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "nav_color",
+      "label": "لون روابط القائمة",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "nav_hover_bg",
+      "label": "خلفية hover القائمة",
+      "default": "#ebe7df"
+    },
+    {
+      "type": "header",
+      "content": "🔘 زر الدخول"
+    },
+    {
+      "type": "color",
+      "id": "btn_login_bg",
+      "label": "خلفية",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_login_text",
+      "label": "نص",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_login_border",
+      "label": "حدود",
+      "default": "#cccccc"
+    },
+    {
+      "type": "header",
+      "content": "🛒 زر السلة"
+    },
+    {
+      "type": "color",
+      "id": "btn_cart_bg",
+      "label": "خلفية",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_cart_text",
+      "label": "نص",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "نص الزر",
+      "default": "السلة"
+    },
+    {
+      "type": "header",
+      "content": "🔴 شارة العدد"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "خلفية",
+      "default": "#c8a030"
+    },
+    {
+      "type": "color",
+      "id": "badge_text",
+      "label": "نص",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "🔍 نافذة البحث"
+    },
+    {
+      "type": "color",
+      "id": "search_panel_bg",
+      "label": "خلفية نافذة البحث",
+      "default": "#f5f2ec"
+    },
+    {
+      "type": "header",
+      "content": "📐 الأبعاد"
+    },
+    {
+      "type": "range",
+      "id": "logo_size_desktop",
+      "label": "حجم الشعار — ديسكتوب",
+      "min": 20, "max": 80, "step": 2, "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "logo_size_mobile",
+      "label": "حجم الشعار — موبايل",
+      "min": 16, "max": 60, "step": 2, "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "btn_radius",
+      "label": "استدارة الأزرار",
+      "min": 0, "max": 50, "step": 2, "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "👁 إخفاء عناصر"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_search",
+      "label": "إخفاء زر البحث",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_login",
+      "label": "إخفاء زر الدخول",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_cart",
+      "label": "إخفاء زر السلة",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_nav",
+      "label": "إخفاء القائمة",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "⚙️ إعدادات عامة"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "القائمة"
+    },
+    {
+      "type": "select",
+      "id": "sticky_header_type",
+      "options": [
+        { "value": "none",           "label": "ثابت" },
+        { "value": "on-scroll-up",   "label": "يظهر عند الرجوع" },
+        { "value": "always",         "label": "دائماً مثبّت" }
+      ],
+      "default": "always",
+      "label": "سلوك التمرير"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "نظام الألوان",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "label": "مسافة أسفل الهيدر",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "logo_position",
+      "options": [
+        { "value": "middle-left",   "label": "وسط يسار" },
+        { "value": "middle-center", "label": "وسط منتصف" }
+      ],
+      "default": "middle-left",
+      "label": "موضع الشعار (للثيم)"
+    },
+    {
+      "type": "select",
+      "id": "menu_type_desktop",
+      "options": [
+        { "value": "dropdown", "label": "قائمة منسدلة" },
+        { "value": "drawer",   "label": "درج جانبي" }
+      ],
+      "default": "dropdown",
+      "label": "نوع القائمة"
+    }
+  ],
+  "blocks": [{ "type": "@app" }]
+}
+{% endschema %}

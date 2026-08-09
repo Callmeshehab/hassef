@@ -1,0 +1,1179 @@
+{% doc %}
+  @prompt
+    <div class="teaser-section color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
+      <div class="page-width">
+        <div class="teaser-content">
+          {%- if section.settings.image != blank -%}
+            <div class="teaser-image">
+              <img src="{{ section.settings.image | img_url: '800x' }}" alt="{{ section.settings.image.alt }}">
+            </div>
+          {%- endif -%}
+          
+          <div class="teaser-text-box">
+            <h2 class="teaser-title">{{ section.settings.title }}</h2>
+            <div class="teaser-description">{{ section.settings.text }}</div>
+            <a href="{{ section.settings.button_link }}" class="button button--primary">
+              {{ section.settings.button_label }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <style>
+      .teaser-content {
+        display: flex;
+        flex-direction: row-reverse; /* ترتيب مناسب للغة العربية: الصورة يسار والنص يمين */
+        align-items: center;
+        gap: 40px;
+        padding: 40px 0;
+      }
+      .teaser-image img {
+        max-width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      }
+      .teaser-text-box {
+        flex: 1;
+        text-align: right;
+      }
+      .teaser-title { margin-bottom: 20px; font-weight: bold; }
+      .teaser-description { margin-bottom: 30px; line-height: 1.6; font-size: 1.1rem; }
+    
+      @media (max-width: 749px) {
+        .teaser-content { flex-direction: column; text-align: center; }
+        .teaser-text-box { text-align: center; }
+      }
+    </style>
+    
+    {% schema %}
+    {
+      "name": "تشويقة المقالات",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "الصورة" },
+        { "type": "text", "id": "title", "label": "العنوان", "default": "اكتشف جديدنا" },
+        { "type": "richtext", "id": "text", "label": "نص التشويق", "default": "<p>اكتب هنا نبذة قصيرة ومحفزة عن المقال...</p>" },
+        { "type": "text", "id": "button_label", "label": "نص الزر", "default": "اقرأ المزيد" },
+        { "type": "url", "id": "button_link", "label": "رابط صفحة المقالات" },
+        { "type": "color_scheme", "id": "color_scheme", "label": "مخطط الألوان", "default": "background-1" }
+      ],
+      "presets": [
+        { "name": "تشويقة المقالات" }
+      ]
+    }
+    {% endschema %}
+    , اضف زر للانتقال للمقالة وخيارات لاضافه صور بحريه في هذا القسم احدد حجمها وموضعها ونص اعلى القسم , بدي خيارات زي التحكم في أبعاد الصوره الرئيسيه للمقالات وخيارات للتنقل بين المقالات وخيارات للتحكم في أبعاد كل جزء عن بعضه واضف خيارات اكثر دقه للتحكم في النصوص, الصوره الزخرفيه لا تظهر بدي تكون ظاهره على كل شيء واجعل هناك حمايه لكل الصور لمنع تحمليها عند الضغط عليها, الصور الزخرفية تالفه ولا تظهر عليك ان تصلحها
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-article-teaser-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    position: relative;
+    padding: {{ block.settings.section_padding_top }}px 0 {{ block.settings.section_padding_bottom }}px;
+  }
+
+  .ai-article-teaser-container-{{ ai_gen_id }} {
+    max-width: {{ settings.page_width }}px;
+    margin: 0 auto;
+    padding: 0 {{ settings.spacing_grid_horizontal }}px;
+    position: relative;
+  }
+
+  .ai-article-teaser-section-heading-{{ ai_gen_id }} {
+    text-align: {{ block.settings.heading_alignment }};
+    margin-bottom: {{ block.settings.heading_spacing }}px;
+    color: rgb(var(--color-foreground));
+    font-size: {{ block.settings.heading_size }}px;
+    font-weight: {{ block.settings.heading_weight }};
+    line-height: {{ block.settings.heading_line_height }};
+  }
+
+  .ai-article-teaser-content-{{ ai_gen_id }} {
+    display: flex;
+    {% if block.settings.layout_direction == 'image_right' %}
+      flex-direction: row;
+    {% else %}
+      flex-direction: row-reverse;
+    {% endif %}
+    align-items: {{ block.settings.content_alignment }};
+    gap: {{ block.settings.content_gap }}px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ai-article-teaser-image-wrapper-{{ ai_gen_id }} {
+    flex: 0 0 {{ block.settings.image_width }}%;
+    min-width: 0;
+  }
+
+  .ai-article-teaser-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.image_height }}px;
+    overflow: hidden;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    {% if settings.media_shadow_opacity > 0 %}
+      box-shadow: {{ settings.media_shadow_horizontal_offset }}px {{ settings.media_shadow_vertical_offset }}px {{ settings.media_shadow_blur }}px rgba(var(--color-shadow), {{ settings.media_shadow_opacity | divided_by: 100.0 }});
+    {% endif %}
+  }
+
+  .ai-article-teaser-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: {{ block.settings.image_fit }};
+    object-position: {{ block.settings.image_position }};
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }
+
+  .ai-article-teaser-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(var(--color-foreground), 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-article-teaser-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+    opacity: 0.3;
+  }
+
+  .ai-article-teaser-text-box-{{ ai_gen_id }} {
+    flex: 0 0 {{ 100 | minus: block.settings.image_width }}%;
+    text-align: {{ block.settings.text_alignment }};
+    {% if block.settings.text_alignment == 'right' %}
+      direction: rtl;
+    {% endif %}
+  }
+
+  .ai-article-teaser-title-{{ ai_gen_id }} {
+    margin: 0 0 {{ block.settings.title_spacing }}px;
+    font-weight: {{ block.settings.title_weight }};
+    color: rgb(var(--color-foreground));
+    font-size: {{ block.settings.title_size }}px;
+    line-height: {{ block.settings.title_line_height }};
+  }
+
+  .ai-article-teaser-description-{{ ai_gen_id }} {
+    margin-bottom: {{ block.settings.description_spacing }}px;
+    line-height: {{ block.settings.description_line_height }};
+    font-size: {{ block.settings.description_size }}px;
+    color: rgba(var(--color-foreground), {{ block.settings.description_opacity | divided_by: 100.0 }});
+  }
+
+  .ai-article-teaser-button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    background-color: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    border-radius: {{ settings.buttons_radius }}px;
+    text-decoration: none;
+    font-weight: {{ block.settings.button_font_weight }};
+    font-size: {{ block.settings.button_font_size }}px;
+    transition: all 0.3s ease;
+    border: {{ settings.buttons_border_thickness }}px solid rgba(var(--color-button), {{ settings.buttons_border_opacity | divided_by: 100.0 }});
+    {% if settings.buttons_shadow_opacity > 0 %}
+      box-shadow: {{ settings.buttons_shadow_horizontal_offset }}px {{ settings.buttons_shadow_vertical_offset }}px {{ settings.buttons_shadow_blur }}px rgba(var(--color-shadow), {{ settings.buttons_shadow_opacity | divided_by: 100.0 }});
+    {% endif %}
+  }
+
+  .ai-article-teaser-button-{{ ai_gen_id }}:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+  }
+
+  .ai-article-teaser-navigation-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    margin-top: {{ block.settings.navigation_spacing }}px;
+    {% if block.settings.text_alignment == 'center' %}
+      justify-content: center;
+    {% elsif block.settings.text_alignment == 'right' %}
+      justify-content: flex-start;
+    {% else %}
+      justify-content: flex-end;
+    {% endif %}
+  }
+
+  .ai-article-teaser-nav-button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(var(--color-button), 0.1);
+    color: rgb(var(--color-button));
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .ai-article-teaser-nav-button-{{ ai_gen_id }}:hover {
+    background-color: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    border-color: rgb(var(--color-button));
+  }
+
+  .ai-article-teaser-nav-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-article-teaser-decorative-image-{{ ai_gen_id }} {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .ai-article-teaser-decorative-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }
+
+  .ai-article-teaser-decorative-1-{{ ai_gen_id }} {
+    width: {{ block.settings.decorative_1_size }}px;
+    height: {{ block.settings.decorative_1_size }}px;
+    top: {{ block.settings.decorative_1_position_y }}%;
+    {% if block.settings.decorative_1_position_x_side == 'right' %}
+      right: {{ block.settings.decorative_1_position_x }}%;
+    {% else %}
+      left: {{ block.settings.decorative_1_position_x }}%;
+    {% endif %}
+    opacity: {{ block.settings.decorative_1_opacity | divided_by: 100.0 }};
+  }
+
+  .ai-article-teaser-decorative-2-{{ ai_gen_id }} {
+    width: {{ block.settings.decorative_2_size }}px;
+    height: {{ block.settings.decorative_2_size }}px;
+    top: {{ block.settings.decorative_2_position_y }}%;
+    {% if block.settings.decorative_2_position_x_side == 'right' %}
+      right: {{ block.settings.decorative_2_position_x }}%;
+    {% else %}
+      left: {{ block.settings.decorative_2_position_x }}%;
+    {% endif %}
+    opacity: {{ block.settings.decorative_2_opacity | divided_by: 100.0 }};
+  }
+
+  .ai-article-teaser-decorative-3-{{ ai_gen_id }} {
+    width: {{ block.settings.decorative_3_size }}px;
+    height: {{ block.settings.decorative_3_size }}px;
+    top: {{ block.settings.decorative_3_position_y }}%;
+    {% if block.settings.decorative_3_position_x_side == 'right' %}
+      right: {{ block.settings.decorative_3_position_x }}%;
+    {% else %}
+      left: {{ block.settings.decorative_3_position_x }}%;
+    {% endif %}
+    opacity: {{ block.settings.decorative_3_opacity | divided_by: 100.0 }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-article-teaser-content-{{ ai_gen_id }} {
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .ai-article-teaser-image-wrapper-{{ ai_gen_id }},
+    .ai-article-teaser-text-box-{{ ai_gen_id }} {
+      flex: 0 0 100%;
+    }
+
+    .ai-article-teaser-text-box-{{ ai_gen_id }} {
+      text-align: center;
+    }
+
+    .ai-article-teaser-image-{{ ai_gen_id }} {
+      height: {{ block.settings.image_height_mobile }}px;
+    }
+
+    .ai-article-teaser-section-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.8 }}px;
+    }
+
+    .ai-article-teaser-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.85 }}px;
+    }
+
+    .ai-article-teaser-description-{{ ai_gen_id }} {
+      font-size: {{ block.settings.description_size | times: 0.9 }}px;
+    }
+
+    .ai-article-teaser-decorative-image-{{ ai_gen_id }} {
+      display: none;
+    }
+
+    .ai-article-teaser-navigation-{{ ai_gen_id }} {
+      justify-content: center;
+    }
+  }
+{% endstyle %}
+
+<article-teaser-{{ ai_gen_id }} class="ai-article-teaser-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-article-teaser-container-{{ ai_gen_id }}">
+    {% if block.settings.decorative_1_enabled and block.settings.decorative_1_image != blank %}
+      <div class="ai-article-teaser-decorative-image-{{ ai_gen_id }} ai-article-teaser-decorative-1-{{ ai_gen_id }}">
+        <img
+          src="{{ block.settings.decorative_1_image | image_url: width: 600 }}"
+          alt=""
+          loading="lazy"
+          draggable="false"
+          oncontextmenu="return false;"
+        >
+      </div>
+    {% endif %}
+
+    {% if block.settings.decorative_2_enabled and block.settings.decorative_2_image != blank %}
+      <div class="ai-article-teaser-decorative-image-{{ ai_gen_id }} ai-article-teaser-decorative-2-{{ ai_gen_id }}">
+        <img
+          src="{{ block.settings.decorative_2_image | image_url: width: 600 }}"
+          alt=""
+          loading="lazy"
+          draggable="false"
+          oncontextmenu="return false;"
+        >
+      </div>
+    {% endif %}
+
+    {% if block.settings.decorative_3_enabled and block.settings.decorative_3_image != blank %}
+      <div class="ai-article-teaser-decorative-image-{{ ai_gen_id }} ai-article-teaser-decorative-3-{{ ai_gen_id }}">
+        <img
+          src="{{ block.settings.decorative_3_image | image_url: width: 600 }}"
+          alt=""
+          loading="lazy"
+          draggable="false"
+          oncontextmenu="return false;"
+        >
+      </div>
+    {% endif %}
+
+    {% if block.settings.section_heading != blank %}
+      <h2 class="ai-article-teaser-section-heading-{{ ai_gen_id }}">{{ block.settings.section_heading }}</h2>
+    {% endif %}
+
+    <div class="ai-article-teaser-content-{{ ai_gen_id }}">
+      <div class="ai-article-teaser-image-wrapper-{{ ai_gen_id }}">
+        <div class="ai-article-teaser-image-{{ ai_gen_id }}">
+          {% if block.settings.image != blank %}
+            <img
+              src="{{ block.settings.image | image_url: width: 1200 }}"
+              alt="{{ block.settings.image.alt | escape }}"
+              loading="lazy"
+              width="{{ block.settings.image.width }}"
+              height="{{ block.settings.image.height }}"
+              draggable="false"
+              oncontextmenu="return false;"
+            >
+          {% else %}
+            <div class="ai-article-teaser-image-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="ai-article-teaser-text-box-{{ ai_gen_id }}">
+        {% if block.settings.title != blank %}
+          <h3 class="ai-article-teaser-title-{{ ai_gen_id }}">{{ block.settings.title }}</h3>
+        {% endif %}
+
+        {% if block.settings.text != blank %}
+          <div class="ai-article-teaser-description-{{ ai_gen_id }}">{{ block.settings.text }}</div>
+        {% endif %}
+
+        {% if block.settings.button_label != blank %}
+          <a 
+            href="{% if block.settings.article != blank %}{{ block.settings.article.url }}{% elsif block.settings.button_link != blank %}{{ block.settings.button_link }}{% else %}#{% endif %}" 
+            class="ai-article-teaser-button-{{ ai_gen_id }}"
+          >
+            {{ block.settings.button_label }}
+          </a>
+        {% endif %}
+
+        {% if block.settings.show_navigation %}
+          <div class="ai-article-teaser-navigation-{{ ai_gen_id }}">
+            {% if block.settings.prev_article != blank %}
+              <a 
+                href="{{ block.settings.prev_article.url }}" 
+                class="ai-article-teaser-nav-button-{{ ai_gen_id }}"
+                aria-label="المقالة السابقة"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            {% else %}
+              <button class="ai-article-teaser-nav-button-{{ ai_gen_id }}" disabled aria-label="لا توجد مقالة سابقة">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            {% endif %}
+
+            {% if block.settings.next_article != blank %}
+              <a 
+                href="{{ block.settings.next_article.url }}" 
+                class="ai-article-teaser-nav-button-{{ ai_gen_id }}"
+                aria-label="المقالة التالية"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            {% else %}
+              <button class="ai-article-teaser-nav-button-{{ ai_gen_id }}" disabled aria-label="لا توجد مقالة تالية">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</article-teaser-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ArticleTeaser{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.preventImageDownload();
+      }
+
+      preventImageDownload() {
+        const images = this.querySelectorAll('img');
+        images.forEach(img => {
+          img.addEventListener('contextmenu', (e) => e.preventDefault());
+          img.addEventListener('dragstart', (e) => e.preventDefault());
+        });
+      }
+    }
+
+    customElements.define('article-teaser-{{ ai_gen_id }}', ArticleTeaser{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "تشويقة المقالات",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "التخطيط العام"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة العلوية",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة السفلية",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "layout_direction",
+      "label": "ترتيب العناصر",
+      "options": [
+        {
+          "value": "image_left",
+          "label": "الصورة يسار - النص يمين"
+        },
+        {
+          "value": "image_right",
+          "label": "الصورة يمين - النص يسار"
+        }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "محاذاة المحتوى عمودياً",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "أعلى"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "flex-end",
+          "label": "أسفل"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_gap",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة بين الصورة والنص",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "عنوان القسم"
+    },
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "نص العنوان"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم الخط",
+      "default": 32
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "سُمك الخط",
+      "options": [
+        {
+          "value": "400",
+          "label": "عادي"
+        },
+        {
+          "value": "500",
+          "label": "متوسط"
+        },
+        {
+          "value": "600",
+          "label": "نصف عريض"
+        },
+        {
+          "value": "700",
+          "label": "عريض"
+        }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر",
+      "default": 1.2
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "محاذاة العنوان",
+      "options": [
+        {
+          "value": "right",
+          "label": "يمين"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة أسفل العنوان",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "الصورة الرئيسية"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "الصورة"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "min": 30,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "label": "عرض الصورة",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "ارتفاع الصورة (ديسكتوب)",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "ارتفاع الصورة (موبايل)",
+      "default": 250
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "طريقة عرض الصورة",
+      "options": [
+        {
+          "value": "cover",
+          "label": "تغطية كاملة"
+        },
+        {
+          "value": "contain",
+          "label": "احتواء كامل"
+        },
+        {
+          "value": "fill",
+          "label": "تمديد"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "موضع الصورة",
+      "options": [
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "top",
+          "label": "أعلى"
+        },
+        {
+          "value": "bottom",
+          "label": "أسفل"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        },
+        {
+          "value": "right",
+          "label": "يمين"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة الزوايا",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "عنوان المقالة"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "العنوان",
+      "default": "اكتشف جديدنا"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم الخط",
+      "default": 28
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "سُمك الخط",
+      "options": [
+        {
+          "value": "400",
+          "label": "عادي"
+        },
+        {
+          "value": "500",
+          "label": "متوسط"
+        },
+        {
+          "value": "600",
+          "label": "نصف عريض"
+        },
+        {
+          "value": "700",
+          "label": "عريض"
+        }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "title_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "title_spacing",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة أسفل العنوان",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "نص الوصف"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "نص التشويق",
+      "default": "<p>اكتب هنا نبذة قصيرة ومحفزة عن المقال...</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم الخط",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "description_line_height",
+      "min": 1.2,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر",
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "description_opacity",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "شفافية النص",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "description_spacing",
+      "min": 16,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة أسفل الوصف",
+      "default": 32
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "محاذاة النص",
+      "options": [
+        {
+          "value": "right",
+          "label": "يمين"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "header",
+      "content": "الزر"
+    },
+    {
+      "type": "article",
+      "id": "article",
+      "label": "اختر المقالة"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "أو أدخل رابط مخصص"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "نص الزر",
+      "default": "اقرأ المزيد"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم خط الزر",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "button_font_weight",
+      "label": "سُمك خط الزر",
+      "options": [
+        {
+          "value": "400",
+          "label": "عادي"
+        },
+        {
+          "value": "500",
+          "label": "متوسط"
+        },
+        {
+          "value": "600",
+          "label": "نصف عريض"
+        }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "المسافة الداخلية عمودياً",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "min": 16,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة الداخلية أفقياً",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "التنقل بين المقالات"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "إظهار أزرار التنقل",
+      "default": false
+    },
+    {
+      "type": "article",
+      "id": "prev_article",
+      "label": "المقالة السابقة"
+    },
+    {
+      "type": "article",
+      "id": "next_article",
+      "label": "المقالة التالية"
+    },
+    {
+      "type": "range",
+      "id": "navigation_spacing",
+      "min": 12,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "المسافة فوق أزرار التنقل",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "صورة زخرفية 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "decorative_1_enabled",
+      "label": "تفعيل الصورة الزخرفية 1",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "decorative_1_image",
+      "label": "الصورة"
+    },
+    {
+      "type": "range",
+      "id": "decorative_1_size",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "حجم الصورة",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "decorative_1_position_x_side",
+      "label": "الجانب الأفقي",
+      "options": [
+        {
+          "value": "right",
+          "label": "يمين"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "decorative_1_position_x",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "الموضع الأفقي",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "decorative_1_position_y",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "الموضع العمودي",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "decorative_1_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "الشفافية",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "صورة زخرفية 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "decorative_2_enabled",
+      "label": "تفعيل الصورة الزخرفية 2",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "decorative_2_image",
+      "label": "الصورة"
+    },
+    {
+      "type": "range",
+      "id": "decorative_2_size",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "حجم الصورة",
+      "default": 150
+    },
+    {
+      "type": "select",
+      "id": "decorative_2_position_x_side",
+      "label": "الجانب الأفقي",
+      "options": [
+        {
+          "value": "right",
+          "label": "يمين"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "decorative_2_position_x",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "الموضع الأفقي",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "decorative_2_position_y",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "الموضع العمودي",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "decorative_2_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "الشفافية",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "صورة زخرفية 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "decorative_3_enabled",
+      "label": "تفعيل الصورة الزخرفية 3",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "decorative_3_image",
+      "label": "الصورة"
+    },
+    {
+      "type": "range",
+      "id": "decorative_3_size",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "حجم الصورة",
+      "default": 120
+    },
+    {
+      "type": "select",
+      "id": "decorative_3_position_x_side",
+      "label": "الجانب الأفقي",
+      "options": [
+        {
+          "value": "right",
+          "label": "يمين"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "decorative_3_position_x",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "الموضع الأفقي",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "decorative_3_position_y",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "الموضع العمودي",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "decorative_3_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "الشفافية",
+      "default": 50
+    }
+  ],
+  "presets": [
+    {
+      "name": "تشويقة المقالات"
+    }
+  ]
+}
+{% endschema %}

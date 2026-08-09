@@ -1,0 +1,478 @@
+{% doc %}
+  @prompt
+    بدي تعمل لي رساله عائمة مربعه تلاحق عند التصفح تسأل المتصفح اسئلة وهي يختار وإذا جاوب صح تحوله لصفحة فيها مقطع فيديو أنا ارفعه
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-quiz-widget-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: {{ block.settings.bottom_position }}px;
+    right: {{ block.settings.right_position }}px;
+    width: {{ block.settings.widget_width }}px;
+    background-color: {{ block.settings.background_color }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    padding: 20px;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-quiz-widget-{{ ai_gen_id }}.hidden {
+    display: none;
+  }
+
+  .ai-quiz-widget-header-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .ai-quiz-widget-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_font_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .ai-quiz-widget-close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: {{ block.settings.text_color }};
+    opacity: 0.7;
+  }
+
+  .ai-quiz-widget-close-{{ ai_gen_id }}:hover {
+    opacity: 1;
+  }
+
+  .ai-quiz-widget-question-{{ ai_gen_id }} {
+    font-size: {{ block.settings.question_font_size }}px;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 15px;
+  }
+
+  .ai-quiz-widget-options-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ai-quiz-widget-option-{{ ai_gen_id }} {
+    padding: 12px 16px;
+    background-color: {{ block.settings.option_bg_color }};
+    color: {{ block.settings.option_text_color }};
+    border: 2px solid {{ block.settings.option_border_color }};
+    border-radius: {{ block.settings.option_border_radius }}px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: {{ block.settings.option_font_size }}px;
+  }
+
+  .ai-quiz-widget-option-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.option_hover_bg_color }};
+    border-color: {{ block.settings.option_hover_border_color }};
+    transform: translateY(-2px);
+  }
+
+  .ai-quiz-widget-message-{{ ai_gen_id }} {
+    font-size: {{ block.settings.message_font_size }}px;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .ai-quiz-widget-message-{{ ai_gen_id }}.success {
+    color: {{ block.settings.success_color }};
+  }
+
+  .ai-quiz-widget-message-{{ ai_gen_id }}.error {
+    color: {{ block.settings.error_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-quiz-widget-{{ ai_gen_id }} {
+      width: calc(100% - 40px);
+      right: 20px;
+      bottom: 20px;
+    }
+  }
+{% endstyle %}
+
+<quiz-widget-{{ ai_gen_id }}
+  class="ai-quiz-widget-{{ ai_gen_id }}"
+  data-correct-answer="{{ block.settings.correct_answer }}"
+  data-success-url="{{ block.settings.success_page.url }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-quiz-widget-header-{{ ai_gen_id }}">
+    <h3 class="ai-quiz-widget-title-{{ ai_gen_id }}">{{ block.settings.widget_title }}</h3>
+    <button class="ai-quiz-widget-close-{{ ai_gen_id }}" aria-label="إغلاق">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="ai-quiz-widget-content-{{ ai_gen_id }}">
+    <div class="ai-quiz-widget-question-{{ ai_gen_id }}">{{ block.settings.question_text }}</div>
+    
+    <div class="ai-quiz-widget-options-{{ ai_gen_id }}">
+      {% if block.settings.option_1 != blank %}
+        <button class="ai-quiz-widget-option-{{ ai_gen_id }}" data-answer="1">
+          {{ block.settings.option_1 }}
+        </button>
+      {% endif %}
+      
+      {% if block.settings.option_2 != blank %}
+        <button class="ai-quiz-widget-option-{{ ai_gen_id }}" data-answer="2">
+          {{ block.settings.option_2 }}
+        </button>
+      {% endif %}
+      
+      {% if block.settings.option_3 != blank %}
+        <button class="ai-quiz-widget-option-{{ ai_gen_id }}" data-answer="3">
+          {{ block.settings.option_3 }}
+        </button>
+      {% endif %}
+      
+      {% if block.settings.option_4 != blank %}
+        <button class="ai-quiz-widget-option-{{ ai_gen_id }}" data-answer="4">
+          {{ block.settings.option_4 }}
+        </button>
+      {% endif %}
+    </div>
+
+    <div class="ai-quiz-widget-message-{{ ai_gen_id }}" style="display: none;"></div>
+  </div>
+</quiz-widget-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class QuizWidget{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.correctAnswer = this.dataset.correctAnswer;
+        this.successUrl = this.dataset.successUrl;
+      }
+
+      connectedCallback() {
+        this.closeButton = this.querySelector('.ai-quiz-widget-close-{{ ai_gen_id }}');
+        this.options = this.querySelectorAll('.ai-quiz-widget-option-{{ ai_gen_id }}');
+        this.messageElement = this.querySelector('.ai-quiz-widget-message-{{ ai_gen_id }}');
+        
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.closeButton.addEventListener('click', () => {
+          this.classList.add('hidden');
+        });
+
+        this.options.forEach((option) => {
+          option.addEventListener('click', (e) => {
+            this.handleAnswer(e.target.dataset.answer);
+          });
+        });
+      }
+
+      handleAnswer(selectedAnswer) {
+        if (selectedAnswer === this.correctAnswer) {
+          this.showMessage('{{ block.settings.success_message }}', 'success');
+          
+          setTimeout(() => {
+            if (this.successUrl) {
+              window.location.href = this.successUrl;
+            }
+          }, 1000);
+        } else {
+          this.showMessage('{{ block.settings.error_message }}', 'error');
+          
+          setTimeout(() => {
+            this.messageElement.style.display = 'none';
+            this.messageElement.classList.remove('error');
+          }, 2000);
+        }
+      }
+
+      showMessage(message, type) {
+        this.messageElement.textContent = message;
+        this.messageElement.className = 'ai-quiz-widget-message-{{ ai_gen_id }} ' + type;
+        this.messageElement.style.display = 'block';
+      }
+    }
+
+    customElements.define('quiz-widget-{{ ai_gen_id }}', QuizWidget{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "رسالة سؤال عائمة",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "text",
+      "id": "widget_title",
+      "label": "عنوان الرسالة",
+      "default": "سؤال سريع"
+    },
+    {
+      "type": "textarea",
+      "id": "question_text",
+      "label": "نص السؤال",
+      "default": "ما هي الإجابة الصحيحة؟"
+    },
+    {
+      "type": "text",
+      "id": "option_1",
+      "label": "الخيار 1",
+      "default": "الخيار الأول"
+    },
+    {
+      "type": "text",
+      "id": "option_2",
+      "label": "الخيار 2",
+      "default": "الخيار الثاني"
+    },
+    {
+      "type": "text",
+      "id": "option_3",
+      "label": "الخيار 3",
+      "default": "الخيار الثالث"
+    },
+    {
+      "type": "text",
+      "id": "option_4",
+      "label": "الخيار 4"
+    },
+    {
+      "type": "select",
+      "id": "correct_answer",
+      "label": "الإجابة الصحيحة",
+      "options": [
+        {
+          "value": "1",
+          "label": "الخيار 1"
+        },
+        {
+          "value": "2",
+          "label": "الخيار 2"
+        },
+        {
+          "value": "3",
+          "label": "الخيار 3"
+        },
+        {
+          "value": "4",
+          "label": "الخيار 4"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "page",
+      "id": "success_page",
+      "label": "صفحة الفيديو عند الإجابة الصحيحة"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "رسالة النجاح",
+      "default": "إجابة صحيحة! جاري التحويل..."
+    },
+    {
+      "type": "text",
+      "id": "error_message",
+      "label": "رسالة الخطأ",
+      "default": "إجابة خاطئة، حاول مرة أخرى"
+    },
+    {
+      "type": "header",
+      "content": "الموقع"
+    },
+    {
+      "type": "range",
+      "id": "widget_width",
+      "label": "عرض الرسالة",
+      "min": 250,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "bottom_position",
+      "label": "المسافة من الأسفل",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "right_position",
+      "label": "المسافة من اليمين",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "الألوان"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "لون الحدود",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "option_bg_color",
+      "label": "لون خلفية الخيارات",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "option_text_color",
+      "label": "لون نص الخيارات",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "option_border_color",
+      "label": "لون حدود الخيارات",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "option_hover_bg_color",
+      "label": "لون خلفية الخيارات عند التمرير",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "option_hover_border_color",
+      "label": "لون حدود الخيارات عند التمرير",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "success_color",
+      "label": "لون رسالة النجاح",
+      "default": "#008060"
+    },
+    {
+      "type": "color",
+      "id": "error_color",
+      "label": "لون رسالة الخطأ",
+      "default": "#D82C0D"
+    },
+    {
+      "type": "header",
+      "content": "التنسيق"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "label": "سمك الحدود",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الحدود",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "option_border_radius",
+      "label": "استدارة حدود الخيارات",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "حجم خط العنوان",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "question_font_size",
+      "label": "حجم خط السؤال",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "option_font_size",
+      "label": "حجم خط الخيارات",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "message_font_size",
+      "label": "حجم خط الرسالة",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    }
+  ],
+  "presets": [
+    {
+      "name": "رسالة سؤال عائمة"
+    }
+  ]
+}
+{% endschema %}

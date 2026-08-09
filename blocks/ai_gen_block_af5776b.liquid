@@ -1,0 +1,1577 @@
+{% doc %}
+  @prompt
+    قسم لعرض أشرطة الكاسيت الرائجة بنفس هوية قسم المقالات الفلسطيني الريترو
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-cassette-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.section_padding_top }}px {{ block.settings.section_padding_horizontal }}px {{ block.settings.section_padding_bottom }}px;
+    background: {{ block.settings.background_color }};
+    position: relative;
+  }
+
+  .ai-cassette-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.container_width }}px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .ai-cassette-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: {{ block.settings.header_margin_bottom }}px;
+    position: relative;
+  }
+
+  .ai-cassette-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 {{ block.settings.title_margin_bottom }}px;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+  }
+
+  .ai-cassette-title-{{ ai_gen_id }}::before,
+  .ai-cassette-title-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: {{ block.settings.title_decoration_width }}px;
+    height: {{ block.settings.title_decoration_height }}px;
+    transform: translateY(-50%);
+  }
+
+  .ai-cassette-title-{{ ai_gen_id }}::before {
+    right: calc(100% + {{ block.settings.title_decoration_spacing }}px);
+    background: repeating-linear-gradient(90deg, {{ block.settings.accent_color }} 0px, {{ block.settings.accent_color }} 8px, transparent 8px, transparent 12px);
+  }
+
+  .ai-cassette-title-{{ ai_gen_id }}::after {
+    left: calc(100% + {{ block.settings.title_decoration_spacing }}px);
+    background: repeating-linear-gradient(90deg, {{ block.settings.accent_color }} 0px, {{ block.settings.accent_color }} 8px, transparent 8px, transparent 12px);
+  }
+
+  .ai-cassette-subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+  }
+
+  /* ── SCROLL MODE ── */
+  .ai-cassette-scroll-wrapper-{{ ai_gen_id }} {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-bottom: {{ block.settings.grid_margin_bottom }}px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: {{ block.settings.accent_color }} transparent;
+  }
+
+  .ai-cassette-scroll-wrapper-{{ ai_gen_id }}::-webkit-scrollbar { height: 8px; }
+  .ai-cassette-scroll-wrapper-{{ ai_gen_id }}::-webkit-scrollbar-track { background: transparent; }
+  .ai-cassette-scroll-wrapper-{{ ai_gen_id }}::-webkit-scrollbar-thumb { background: {{ block.settings.accent_color }}; border-radius: 4px; }
+
+  .ai-cassette-grid-scroll-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.grid_gap }}px;
+    min-width: min-content;
+  }
+
+  .ai-cassette-grid-scroll-{{ ai_gen_id }}[data-count="1"] {
+    justify-content: center;
+    min-width: unset;
+  }
+
+  /* ── GRID MODE ── */
+  .ai-cassette-grid-wrap-{{ ai_gen_id }} {
+    margin-bottom: {{ block.settings.grid_margin_bottom }}px;
+  }
+
+  .ai-cassette-grid-multi-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat({{ block.settings.grid_columns }}, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+  }
+
+  /* ── SLIDER MODE ── */
+  .ai-cassette-slider-outer-{{ ai_gen_id }} {
+    overflow: hidden;
+    margin-bottom: {{ block.settings.grid_margin_bottom }}px;
+    position: relative;
+  }
+
+  .ai-cassette-slider-track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.grid_gap }}px;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* نقاط التنقل */
+  .ai-cassette-dots-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    margin-bottom: {{ block.settings.grid_margin_bottom }}px;
+  }
+
+  .ai-cassette-dot-{{ ai_gen_id }} {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: {{ block.settings.card_border_color }};
+    opacity: 0.25;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    transition: opacity 0.3s, width 0.3s, background 0.3s;
+  }
+
+  .ai-cassette-dot-{{ ai_gen_id }}.active {
+    opacity: 1;
+    width: 24px;
+    background: {{ block.settings.accent_color }};
+  }
+
+  /* ── CARD (مشترك) ── */
+  .ai-cassette-card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_background }};
+    border: {{ block.settings.card_border_width }}px solid {{ block.settings.card_border_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: {{ block.settings.card_shadow_x }}px {{ block.settings.card_shadow_y }}px {{ block.settings.card_shadow_blur }}px {{ block.settings.card_shadow_color }};
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ai-cassette-grid-scroll-{{ ai_gen_id }} .ai-cassette-card-{{ ai_gen_id }},
+  .ai-cassette-slider-track-{{ ai_gen_id }} .ai-cassette-card-{{ ai_gen_id }} {
+    flex: 0 0 {{ block.settings.card_width }}px;
+    width: {{ block.settings.card_width }}px;
+  }
+
+  .ai-cassette-card-{{ ai_gen_id }}:hover {
+    transform: translateY({{ block.settings.card_hover_lift }}px);
+    box-shadow: {{ block.settings.card_shadow_x | times: 1.5 }}px {{ block.settings.card_shadow_y | times: 1.5 }}px {{ block.settings.card_shadow_blur | times: 1.5 }}px {{ block.settings.card_shadow_color }};
+  }
+
+  /* نمط التطريز */
+  .ai-cassette-card-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: {{ block.settings.pattern_height }}px;
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.pattern_color_1 }} 0px,
+      {{ block.settings.pattern_color_1 }} {{ block.settings.pattern_stripe_width }}px,
+      {{ block.settings.pattern_color_2 }} {{ block.settings.pattern_stripe_width }}px,
+      {{ block.settings.pattern_color_2 }} {{ block.settings.pattern_stripe_width | times: 2 }}px,
+      {{ block.settings.pattern_color_3 }} {{ block.settings.pattern_stripe_width | times: 2 }}px,
+      {{ block.settings.pattern_color_3 }} {{ block.settings.pattern_stripe_width | times: 3 }}px
+    );
+    z-index: 2;
+  }
+
+  /* ── IMAGE ── */
+/* ── IMAGE ── */
+.ai-cassette-image-wrapper-{{ ai_gen_id }} {
+  position: relative;
+  width: 100%;
+  /* إزالة الـ aspect-ratio الثابت عشان الصورة تبقى حسب أبعادها الأصلية */
+  height: auto;
+  overflow: hidden;
+  /* اختياري: لو عايز تحافظ على شكل الكاسيت أكتر، استخدم padding-bottom بدل aspect-ratio */
+  /* padding-bottom: 125%; */ /* ≈ نسبة كاسيت حقيقي (طول أكبر من العرض) */
+}
+
+.ai-cassette-image-{{ ai_gen_id }} {
+  position: relative;     /* غير absolute عشان ياخد الارتفاع الطبيعي */
+  width: 100%;
+  height: auto;           /* مهم جداً */
+  object-fit: contain;    /* بدل cover → عشان الصورة تبقى كاملة بدون قص */
+  display: block;
+}
+
+  .ai-cassette-placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: {{ block.settings.image_placeholder_bg }};
+  }
+
+  /* بادج */
+  .ai-cassette-trending-badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: {{ block.settings.pattern_height | plus: 10 }}px;
+    {% if block.settings.badge_position == 'right' %}right{% else %}left{% endif %}: 12px;
+    background: {{ block.settings.badge_bg }};
+    color: {{ block.settings.badge_color }};
+    font-size: {{ block.settings.badge_size }}px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border: 2px solid {{ block.settings.card_border_color }};
+    border-radius: 3px;
+    z-index: 3;
+    box-shadow: 2px 2px 0 {{ block.settings.card_border_color }};
+  }
+
+  /* ── CONTENT ── */
+  .ai-cassette-content-{{ ai_gen_id }} {
+    padding: {{ block.settings.card_padding_top }}px {{ block.settings.card_padding_horizontal }}px {{ block.settings.card_padding_bottom }}px;
+    position: relative;
+  }
+
+  .ai-cassette-content-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: {{ block.settings.card_padding_horizontal }}px;
+    right: {{ block.settings.card_padding_horizontal }}px;
+    height: {{ block.settings.content_divider_height }}px;
+    background: repeating-linear-gradient(90deg, {{ block.settings.accent_color }} 0px, {{ block.settings.accent_color }} 4px, transparent 4px, transparent 8px);
+  }
+
+  .ai-cassette-rank-{{ ai_gen_id }} {
+    font-size: {{ block.settings.rank_size }}px;
+    color: {{ block.settings.accent_color }};
+    margin: 0 0 {{ block.settings.rank_margin_bottom }}px;
+    font-weight: 800;
+    letter-spacing: {{ block.settings.date_letter_spacing }}px;
+  }
+
+  .ai-cassette-tape-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.tape_title_size }}px;
+    color: {{ block.settings.tape_title_color }};
+    margin: 0 0 {{ block.settings.tape_title_margin_bottom }}px;
+    font-weight: 700;
+    line-height: {{ block.settings.tape_title_line_height }};
+    display: -webkit-box;
+    -webkit-line-clamp: {{ block.settings.tape_title_lines }};
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ai-cassette-tape-title-{{ ai_gen_id }} a { color: inherit; text-decoration: none; }
+  .ai-cassette-tape-title-{{ ai_gen_id }} a:hover { color: {{ block.settings.accent_color }}; }
+
+  .ai-cassette-artist-{{ ai_gen_id }} {
+    font-size: {{ block.settings.artist_size }}px;
+    color: {{ block.settings.artist_color }};
+    margin: 0 0 {{ block.settings.artist_margin_bottom }}px;
+    line-height: {{ block.settings.excerpt_line_height }};
+    display: -webkit-box;
+    -webkit-line-clamp: {{ block.settings.excerpt_lines }};
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* زر التشغيل — نفس أسلوب "اقرأ المزيد" */
+  .ai-cassette-play-link-{{ ai_gen_id }} {
+    display: inline-block;
+    font-size: {{ block.settings.play_btn_size }}px;
+    color: {{ block.settings.play_btn_color }};
+    text-decoration: none;
+    font-weight: {{ block.settings.play_btn_weight }};
+    cursor: pointer;
+    transition: color 0.3s ease;
+    position: relative;
+    letter-spacing: {{ block.settings.play_btn_letter_spacing }}px;
+  }
+
+  .ai-cassette-play-link-{{ ai_gen_id }}:hover { color: {{ block.settings.play_btn_hover_color }}; }
+
+  .ai-cassette-play-link-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: {{ block.settings.play_btn_underline_offset }}px;
+    left: 0;
+    width: 0;
+    height: {{ block.settings.play_btn_underline_height }}px;
+    background: {{ block.settings.play_btn_hover_color }};
+    transition: width 0.3s ease;
+  }
+
+  .ai-cassette-play-link-{{ ai_gen_id }}:hover::after { width: 100%; }
+
+  /* ── زر عرض المزيد ── */
+  .ai-cassette-view-all-{{ ai_gen_id }} {
+    text-align: center;
+    margin-top: {{ block.settings.view_all_margin_top }}px;
+  }
+
+  .ai-cassette-view-all-link-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: {{ block.settings.view_all_icon_gap }}px;
+    font-size: {{ block.settings.view_all_font_size }}px;
+    color: {{ block.settings.view_all_text_color }};
+    background: {{ block.settings.view_all_bg_color }};
+    padding: {{ block.settings.view_all_padding_vertical }}px {{ block.settings.view_all_padding_horizontal }}px;
+    border-radius: {{ block.settings.view_all_border_radius }}px;
+    text-decoration: none;
+    font-weight: {{ block.settings.view_all_font_weight }};
+    border: {{ block.settings.view_all_border_width }}px solid {{ block.settings.view_all_border_color }};
+    transition: all 0.3s ease;
+    box-shadow: {{ block.settings.view_all_shadow_x }}px {{ block.settings.view_all_shadow_y }}px 0 {{ block.settings.view_all_shadow_color }};
+  }
+
+  .ai-cassette-view-all-link-{{ ai_gen_id }}:hover {
+    transform: translate({{ block.settings.view_all_hover_translate }}px, {{ block.settings.view_all_hover_translate }}px);
+    box-shadow: {{ block.settings.view_all_shadow_x | divided_by: 2 }}px {{ block.settings.view_all_shadow_y | divided_by: 2 }}px 0 {{ block.settings.view_all_shadow_color }};
+    background: {{ block.settings.view_all_hover_bg }};
+    color: {{ block.settings.view_all_hover_text }};
+  }
+
+  .ai-cassette-empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: {{ block.settings.subtitle_color }};
+    font-size: 16px;
+  }
+
+  /* ── MOBILE ── */
+  @media screen and (max-width: 749px) {
+    .ai-cassette-{{ ai_gen_id }} {
+      padding: {{ block.settings.section_padding_top_mobile }}px {{ block.settings.section_padding_horizontal_mobile }}px {{ block.settings.section_padding_bottom_mobile }}px;
+    }
+    .ai-cassette-title-{{ ai_gen_id }}::before,
+    .ai-cassette-title-{{ ai_gen_id }}::after { display: none; }
+    .ai-cassette-grid-multi-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ block.settings.grid_columns_mobile }}, 1fr);
+    }
+    .ai-cassette-grid-scroll-{{ ai_gen_id }} .ai-cassette-card-{{ ai_gen_id }},
+    .ai-cassette-slider-track-{{ ai_gen_id }} .ai-cassette-card-{{ ai_gen_id }} {
+      flex: 0 0 {{ block.settings.card_width_mobile }}px;
+      width: {{ block.settings.card_width_mobile }}px;
+    }
+    .ai-cassette-title-{{ ai_gen_id }} { font-size: {{ block.settings.title_size_mobile }}px; }
+    .ai-cassette-tape-title-{{ ai_gen_id }} { font-size: {{ block.settings.tape_title_size_mobile }}px; }
+  }
+{% endstyle %}
+
+{%- assign display_mode = block.settings.display_mode -%}
+
+<cassette-section-{{ ai_gen_id }}
+  class="ai-cassette-{{ ai_gen_id }}"
+  data-mode="{{ display_mode }}"
+  data-auto="{{ block.settings.auto_scroll }}"
+  data-speed="{{ block.settings.scroll_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-cassette-container-{{ ai_gen_id }}">
+
+    {% if block.settings.show_header %}
+      <div class="ai-cassette-header-{{ ai_gen_id }}">
+        {% if block.settings.section_title != blank %}
+          <h2 class="ai-cassette-title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+        {% endif %}
+        {% if block.settings.section_subtitle != blank %}
+          <p class="ai-cassette-subtitle-{{ ai_gen_id }}">{{ block.settings.section_subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if block.settings.collection != blank %}
+      {% assign products = block.settings.collection.products %}
+      {% assign tapes_count = block.settings.tapes_count %}
+
+      {% if products.size > 0 %}
+
+        {%- comment -%} ── وضع السكرول ── {%- endcomment -%}
+        {% if display_mode == 'scroll' %}
+          {% assign actual_count = products.size %}
+          {% if actual_count > tapes_count %}{% assign actual_count = tapes_count %}{% endif %}
+          <div class="ai-cassette-scroll-wrapper-{{ ai_gen_id }}">
+            <div class="ai-cassette-grid-scroll-{{ ai_gen_id }}" data-count="{{ actual_count }}">
+              {% for product in products limit: tapes_count %}
+                {%- assign r = forloop.index -%}
+                <article class="ai-cassette-card-{{ ai_gen_id }}">
+                  {% if block.settings.show_trending_badge %}
+                    <div class="ai-cassette-trending-badge-{{ ai_gen_id }}">{{ block.settings.badge_prefix }}{{ r }}</div>
+                  {% endif %}
+                  <div class="ai-cassette-image-wrapper-{{ ai_gen_id }}">
+                    {% if product.featured_image %}
+                      <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" class="ai-cassette-image-{{ ai_gen_id }}" loading="lazy" width="600" height="400">
+                    {% else %}
+                      <div class="ai-cassette-placeholder-{{ ai_gen_id }}">
+                        <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="70%" style="opacity:.25"><rect x="4" y="4" width="112" height="72" rx="6" stroke="{{ block.settings.accent_color }}" stroke-width="4" fill="none"/><circle cx="38" cy="42" r="14" stroke="{{ block.settings.accent_color }}" stroke-width="3" fill="none"/><circle cx="82" cy="42" r="14" stroke="{{ block.settings.accent_color }}" stroke-width="3" fill="none"/><circle cx="38" cy="42" r="5" fill="{{ block.settings.accent_color }}" fill-opacity=".4"/><circle cx="82" cy="42" r="5" fill="{{ block.settings.accent_color }}" fill-opacity=".4"/><path d="M52 42 Q60 36 68 42" stroke="{{ block.settings.accent_color }}" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="ai-cassette-content-{{ ai_gen_id }}">
+                    {% if block.settings.show_rank %}<div class="ai-cassette-rank-{{ ai_gen_id }}">{{ block.settings.rank_prefix }}{{ r }}</div>{% endif %}
+                    <h3 class="ai-cassette-tape-title-{{ ai_gen_id }}"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                    {% if block.settings.show_artist %}
+                      {% if product.metafields.custom.artist != blank %}
+                        <div class="ai-cassette-artist-{{ ai_gen_id }}">{{ product.metafields.custom.artist }}</div>
+                      {% elsif product.description != blank %}
+                        <div class="ai-cassette-artist-{{ ai_gen_id }}">{{ product.description | strip_html | truncate: 100 }}</div>
+                      {% endif %}
+                    {% endif %}
+                    {% if block.settings.show_play_btn %}<a href="{{ product.url }}" class="ai-cassette-play-link-{{ ai_gen_id }}">{{ block.settings.play_btn_text }}</a>{% endif %}
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+
+        {%- comment -%} ── وضع الشبكة ── {%- endcomment -%}
+        {% elsif display_mode == 'grid' %}
+          <div class="ai-cassette-grid-wrap-{{ ai_gen_id }}">
+            <div class="ai-cassette-grid-multi-{{ ai_gen_id }}">
+              {% for product in products limit: tapes_count %}
+                {%- assign r = forloop.index -%}
+                <article class="ai-cassette-card-{{ ai_gen_id }}">
+                  {% if block.settings.show_trending_badge %}
+                    <div class="ai-cassette-trending-badge-{{ ai_gen_id }}">{{ block.settings.badge_prefix }}{{ r }}</div>
+                  {% endif %}
+                  <div class="ai-cassette-image-wrapper-{{ ai_gen_id }}">
+                    {% if product.featured_image %}
+                      <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" class="ai-cassette-image-{{ ai_gen_id }}" loading="lazy" width="600" height="400">
+                    {% else %}
+                      <div class="ai-cassette-placeholder-{{ ai_gen_id }}">
+                        <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="70%" style="opacity:.25"><rect x="4" y="4" width="112" height="72" rx="6" stroke="{{ block.settings.accent_color }}" stroke-width="4" fill="none"/><circle cx="38" cy="42" r="14" stroke="{{ block.settings.accent_color }}" stroke-width="3" fill="none"/><circle cx="82" cy="42" r="14" stroke="{{ block.settings.accent_color }}" stroke-width="3" fill="none"/><circle cx="38" cy="42" r="5" fill="{{ block.settings.accent_color }}" fill-opacity=".4"/><circle cx="82" cy="42" r="5" fill="{{ block.settings.accent_color }}" fill-opacity=".4"/><path d="M52 42 Q60 36 68 42" stroke="{{ block.settings.accent_color }}" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="ai-cassette-content-{{ ai_gen_id }}">
+                    {% if block.settings.show_rank %}<div class="ai-cassette-rank-{{ ai_gen_id }}">{{ block.settings.rank_prefix }}{{ r }}</div>{% endif %}
+                    <h3 class="ai-cassette-tape-title-{{ ai_gen_id }}"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                    {% if block.settings.show_artist %}
+                      {% if product.metafields.custom.artist != blank %}
+                        <div class="ai-cassette-artist-{{ ai_gen_id }}">{{ product.metafields.custom.artist }}</div>
+                      {% elsif product.description != blank %}
+                        <div class="ai-cassette-artist-{{ ai_gen_id }}">{{ product.description | strip_html | truncate: 100 }}</div>
+                      {% endif %}
+                    {% endif %}
+                    {% if block.settings.show_play_btn %}<a href="{{ product.url }}" class="ai-cassette-play-link-{{ ai_gen_id }}">{{ block.settings.play_btn_text }}</a>{% endif %}
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+
+        {%- comment -%} ── وضع السلايدر التلقائي ── {%- endcomment -%}
+        {% elsif display_mode == 'slider' %}
+          <div class="ai-cassette-slider-outer-{{ ai_gen_id }}" id="cs-outer-{{ ai_gen_id }}">
+            <div class="ai-cassette-slider-track-{{ ai_gen_id }}" id="cs-track-{{ ai_gen_id }}">
+              {% for product in products limit: tapes_count %}
+                {%- assign r = forloop.index -%}
+                <article class="ai-cassette-card-{{ ai_gen_id }}">
+                  {% if block.settings.show_trending_badge %}
+                    <div class="ai-cassette-trending-badge-{{ ai_gen_id }}">{{ block.settings.badge_prefix }}{{ r }}</div>
+                  {% endif %}
+                  <div class="ai-cassette-image-wrapper-{{ ai_gen_id }}">
+                    {% if product.featured_image %}
+                      <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" class="ai-cassette-image-{{ ai_gen_id }}" loading="lazy" width="600" height="400">
+                    {% else %}
+                      <div class="ai-cassette-placeholder-{{ ai_gen_id }}">
+                        <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="70%" style="opacity:.25"><rect x="4" y="4" width="112" height="72" rx="6" stroke="{{ block.settings.accent_color }}" stroke-width="4" fill="none"/><circle cx="38" cy="42" r="14" stroke="{{ block.settings.accent_color }}" stroke-width="3" fill="none"/><circle cx="82" cy="42" r="14" stroke="{{ block.settings.accent_color }}" stroke-width="3" fill="none"/><circle cx="38" cy="42" r="5" fill="{{ block.settings.accent_color }}" fill-opacity=".4"/><circle cx="82" cy="42" r="5" fill="{{ block.settings.accent_color }}" fill-opacity=".4"/><path d="M52 42 Q60 36 68 42" stroke="{{ block.settings.accent_color }}" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="ai-cassette-content-{{ ai_gen_id }}">
+                    {% if block.settings.show_rank %}<div class="ai-cassette-rank-{{ ai_gen_id }}">{{ block.settings.rank_prefix }}{{ r }}</div>{% endif %}
+                    <h3 class="ai-cassette-tape-title-{{ ai_gen_id }}"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                    {% if block.settings.show_artist %}
+                      {% if product.metafields.custom.artist != blank %}
+                        <div class="ai-cassette-artist-{{ ai_gen_id }}">{{ product.metafields.custom.artist }}</div>
+                      {% elsif product.description != blank %}
+                        <div class="ai-cassette-artist-{{ ai_gen_id }}">{{ product.description | strip_html | truncate: 100 }}</div>
+                      {% endif %}
+                    {% endif %}
+                    {% if block.settings.show_play_btn %}<a href="{{ product.url }}" class="ai-cassette-play-link-{{ ai_gen_id }}">{{ block.settings.play_btn_text }}</a>{% endif %}
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+          {% if block.settings.show_dots %}
+            <div class="ai-cassette-dots-{{ ai_gen_id }}" id="cs-dots-{{ ai_gen_id }}">
+              {% for product in products limit: tapes_count %}
+                <button class="ai-cassette-dot-{{ ai_gen_id }}{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="شريط {{ forloop.index }}"></button>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endif %}
+
+        {% if block.settings.show_view_all %}
+          <div class="ai-cassette-view-all-{{ ai_gen_id }}">
+            <a href="/collections/all" class="ai-cassette-view-all-link-{{ ai_gen_id }}">
+              {{ block.settings.view_all_text }}
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 15L12 10L7 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/>
+              </svg>
+            </a>
+          </div>
+        {% endif %}
+
+      {% else %}
+        <div class="ai-cassette-empty-{{ ai_gen_id }}">لا توجد كاسيتات في هذه المجموعة حالياً</div>
+      {% endif %}
+
+    {% else %}
+      <div class="ai-cassette-empty-{{ ai_gen_id }}">الرجاء اختيار مجموعة لعرض الكاسيتات الرائجة</div>
+    {% endif %}
+
+  </div>
+</cassette-section-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  var GEN = '{{ ai_gen_id }}';
+  var MODE  = '{{ display_mode }}';
+  var AUTO  = {{ block.settings.auto_scroll }};
+  var SPEED = {{ block.settings.scroll_speed }};
+
+  if (MODE !== 'slider') return;
+
+  function initSlider() {
+    var outer  = document.getElementById('cs-outer-' + GEN);
+    var track  = document.getElementById('cs-track-' + GEN);
+    var dotsEl = document.getElementById('cs-dots-' + GEN);
+    if (!outer || !track) return;
+
+    var cards  = track.querySelectorAll('.ai-cassette-card-' + GEN);
+    var total  = cards.length;
+    if (total < 2) return;
+
+    var current = 0;
+    var timer   = null;
+    var paused  = false;
+
+    function gap() {
+      return parseInt(getComputedStyle(track).gap) || 0;
+    }
+
+    function cardW() {
+      return cards[0] ? cards[0].offsetWidth + gap() : 0;
+    }
+
+    function goTo(idx) {
+      current = ((idx % total) + total) % total;
+      track.style.transform = 'translateX(-' + (current * cardW()) + 'px)';
+      if (dotsEl) {
+        dotsEl.querySelectorAll('.ai-cassette-dot-' + GEN).forEach(function(d, i) {
+          d.classList.toggle('active', i === current);
+        });
+      }
+    }
+
+    function next() { if (!paused) goTo(current + 1); }
+
+    function startAuto() { if (AUTO) timer = setInterval(next, SPEED); }
+    function stopAuto()  { clearInterval(timer); }
+
+    outer.addEventListener('mouseenter', function() { paused = true; });
+    outer.addEventListener('mouseleave', function() { paused = false; });
+
+    if (dotsEl) {
+      dotsEl.querySelectorAll('.ai-cassette-dot-' + GEN).forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          stopAuto();
+          goTo(parseInt(dot.dataset.index));
+          startAuto();
+        });
+      });
+    }
+
+    var startX = 0;
+    outer.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive: true });
+    outer.addEventListener('touchend', function(e) {
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) { stopAuto(); goTo(diff > 0 ? current + 1 : current - 1); startAuto(); }
+    }, { passive: true });
+
+    goTo(0);
+    startAuto();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSlider);
+  } else {
+    initSlider();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "كاسيتات رائجة",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "مجموعة الكاسيتات"
+    },
+    {
+      "type": "range",
+      "id": "tapes_count",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "label": "عدد الكاسيتات المعروضة",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "طريقة العرض"
+    },
+    {
+      "type": "select",
+      "id": "display_mode",
+      "label": "طريقة العرض",
+      "options": [
+        { "value": "scroll", "label": "🔄 سكرول أفقي" },
+        { "value": "grid",   "label": "⊞ شبكة متعددة الصفوف" },
+        { "value": "slider", "label": "▶ سلايدر تلقائي" }
+      ],
+      "default": "scroll"
+    },
+    {
+      "type": "range",
+      "id": "grid_columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "عدد الأعمدة (شبكة فقط)",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "عدد الأعمدة موبايل (شبكة فقط)",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "إعدادات السلايدر"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_scroll",
+      "label": "تفعيل التقليب التلقائي",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 1000,
+      "max": 8000,
+      "step": 500,
+      "unit": "ms",
+      "label": "سرعة التقليب",
+      "default": 3000
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "إظهار نقاط التنقل",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "إعدادات المحتوى"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "إظهار العنوان الرئيسي",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "عنوان القسم",
+      "default": "الكاسيتات الرائجة"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "العنوان الفرعي",
+      "default": "الأكثر استماعاً هذا الأسبوع"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rank",
+      "label": "إظهار رقم الترتيب",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "rank_prefix",
+      "label": "نص قبل الرقم",
+      "default": "# "
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trending_badge",
+      "label": "إظهار بادج الترند",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_prefix",
+      "label": "نص البادج",
+      "default": "🔥 #"
+    },
+    {
+      "type": "select",
+      "id": "badge_position",
+      "label": "موضع البادج",
+      "options": [
+        { "value": "left",  "label": "يسار" },
+        { "value": "right", "label": "يمين" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_artist",
+      "label": "إظهار الفنان / الوصف",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_btn",
+      "label": "إظهار زر التشغيل",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "play_btn_text",
+      "label": "نص زر التشغيل",
+      "default": "▶ استمع الآن"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "إظهار زر عرض المزيد",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "نص زر عرض المزيد",
+      "default": "المزيد من الكاسيتات"
+    },
+    {
+      "type": "header",
+      "content": "المسافات - القسم"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "min": 800,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "label": "عرض الحاوية",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "مسافة علوية",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "مسافة سفلية",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة جانبية",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة علوية (موبايل)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة سفلية (موبايل)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal_mobile",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة جانبية (موبايل)",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "المسافات - العنوان"
+    },
+    {
+      "type": "range",
+      "id": "header_margin_bottom",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت العنوان",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "min": 5,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة بين العنوان والوصف",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "title_decoration_width",
+      "min": 30,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض الزخرفة",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "title_decoration_height",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الزخرفة",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "title_decoration_spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة الزخرفة من العنوان",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "المسافات - البطاقات"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "min": 220,
+      "max": 480,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض البطاقة (سكرول/سلايدر)",
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "card_width_mobile",
+      "min": 180,
+      "max": 320,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض البطاقة (موبايل)",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "المسافة بين البطاقات",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "grid_margin_bottom",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت الشبكة",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "card_padding_top",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية علوية",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "card_padding_bottom",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية سفلية",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "card_padding_horizontal",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية جانبية",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_hover_lift",
+      "min": -20,
+      "max": 0,
+      "step": 1,
+      "unit": "px",
+      "label": "ارتفاع عند التمرير",
+      "default": -5
+    },
+    {
+      "type": "header",
+      "content": "المسافات - المحتوى"
+    },
+    {
+      "type": "range",
+      "id": "rank_margin_bottom",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "مسافة تحت رقم الترتيب",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "tape_title_margin_bottom",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "مسافة تحت العنوان",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "artist_margin_bottom",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت الفنان",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "content_divider_height",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الفاصل العلوي",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد - نمط التطريز"
+    },
+    {
+      "type": "range",
+      "id": "pattern_height",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ارتفاع النمط",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "pattern_stripe_width",
+      "min": 6,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "عرض الخط الواحد",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد - الصورة"
+    },
+    {
+      "type": "range",
+      "id": "image_ratio",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "label": "نسبة ارتفاع الصورة",
+      "default": 67,
+      "info": "67 = 3:2 ، 75 = 4:3 ، 56 = 16:9"
+    },
+    {
+      "type": "header",
+      "content": "أبعاد زر عرض المزيد"
+    },
+    {
+      "type": "range",
+      "id": "view_all_margin_top",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة فوق الزر",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "view_all_padding_vertical",
+      "min": 8,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "مسافة داخلية عمودية",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "view_all_padding_horizontal",
+      "min": 20,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية أفقية",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "view_all_icon_gap",
+      "min": 5,
+      "max": 20,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة بين النص والأيقونة",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "view_all_border_width",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الحدود",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "view_all_shadow_x",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "ظل أفقي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "view_all_shadow_y",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "ظل عمودي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "view_all_hover_translate",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "حركة عند التمرير",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "الألوان الرئيسية"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "اللون المميز",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "لون العنوان الفرعي",
+      "default": "#910f3f"
+    },
+    {
+      "type": "header",
+      "content": "ألوان نمط التطريز"
+    },
+    {
+      "type": "color",
+      "id": "pattern_color_1",
+      "label": "لون النمط 1",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "pattern_color_2",
+      "label": "لون النمط 2",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "pattern_color_3",
+      "label": "لون النمط 3",
+      "default": "#f9e547"
+    },
+    {
+      "type": "header",
+      "content": "البطاقات"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "خلفية البطاقة",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "لون حدود البطاقة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "card_border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك حدود البطاقة",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة الزوايا",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "card_shadow_color",
+      "label": "لون ظل البطاقة",
+      "default": "#3d081b33"
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_x",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل أفقي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_y",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل عمودي",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_blur",
+      "min": 0,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "تمويه الظل",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "البادج"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "خلفية البادج",
+      "default": "#f9e547"
+    },
+    {
+      "type": "color",
+      "id": "badge_color",
+      "label": "لون نص البادج",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم نص البادج",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "image_placeholder_bg",
+      "label": "خلفية الصورة البديلة",
+      "default": "#e8e5d3"
+    },
+    {
+      "type": "header",
+      "content": "النصوص"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم العنوان الرئيسي",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "min": 18,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم العنوان (موبايل)",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم العنوان الفرعي",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "rank_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم رقم الترتيب",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "tape_title_size",
+      "min": 16,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم عنوان الشريط",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "tape_title_size_mobile",
+      "min": 14,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم عنوان الشريط (موبايل)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "artist_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم نص الفنان",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "tape_title_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر - العنوان",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "tape_title_lines",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "عدد أسطر عنوان الشريط",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "excerpt_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر - الوصف",
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "excerpt_lines",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "عدد أسطر الوصف",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "date_letter_spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "label": "تباعد أحرف الترتيب",
+      "default": 0.5
+    },
+    {
+      "type": "color",
+      "id": "tape_title_color",
+      "label": "لون عنوان الشريط",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "artist_color",
+      "label": "لون نص الفنان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "زر التشغيل"
+    },
+    {
+      "type": "range",
+      "id": "play_btn_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم النص",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "play_btn_weight",
+      "min": 400,
+      "max": 900,
+      "step": 100,
+      "label": "سمك الخط",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "play_btn_letter_spacing",
+      "min": 0,
+      "max": 2,
+      "step": 0.5,
+      "unit": "px",
+      "label": "تباعد الأحرف",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "play_btn_underline_height",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الخط السفلي",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "play_btn_underline_offset",
+      "min": -5,
+      "max": 0,
+      "step": 1,
+      "unit": "px",
+      "label": "موضع الخط السفلي",
+      "default": -2
+    },
+    {
+      "type": "color",
+      "id": "play_btn_color",
+      "label": "لون النص",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "play_btn_hover_color",
+      "label": "لون عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "زر عرض المزيد"
+    },
+    {
+      "type": "range",
+      "id": "view_all_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم النص",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "view_all_font_weight",
+      "min": 400,
+      "max": 900,
+      "step": 100,
+      "label": "سمك الخط",
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "view_all_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة الزوايا",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "view_all_bg_color",
+      "label": "خلفية الزر",
+      "default": "#f9e547"
+    },
+    {
+      "type": "color",
+      "id": "view_all_text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "view_all_border_color",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "view_all_shadow_color",
+      "label": "لون الظل",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "view_all_hover_bg",
+      "label": "خلفية عند التمرير",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "view_all_hover_text",
+      "label": "نص عند التمرير",
+      "default": "#f2efdd"
+    }
+  ],
+  "presets": [
+    {
+      "name": "كاسيتات رائجة"
+    }
+  ]
+}
+{% endschema %}

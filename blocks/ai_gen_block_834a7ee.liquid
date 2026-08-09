@@ -1,0 +1,636 @@
+{% doc %}
+  @prompt
+    أريد إنشاء سكشن في Shopify يعرض أنيميشن يعتمد على السكرول باستخدام مجموعة صور (frames) بدل فيديو.
+    المطلوب أن يكون السكشن احترافي وقابل للتحكم من داخل إعدادات الثيم، بحيث أستطيع رفع الصور (الفريمات) بسهولة بدون تعديل الكود.
+    
+    المواصفات:
+    
+    - السكشن يحتوي على خيار رفع عدد كبير من الصور (frames) باستخدام image picker (blocks).
+    - الصور يتم عرضها داخل عن
+    صر واحد (img) ويتم تغييرها حسب حركة السكرول.
+    - عند نزول المستخدم في الصفحة، يتم تغيير الصور تدريجيًا ليظهر كأن الفيديو يتحرك مع السكرول.
+    وليست متقطعة.
+    
+    من ناحية الأداء:
+    
+    - يجب أن يتم تحميل الصور ب- يجب أن يكون العنصر مثبت (sticky) في الشاشة أثناء التمرير.
+    - طول السكرول قابل للتحكم (مثلاً 200vh أو أكثر).
+    - الحركة تكون ناعمة ومتدرجة
+     شكل ذكي (عدم إعادة تحميل نفس الصورة كل مرة).
+    - دعم الصور بصيغة WebP لتقليل الحجم.
+    - يفضل وجود preload لأول عدد من الصور لتحسين الأداء.
+    
+    من ناحية التجربة:
+    
+    - المشهد يكون في المنتصف ويملأ الشاشة.
+    - لا يتم تغيير حجم الصور أو تشويهها (object-fit مناسب).
+    طريق JavaScrip- الحفاظ على نفس التكوين البصري طوال التمرير.
+    
+    الهدف النهائي:
+    
+    - ربط حركة السكرول بتغيير الفريمات بحيث يشعر المستخدم أنه يتحكم في الأنيميشن بنفسه.
+    - تجربة تفاعلية سينمائية تشبه مواقع Apple.
+    
+    بدون استخدام فيديو مباشر، فقط صور متسلسلة يتم التحكم بها عن
+     , بدي خيار لازاله الخلفية السوداء من الصور
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-scroll-sequence-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.scroll_height }}vh;
+  }
+
+  .ai-scroll-sequence-sticky-{{ ai_gen_id }} {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    {% if block.settings.show_background %}
+      background-color: {{ block.settings.background_color }};
+    {% else %}
+      background-color: transparent;
+    {% endif %}
+  }
+
+  .ai-scroll-sequence-canvas-{{ ai_gen_id }} {
+    position: relative;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-scroll-sequence-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    object-fit: {{ block.settings.object_fit }};
+    display: block;
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-scroll-sequence-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: {{ block.settings.border_radius }}px;
+    position: relative;
+  }
+
+  .ai-scroll-sequence-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .ai-scroll-sequence-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-scroll-sequence-canvas-{{ ai_gen_id }} {
+      width: 100%;
+    }
+  }
+{% endstyle %}
+
+{% assign frame_images = '' %}
+{% for i in (1..50) %}
+  {% assign frame_key = 'frame_' | append: i %}
+  {% assign frame_image = block.settings[frame_key] %}
+  {% if frame_image %}
+    {% if frame_images != '' %}
+      {% assign frame_images = frame_images | append: ',' %}
+    {% endif %}
+    {% assign frame_url = frame_image | image_url: width: 2000 %}
+    {% assign frame_images = frame_images | append: frame_url %}
+  {% endif %}
+{% endfor %}
+
+{% assign frames_array = frame_images | split: ',' %}
+{% assign frame_count = frames_array.size %}
+
+<scroll-sequence-{{ ai_gen_id }}
+  class="ai-scroll-sequence-{{ ai_gen_id }}"
+  data-frames="{{ frame_images }}"
+  data-frame-count="{{ frame_count }}"
+  data-preload-count="{{ block.settings.preload_count }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-scroll-sequence-sticky-{{ ai_gen_id }}">
+    <div class="ai-scroll-sequence-canvas-{{ ai_gen_id }}">
+      {% if frame_count > 0 %}
+        <img
+          class="ai-scroll-sequence-image-{{ ai_gen_id }}"
+          src="{{ frames_array[0] }}"
+          alt="Frame sequence"
+          loading="eager"
+          width="2000"
+          height="auto"
+          data-sequence-image
+        >
+        
+        {% for i in (1..block.settings.preload_count) %}
+          {% if i < frame_count %}
+            <link
+              rel="preload"
+              as="image"
+              href="{{ frames_array[i] }}"
+            >
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="ai-scroll-sequence-placeholder-{{ ai_gen_id }}">
+          {{ 'image' | placeholder_svg_tag }}
+          <div class="ai-scroll-sequence-empty-state-{{ ai_gen_id }}">
+            أضف صور الفريمات من الإعدادات
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</scroll-sequence-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ScrollSequence{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.frameCount = parseInt(this.dataset.frameCount) || 0;
+        this.preloadCount = parseInt(this.dataset.preloadCount) || 5;
+        this.frames = [];
+        this.currentFrame = 0;
+        this.imageElement = this.querySelector('[data-sequence-image]');
+        this.loadedFrames = new Set();
+        this.rafId = null;
+      }
+
+      connectedCallback() {
+        if (this.frameCount === 0 || !this.imageElement) return;
+
+        this.collectFrameUrls();
+        this.preloadInitialFrames();
+        this.setupScrollListener();
+      }
+
+      collectFrameUrls() {
+        const framesData = this.dataset.frames;
+        if (framesData) {
+          this.frames = framesData.split(',').filter(url => url.trim() !== '');
+        }
+      }
+
+      preloadInitialFrames() {
+        const preloadLimit = Math.min(this.preloadCount, this.frames.length);
+        for (let i = 0; i < preloadLimit; i++) {
+          this.preloadFrame(i);
+        }
+      }
+
+      preloadFrame(index) {
+        if (this.loadedFrames.has(index) || !this.frames[index]) return;
+
+        const img = new Image();
+        img.onload = () => {
+          this.loadedFrames.add(index);
+        };
+        img.src = this.frames[index];
+      }
+
+      setupScrollListener() {
+        let ticking = false;
+
+        const handleScroll = () => {
+          if (!ticking) {
+            this.rafId = requestAnimationFrame(() => {
+              this.updateFrame();
+              ticking = false;
+            });
+            ticking = true;
+          }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+      }
+
+      updateFrame() {
+        const rect = this.getBoundingClientRect();
+        const scrollProgress = Math.max(0, Math.min(1, -rect.top / (rect.height - window.innerHeight)));
+        
+        const targetFrame = Math.min(
+          this.frames.length - 1,
+          Math.floor(scrollProgress * this.frames.length)
+        );
+
+        if (targetFrame !== this.currentFrame) {
+          this.currentFrame = targetFrame;
+          this.renderFrame(targetFrame);
+          this.preloadNearbyFrames(targetFrame);
+        }
+      }
+
+      renderFrame(index) {
+        if (!this.frames[index]) return;
+
+        if (this.loadedFrames.has(index)) {
+          this.imageElement.src = this.frames[index];
+        } else {
+          this.preloadFrame(index);
+          const img = new Image();
+          img.onload = () => {
+            if (this.currentFrame === index) {
+              this.imageElement.src = this.frames[index];
+            }
+          };
+          img.src = this.frames[index];
+        }
+      }
+
+      preloadNearbyFrames(currentIndex) {
+        const preloadRange = 3;
+        for (let i = -preloadRange; i <= preloadRange; i++) {
+          const index = currentIndex + i;
+          if (index >= 0 && index < this.frames.length) {
+            this.preloadFrame(index);
+          }
+        }
+      }
+
+      disconnectedCallback() {
+        if (this.rafId) {
+          cancelAnimationFrame(this.rafId);
+        }
+      }
+    }
+
+    customElements.define('scroll-sequence-{{ ai_gen_id }}', ScrollSequence{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Scroll sequence animation",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Scroll settings"
+    },
+    {
+      "type": "range",
+      "id": "scroll_height",
+      "label": "Scroll height",
+      "min": 100,
+      "max": 500,
+      "step": 50,
+      "unit": "vh",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "preload_count",
+      "label": "Preload frames count",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Display settings"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "select",
+      "id": "object_fit",
+      "label": "Image fit",
+      "options": [
+        {
+          "value": "contain",
+          "label": "Contain"
+        },
+        {
+          "value": "cover",
+          "label": "Cover"
+        },
+        {
+          "value": "fill",
+          "label": "Fill"
+        }
+      ],
+      "default": "contain"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_background",
+      "label": "Show background color",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "Frame images"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_1",
+      "label": "Frame 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_2",
+      "label": "Frame 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_3",
+      "label": "Frame 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_4",
+      "label": "Frame 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_5",
+      "label": "Frame 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_6",
+      "label": "Frame 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_7",
+      "label": "Frame 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_8",
+      "label": "Frame 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_9",
+      "label": "Frame 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_10",
+      "label": "Frame 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_11",
+      "label": "Frame 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_12",
+      "label": "Frame 12"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_13",
+      "label": "Frame 13"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_14",
+      "label": "Frame 14"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_15",
+      "label": "Frame 15"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_16",
+      "label": "Frame 16"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_17",
+      "label": "Frame 17"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_18",
+      "label": "Frame 18"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_19",
+      "label": "Frame 19"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_20",
+      "label": "Frame 20"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_21",
+      "label": "Frame 21"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_22",
+      "label": "Frame 22"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_23",
+      "label": "Frame 23"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_24",
+      "label": "Frame 24"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_25",
+      "label": "Frame 25"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_26",
+      "label": "Frame 26"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_27",
+      "label": "Frame 27"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_28",
+      "label": "Frame 28"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_29",
+      "label": "Frame 29"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_30",
+      "label": "Frame 30"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_31",
+      "label": "Frame 31"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_32",
+      "label": "Frame 32"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_33",
+      "label": "Frame 33"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_34",
+      "label": "Frame 34"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_35",
+      "label": "Frame 35"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_36",
+      "label": "Frame 36"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_37",
+      "label": "Frame 37"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_38",
+      "label": "Frame 38"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_39",
+      "label": "Frame 39"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_40",
+      "label": "Frame 40"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_41",
+      "label": "Frame 41"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_42",
+      "label": "Frame 42"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_43",
+      "label": "Frame 43"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_44",
+      "label": "Frame 44"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_45",
+      "label": "Frame 45"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_46",
+      "label": "Frame 46"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_47",
+      "label": "Frame 47"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_48",
+      "label": "Frame 48"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_49",
+      "label": "Frame 49"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_50",
+      "label": "Frame 50"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scroll sequence animation"
+    }
+  ]
+}
+{% endschema %}

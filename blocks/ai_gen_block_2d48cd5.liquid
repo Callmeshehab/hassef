@@ -1,0 +1,441 @@
+{% doc %}
+  @prompt
+    بدي بانر كاعلان وينتقل عن الضغط عليه بشكل احترافي لصفحة فيها القصة 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-story-banner-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-story-banner-link-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ai-story-banner-link-{{ ai_gen_id }}:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-story-banner-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.banner_height }}px;
+    overflow: hidden;
+  }
+
+  .ai-story-banner-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .ai-story-banner-link-{{ ai_gen_id }}:hover .ai-story-banner-image-{{ ai_gen_id }} {
+    transform: scale(1.05);
+  }
+
+  .ai-story-banner-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-story-banner-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .ai-story-banner-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-story-banner-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, {{ block.settings.overlay_opacity | divided_by: 100.0 }}) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: {{ block.settings.content_position }};
+    align-items: {{ block.settings.text_alignment }};
+    padding: {{ block.settings.content_padding }}px;
+  }
+
+  .ai-story-banner-title-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-story-banner-description-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.description_size }}px;
+    margin: 0 0 20px 0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+  }
+
+  .ai-story-banner-cta-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 12px 32px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_text_size }}px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid {{ block.settings.button_bg_color }};
+  }
+
+  .ai-story-banner-link-{{ ai_gen_id }}:hover .ai-story-banner-cta-{{ ai_gen_id }} {
+    background-color: {{ block.settings.button_hover_bg_color }};
+    color: {{ block.settings.button_hover_text_color }};
+    border-color: {{ block.settings.button_hover_bg_color }};
+    transform: scale(1.05);
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-story-banner-image-wrapper-{{ ai_gen_id }} {
+      height: {{ block.settings.mobile_banner_height }}px;
+    }
+
+    .ai-story-banner-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.7 }}px;
+    }
+
+    .ai-story-banner-description-{{ ai_gen_id }} {
+      font-size: {{ block.settings.description_size | times: 0.8 }}px;
+    }
+
+    .ai-story-banner-overlay-{{ ai_gen_id }} {
+      padding: {{ block.settings.content_padding | times: 0.6 }}px;
+    }
+  }
+{% endstyle %}
+
+<story-banner-{{ ai_gen_id }} class="ai-story-banner-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <a href="{{ block.settings.story_page.url }}" class="ai-story-banner-link-{{ ai_gen_id }}">
+    <div class="ai-story-banner-image-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.banner_image %}
+        <img
+          src="{{ block.settings.banner_image | image_url: width: 2000 }}"
+          alt="{{ block.settings.banner_image.alt | escape }}"
+          loading="lazy"
+          width="{{ block.settings.banner_image.width }}"
+          height="{{ block.settings.banner_image.height }}"
+          class="ai-story-banner-image-{{ ai_gen_id }}"
+        >
+      {% else %}
+        <div class="ai-story-banner-placeholder-{{ ai_gen_id }}">
+          {{ 'hero-apparel-1' | placeholder_svg_tag }}
+          <div class="ai-story-banner-empty-state-{{ ai_gen_id }}">
+            أضف صورة للبانر
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="ai-story-banner-overlay-{{ ai_gen_id }}">
+        {% if block.settings.banner_title != blank %}
+          <h2 class="ai-story-banner-title-{{ ai_gen_id }}">{{ block.settings.banner_title }}</h2>
+        {% endif %}
+
+        {% if block.settings.banner_description != blank %}
+          <div class="ai-story-banner-description-{{ ai_gen_id }}">{{ block.settings.banner_description }}</div>
+        {% endif %}
+
+        {% if block.settings.show_button and block.settings.button_text != blank %}
+          <span class="ai-story-banner-cta-{{ ai_gen_id }}">{{ block.settings.button_text }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </a>
+</story-banner-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class StoryBanner{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        const link = this.querySelector('.ai-story-banner-link-{{ ai_gen_id }}');
+        
+        link.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          if (!href || href === '' || href === '#') {
+            e.preventDefault();
+          }
+        });
+      }
+    }
+
+    customElements.define('story-banner-{{ ai_gen_id }}', StoryBanner{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "بانر القصة",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "صورة البانر"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "banner_title",
+      "label": "العنوان",
+      "default": "اكتشف قصتنا"
+    },
+    {
+      "type": "richtext",
+      "id": "banner_description",
+      "label": "الوصف",
+      "default": "<p>تعرف على رحلتنا وما يجعلنا مميزين</p>"
+    },
+    {
+      "type": "page",
+      "id": "story_page",
+      "label": "صفحة القصة"
+    },
+    {
+      "type": "header",
+      "content": "الزر"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "إظهار الزر",
+      "default": true
+    },
+    {
+      "type": "inline_richtext",
+      "id": "button_text",
+      "label": "نص الزر",
+      "default": "اقرأ المزيد"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "لون خلفية الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "لون نص الزر",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "لون الخلفية عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "لون النص عند التمرير",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "button_text_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم نص الزر",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة حواف الزر",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "التصميم"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض سطح المكتب",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "ارتفاع البانر",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "mobile_banner_height",
+      "min": 200,
+      "max": 600,
+      "step": 50,
+      "unit": "px",
+      "label": "ارتفاع البانر للموبايل",
+      "default": 350
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة الحواف",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "شفافية التظليل",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "النص"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم العنوان",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم الوصف",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "موضع المحتوى",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "أعلى"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "flex-end",
+          "label": "أسفل"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "محاذاة النص",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "يسار"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "flex-end",
+          "label": "يمين"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "min": 20,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "المسافة الداخلية",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "بانر القصة"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1066 @@
+{% doc %}
+  @prompt
+    المطلوب: مشغل فيديو مخصص بتصميم تلفاز قديم
+    1️⃣ الهيكل العام
+    	•	يوجد نص قابل للتحرير في الأعلى (عنوان + وصف).
+    مشغل ليس بعرض الصفحة بالكامل.
+    	•	يمكنني التحكم في:
+    	•	عرض الم	•	تحت النص يوجد مشغل فيديو مربع الشكل (1:1) في منتصف الصفحة.
+    	•	ا
+    لشغل (width)
+    	•	ارتفاع المشغل (height)
+    	•	لون الإطار
+    	•	سماكة الإطار
+    	•	الزوايا (border-radius)
+    	•	المشغل محاط بإطار قابل للتخصيص بالكامل.
+    
+    ⸻
+    
+    2️⃣ شكل التلفاز القديم
+    	•	أريد رفع صورة تلفاز قديم من جهازي.
+    	•	الصورة تكون خلفية.
+    	•	الفيديو يظهر داخل منطقة الشاشة فقط.
+    	•	أريد خيار
+    ات للتحكم في:
+    	•	عرض صورة التلفاز
+    	•	ارتفاع صورة التلفاز
+    	•	تموضع الفيديو داخل الشاشة
+    	•	تكبير وتصغير صورة التلفاز
+    
+    ⸻
+    
+    3️⃣ تشغيل الفيديو
+    	•	الفيديوهات مرفوعة من ملفات الموقع (ليس عبر رابط خارجي).
+    Effect)
+    	•	قبل ت	•	التشغيل يكون:
+    	•	✅ تلقائي عند فتح الصفحة
+    	•	✅ يدوي عبر زر تشغيل
+    	•	إضافة زر:
+    	•	تشغيل / إيقاف
+    	•	تكبير ملء الشاشة
+    	•	المشغل يدعم تغيير الحجم بدون أن يختل التصميم.
+    
+    ⸻
+    
+    4️⃣ تأثير التشويش (Static
+     شغيل أي فيديو جديد:
+    	•	يظهر تشويش تلفاز قديم لمدة 2-3 ثواني.
+    	•	أريد خيارين:
+    	•	استخدام تأثير تشويش برمجي
+    	•	أو رفع فيديو تشويش مخصص من جهازي يتم تشغيله قبل أي فيديو
+    
+    ⸻
+    
+    5️⃣ قائمة الفيديوهات
+    	•	أسفل المشغل يوجد إطار يحتوي على:
+    ى 10 فيديوهات.
+    
+    ⸻
+    
+    6️⃣	•	صور مصغرة لكل فيديو
+    	•	لا أريد رفع صورة مصغرة يدوياً:
+    	•	يتم أخذ لقطة عشوائية تلقائياً من الفيديو
+    	•	عند الضغط على أي صورة مصغرة:
+    	•	يتم تشغيل الفيديو داخل المشغل الرئيسي
+    	•	يسبق التشغيل تأثير التشويش
+    	•	عدد الفيديوهات يصل إ
+    ل التنقل
+    	•	يوجد:
+    	•	زر التالي
+    	•	زر السابق
+    	•	إمكانية التنقل عبر:
+    	•	السحب يمين / شمال (Swipe)
+    	•	الأزرار تكون ظاهرة وواضحة.
+    
+    ⸻
+    
+    7️⃣ متطلبات إضافية
+    	•	المشغل مربع وليس مستطيل.
+    	•	طوله أقصر قليلاً من العرض (مع خيار تعديل يدوي).
+    	•	التصميم متناسق مع شكل الموقع.
+    ني فوقه وبدي لما يشغل المشغل ويضغط ز	•	كل العناصر قابلة للتخصيص عبر CSS.
+    	•	كل شيء يعمل بدون أخطاء:
+    	•	الفيديو يظهر
+    	•	التشغيل يعمل
+    	•	المصغرات تعمل
+    	•	التنقل يعمل
+    	•	التشويش يعمل
+    , بدي الفيديو أنا ارفعه من جهازي من رابط و كمان صوره التلفاز انت عاملها تكون خلف المشغل لا أنا بدي تكون ظاهره عليه ي
+    عر التكبير يشتغل المشغل العادي المدمج وبدي الصور المصغرهوالازرار تحت يكونوا في ايطار اقدر أتحكم في مواصفاته, بدي الفيديوهات أنا اللي ارفعهم من الجهاز وكمان تضيف إني أتحكم بموضع الأزرار اللي بالمشغل اللي انت شايفهم او أزيلهم كخيار , ضيف خاصيه أتحكم في أبعاد صوره التلفاز ومكانها , حلو ولكن بعد التشويش لا يعمل الفيديو, مازال الفيديوهات لا تعمل, بدي افهم ليش التشويش يعمل بشكل متصل عند تحديد الفيديو ولا يعمل بعدها, ما زال لا يعمل الفيديو مطلقا والتشويش لا يتوقف,  وعندما يصل للفيديو يخرج رمز خطأ أعيد برمجته المشغل لا يعمل, بدي أنا اللي ارفع الفيديوهات من الجهاز, حلو بس المشغل لا يعمل, بدي استبدل التالي والسابق برموز افضل كسهم هيك وكمان الأزرار اللي عند المشغل بدي زر تشغيل وزر تكبير ولكن أنا أتحكم في إبعادهم وموضعهم 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-retro-tv-player-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .ai-retro-tv-player__header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .ai-retro-tv-player__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 10px;
+  }
+
+  .ai-retro-tv-player__description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-retro-tv-player__container-{{ ai_gen_id }} {
+    position: relative;
+    width: {{ block.settings.player_width }}px;
+    height: {{ block.settings.player_height }}px;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+
+  .ai-retro-tv-player__tv-frame-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale({{ block.settings.tv_scale }});
+    width: {{ block.settings.tv_width }}px;
+    height: {{ block.settings.tv_height }}px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .ai-retro-tv-player__tv-frame-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .ai-retro-tv-player__video-wrapper-{{ ai_gen_id }} {
+    position: absolute;
+    top: {{ block.settings.video_position_y }}%;
+    left: {{ block.settings.video_position_x }}%;
+    transform: translate(-50%, -50%);
+    width: {{ block.settings.video_width }}%;
+    height: {{ block.settings.video_height }}%;
+    border: {{ block.settings.frame_thickness }}px solid {{ block.settings.frame_color }};
+    border-radius: {{ block.settings.frame_radius }}px;
+    overflow: hidden;
+    background: #000;
+    z-index: 1;
+  }
+
+  .ai-retro-tv-player__video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-retro-tv-player__static-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .ai-retro-tv-player__static-{{ ai_gen_id }}.active {
+    opacity: 1;
+  }
+
+  .ai-retro-tv-player__static-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-retro-tv-player__controls-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: {{ block.settings.controls_position_y }}px;
+    left: {{ block.settings.controls_position_x }}%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: {{ block.settings.controls_gap }}px;
+    z-index: 4;
+    {% if block.settings.show_controls %}
+      opacity: 1;
+      pointer-events: auto;
+    {% else %}
+      opacity: 0;
+      pointer-events: none;
+    {% endif %}
+  }
+
+  .ai-retro-tv-player__control-btn-{{ ai_gen_id }} {
+    background: {{ block.settings.control_button_bg }};
+    color: {{ block.settings.control_button_color }};
+    border: none;
+    width: {{ block.settings.control_button_size }}px;
+    height: {{ block.settings.control_button_size }}px;
+    border-radius: {{ block.settings.control_button_radius }}px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+  }
+
+  .ai-retro-tv-player__control-btn-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-retro-tv-player__control-btn-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    fill: currentColor;
+  }
+
+  .ai-retro-tv-player__thumbnails-{{ ai_gen_id }} {
+    margin-top: 30px;
+    padding: {{ block.settings.thumbnails_padding }}px;
+    background: {{ block.settings.thumbnails_bg }};
+    border: {{ block.settings.thumbnails_border_thickness }}px solid {{ block.settings.thumbnails_border_color }};
+    border-radius: {{ block.settings.thumbnails_radius }}px;
+  }
+
+  .ai-retro-tv-player__thumbnails-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-retro-tv-player__thumbnails-track-{{ ai_gen_id }} {
+    display: flex;
+    gap: 15px;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-retro-tv-player__thumbnail-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    background: #000;
+  }
+
+  .ai-retro-tv-player__thumbnail-{{ ai_gen_id }}.active {
+    border-color: {{ block.settings.frame_color }};
+  }
+
+  .ai-retro-tv-player__thumbnail-{{ ai_gen_id }}:hover {
+    border-color: {{ block.settings.frame_color }};
+    opacity: 0.8;
+  }
+
+  .ai-retro-tv-player__thumbnail-{{ ai_gen_id }} video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .ai-retro-tv-player__nav-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .ai-retro-tv-player__nav-btn-{{ ai_gen_id }} {
+    background: {{ block.settings.nav_button_bg }};
+    color: {{ block.settings.nav_button_color }};
+    border: none;
+    width: {{ block.settings.nav_button_size }}px;
+    height: {{ block.settings.nav_button_size }}px;
+    border-radius: {{ block.settings.nav_button_radius }}px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+  }
+
+  .ai-retro-tv-player__nav-btn-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-retro-tv-player__nav-btn-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-retro-tv-player__nav-btn-{{ ai_gen_id }} svg {
+    width: 50%;
+    height: 50%;
+    fill: currentColor;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-retro-tv-player__container-{{ ai_gen_id }} {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+    }
+
+    .ai-retro-tv-player__thumbnail-{{ ai_gen_id }} {
+      width: 80px;
+      height: 80px;
+    }
+  }
+{% endstyle %}
+
+<retro-tv-player-{{ ai_gen_id }} class="ai-retro-tv-player-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.title != blank or block.settings.description != blank %}
+    <div class="ai-retro-tv-player__header-{{ ai_gen_id }}">
+      {% if block.settings.title != blank %}
+        <h2 class="ai-retro-tv-player__title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+      {% endif %}
+      {% if block.settings.description != blank %}
+        <div class="ai-retro-tv-player__description-{{ ai_gen_id }}">{{ block.settings.description }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="ai-retro-tv-player__container-{{ ai_gen_id }}">
+    {% if block.settings.tv_frame_image %}
+      <div class="ai-retro-tv-player__tv-frame-{{ ai_gen_id }}">
+        <img src="{{ block.settings.tv_frame_image | image_url: width: 1000 }}" alt="TV Frame">
+      </div>
+    {% endif %}
+
+    <div class="ai-retro-tv-player__video-wrapper-{{ ai_gen_id }}">
+      <video
+        class="ai-retro-tv-player__video-{{ ai_gen_id }}"
+        playsinline
+        controls
+        data-main-video
+      ></video>
+
+      <div class="ai-retro-tv-player__static-{{ ai_gen_id }}" data-static-overlay>
+        {% if block.settings.use_custom_static and block.settings.static_video != blank %}
+          <video class="ai-retro-tv-player__static-video-{{ ai_gen_id }}" autoplay loop muted playsinline data-static-video>
+            <source src="{{ block.settings.static_video.sources[0].url }}" type="{{ block.settings.static_video.sources[0].mime_type }}">
+          </video>
+        {% else %}
+          <canvas class="ai-retro-tv-player__static-video-{{ ai_gen_id }}" data-static-canvas></canvas>
+        {% endif %}
+      </div>
+
+      {% if block.settings.show_controls %}
+        <div class="ai-retro-tv-player__controls-{{ ai_gen_id }}">
+          <button class="ai-retro-tv-player__control-btn-{{ ai_gen_id }}" data-play-pause aria-label="تشغيل/إيقاف">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" data-play-icon>
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" data-pause-icon style="display: none;">
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+            </svg>
+          </button>
+          <button class="ai-retro-tv-player__control-btn-{{ ai_gen_id }}" data-fullscreen aria-label="ملء الشاشة">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+            </svg>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="ai-retro-tv-player__thumbnails-{{ ai_gen_id }}">
+    <div class="ai-retro-tv-player__thumbnails-wrapper-{{ ai_gen_id }}">
+      <div class="ai-retro-tv-player__thumbnails-track-{{ ai_gen_id }}" data-thumbnails-track>
+        {% for i in (1..10) %}
+          {% assign video_key = 'video_' | append: i %}
+          {% assign video_file = block.settings[video_key] %}
+          {% if video_file != blank %}
+            <div 
+              class="ai-retro-tv-player__thumbnail-{{ ai_gen_id }} {% if forloop.first %}active{% endif %}" 
+              data-video-index="{{ forloop.index0 }}"
+              data-video-url="{{ video_file.sources[0].url }}"
+            >
+              <video muted playsinline loop>
+                <source src="{{ video_file.sources[0].url }}" type="{{ video_file.sources[0].mime_type }}">
+              </video>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="ai-retro-tv-player__nav-{{ ai_gen_id }}">
+      <button class="ai-retro-tv-player__nav-btn-{{ ai_gen_id }}" data-nav-prev aria-label="السابق">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </button>
+      <button class="ai-retro-tv-player__nav-btn-{{ ai_gen_id }}" data-nav-next aria-label="التالي">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</retro-tv-player-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  class RetroTvPlayer{{ ai_gen_id }} extends HTMLElement {
+    constructor() {
+      super();
+      this.currentIndex = 0;
+      this.videos = [];
+      this.isTransitioning = false;
+    }
+
+    connectedCallback() {
+      this.mainVideo = this.querySelector('[data-main-video]');
+      this.staticOverlay = this.querySelector('[data-static-overlay]');
+      this.staticCanvas = this.querySelector('[data-static-canvas]');
+      this.playPauseBtn = this.querySelector('[data-play-pause]');
+      this.playIcon = this.querySelector('[data-play-icon]');
+      this.pauseIcon = this.querySelector('[data-pause-icon]');
+      this.fullscreenBtn = this.querySelector('[data-fullscreen]');
+      this.thumbnails = this.querySelectorAll('.ai-retro-tv-player__thumbnail-{{ ai_gen_id }}');
+      this.thumbnailsTrack = this.querySelector('[data-thumbnails-track]');
+      this.navPrev = this.querySelector('[data-nav-prev]');
+      this.navNext = this.querySelector('[data-nav-next]');
+
+      this.collectVideos();
+      this.setupEventListeners();
+      this.initStaticEffect();
+      
+      if (this.videos.length > 0) {
+        this.loadVideo(0, false);
+      }
+      
+      this.updateNavButtons();
+    }
+
+    collectVideos() {
+      this.thumbnails.forEach((thumb) => {
+        const videoUrl = thumb.getAttribute('data-video-url');
+        if (videoUrl) {
+          this.videos.push(videoUrl);
+          const thumbVideo = thumb.querySelector('video');
+          if (thumbVideo) {
+            thumbVideo.currentTime = Math.random() * 2;
+          }
+        }
+      });
+    }
+
+    setupEventListeners() {
+      if (this.playPauseBtn) {
+        this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+      }
+
+      if (this.fullscreenBtn) {
+        this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+      }
+
+      this.thumbnails.forEach((thumb, index) => {
+        thumb.addEventListener('click', () => {
+          if (!this.isTransitioning) {
+            this.loadVideo(index, true);
+          }
+        });
+      });
+
+      if (this.navPrev) {
+        this.navPrev.addEventListener('click', () => this.navigate(-1));
+      }
+
+      if (this.navNext) {
+        this.navNext.addEventListener('click', () => this.navigate(1));
+      }
+
+      let startX = 0;
+      if (this.thumbnailsTrack) {
+        this.thumbnailsTrack.addEventListener('touchstart', (e) => {
+          startX = e.touches[0].clientX;
+        });
+
+        this.thumbnailsTrack.addEventListener('touchend', (e) => {
+          const endX = e.changedTouches[0].clientX;
+          const diff = startX - endX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+              this.navigate(1);
+            } else {
+              this.navigate(-1);
+            }
+          }
+        });
+      }
+
+      if (this.mainVideo) {
+        this.mainVideo.addEventListener('play', () => {
+          this.updatePlayPauseIcon(false);
+        });
+
+        this.mainVideo.addEventListener('pause', () => {
+          this.updatePlayPauseIcon(true);
+        });
+      }
+    }
+
+    updatePlayPauseIcon(showPlay) {
+      if (this.playIcon && this.pauseIcon) {
+        if (showPlay) {
+          this.playIcon.style.display = 'block';
+          this.pauseIcon.style.display = 'none';
+        } else {
+          this.playIcon.style.display = 'none';
+          this.pauseIcon.style.display = 'block';
+        }
+      }
+    }
+
+    initStaticEffect() {
+      if (!this.staticCanvas) return;
+
+      const ctx = this.staticCanvas.getContext('2d');
+      const width = this.staticCanvas.width = 320;
+      const height = this.staticCanvas.height = 240;
+
+      const drawStatic = () => {
+        const imageData = ctx.createImageData(width, height);
+        for (let i = 0; i < imageData.data.length; i += 4) {
+          const color = Math.random() * 255;
+          imageData.data[i] = color;
+          imageData.data[i + 1] = color;
+          imageData.data[i + 2] = color;
+          imageData.data[i + 3] = 255;
+        }
+        ctx.putImageData(imageData, 0, 0);
+      };
+
+      this.staticInterval = setInterval(drawStatic, 50);
+    }
+
+    async loadVideo(index, showStatic) {
+      if (index < 0 || index >= this.videos.length || this.isTransitioning) return;
+
+      this.isTransitioning = true;
+      this.currentIndex = index;
+
+      this.thumbnails.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+      });
+
+      if (showStatic) {
+        this.showStatic();
+        await new Promise(resolve => setTimeout(resolve, {{ block.settings.static_duration }} * 1000));
+        this.hideStatic();
+      }
+
+      this.mainVideo.src = this.videos[index];
+      this.mainVideo.load();
+
+      this.mainVideo.onloadeddata = () => {
+        {% if block.settings.autoplay %}
+          this.mainVideo.play().catch(err => {
+            console.log('تعذر التشغيل التلقائي');
+          });
+        {% endif %}
+        this.isTransitioning = false;
+      };
+
+      this.updateNavButtons();
+    }
+
+    showStatic() {
+      if (this.staticOverlay) {
+        this.staticOverlay.classList.add('active');
+      }
+    }
+
+    hideStatic() {
+      if (this.staticOverlay) {
+        this.staticOverlay.classList.remove('active');
+      }
+    }
+
+    togglePlayPause() {
+      if (this.mainVideo.paused) {
+        this.mainVideo.play();
+      } else {
+        this.mainVideo.pause();
+      }
+    }
+
+    toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        this.mainVideo.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    navigate(direction) {
+      const newIndex = this.currentIndex + direction;
+      if (newIndex >= 0 && newIndex < this.videos.length) {
+        this.loadVideo(newIndex, true);
+      }
+    }
+
+    updateNavButtons() {
+      if (this.navPrev) {
+        this.navPrev.disabled = this.currentIndex === 0;
+      }
+      if (this.navNext) {
+        this.navNext.disabled = this.currentIndex === this.videos.length - 1;
+      }
+    }
+
+    disconnectedCallback() {
+      if (this.staticInterval) {
+        clearInterval(this.staticInterval);
+      }
+    }
+  }
+
+  customElements.define('retro-tv-player-{{ ai_gen_id }}', RetroTvPlayer{{ ai_gen_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "مشغل فيديو تلفاز قديم",
+  "settings": [
+    {
+      "type": "header",
+      "content": "النص"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "العنوان",
+      "default": "مشغل الفيديو"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "الوصف",
+      "default": "شاهد مقاطع الفيديو بأسلوب التلفاز القديم"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "label": "حجم الوصف",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "المشغل"
+    },
+    {
+      "type": "range",
+      "id": "player_width",
+      "label": "عرض المشغل",
+      "min": 300,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "player_height",
+      "label": "ارتفاع المشغل",
+      "min": 300,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "header",
+      "content": "إطار الفيديو"
+    },
+    {
+      "type": "range",
+      "id": "video_width",
+      "label": "عرض الفيديو",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "video_height",
+      "label": "ارتفاع الفيديو",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "video_position_x",
+      "label": "موضع الفيديو أفقياً",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "video_position_y",
+      "label": "موضع الفيديو عمودياً",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "frame_thickness",
+      "label": "سماكة الإطار",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "frame_color",
+      "label": "لون الإطار",
+      "default": "#910f3f"
+    },
+    {
+      "type": "range",
+      "id": "frame_radius",
+      "label": "زوايا الإطار",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "صورة التلفاز"
+    },
+    {
+      "type": "image_picker",
+      "id": "tv_frame_image",
+      "label": "صورة التلفاز"
+    },
+    {
+      "type": "range",
+      "id": "tv_width",
+      "label": "عرض صورة التلفاز",
+      "min": 300,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "tv_height",
+      "label": "ارتفاع صورة التلفاز",
+      "min": 300,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "tv_scale",
+      "label": "تكبير صورة التلفاز",
+      "min": 0.5,
+      "max": 2,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "أزرار التحكم"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "إظهار أزرار التحكم",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "control_button_size",
+      "label": "حجم الأزرار",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "controls_gap",
+      "label": "المسافة بين الأزرار",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "controls_position_x",
+      "label": "موضع الأزرار أفقياً",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "controls_position_y",
+      "label": "موضع الأزرار عمودياً",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "control_button_radius",
+      "label": "زوايا الأزرار",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "control_button_bg",
+      "label": "لون خلفية الأزرار",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "control_button_color",
+      "label": "لون رموز الأزرار",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "إعدادات التشغيل"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تشغيل تلقائي",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "تأثير التشويش"
+    },
+    {
+      "type": "range",
+      "id": "static_duration",
+      "label": "مدة التشويش",
+      "min": 1,
+      "max": 5,
+      "step": 0.5,
+      "unit": "s",
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "use_custom_static",
+      "label": "استخدام فيديو تشويش مخصص",
+      "default": false
+    },
+    {
+      "type": "video",
+      "id": "static_video",
+      "label": "فيديو التشويش"
+    },
+    {
+      "type": "header",
+      "content": "الصور المصغرة"
+    },
+    {
+      "type": "range",
+      "id": "thumbnails_padding",
+      "label": "المسافة الداخلية",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "thumbnails_bg",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "thumbnails_border_thickness",
+      "label": "سماكة الإطار",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "thumbnails_border_color",
+      "label": "لون الإطار",
+      "default": "#910f3f"
+    },
+    {
+      "type": "range",
+      "id": "thumbnails_radius",
+      "label": "زوايا الإطار",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "أزرار التنقل"
+    },
+    {
+      "type": "range",
+      "id": "nav_button_size",
+      "label": "حجم أزرار التنقل",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "nav_button_radius",
+      "label": "زوايا أزرار التنقل",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "nav_button_bg",
+      "label": "لون خلفية أزرار التنقل",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_color",
+      "label": "لون رموز أزرار التنقل",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "الفيديوهات"
+    },
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "فيديو 1"
+    },
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "فيديو 2"
+    },
+    {
+      "type": "video",
+      "id": "video_3",
+      "label": "فيديو 3"
+    },
+    {
+      "type": "video",
+      "id": "video_4",
+      "label": "فيديو 4"
+    },
+    {
+      "type": "video",
+      "id": "video_5",
+      "label": "فيديو 5"
+    },
+    {
+      "type": "video",
+      "id": "video_6",
+      "label": "فيديو 6"
+    },
+    {
+      "type": "video",
+      "id": "video_7",
+      "label": "فيديو 7"
+    },
+    {
+      "type": "video",
+      "id": "video_8",
+      "label": "فيديو 8"
+    },
+    {
+      "type": "video",
+      "id": "video_9",
+      "label": "فيديو 9"
+    },
+    {
+      "type": "video",
+      "id": "video_10",
+      "label": "فيديو 10"
+    }
+  ],
+  "presets": [
+    {
+      "name": "مشغل فيديو تلفاز قديم"
+    }
+  ]
+}
+{% endschema %}

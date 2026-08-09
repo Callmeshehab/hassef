@@ -1,0 +1,1183 @@
+{% comment %}
+╔══════════════════════════════════════════════════════════╗
+║  ARTIST SELECTOR WHEEL v3 — Retro Cassette               ║
+║  إصدار محسّن — مؤشر حقيقي، عربي صحيح، صوت فوري          ║
+╚══════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════
+   VARIABLES
+══════════════════════════════════════ */
+#asw {
+  --bg:         {{ section.settings.color_bg }};
+  --primary:    {{ section.settings.color_primary }};
+  --secondary:  {{ section.settings.color_secondary }};
+  --text:       {{ section.settings.color_text }};
+  --ws:         {{ section.settings.wheel_size }}px;
+  --hub:        {{ section.settings.hub_size }}px;
+  --av:         {{ section.settings.avatar_size }}px;
+  --ptr:        {{ section.settings.pointer_size }}px;
+  --gap-hw:     {{ section.settings.gap_header_wheel }}px;
+  --gap-wi:     {{ section.settings.gap_wheel_info }}px;
+  --gap-meta:   {{ section.settings.gap_meta }}px;
+  --r-out:      {{ section.settings.radius_outer }};
+  --r-in:       {{ section.settings.radius_inner }};
+  --sec-gap:    {{ section.settings.sector_gap_deg }};
+  --anim:       {{ section.settings.snap_speed }}ms;
+  --friction:   0.{{ section.settings.friction }};
+  --font-en:    'Orbitron', monospace;
+  --font-ar:    'Cairo', sans-serif;
+}
+
+/* ══════════════════════════════════════
+   ROOT
+══════════════════════════════════════ */
+#asw *, #asw *::before, #asw *::after { box-sizing:border-box; margin:0; padding:0; }
+
+#asw {
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: {{ section.settings.section_padding_v }}px {{ section.settings.section_padding_h }}px;
+  position: relative;
+  overflow: hidden;
+  direction: rtl;
+}
+
+/* paper grain */
+#asw::after {
+  content:'';
+  position:absolute; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23f)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0;
+}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+.asw-header {
+  text-align:center;
+  position:relative; z-index:2;
+  margin-bottom: var(--gap-hw);
+}
+.asw-eyebrow {
+  font-family: var(--font-ar);
+  font-size: {{ section.settings.eyebrow_size }}px;
+  color: var(--secondary);
+  opacity:.75;
+  margin-bottom:6px;
+  letter-spacing:0;
+}
+.asw-title {
+  font-family: var(--font-ar);
+  font-size: {{ section.settings.title_size }}px;
+  font-weight:900;
+  color: var(--primary);
+  line-height:1.15;
+  letter-spacing:0;
+}
+.asw-subtitle {
+  font-family: var(--font-ar);
+  font-size: {{ section.settings.subtitle_size }}px;
+  color: var(--text);
+  opacity:.4;
+  margin-top:6px;
+}
+
+/* ══════════════════════════════════════
+   STAGE
+══════════════════════════════════════ */
+.asw-stage {
+  position:relative;
+  width: var(--ws);
+  height: var(--ws);
+  flex-shrink:0;
+  z-index:2;
+  touch-action:none;
+  user-select:none;
+}
+
+/* ══════════════════════════════════════
+   OUTER RING
+══════════════════════════════════════ */
+.asw-ring {
+  position:absolute;
+  inset:-{{ section.settings.ring_gap }}px;
+  border-radius:50%;
+  border:{{ section.settings.ring_thickness }}px solid;
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  pointer-events:none;
+}
+.asw-ring-inner {
+  position:absolute;
+  inset:{{ section.settings.ring_gap }}px;
+  border-radius:50%;
+  border:1px dashed color-mix(in srgb, var(--secondary) 18%, transparent);
+  pointer-events:none;
+}
+
+/* ══════════════════════════════════════
+   WHEEL
+══════════════════════════════════════ */
+.asw-wheel {
+  position:absolute; inset:0;
+  border-radius:50%;
+  cursor:grab;
+  will-change:transform;
+}
+.asw-wheel:active { cursor:grabbing; }
+.asw-wheel svg {
+  width:100%; height:100%;
+  overflow:visible;
+}
+
+/* ══════════════════════════════════════
+   HUB (center)
+══════════════════════════════════════ */
+.asw-hub {
+  position:absolute;
+  width: var(--hub);
+  height: var(--hub);
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background: var(--bg);
+  border: {{ section.settings.hub_border }}px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  box-shadow:
+    0 0 0 {{ section.settings.hub_gap }}px var(--bg),
+    0 0 0 {{ section.settings.hub_gap | plus: 1 }}px color-mix(in srgb, var(--primary) 12%, transparent),
+    0 4px 24px color-mix(in srgb, var(--primary) 14%, transparent);
+  overflow:hidden;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  cursor:pointer;
+  transition: box-shadow .4s ease;
+}
+.asw-hub:hover {
+  box-shadow:
+    0 0 0 {{ section.settings.hub_gap }}px var(--bg),
+    0 0 0 {{ section.settings.hub_gap | plus: 1 }}px color-mix(in srgb, var(--primary) 25%, transparent),
+    0 6px 32px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+/* Hub inner reel ring */
+.asw-hub::before {
+  content:'';
+  position:absolute;
+  width:35%; height:35%;
+  border-radius:50%;
+  border:2px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  z-index:1;
+  pointer-events:none;
+}
+
+.asw-hub-img {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  border-radius:50%;
+  opacity:0;
+  transform:scale(.9);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.34,1.3,.64,1);
+  pointer-events:none;
+}
+.asw-hub-img.on { opacity:1; transform:scale(1); }
+
+/* Hub overlay for name + CTA */
+.asw-hub-overlay {
+  position:absolute; inset:0;
+  border-radius:50%;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg) 85%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 20%, transparent) 55%,
+    transparent 100%
+  );
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  padding-bottom:14%;
+  z-index:2;
+  pointer-events:none;
+}
+.asw-hub-name {
+  font-family: var(--font-ar);
+  font-size: clamp(10px, calc(var(--hub) * 0.09), 16px);
+  font-weight:900;
+  color: var(--primary);
+  text-align:center;
+  line-height:1.2;
+  letter-spacing:0;
+  max-width:85%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.asw-hub-cta {
+  font-family: var(--font-ar);
+  font-size: clamp(8px, calc(var(--hub) * 0.07), 12px);
+  font-weight:700;
+  color: var(--bg);
+  background: var(--primary);
+  padding:3px 10px;
+  border-radius:20px;
+  margin-top:4px;
+  letter-spacing:0;
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  transform:translateY(4px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.asw-hub.active .asw-hub-cta {
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ══════════════════════════════════════
+   POINTER — Real SVG needle, fixed bottom
+══════════════════════════════════════ */
+.asw-ptr-wrap {
+  position:absolute;
+  bottom: -{{ section.settings.ptr_offset }}px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  z-index:20;
+  pointer-events:none;
+}
+
+/* SVG needle shape */
+.asw-ptr-svg {
+  width: var(--ptr);
+  height: calc(var(--ptr) * 1.8);
+  filter: drop-shadow(0 -2px 6px color-mix(in srgb, var(--primary) 50%, transparent));
+  transition: transform .12s ease;
+}
+.asw-ptr-svg.tick {
+  animation: ptrPulse .22s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes ptrPulse {
+  0%,100% { transform: scale(1) translateY(0); }
+  35%      { transform: scale(1.3) translateY(-4px); }
+  65%      { transform: scale(.9)  translateY(2px); }
+}
+
+/* Vertical stem below needle */
+.asw-ptr-stem {
+  width: {{ section.settings.ptr_stem_w }}px;
+  height: {{ section.settings.ptr_stem_h }}px;
+  background: linear-gradient(to bottom, var(--primary), transparent);
+  opacity:.45;
+  border-radius:1px;
+}
+
+/* ══════════════════════════════════════
+   INFO PANEL
+══════════════════════════════════════ */
+.asw-info {
+  position:relative; z-index:2;
+  margin-top: var(--gap-wi);
+  width:100%;
+  max-width: {{ section.settings.info_max_width }}px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: var(--gap-meta);
+  min-height:170px;
+}
+
+/* tape line */
+.asw-tape {
+  width: {{ section.settings.tape_width }}px;
+  height: {{ section.settings.tape_height }}px;
+  background: linear-gradient(
+    to left,
+    transparent,
+    color-mix(in srgb, var(--secondary) 45%, transparent),
+    color-mix(in srgb, var(--primary) 65%, transparent),
+    color-mix(in srgb, var(--secondary) 45%, transparent),
+    transparent
+  );
+  border-radius:2px;
+}
+
+.asw-name {
+  font-family: var(--font-ar);
+  font-size: {{ section.settings.name_size }}px;
+  font-weight:900;
+  color: var(--primary);
+  text-align:center;
+  letter-spacing:0;
+  line-height:1.2;
+  opacity:0;
+  transform:translateY(10px);
+  transition: opacity .4s ease, transform .4s cubic-bezier(.34,1.3,.64,1);
+}
+.asw-name.on { opacity:1; transform:translateY(0); }
+
+/* meta stats row */
+.asw-meta {
+  display:flex;
+  align-items:center;
+  gap:0;
+  opacity:0;
+  transition: opacity .4s ease .1s;
+  direction:rtl;
+}
+.asw-meta.on { opacity:1; }
+
+.asw-meta-item {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 {{ section.settings.meta_item_pad }}px;
+  gap:3px;
+}
+.asw-meta-val {
+  font-family: var(--font-ar);
+  font-size: {{ section.settings.meta_val_size }}px;
+  font-weight:900;
+  color: var(--primary);
+  line-height:1;
+}
+.asw-meta-key {
+  font-family: var(--font-ar);
+  font-size: {{ section.settings.meta_key_size }}px;
+  font-weight:600;
+  color: var(--text);
+  opacity:.45;
+  letter-spacing:0;
+}
+.asw-meta-sep {
+  width:{{ section.settings.meta_sep_w }}px;
+  height:{{ section.settings.meta_sep_h }}px;
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+/* CTA button */
+.asw-cta {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family: var(--font-ar);
+  font-size: {{ section.settings.cta_size }}px;
+  font-weight:700;
+  color: var(--bg);
+  background: var(--primary);
+  padding: {{ section.settings.cta_pad_v }}px {{ section.settings.cta_pad_h }}px;
+  border-radius: {{ section.settings.cta_radius }}px;
+  text-decoration:none;
+  letter-spacing:0;
+  opacity:0;
+  transform:translateY(8px) scale(.96);
+  transition:
+    opacity .4s ease .2s,
+    transform .4s cubic-bezier(.34,1.3,.64,1) .2s,
+    box-shadow .2s;
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--primary) 30%, transparent);
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  border:none;
+}
+.asw-cta::before {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(135deg, rgba(255,255,255,.12) 0%, transparent 60%);
+}
+.asw-cta.on {
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+.asw-cta:hover {
+  box-shadow: 0 6px 26px color-mix(in srgb, var(--primary) 45%, transparent);
+  transform: translateY(-2px) scale(1.03) !important;
+}
+.asw-cta svg { width:14px; height:14px; fill:currentColor; flex-shrink:0; }
+
+/* audio badge */
+.asw-audio {
+  position:absolute;
+  top: {{ section.settings.audio_badge_top }}px;
+  {% if section.settings.audio_badge_side == 'right' %}right{% else %}left{% endif %}: {{ section.settings.audio_badge_side_offset }}px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family: var(--font-ar);
+  font-size:11px;
+  color: var(--primary);
+  opacity:0;
+  transition: opacity .4s ease;
+  z-index:5;
+  pointer-events:none;
+}
+.asw-audio.on { opacity:.75; }
+.asw-waves { display:flex; gap:2px; align-items:flex-end; height:14px; }
+.asw-bar {
+  width:3px; background: var(--primary); border-radius:2px;
+  animation: wavebar .7s ease-in-out infinite alternate;
+}
+.asw-bar:nth-child(1){height:4px;  animation-delay:0s;}
+.asw-bar:nth-child(2){height:11px; animation-delay:.14s;}
+.asw-bar:nth-child(3){height:7px;  animation-delay:.28s;}
+.asw-bar:nth-child(4){height:13px; animation-delay:.08s;}
+.asw-bar:nth-child(5){height:5px;  animation-delay:.22s;}
+@keyframes wavebar {
+  from { transform:scaleY(.35); opacity:.35; }
+  to   { transform:scaleY(1);   opacity:1; }
+}
+
+/* auto-rotate pause indicator */
+.asw-autoplay-btn {
+  position:absolute;
+  top:{{ section.settings.audio_badge_top }}px;
+  {% if section.settings.audio_badge_side == 'right' %}left{% else %}right{% endif %}:{{ section.settings.audio_badge_side_offset }}px;
+  width:30px; height:30px;
+  border-radius:50%;
+  border:1.5px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  z-index:5;
+  transition: border-color .3s;
+  backdrop-filter:blur(4px);
+}
+.asw-autoplay-btn:hover { border-color: var(--primary); }
+.asw-autoplay-btn svg { width:12px; height:12px; fill:var(--primary); }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media(max-width:600px){
+  #asw {
+    --ws: min(88vw, 360px);
+    --hub: min(28vw, 120px);
+    --av: min(9vw, 36px);
+  }
+}
+</style>
+
+<!-- ════════════════════════════════════════
+     HTML
+════════════════════════════════════════ -->
+<section id="asw">
+
+  <!-- Header -->
+  <header class="asw-header">
+    <p class="asw-eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="asw-title">{{ section.settings.title }}</h2>
+    <p class="asw-subtitle">{{ section.settings.subtitle }}</p>
+  </header>
+
+  <!-- Audio badge -->
+  {% if section.settings.enable_preview %}
+  <div class="asw-audio" id="asw-audio">
+    <div class="asw-waves">
+      <div class="asw-bar"></div><div class="asw-bar"></div>
+      <div class="asw-bar"></div><div class="asw-bar"></div>
+      <div class="asw-bar"></div>
+    </div>
+    <span>{{ section.settings.audio_label }}</span>
+  </div>
+  {% endif %}
+
+  <!-- Auto-rotate toggle -->
+  {% if section.settings.enable_autorotate %}
+  <button class="asw-autoplay-btn" id="asw-auto-btn" title="إيقاف / تشغيل التدوير">
+    <svg id="asw-auto-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
+  </button>
+  {% endif %}
+
+  <!-- Stage -->
+  <div class="asw-stage" id="asw-stage">
+
+    <!-- rings -->
+    <div class="asw-ring"></div>
+    <div class="asw-ring-inner"></div>
+
+    <!-- Rotating wheel -->
+    <div class="asw-wheel" id="asw-wheel">
+      <svg id="asw-svg" viewBox="-300 -300 600 600"
+           xmlns="http://www.w3.org/2000/svg"
+           xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs id="asw-defs"></defs>
+      </svg>
+    </div>
+
+    <!-- Center hub (clickable) -->
+    <div class="asw-hub" id="asw-hub">
+      <img class="asw-hub-img" id="asw-hub-img" src="" alt="">
+      <div class="asw-hub-overlay">
+        <span class="asw-hub-name" id="asw-hub-name">—</span>
+        <span class="asw-hub-cta">{{ section.settings.hub_cta_text }}</span>
+      </div>
+    </div>
+
+    <!-- Fixed pointer at bottom (270°) -->
+    <div class="asw-ptr-wrap" id="asw-ptr-wrap">
+      <!-- SVG needle -->
+      <svg class="asw-ptr-svg" id="asw-ptr" viewBox="0 0 40 72"
+           xmlns="http://www.w3.org/2000/svg">
+        <!-- Needle body -->
+        <path d="M20 4 C20 4 36 24 36 40 C36 56 29 68 20 68 C11 68 4 56 4 40 C4 24 20 4 20 4Z"
+              fill="{{ section.settings.color_primary }}"
+              opacity=".15"/>
+        <!-- Needle sharp tip pointing UP into wheel -->
+        <path d="M20 2 L28 32 L20 28 L12 32 Z"
+              fill="{{ section.settings.color_primary }}"/>
+        <!-- Needle body filled -->
+        <ellipse cx="20" cy="46" rx="12" ry="18"
+                 fill="{{ section.settings.color_primary }}" opacity=".25"
+                 stroke="{{ section.settings.color_primary }}" stroke-width="1"/>
+        <!-- Center dot -->
+        <circle cx="20" cy="46" r="4"
+                fill="{{ section.settings.color_primary }}" opacity=".6"/>
+        <!-- Highlight -->
+        <path d="M15 10 Q20 5 22 14" stroke="white" stroke-width="1.5"
+              fill="none" stroke-linecap="round" opacity=".4"/>
+      </svg>
+      <div class="asw-ptr-stem"></div>
+    </div>
+
+  </div><!-- end stage -->
+
+  <!-- Info panel -->
+  <div class="asw-info">
+    <div class="asw-tape"></div>
+    <div class="asw-name" id="asw-name">—</div>
+    <div class="asw-meta" id="asw-meta">
+      <div class="asw-meta-item">
+        <div class="asw-meta-val" id="asw-tracks">—</div>
+        <div class="asw-meta-key">{{ section.settings.label_tracks }}</div>
+      </div>
+      <div class="asw-meta-sep"></div>
+      <div class="asw-meta-item">
+        <div class="asw-meta-val" id="asw-products">—</div>
+        <div class="asw-meta-key">{{ section.settings.label_products }}</div>
+      </div>
+      <div class="asw-meta-sep"></div>
+      <div class="asw-meta-item">
+        <div class="asw-meta-val" id="asw-genre">—</div>
+        <div class="asw-meta-key">{{ section.settings.label_genre }}</div>
+      </div>
+    </div>
+    <a class="asw-cta" id="asw-cta" href="#">
+      <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+      {{ section.settings.cta_text }}
+    </a>
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════════════
+     JAVASCRIPT ENGINE
+════════════════════════════════════════ -->
+<script>
+(function(){
+"use strict";
+
+/* ─────────────────────────────────────
+   ARTISTS from Shopify blocks
+───────────────────────────────────── */
+const ARTISTS = [
+  {% for block in section.blocks %}{% if block.type == 'artist' %}
+  {
+    name:      {{ block.settings.name | json }},
+    image:     {{ block.settings.image | img_url: '600x600', crop: 'center' | json }},
+    url:       {{ block.settings.collection_url | json }},
+    tracks:    {{ block.settings.tracks   | default: 0 }},
+    products:  {{ block.settings.products | default: 0 }},
+    genre:     {{ block.settings.genre | json }},
+    color:     {{ block.settings.color | json }},
+    audio:     {{ block.settings.preview_audio | json }},
+  },
+  {% endif %}{% endfor %}
+].filter(a => a.name && a.name.trim());
+
+if(ARTISTS.length < 2) return;
+
+/* ─────────────────────────────────────
+   CONFIG
+───────────────────────────────────── */
+const N          = ARTISTS.length;
+const SLICE      = 360 / N;
+const PTR_DEG    = 270;          // pointer fixed at bottom
+const R_OUT      = {{ section.settings.radius_outer }};
+const R_IN       = {{ section.settings.radius_inner }};
+const AV_R       = {{ section.settings.avatar_size }} / 2 | 0;
+const SEC_GAP    = {{ section.settings.sector_gap_deg }};
+const SNAP_MS    = {{ section.settings.snap_speed }};
+const FRICTION   = 1 - {{ section.settings.friction }} / 100;
+const EN_SOUND   = {{ section.settings.enable_sound   | json }};
+const EN_PREV    = {{ section.settings.enable_preview | json }};
+const PREV_DUR   = {{ section.settings.preview_duration }} * 1000;
+const EN_AUTO    = {{ section.settings.enable_autorotate | json }};
+const AUTO_SPD   = {{ section.settings.autorotate_speed }} / 10;
+const PRIMARY    = '{{ section.settings.color_primary }}';
+const BG         = '{{ section.settings.color_bg }}';
+
+/* ─────────────────────────────────────
+   STATE
+───────────────────────────────────── */
+let angle    = 0;
+let velocity = 0;
+let dragging = false;
+let lastMX   = null;
+let lastTime = 0;
+let activeIdx = -1;
+let prevIdx   = -1;
+let rafId     = null;
+let audioCtx  = null;
+let unlocked  = false;
+let curAudio  = null;
+let prevTimer = null;
+let autoOn    = EN_AUTO;
+let autoRafId = null;
+
+/* ─────────────────────────────────────
+   DOM
+───────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const stage    = $('asw-stage');
+const wheelEl  = $('asw-wheel');
+const svgEl    = $('asw-svg');
+const defsEl   = $('asw-defs');
+const hubEl    = $('asw-hub');
+const hubImg   = $('asw-hub-img');
+const hubName  = $('asw-hub-name');
+const ptrSvg   = $('asw-ptr');
+const nameEl   = $('asw-name');
+const metaEl   = $('asw-meta');
+const ctaEl    = $('asw-cta');
+const tracksEl = $('asw-tracks');
+const prodsEl  = $('asw-products');
+const genreEl  = $('asw-genre');
+const audioBadge = $('asw-audio');
+const autoBtn  = $('asw-auto-btn');
+const autoIcon = $('asw-auto-icon');
+
+/* ─────────────────────────────────────
+   ARABIC helpers
+   Cairo font is connected — no kerning issues
+───────────────────────────────────── */
+function ar(str){ return /[\u0600-\u06FF]/.test(str||''); }
+
+/* ─────────────────────────────────────
+   SVG MATH
+───────────────────────────────────── */
+function rad(d){ return d*Math.PI/180; }
+function pt(r,d){ return { x:r*Math.cos(rad(d)), y:r*Math.sin(rad(d)) }; }
+
+function sectorD(i){
+  const s = i*SLICE + SEC_GAP/2;
+  const e = (i+1)*SLICE - SEC_GAP/2;
+  const lg = (e-s)>180?1:0;
+  const o1=pt(R_OUT,s), o2=pt(R_OUT,e);
+  const i1=pt(R_IN,e),  i2=pt(R_IN,s);
+  return `M${o1.x},${o1.y} A${R_OUT},${R_OUT} 0 ${lg} 1 ${o2.x},${o2.y}
+          L${i1.x},${i1.y} A${R_IN},${R_IN}   0 ${lg} 0 ${i2.x},${i2.y} Z`;
+}
+
+function midPt(i,r){
+  const m = i*SLICE + SLICE/2;
+  return { x:r*Math.cos(rad(m)), y:r*Math.sin(rad(m)), deg:m };
+}
+
+/* ─────────────────────────────────────
+   BUILD WHEEL
+───────────────────────────────────── */
+function build(){
+  let defs = `
+    <filter id="asw-f-blur"><feGaussianBlur stdDeviation="2.5"/></filter>
+    <filter id="asw-f-glow">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>`;
+
+  ARTISTS.forEach((a,i)=>{
+    const ap = midPt(i, (R_IN+R_OUT)/2);
+    defs += `
+      <pattern id="p${i}" patternUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600">
+        <image href="${a.image||''}" x="0" y="0" width="600" height="600"
+               preserveAspectRatio="xMidYMid slice"/>
+      </pattern>
+      <clipPath id="sc${i}"><path d="${sectorD(i)}"/></clipPath>
+      <clipPath id="ac${i}"><circle cx="${ap.x}" cy="${ap.y}" r="${AV_R}"/></clipPath>`;
+  });
+  defsEl.innerHTML = defs;
+
+  ARTISTS.forEach((a,i)=>{
+    const col  = a.color || PRIMARY;
+    const path = sectorD(i);
+    const ap   = midPt(i, (R_IN+R_OUT)/2);
+    const lp   = midPt(i, R_IN+(R_OUT-R_IN)*0.78);
+    const avR2 = AV_R + 3;
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.dataset.i = i;
+
+    g.innerHTML = `
+      <!-- sector base -->
+      <path d="${path}" fill="${col}" opacity=".2"
+            stroke="${col}" stroke-width="1.2" stroke-opacity=".4"/>
+      <!-- bg image blurred -->
+      <path d="${path}" fill="url(#p${i})"
+            opacity=".16" filter="url(#asw-f-blur)" clip-path="url(#sc${i})"/>
+      <!-- color tint -->
+      <path d="${path}" fill="${col}" opacity=".1"/>
+      <!-- border glow -->
+      <path d="${path}" fill="none"
+            stroke="${col}" stroke-width="1.2" opacity=".55"
+            filter="url(#asw-f-glow)"/>
+
+      <!-- avatar shadow ring -->
+      <circle cx="${ap.x}" cy="${ap.y}" r="${avR2+2}"
+              fill="${col}" opacity=".18"/>
+      <!-- avatar bg -->
+      <circle cx="${ap.x}" cy="${ap.y}" r="${avR2}"
+              fill="${BG}" opacity=".7"/>
+      <!-- avatar image -->
+      <image href="${a.image||''}"
+             x="${ap.x-AV_R}" y="${ap.y-AV_R}"
+             width="${AV_R*2}" height="${AV_R*2}"
+             preserveAspectRatio="xMidYMid slice"
+             clip-path="url(#ac${i})"/>
+      <!-- avatar ring -->
+      <circle cx="${ap.x}" cy="${ap.y}" r="${AV_R}"
+              fill="none" stroke="${col}" stroke-width="1.8" opacity=".75"/>
+
+      <!-- label -->
+      <text x="${lp.x}" y="${lp.y}"
+            text-anchor="middle" dominant-baseline="middle"
+            font-size="${Math.max(7, Math.min(10, 220/N))}"
+            font-family="'Cairo',sans-serif"
+            font-weight="700"
+            fill="white" opacity=".5"
+            transform="rotate(${lp.deg},${lp.x},${lp.y})"
+            style="pointer-events:none">
+        ${(a.name||'').substring(0,6)}
+      </text>`;
+
+    svgEl.appendChild(g);
+  });
+}
+
+/* ─────────────────────────────────────
+   ROTATION
+───────────────────────────────────── */
+function setAngle(deg){
+  wheelEl.style.transform = `rotate(${deg}deg)`;
+}
+
+function activeIdxAt(deg){
+  let best=0, bestD=Infinity;
+  for(let i=0;i<N;i++){
+    let sa = ((i*SLICE + SLICE/2 + deg) % 360 + 360) % 360;
+    let d  = Math.abs(sa - PTR_DEG);
+    if(d>180) d=360-d;
+    if(d<bestD){ bestD=d; best=i; }
+  }
+  return best;
+}
+
+function computeSnap(deg){
+  const idx = activeIdxAt(deg);
+  const center = idx*SLICE + SLICE/2;
+  let diff = ((PTR_DEG - center - deg%360) % 360 + 360) % 360;
+  if(diff>180) diff -= 360;
+  return { angle: deg+diff, idx };
+}
+
+/* ─────────────────────────────────────
+   UI UPDATE
+───────────────────────────────────── */
+function updateUI(idx){
+  if(idx===activeIdx) return;
+  activeIdx = idx;
+  const a = ARTISTS[idx];
+  if(!a) return;
+
+  // Hub image
+  hubImg.classList.remove('on');
+  setTimeout(()=>{
+    if(a.image){ hubImg.src=a.image; hubImg.classList.add('on'); }
+    hubName.textContent = a.name;
+    hubEl.classList.add('active');
+  }, 80);
+
+  // Accent color
+  stage.style.setProperty('--c', a.color||PRIMARY);
+
+  // Info panel
+  nameEl.classList.remove('on');
+  metaEl.classList.remove('on');
+  ctaEl.classList.remove('on');
+  requestAnimationFrame(()=>{
+    nameEl.textContent   = a.name;
+    tracksEl.textContent = a.tracks  || '—';
+    prodsEl.textContent  = a.products|| '—';
+    genreEl.textContent  = a.genre   || '—';
+    ctaEl.href = a.url || '#';
+    setTimeout(()=> nameEl.classList.add('on'), 30);
+    setTimeout(()=> metaEl.classList.add('on'), 90);
+    setTimeout(()=>  ctaEl.classList.add('on'),150);
+  });
+}
+
+/* ─────────────────────────────────────
+   AUDIO ENGINE
+───────────────────────────────────── */
+function unlock(){
+  if(unlocked||!EN_SOUND&&!EN_PREV) return;
+  try{ audioCtx = new(window.AudioContext||window.webkitAudioContext)(); unlocked=true; }catch(e){}
+}
+
+/* Tick: short sine blip — fires immediately on zone entry */
+function tick(){
+  if(!EN_SOUND||!unlocked||!audioCtx) return;
+  try{
+    const o=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='sine';
+    o.frequency.value = 380 + Math.random()*120;
+    g.gain.setValueAtTime(.09, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime+.07);
+    o.start(); o.stop(audioCtx.currentTime+.08);
+  }catch(e){}
+}
+
+/* Pointer visual tick */
+function ptrTick(){
+  ptrSvg.classList.remove('tick');
+  void ptrSvg.offsetWidth;
+  ptrSvg.classList.add('tick');
+  tick();                          // ← sound fires here, on zone entry
+}
+
+/* Preview audio */
+function stopPreview(fade){
+  clearTimeout(prevTimer);
+  if(!curAudio) return;
+  const a = curAudio;
+  if(fade){
+    let v=a.volume;
+    const iv=setInterval(()=>{ v-=.06; if(v<=0){a.pause();a.currentTime=0;clearInterval(iv);}else a.volume=v;},35);
+  } else { a.pause(); a.currentTime=0; }
+  curAudio=null;
+  if(audioBadge) audioBadge.classList.remove('on');
+}
+
+function playPreview(idx){
+  if(!EN_PREV||!unlocked) return;
+  const a=ARTISTS[idx];
+  if(!a||!a.audio) return;
+  stopPreview(true);
+  prevTimer=setTimeout(()=>{
+    const au=new Audio(a.audio);
+    au.crossOrigin='anonymous';
+    au.volume=0;
+    au.play().then(()=>{
+      curAudio=au;
+      if(audioBadge) audioBadge.classList.add('on');
+      let v=0;
+      const iv=setInterval(()=>{ v+=.05; if(v>=.65){au.volume=.65;clearInterval(iv);}else au.volume=v;},40);
+      setTimeout(()=>stopPreview(true), PREV_DUR);
+    }).catch(()=>{});
+  }, 700);
+}
+
+/* ─────────────────────────────────────
+   DRAG
+───────────────────────────────────── */
+function xy(e){ return e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY}; }
+function center(){ const r=stage.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; }
+function mAngle(e){ const c=center(),p=xy(e); return Math.atan2(p.y-c.y,p.x-c.x)*180/Math.PI; }
+
+function onDown(e){
+  unlock();
+  stopPreview(true); clearTimeout(prevTimer);
+  dragging=true; velocity=0;
+  lastMX=mAngle(e); lastTime=performance.now();
+  wheelEl.style.transition='none';
+  stopAuto();
+  if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+}
+
+function onMove(e){
+  if(!dragging) return;
+  e.preventDefault();
+  const now=performance.now();
+  const cur=mAngle(e);
+  let d=cur-lastMX;
+  if(d>180) d-=360;
+  if(d<-180) d+=360;
+  velocity = d/Math.max(now-lastTime,1)*16;
+  angle+=d;
+  lastMX=cur; lastTime=now;
+  setAngle(angle);
+
+  const idx=activeIdxAt(angle);
+  if(idx!==prevIdx){ prevIdx=idx; ptrTick(); updateUI(idx); }
+}
+
+function onUp(){
+  if(!dragging) return;
+  dragging=false;
+  inertia();
+}
+
+/* ─────────────────────────────────────
+   INERTIA + SNAP
+───────────────────────────────────── */
+function inertia(){
+  function frame(){
+    if(Math.abs(velocity)<0.06){ snap(); return; }
+    velocity*=FRICTION;
+    angle+=velocity;
+    setAngle(angle);
+    const idx=activeIdxAt(angle);
+    if(idx!==prevIdx){ prevIdx=idx; ptrTick(); updateUI(idx); }
+    rafId=requestAnimationFrame(frame);
+  }
+  rafId=requestAnimationFrame(frame);
+}
+
+function snap(){
+  const {angle:snapped, idx}=computeSnap(angle);
+  angle=snapped;
+  wheelEl.style.transition=`transform ${SNAP_MS}ms cubic-bezier(.25,.46,.45,.94)`;
+  setAngle(angle);
+  prevIdx=idx; updateUI(idx);
+  setTimeout(()=>ptrTick(), SNAP_MS*.75);
+  setTimeout(()=>{ playPreview(idx); if(EN_AUTO)startAuto(); }, SNAP_MS+150);
+}
+
+/* ─────────────────────────────────────
+   AUTO-ROTATE
+───────────────────────────────────── */
+function startAuto(){
+  if(!autoOn||dragging) return;
+  stopAuto();
+  function frame(){
+    if(dragging){ stopAuto(); return; }
+    angle -= AUTO_SPD;
+    wheelEl.style.transition='none';
+    setAngle(angle);
+    const idx=activeIdxAt(angle);
+    if(idx!==prevIdx){ prevIdx=idx; ptrTick(); updateUI(idx); }
+    autoRafId=requestAnimationFrame(frame);
+  }
+  autoRafId=requestAnimationFrame(frame);
+}
+function stopAuto(){
+  if(autoRafId){ cancelAnimationFrame(autoRafId); autoRafId=null; }
+}
+function toggleAuto(){
+  autoOn=!autoOn;
+  if(autoOn){ startAuto(); }
+  else { stopAuto(); snap(); }
+  if(autoIcon){
+    autoIcon.innerHTML = autoOn
+      ? '<path d="M6 19h4V5H6zm8-14v14h4V5z"/>'
+      : '<path d="M8 5v14l11-7z"/>';
+  }
+}
+
+/* ─────────────────────────────────────
+   HUB CLICK → navigate
+───────────────────────────────────── */
+hubEl.addEventListener('click',()=>{
+  if(activeIdx<0) return;
+  const url=ARTISTS[activeIdx].url;
+  if(url) window.location.href=url;
+});
+
+/* ─────────────────────────────────────
+   EVENTS
+───────────────────────────────────── */
+stage.addEventListener('mousedown',  onDown);
+window.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup',   onUp);
+stage.addEventListener('touchstart', onDown,{passive:true});
+window.addEventListener('touchmove', onMove,{passive:false});
+window.addEventListener('touchend',  onUp);
+
+if(autoBtn) autoBtn.addEventListener('click',toggleAuto);
+
+ctaEl.addEventListener('click',e=>{
+  if(!ARTISTS[activeIdx]||!ARTISTS[activeIdx].url) e.preventDefault();
+});
+
+document.addEventListener('keydown',e=>{
+  const LEFT =['ArrowLeft','ArrowUp'];
+  const RIGHT=['ArrowRight','ArrowDown'];
+  if(LEFT.includes(e.key)||RIGHT.includes(e.key)){
+    unlock();
+    stopPreview(true);
+    const dir=LEFT.includes(e.key)?1:-1;
+    angle += dir*SLICE;
+    wheelEl.style.transition=`transform ${SNAP_MS}ms cubic-bezier(.25,.46,.45,.94)`;
+    setAngle(angle);
+    const idx=activeIdxAt(angle); prevIdx=idx;
+    ptrTick(); updateUI(idx);
+    setTimeout(()=>playPreview(idx), SNAP_MS+100);
+  }
+  if(e.key==='Enter'&&activeIdx>=0){
+    const url=ARTISTS[activeIdx].url;
+    if(url) window.location.href=url;
+  }
+});
+
+/* ─────────────────────────────────────
+   INIT
+───────────────────────────────────── */
+build();
+const init = computeSnap(0);
+angle = init.angle;
+setAngle(angle);
+setTimeout(()=>{
+  const idx=activeIdxAt(angle);
+  prevIdx=idx; updateUI(idx);
+  if(EN_AUTO&&autoOn) setTimeout(startAuto,1200);
+},120);
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🎵 عجلة الفنانين",
+  "tag": "section",
+  "class": "asw-section",
+  "settings": [
+
+    { "type":"header","content":"📝 النصوص" },
+    { "type":"text","id":"eyebrow","label":"النص الصغير فوق العنوان","default":"اختر فنانك المفضل" },
+    { "type":"text","id":"title","label":"العنوان الرئيسي","default":"اختر فنانك" },
+    { "type":"text","id":"subtitle","label":"النص التوجيهي","default":"اسحب الدائرة • اختر فنانك" },
+    { "type":"text","id":"cta_text","label":"نص زر التصفح","default":"تصفح منتجات الفنان" },
+    { "type":"text","id":"hub_cta_text","label":"نص زر المركز","default":"تصفح" },
+    { "type":"text","id":"audio_label","label":"نص مؤشر الصوت","default":"يعزف الآن" },
+
+    { "type":"header","content":"🏷️ تسميات الإحصائيات" },
+    { "type":"text","id":"label_tracks","label":"تسمية المقاطع","default":"مقطع" },
+    { "type":"text","id":"label_products","label":"تسمية المنتجات","default":"منتج" },
+    { "type":"text","id":"label_genre","label":"تسمية النوع","default":"نوع" },
+
+    { "type":"header","content":"🔤 أحجام الخطوط" },
+    { "type":"range","id":"eyebrow_size","label":"حجم النص الصغير (px)","min":9,"max":20,"step":1,"default":12 },
+    { "type":"range","id":"title_size","label":"حجم العنوان (px)","min":20,"max":60,"step":1,"default":36 },
+    { "type":"range","id":"subtitle_size","label":"حجم النص الفرعي (px)","min":10,"max":22,"step":1,"default":13 },
+    { "type":"range","id":"name_size","label":"حجم اسم الفنان (px)","min":18,"max":56,"step":1,"default":30 },
+    { "type":"range","id":"meta_val_size","label":"حجم الأرقام في الإحصائيات (px)","min":14,"max":36,"step":1,"default":22 },
+    { "type":"range","id":"meta_key_size","label":"حجم تسميات الإحصائيات (px)","min":9,"max":18,"step":1,"default":12 },
+    { "type":"range","id":"cta_size","label":"حجم خط زر التصفح (px)","min":11,"max":22,"step":1,"default":14 },
+
+    { "type":"header","content":"🎨 الألوان" },
+    { "type":"color","id":"color_bg","label":"لون الخلفية","default":"#F5EFE6" },
+    { "type":"color","id":"color_primary","label":"اللون الرئيسي","default":"#7A0C2E" },
+    { "type":"color","id":"color_secondary","label":"اللون الثانوي","default":"#D4AF37" },
+    { "type":"color","id":"color_text","label":"لون النص","default":"#1A1A1A" },
+
+    { "type":"header","content":"⚙️ أبعاد العجلة" },
+    { "type":"range","id":"wheel_size","label":"قطر العجلة (px)","min":260,"max":660,"step":10,"default":480 },
+    { "type":"range","id":"radius_outer","label":"الشعاع الخارجي (وحدات SVG)","min":160,"max":285,"step":5,"default":240 },
+    { "type":"range","id":"radius_inner","label":"الشعاع الداخلي (وحدات SVG)","min":50,"max":160,"step":5,"default":88 },
+    { "type":"range","id":"sector_gap_deg","label":"الفجوة بين القطاعات (درجة)","min":0,"max":8,"step":0.5,"default":2 },
+
+    { "type":"header","content":"🔵 المركز" },
+    { "type":"range","id":"hub_size","label":"حجم دائرة المركز (px)","min":70,"max":220,"step":5,"default":130 },
+    { "type":"range","id":"hub_border","label":"سُمك إطار المركز (px)","min":1,"max":6,"step":1,"default":2 },
+    { "type":"range","id":"hub_gap","label":"المسافة بين المركز والعجلة (px)","min":2,"max":20,"step":1,"default":6 },
+
+    { "type":"header","content":"🟤 الأفاتار (الصور الدائرية على القطاعات)" },
+    { "type":"range","id":"avatar_size","label":"قطر الأفاتار (px)","min":20,"max":90,"step":2,"default":48 },
+
+    { "type":"header","content":"📍 المؤشر" },
+    { "type":"range","id":"pointer_size","label":"حجم المؤشر (px)","min":14,"max":50,"step":2,"default":30 },
+    { "type":"range","id":"ptr_offset","label":"بروز المؤشر خارج العجلة (px)","min":0,"max":30,"step":1,"default":8 },
+    { "type":"range","id":"ptr_stem_w","label":"عرض ذيل المؤشر (px)","min":1,"max":6,"step":1,"default":2 },
+    { "type":"range","id":"ptr_stem_h","label":"طول ذيل المؤشر (px)","min":0,"max":30,"step":2,"default":14 },
+
+    { "type":"header","content":"📐 المسافات العامة" },
+    { "type":"range","id":"section_padding_v","label":"حشوة القسم عمودية (px)","min":20,"max":100,"step":4,"default":48 },
+    { "type":"range","id":"section_padding_h","label":"حشوة القسم أفقية (px)","min":10,"max":60,"step":4,"default":20 },
+    { "type":"range","id":"gap_header_wheel","label":"مسافة بين العنوان والعجلة (px)","min":10,"max":80,"step":4,"default":32 },
+    { "type":"range","id":"gap_wheel_info","label":"مسافة بين العجلة ومعلومات الفنان (px)","min":10,"max":80,"step":4,"default":30 },
+    { "type":"range","id":"gap_meta","label":"المسافة بين عناصر المعلومات (px)","min":4,"max":32,"step":2,"default":14 },
+    { "type":"range","id":"meta_item_pad","label":"حشوة عناصر الإحصائيات (px)","min":8,"max":32,"step":2,"default":18 },
+    { "type":"range","id":"meta_sep_w","label":"عرض الفاصل (px)","min":1,"max":4,"step":1,"default":1 },
+    { "type":"range","id":"meta_sep_h","label":"ارتفاع الفاصل (px)","min":16,"max":50,"step":2,"default":28 },
+    { "type":"range","id":"cta_pad_v","label":"حشوة زر التصفح عمودية (px)","min":8,"max":24,"step":1,"default":13 },
+    { "type":"range","id":"cta_pad_h","label":"حشوة زر التصفح أفقية (px)","min":16,"max":60,"step":2,"default":30 },
+    { "type":"range","id":"cta_radius","label":"استدارة زوايا الزر (px)","min":0,"max":30,"step":1,"default":4 },
+    { "type":"range","id":"info_max_width","label":"أقصى عرض لمنطقة المعلومات (px)","min":280,"max":600,"step":10,"default":420 },
+    { "type":"range","id":"tape_width","label":"عرض خط الشريط الزخرفي (px)","min":60,"max":320,"step":10,"default":200 },
+    { "type":"range","id":"tape_height","label":"سُمك خط الشريط (px)","min":1,"max":6,"step":1,"default":2 },
+
+    { "type":"header","content":"🔵 الحلقة الخارجية" },
+    { "type":"range","id":"ring_gap","label":"مسافة الحلقة عن العجلة (px)","min":4,"max":30,"step":1,"default":10 },
+    { "type":"range","id":"ring_thickness","label":"سُمك الحلقة (px)","min":1,"max":4,"step":1,"default":1 },
+
+    { "type":"header","content":"🎧 مؤشر الصوت" },
+    { "type":"range","id":"audio_badge_top","label":"موضع المؤشر من الأعلى (px)","min":10,"max":60,"step":2,"default":20 },
+    { "type":"select","id":"audio_badge_side","label":"جهة مؤشر الصوت","options":[{"value":"right","label":"يمين"},{"value":"left","label":"يسار"}],"default":"right" },
+    { "type":"range","id":"audio_badge_side_offset","label":"بُعد المؤشر عن الجانب (px)","min":10,"max":60,"step":2,"default":16 },
+
+    { "type":"header","content":"🎮 الحركة" },
+    { "type":"range","id":"snap_speed","label":"سرعة التثبيت (ms)","min":200,"max":1000,"step":50,"default":480 },
+    { "type":"range","id":"friction","label":"احتكاك الإنيرشيا (1=بطيء, 15=سريع)","min":1,"max":15,"step":1,"default":7 },
+    { "type":"checkbox","id":"enable_autorotate","label":"تفعيل التدوير التلقائي","default":false },
+    { "type":"range","id":"autorotate_speed","label":"سرعة التدوير التلقائي (1-20)","min":1,"max":20,"step":1,"default":5 },
+
+    { "type":"header","content":"🎧 الصوت" },
+    { "type":"checkbox","id":"enable_sound","label":"تفعيل صوت النقر عند التغيير","default":true },
+    { "type":"checkbox","id":"enable_preview","label":"تفعيل معاينة الصوت للفنان","default":true },
+    { "type":"range","id":"preview_duration","label":"مدة معاينة الصوت (ثانية)","min":5,"max":60,"step":5,"default":20 }
+
+  ],
+  "blocks":[
+    {
+      "type":"artist",
+      "name":"🎤 فنان",
+      "limit":10,
+      "settings":[
+        { "type":"text","id":"name","label":"اسم الفنان","default":"الفنان" },
+        { "type":"image_picker","id":"image","label":"صورة الفنان" },
+        { "type":"url","id":"collection_url","label":"رابط الكولكشن" },
+        { "type":"color","id":"color","label":"اللون المميز","default":"#7A0C2E" },
+        { "type":"text","id":"genre","label":"النوع الموسيقي","default":"طرب" },
+        { "type":"number","id":"tracks","label":"عدد المقاطع","default":12 },
+        { "type":"number","id":"products","label":"عدد المنتجات","default":20 },
+        { "type":"text","id":"preview_audio","label":"رابط ملف الصوت (MP3/AAC)","info":"رابط مباشر لملف صوتي يُشغَّل عند توقف العجلة على الفنان" }
+      ]
+    }
+  ],
+  "presets":[
+    {
+      "name":"🎵 عجلة الفنانين",
+      "blocks":[
+        { "type":"artist","settings":{"name":"محمد عبده","color":"#7A0C2E","genre":"طرب","tracks":24,"products":40} },
+        { "type":"artist","settings":{"name":"فيروز","color":"#1A3A5C","genre":"كلاسيكي","tracks":18,"products":28} },
+        { "type":"artist","settings":{"name":"عمرو دياب","color":"#4A5C1A","genre":"بوب","tracks":20,"products":35} },
+        { "type":"artist","settings":{"name":"أم كلثوم","color":"#5C3A1A","genre":"تراث","tracks":15,"products":22} }
+      ]
+    }
+  ]
+}
+{% endschema %}

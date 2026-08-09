@@ -1,0 +1,680 @@
+{% doc %}
+  @prompt
+    بدي قسم يعرض أقسام الكتب المختلفه ويتحرك تلقائيا وإمكانيه التقليب بالإزاحة يمين او يسار وفي كل قسم إسم القسم وشعار له وإمكانيه الضغط عليه للتحويل لصفحة القسم , البطاقات لا تتحرك بدي تتحرك تلقائيا وعند الضغط عليها تتوقف وتنتقل للقسم
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-book-categories-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    padding: {{ block.settings.section_padding }}px 0;
+    background-color: {{ block.settings.background_color }};
+    direction: rtl;
+  }
+
+  .ai-book-categories-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.container_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-book-categories-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .ai-book-categories-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0;
+  }
+
+  .ai-book-categories-carousel-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-book-categories-carousel-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.card_gap }}px;
+    transition: transform 0.5s ease;
+    will-change: transform;
+  }
+
+  .ai-book-categories-card-{{ ai_gen_id }} {
+    flex: 0 0 calc((100% - ({{ block.settings.cards_per_view | minus: 1 }} * {{ block.settings.card_gap }}px)) / {{ block.settings.cards_per_view }});
+    background-color: {{ block.settings.card_background }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    padding: {{ block.settings.card_padding }}px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-book-categories-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-book-categories-icon-wrapper-{{ ai_gen_id }} {
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    flex-shrink: 0;
+  }
+
+  .ai-book-categories-icon-wrapper-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .ai-book-categories-icon-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-book-categories-icon-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-book-categories-name-{{ ai_gen_id }} {
+    font-size: {{ block.settings.category_name_size }}px;
+    color: {{ block.settings.category_name_color }};
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .ai-book-categories-controls-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .ai-book-categories-btn-{{ ai_gen_id }} {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_color }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .ai-book-categories-btn-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    transform: scale(1.1);
+  }
+
+  .ai-book-categories-btn-{{ ai_gen_id }}:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .ai-book-categories-btn-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ai-book-categories-empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-book-categories-card-{{ ai_gen_id }} {
+      flex: 0 0 calc((100% - {{ block.settings.card_gap }}px) / 2);
+    }
+
+    .ai-book-categories-title-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.title_size }}px * 0.8);
+    }
+  }
+{% endstyle %}
+
+<book-categories-carousel-{{ ai_gen_id }}
+  class="ai-book-categories-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  data-autoplay="{{ block.settings.autoplay }}"
+  data-autoplay-speed="{{ block.settings.autoplay_speed }}"
+>
+  <div class="ai-book-categories-container-{{ ai_gen_id }}">
+    {% if block.settings.section_title != blank %}
+      <div class="ai-book-categories-header-{{ ai_gen_id }}">
+        <h2 class="ai-book-categories-title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+      </div>
+    {% endif %}
+
+    {% assign has_categories = false %}
+    {% for i in (1..6) %}
+      {% liquid
+        assign collection_key = 'collection_' | append: i
+        assign collection = block.settings[collection_key]
+        if collection != blank
+          assign has_categories = true
+        endif
+      %}
+    {% endfor %}
+
+    {% if has_categories %}
+      <div class="ai-book-categories-carousel-wrapper-{{ ai_gen_id }}">
+        <div class="ai-book-categories-carousel-{{ ai_gen_id }}">
+          {% for i in (1..6) %}
+            {% liquid
+              assign collection_key = 'collection_' | append: i
+              assign icon_key = 'icon_' | append: i
+              assign collection = block.settings[collection_key]
+              assign icon = block.settings[icon_key]
+            %}
+
+            {% if collection != blank %}
+              <a
+                href="{{ collection.url }}"
+                class="ai-book-categories-card-{{ ai_gen_id }}"
+                data-card-link
+              >
+                <div class="ai-book-categories-icon-wrapper-{{ ai_gen_id }}">
+                  {% if icon != blank %}
+                    <img
+                      src="{{ icon | image_url: width: 200 }}"
+                      alt="{{ collection.title | escape }}"
+                      loading="lazy"
+                      width="200"
+                      height="200"
+                    >
+                  {% else %}
+                    <div class="ai-book-categories-icon-placeholder-{{ ai_gen_id }}">
+                      {{ 'collection' | placeholder_svg_tag }}
+                    </div>
+                  {% endif %}
+                </div>
+                <h3 class="ai-book-categories-name-{{ ai_gen_id }}">{{ collection.title }}</h3>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="ai-book-categories-controls-{{ ai_gen_id }}">
+        <button
+          class="ai-book-categories-btn-{{ ai_gen_id }} ai-book-categories-prev-{{ ai_gen_id }}"
+          aria-label="السابق"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button
+          class="ai-book-categories-btn-{{ ai_gen_id }} ai-book-categories-next-{{ ai_gen_id }}"
+          aria-label="التالي"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    {% else %}
+      <div class="ai-book-categories-empty-{{ ai_gen_id }}">
+        الرجاء إضافة أقسام الكتب من إعدادات القسم
+      </div>
+    {% endif %}
+  </div>
+</book-categories-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class BookCategoriesCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.autoplayInterval = null;
+        this.isAutoplayStopped = false;
+      }
+
+      connectedCallback() {
+        this.carousel = this.querySelector('.ai-book-categories-carousel-{{ ai_gen_id }}');
+        this.prevBtn = this.querySelector('.ai-book-categories-prev-{{ ai_gen_id }}');
+        this.nextBtn = this.querySelector('.ai-book-categories-next-{{ ai_gen_id }}');
+        this.cards = this.querySelectorAll('.ai-book-categories-card-{{ ai_gen_id }}');
+        
+        if (!this.carousel || this.cards.length === 0) return;
+
+        this.cardsPerView = this.getCardsPerView();
+        this.maxIndex = Math.max(0, this.cards.length - this.cardsPerView);
+
+        this.setupEventListeners();
+        this.updateCarousel();
+
+        if (this.dataset.autoplay === 'true') {
+          this.startAutoplay();
+        }
+
+        window.addEventListener('resize', () => {
+          this.cardsPerView = this.getCardsPerView();
+          this.maxIndex = Math.max(0, this.cards.length - this.cardsPerView);
+          this.currentIndex = Math.min(this.currentIndex, this.maxIndex);
+          this.updateCarousel();
+        });
+      }
+
+      getCardsPerView() {
+        return window.innerWidth <= 749 ? 2 : {{ block.settings.cards_per_view }};
+      }
+
+      setupEventListeners() {
+        this.prevBtn.addEventListener('click', () => {
+          this.stopAutoplay();
+          this.isAutoplayStopped = true;
+          this.prev();
+        });
+
+        this.nextBtn.addEventListener('click', () => {
+          this.stopAutoplay();
+          this.isAutoplayStopped = true;
+          this.next();
+        });
+
+        this.cards.forEach((card) => {
+          card.addEventListener('click', (e) => {
+            this.stopAutoplay();
+            this.isAutoplayStopped = true;
+          });
+        });
+
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        this.carousel.addEventListener('touchstart', (e) => {
+          startX = e.touches[0].clientX;
+          isDragging = true;
+          this.stopAutoplay();
+          this.isAutoplayStopped = true;
+        });
+
+        this.carousel.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          currentX = e.touches[0].clientX;
+        });
+
+        this.carousel.addEventListener('touchend', () => {
+          if (!isDragging) return;
+          isDragging = false;
+          
+          const diff = startX - currentX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+              this.next();
+            } else {
+              this.prev();
+            }
+          }
+        });
+
+        this.carousel.addEventListener('mouseenter', () => {
+          if (!this.isAutoplayStopped) {
+            this.stopAutoplay();
+          }
+        });
+
+        this.carousel.addEventListener('mouseleave', () => {
+          if (!this.isAutoplayStopped && this.dataset.autoplay === 'true') {
+            this.startAutoplay();
+          }
+        });
+      }
+
+      prev() {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+          this.updateCarousel();
+        } else {
+          this.currentIndex = this.maxIndex;
+          this.updateCarousel();
+        }
+      }
+
+      next() {
+        if (this.currentIndex < this.maxIndex) {
+          this.currentIndex++;
+          this.updateCarousel();
+        } else {
+          this.currentIndex = 0;
+          this.updateCarousel();
+        }
+      }
+
+      updateCarousel() {
+        const cardWidth = this.cards[0].offsetWidth;
+        const gap = {{ block.settings.card_gap }};
+        const offset = this.currentIndex * (cardWidth + gap);
+        
+        this.carousel.style.transform = `translateX(${offset}px)`;
+
+        this.prevBtn.disabled = false;
+        this.nextBtn.disabled = false;
+      }
+
+      startAutoplay() {
+        const speed = parseInt(this.dataset.autoplaySpeed) * 1000;
+        this.autoplayInterval = setInterval(() => {
+          this.next();
+        }, speed);
+      }
+
+      stopAutoplay() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+          this.autoplayInterval = null;
+        }
+      }
+
+      disconnectedCallback() {
+        this.stopAutoplay();
+      }
+    }
+
+    customElements.define('book-categories-carousel-{{ ai_gen_id }}', BookCategoriesCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "أقسام الكتب",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "عنوان القسم",
+      "default": "تصفح أقسام الكتب"
+    },
+    {
+      "type": "header",
+      "content": "القسم 1"
+    },
+    {
+      "type": "collection",
+      "id": "collection_1",
+      "label": "المجموعة"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_1",
+      "label": "الشعار"
+    },
+    {
+      "type": "header",
+      "content": "القسم 2"
+    },
+    {
+      "type": "collection",
+      "id": "collection_2",
+      "label": "المجموعة"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_2",
+      "label": "الشعار"
+    },
+    {
+      "type": "header",
+      "content": "القسم 3"
+    },
+    {
+      "type": "collection",
+      "id": "collection_3",
+      "label": "المجموعة"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_3",
+      "label": "الشعار"
+    },
+    {
+      "type": "header",
+      "content": "القسم 4"
+    },
+    {
+      "type": "collection",
+      "id": "collection_4",
+      "label": "المجموعة"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_4",
+      "label": "الشعار"
+    },
+    {
+      "type": "header",
+      "content": "القسم 5"
+    },
+    {
+      "type": "collection",
+      "id": "collection_5",
+      "label": "المجموعة"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_5",
+      "label": "الشعار"
+    },
+    {
+      "type": "header",
+      "content": "القسم 6"
+    },
+    {
+      "type": "collection",
+      "id": "collection_6",
+      "label": "المجموعة"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_6",
+      "label": "الشعار"
+    },
+    {
+      "type": "header",
+      "content": "إعدادات العرض"
+    },
+    {
+      "type": "range",
+      "id": "cards_per_view",
+      "label": "عدد البطاقات المعروضة",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "المسافة بين البطاقات",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "التشغيل التلقائي",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "سرعة التشغيل التلقائي",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض سطح المكتب",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "التصميم"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "المسافة الداخلية للقسم",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "عرض الحاوية",
+      "min": 800,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "البطاقات"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "خلفية البطاقة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "استدارة حواف البطاقة",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "المسافة الداخلية للبطاقة",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "حجم الشعار",
+      "min": 40,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "category_name_size",
+      "label": "حجم اسم القسم",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "category_name_color",
+      "label": "لون اسم القسم",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "أزرار التحكم"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "خلفية الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "خلفية الزر عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "لون الزر",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "أقسام الكتب"
+    }
+  ]
+}
+{% endschema %}

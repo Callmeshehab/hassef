@@ -1,0 +1,491 @@
+{% doc %}
+  @prompt
+    بدي اعمل قسم يعرض في صور بنتظام السكروز داون أحط ١٠ صور يعرضهم بالترتيب كل ما ينزل لاسفل يعرض الصوره كامله بدون اي قصه كانّها فريمات متقطعه هيك وتتغير لما ينزل ولما يعرض كل الصور بنظام ذكي يتعرف على الصور المرفوعه فقط يعرض المنتجات المقترحه بشكل عشوائي مع زر لتصفح المزيد 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-scroll-gallery-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    position: relative;
+  }
+
+  .ai-scroll-gallery-container-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-scroll-gallery-images-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-scroll-gallery-frame-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .ai-scroll-gallery-frame-{{ ai_gen_id }}.active {
+    opacity: 1;
+  }
+
+  .ai-scroll-gallery-frame-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .ai-scroll-gallery-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-scroll-gallery-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .ai-scroll-gallery-products-{{ ai_gen_id }} {
+    padding: 60px 20px;
+    background-color: {{ block.settings.products_bg_color }};
+  }
+
+  .ai-scroll-gallery-products-title-{{ ai_gen_id }} {
+    text-align: center;
+    font-size: {{ block.settings.products_title_size }}px;
+    color: {{ block.settings.products_title_color }};
+    margin: 0 0 40px;
+  }
+
+  .ai-scroll-gallery-products-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .ai-scroll-gallery-product-card-{{ ai_gen_id }} {
+    background-color: {{ block.settings.card_bg_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-scroll-gallery-product-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-4px);
+  }
+
+  .ai-scroll-gallery-product-image-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+
+  .ai-scroll-gallery-product-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-scroll-gallery-product-info-{{ ai_gen_id }} {
+    padding: 16px;
+  }
+
+  .ai-scroll-gallery-product-title-{{ ai_gen_id }} {
+    font-size: 16px;
+    color: {{ block.settings.card_text_color }};
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+
+  .ai-scroll-gallery-product-price-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: {{ block.settings.card_text_color }};
+    margin: 0;
+  }
+
+  .ai-scroll-gallery-button-wrapper-{{ ai_gen_id }} {
+    text-align: center;
+  }
+
+  .ai-scroll-gallery-button-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 14px 32px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-scroll-gallery-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-scroll-gallery-frame-{{ ai_gen_id }} {
+      height: 70vh;
+    }
+
+    .ai-scroll-gallery-products-grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+    }
+  }
+{% endstyle %}
+
+<scroll-gallery-{{ ai_gen_id }} class="ai-scroll-gallery-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-scroll-gallery-container-{{ ai_gen_id }}">
+    <div class="ai-scroll-gallery-images-{{ ai_gen_id }}">
+      {% liquid
+        assign images_array = ''
+        for i in (1..10)
+          assign image_key = 'image_' | append: i
+          assign current_image = block.settings[image_key]
+          if current_image != blank
+            assign images_array = images_array | append: i | append: ','
+          endif
+        endfor
+        assign images_array = images_array | split: ','
+        assign images_count = images_array.size
+      %}
+
+      {% if images_count > 0 %}
+        {% for i in (1..10) %}
+          {% assign image_key = 'image_' | append: i %}
+          {% assign current_image = block.settings[image_key] %}
+          {% if current_image != blank %}
+            <div class="ai-scroll-gallery-frame-{{ ai_gen_id }}" data-frame="{{ i }}">
+              <img
+                src="{{ current_image | image_url: width: 2000 }}"
+                alt="{{ current_image.alt | escape }}"
+                loading="lazy"
+                width="{{ current_image.width }}"
+                height="{{ current_image.height }}"
+              >
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="ai-scroll-gallery-frame-{{ ai_gen_id }} active">
+          <div class="ai-scroll-gallery-placeholder-{{ ai_gen_id }}">
+            {{ 'image' | placeholder_svg_tag }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if images_count > 0 %}
+      <div class="ai-scroll-gallery-products-{{ ai_gen_id }}">
+        {% if block.settings.products_title != blank %}
+          <h2 class="ai-scroll-gallery-products-title-{{ ai_gen_id }}">{{ block.settings.products_title }}</h2>
+        {% endif %}
+
+        <div class="ai-scroll-gallery-products-grid-{{ ai_gen_id }}">
+          {% if block.settings.products_collection != blank %}
+            {% assign all_products = block.settings.products_collection.products %}
+            {% assign shuffled_products = all_products | sort: 'id' %}
+            {% assign display_count = block.settings.products_count | at_most: shuffled_products.size %}
+
+            {% for product in shuffled_products limit: display_count %}
+              <a href="{{ product.url }}" class="ai-scroll-gallery-product-card-{{ ai_gen_id }}">
+                <div class="ai-scroll-gallery-product-image-{{ ai_gen_id }}">
+                  {% if product.featured_image %}
+                    <img
+                      src="{{ product.featured_image | image_url: width: 500 }}"
+                      alt="{{ product.featured_image.alt | escape }}"
+                      loading="lazy"
+                      width="500"
+                      height="500"
+                    >
+                  {% endif %}
+                </div>
+                <div class="ai-scroll-gallery-product-info-{{ ai_gen_id }}">
+                  <h3 class="ai-scroll-gallery-product-title-{{ ai_gen_id }}">{{ product.title }}</h3>
+                  <p class="ai-scroll-gallery-product-price-{{ ai_gen_id }}">{{ product.price | money }}</p>
+                </div>
+              </a>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        {% if block.settings.button_link != blank and block.settings.button_text != blank %}
+          <div class="ai-scroll-gallery-button-wrapper-{{ ai_gen_id }}">
+            <a href="{{ block.settings.button_link }}" class="ai-scroll-gallery-button-{{ ai_gen_id }}">
+              {{ block.settings.button_text }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</scroll-gallery-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ScrollGallery{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.frames = [];
+        this.currentFrame = 0;
+        this.scrollThreshold = 100;
+        this.lastScrollY = 0;
+      }
+
+      connectedCallback() {
+        this.frames = Array.from(this.querySelectorAll('.ai-scroll-gallery-frame-{{ ai_gen_id }}'));
+        
+        if (this.frames.length === 0) return;
+
+        this.frames[0].classList.add('active');
+        this.currentFrame = 0;
+
+        this.handleScroll = this.handleScroll.bind(this);
+        window.addEventListener('scroll', this.handleScroll);
+      }
+
+      disconnectedCallback() {
+        window.removeEventListener('scroll', this.handleScroll);
+      }
+
+      handleScroll() {
+        const scrollY = window.scrollY;
+        const scrollDelta = scrollY - this.lastScrollY;
+        
+        const rect = this.getBoundingClientRect();
+        const isInView = rect.top < window.innerHeight && rect.bottom > 0;
+
+        if (!isInView) {
+          this.lastScrollY = scrollY;
+          return;
+        }
+
+        if (Math.abs(scrollDelta) > this.scrollThreshold) {
+          if (scrollDelta > 0 && this.currentFrame < this.frames.length - 1) {
+            this.frames[this.currentFrame].classList.remove('active');
+            this.currentFrame++;
+            this.frames[this.currentFrame].classList.add('active');
+            this.lastScrollY = scrollY;
+          } else if (scrollDelta < 0 && this.currentFrame > 0) {
+            this.frames[this.currentFrame].classList.remove('active');
+            this.currentFrame--;
+            this.frames[this.currentFrame].classList.add('active');
+            this.lastScrollY = scrollY;
+          }
+        }
+      }
+    }
+
+    customElements.define('scroll-gallery-{{ ai_gen_id }}', ScrollGallery{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "معرض التمرير",
+  "settings": [
+    {
+      "type": "header",
+      "content": "الصور"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "العرض الأقصى",
+      "min": 800,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "الصورة 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "الصورة 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "الصورة 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "الصورة 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_5",
+      "label": "الصورة 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_6",
+      "label": "الصورة 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_7",
+      "label": "الصورة 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_8",
+      "label": "الصورة 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_9",
+      "label": "الصورة 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_10",
+      "label": "الصورة 10"
+    },
+    {
+      "type": "header",
+      "content": "المنتجات المقترحة"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "products_title",
+      "label": "العنوان",
+      "default": "منتجات مقترحة"
+    },
+    {
+      "type": "collection",
+      "id": "products_collection",
+      "label": "المجموعة"
+    },
+    {
+      "type": "range",
+      "id": "products_count",
+      "label": "عدد المنتجات",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "products_title_size",
+      "label": "حجم العنوان",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "products_title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "products_bg_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "بطاقات المنتجات"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "لون خلفية البطاقة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "استدارة الحواف",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "زر المزيد"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "button_text",
+      "label": "نص الزر",
+      "default": "تصفح المزيد"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "رابط الزر"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "لون خلفية الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "لون الخلفية عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "لون نص الزر",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "استدارة حواف الزر",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "معرض التمرير"
+    }
+  ]
+}
+{% endschema %}

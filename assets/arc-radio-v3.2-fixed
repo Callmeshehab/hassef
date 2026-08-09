@@ -1,0 +1,1392 @@
+{% comment %}
+╔══════════════════════════════════════════════════════════════════╗
+║  ARC RADIO PLAYER v3.3 — FIXED                                  ║
+║  ✓ صور المنتجات تظهر بشكل صحيح                                 ║
+║  ✓ بادج الجنر واسع ومريح                                        ║
+║  ✓ زر السلة وبطاقة المنتج بمساحة كافية                         ║
+║  ✓ مسافة بين المنتجات وزر التصفح                               ║
+║  ✓ صوت ذكي — loop تلقائي + fade in/out سلس                     ║
+╚══════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+#arp3 {
+  --c-bg:        {{ section.settings.color_bg }};
+  --c-primary:   {{ section.settings.color_primary }};
+  --c-accent:    {{ section.settings.color_accent }};
+  --c-text:      {{ section.settings.color_text }};
+  --c-card-bg:   {{ section.settings.color_card_bg }};
+  --c-card-bdr:  {{ section.settings.color_card_border }};
+  --c-muted:     color-mix(in srgb, var(--c-text) 40%, transparent);
+  --arc-center:  {{ section.settings.center_size }}px;
+  --arc-side:    {{ section.settings.side_size }}px;
+  --arc-drop:    {{ section.settings.arc_drop }}px;
+  --arc-step:    {{ section.settings.card_step }}px;
+  --arc-h:       {{ section.settings.arc_height }}px;
+  --card-bdr-w:  {{ section.settings.card_border_w }}px;
+  --pat-h:       {{ section.settings.pattern_h }}px;
+  --pat-stripe:  {{ section.settings.pattern_stripe }}px;
+  --c-pat1:      {{ section.settings.color_pattern1 }};
+  --c-pat2:      {{ section.settings.color_pattern2 }};
+  --c-pat3:      {{ section.settings.color_pattern3 }};
+  --prod-radius: {{ section.settings.prod_radius }}px;
+  --prod-gap:    {{ section.settings.prod_gap }}px;
+  --prod-min-w:  {{ section.settings.prod_min_w }}px;
+  --prod-img-ratio: {{ section.settings.prod_img_ratio }};
+  --f: 'Cairo', sans-serif;
+  --sz-eyebrow:    {{ section.settings.sz_eyebrow }}px;
+  --sz-title:      {{ section.settings.sz_title }}px;
+  --sz-artname:    {{ section.settings.sz_artname }}px;
+  --sz-cardname:   {{ section.settings.sz_cardname }}px;
+  --sz-desc:       {{ section.settings.sz_desc }}px;
+  --sz-prod-name:  {{ section.settings.sz_prod_name }}px;
+  --sz-prod-price: {{ section.settings.sz_prod_price }}px;
+  --sz-cta:        {{ section.settings.sz_cta }}px;
+  --sz-minicta:    {{ section.settings.sz_minicta }}px;
+  --sz-atc:        {{ section.settings.sz_atc }}px;
+  --sp-section-t: {{ section.settings.sp_section_t }}px;
+  --sp-section-b: {{ section.settings.sp_section_b }}px;
+  --sp-section-h: {{ section.settings.sp_section_h }}px;
+  --sp-header-b:  {{ section.settings.sp_header_b }}px;
+  --sp-info-t:    {{ section.settings.sp_info_t }}px;
+  --sp-info-b:    {{ section.settings.sp_info_b }}px;
+  --sp-info-gap:  {{ section.settings.sp_info_gap }}px;
+  --sp-prod-b:    {{ section.settings.sp_prod_b }}px;
+  --sp-max-w:     {{ section.settings.sp_max_w }}px;
+  --sp-card-p:    {{ section.settings.sp_card_p }}px;
+  --snap-ms:      {{ section.settings.snap_ms }}ms;
+  --cta-bg:        {{ section.settings.cta_bg }};
+  --cta-text:      {{ section.settings.cta_text_color }};
+  --cta-border:    {{ section.settings.cta_border_color }};
+  --cta-shadow:    {{ section.settings.cta_shadow_color }};
+  --cta-hover-bg:  {{ section.settings.cta_hover_bg }};
+  --cta-hover-txt: {{ section.settings.cta_hover_text }};
+  --cta-r:         {{ section.settings.cta_radius }}px;
+  --cta-bdr:       {{ section.settings.cta_border_w }}px;
+  --cta-sh-x:      {{ section.settings.cta_shadow_x }}px;
+  --cta-sh-y:      {{ section.settings.cta_shadow_y }}px;
+}
+
+#arp3 *, #arp3 *::before, #arp3 *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+#arp3 {
+  background: var(--c-bg);
+  width: 100%; overflow-x: hidden;
+  position: relative; direction: rtl;
+  font-family: var(--f);
+  padding: var(--sp-section-t) var(--sp-section-h) var(--sp-section-b);
+}
+
+{% unless section.settings.disable_grain %}
+#arp3::before {
+  content: ''; position: fixed; inset: 0;
+  pointer-events: none; z-index: 0; opacity: .4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+{% endunless %}
+
+.arp3-ambient {
+  position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 500px; border-radius: 50%;
+  pointer-events: none; z-index: 0; transition: background 1s ease;
+  background: radial-gradient(ellipse at center, color-mix(in srgb,var(--c-primary) 8%,transparent) 0%, transparent 70%);
+}
+
+/* ── HEADER ── */
+.arp3-header { text-align: center; position: relative; z-index: 2; margin-bottom: var(--sp-header-b); }
+.arp3-eyebrow { font-size: var(--sz-eyebrow); font-weight: 300; color: var(--c-primary); opacity:.7; margin-bottom:6px; }
+.arp3-title {
+  font-size: var(--sz-title); font-weight: 900; color: var(--c-text);
+  line-height: 1.15; position: relative; display: inline-block;
+}
+.arp3-title::before, .arp3-title::after {
+  content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+  height: {{ section.settings.title_deco_h }}px; width: {{ section.settings.title_deco_w }}px;
+  background: repeating-linear-gradient(90deg, var(--c-primary) 0, var(--c-primary) {{ section.settings.pattern_stripe }}px, transparent {{ section.settings.pattern_stripe }}px, transparent calc({{ section.settings.pattern_stripe }}px * 2));
+  opacity: .45;
+}
+.arp3-title::before { right: calc(100% + {{ section.settings.title_deco_gap }}px); }
+.arp3-title::after  { left:  calc(100% + {{ section.settings.title_deco_gap }}px); }
+.arp3-title em { color: var(--c-primary); font-style: normal; }
+
+/* ── ARC STAGE ── */
+.arp3-stage {
+  position: relative; width: 100%; height: var(--arc-h);
+  display: flex; align-items: flex-end; justify-content: center;
+  overflow: visible; touch-action: pan-y; user-select: none; cursor: grab; z-index: 2;
+}
+.arp3-stage:active { cursor: grabbing; }
+.arp3-cards-wrap {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; display: flex; align-items: flex-end; justify-content: center;
+  pointer-events: none;
+}
+
+/* ── ARTIST CARD ── */
+.arp3-card {
+  position: absolute; bottom: 0; display: flex; flex-direction: column;
+  align-items: center; gap: {{ section.settings.sp_card_name_gap }}px;
+  pointer-events: auto; cursor: pointer; will-change: transform, opacity; transform-origin: center bottom;
+}
+.arp3-card-img-box {
+  position: relative; border-radius: 50%; overflow: hidden;
+  background: var(--c-card-bg); border: var(--card-bdr-w) solid var(--c-card-bdr);
+  transition: box-shadow .4s ease, border-color .4s ease; flex-shrink: 0;
+}
+.arp3-card.is-active .arp3-card-img-box {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,var(--c-primary) 18%,transparent), 0 10px 36px color-mix(in srgb,var(--c-primary) 24%,transparent);
+  animation: cardPulse 4s ease-in-out infinite;
+}
+@keyframes cardPulse {
+  0%,100% { box-shadow: 0 0 0 3px color-mix(in srgb,var(--c-primary) 18%,transparent), 0 10px 36px color-mix(in srgb,var(--c-primary) 24%,transparent); }
+  50%     { box-shadow: 0 0 0 7px color-mix(in srgb,var(--c-primary) 28%,transparent), 0 18px 52px color-mix(in srgb,var(--c-primary) 36%,transparent); }
+}
+.arp3-card-img-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: var(--pat-h); z-index: 3;
+  background: repeating-linear-gradient(90deg, var(--c-pat1) 0, var(--c-pat1) var(--pat-stripe), var(--c-pat2) var(--pat-stripe), var(--c-pat2) calc(var(--pat-stripe)*2), var(--c-pat3) calc(var(--pat-stripe)*2), var(--c-pat3) calc(var(--pat-stripe)*3));
+  opacity: 0; transition: opacity .4s ease;
+}
+.arp3-card.is-active .arp3-card-img-box::before { opacity: 1; }
+.arp3-card-img {
+  display: block; width: 100%; height: 100%;
+  object-fit: {{ section.settings.img_fit }}; border-radius: 50%;
+  pointer-events: none; background: var(--c-card-bg);
+  transition: transform .45s cubic-bezier(.34,1.2,.64,1);
+}
+.arp3-card.is-active .arp3-card-img { transform: scale({{ section.settings.active_zoom | divided_by: 100.0 }}); }
+
+.arp3-play-btn {
+  position: absolute; bottom: {{ section.settings.play_btn_bot }}%; left: 50%;
+  transform: translateX(-50%) scale(.8);
+  width: {{ section.settings.play_btn_sz }}px; height: {{ section.settings.play_btn_sz }}px;
+  border-radius: 50%; background: color-mix(in srgb,var(--c-bg) 90%,transparent);
+  border: 1.5px solid color-mix(in srgb,var(--c-primary) 45%,transparent);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; backdrop-filter: blur(8px); opacity: 0;
+  transition: opacity .3s, transform .3s cubic-bezier(.34,1.3,.64,1), background .2s, box-shadow .2s;
+  z-index: 4; pointer-events: none;
+}
+.arp3-card.is-active .arp3-play-btn { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
+.arp3-play-btn:hover { background: color-mix(in srgb,var(--c-primary) 15%,var(--c-bg)); box-shadow: 0 4px 14px color-mix(in srgb,var(--c-primary) 28%,transparent); }
+.arp3-play-btn.is-playing { background: color-mix(in srgb,var(--c-primary) 18%,var(--c-bg)); border-color: color-mix(in srgb,var(--c-primary) 55%,transparent); }
+.arp3-play-btn svg { width: 36%; height: 36%; fill: var(--c-primary); }
+.arp3-play-btn.pulse { animation: playPulse .28s ease; }
+@keyframes playPulse { 0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.2)} }
+
+.arp3-card-ring {
+  position: absolute; inset: -{{ section.settings.ring_inset }}px; border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb,var(--c-primary) 30%,transparent);
+  opacity: 0; pointer-events: none; transition: opacity .4s;
+}
+.arp3-card.is-active.is-playing .arp3-card-ring { opacity: 1; animation: ringPulse 2.2s ease-in-out infinite; }
+@keyframes ringPulse {
+  0%,100%{box-shadow:0 0 8px color-mix(in srgb,var(--c-primary) 14%,transparent)}
+  50%    {box-shadow:0 0 22px color-mix(in srgb,var(--c-primary) 26%,transparent)}
+}
+.arp3-card-name {
+  font-size: var(--sz-cardname); font-weight: 700; color: var(--c-text);
+  white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis;
+  text-align: center; opacity: 0; transform: translateY(4px);
+  transition: opacity .3s, transform .3s, color .3s; pointer-events: none;
+}
+.arp3-card.is-active .arp3-card-name, .arp3-card.is-near .arp3-card-name { opacity:1; transform:translateY(0); }
+.arp3-card.is-active .arp3-card-name { color: var(--c-primary); }
+
+/* ── TUNER ── */
+.arp3-tuner {
+  position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 2px; align-items: flex-end; height: 20px;
+  opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 3;
+}
+.arp3-tuner.show { opacity: .6; }
+.arp3-tuner-bar { width: 3px; border-radius: 2px; background: var(--c-primary); transition: height .08s; }
+
+/* ── INFO ── */
+.arp3-info {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--sp-info-gap); padding: var(--sp-info-t) 0 var(--sp-info-b);
+  max-width: var(--sp-max-w); margin: 0 auto; text-align: center;
+}
+.arp3-tape {
+  width: {{ section.settings.tape_w }}px; height: {{ section.settings.tape_h }}px; border-radius: 2px;
+  background: linear-gradient(to left, transparent, color-mix(in srgb,var(--c-accent) 35%,transparent), color-mix(in srgb,var(--c-primary) 60%,transparent), color-mix(in srgb,var(--c-accent) 35%,transparent), transparent);
+}
+.arp3-artist-name {
+  font-size: var(--sz-artname); font-weight: 900; color: var(--c-text); line-height: 1.15;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .4s, transform .4s cubic-bezier(.34,1.2,.64,1), color .5s;
+}
+.arp3-artist-name.on { opacity:1; transform:translateY(0); }
+
+/* ── FIX: بادج الجنر — مساحة كافية ── */
+{% if section.settings.show_genre %}
+.arp3-genre {
+  font-size: {{ section.settings.sz_genre }}px; font-weight: 700;
+  color: var(--c-card-bg); background: var(--c-primary);
+  padding: 6px 20px; border-radius: 20px;
+  display: inline-block; min-width: 70px;
+  opacity:0; transform:scale(.85);
+  transition: opacity .35s .06s, transform .35s cubic-bezier(.34,1.3,.64,1) .06s, background .5s;
+}
+.arp3-genre.on { opacity:1; transform:scale(1); }
+{% endif %}
+
+{% if section.settings.show_description %}
+.arp3-desc {
+  font-size: var(--sz-desc); font-weight: 400; color: var(--c-muted);
+  max-width: {{ section.settings.desc_max_w }}px; line-height: 1.75;
+  opacity: 0; transition: opacity .4s .1s;
+}
+.arp3-desc.on { opacity:1; }
+{% endif %}
+
+.arp3-prog-wrap {
+  width: 100%; max-width: {{ section.settings.prog_max_w }}px;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  opacity: 0; transition: opacity .4s .15s;
+}
+.arp3-prog-wrap.on { opacity:1; }
+
+.arp3-waves { display: flex; gap: 2px; align-items: flex-end; height: 14px; opacity: 0; transition: opacity .3s; }
+.arp3-waves.on { opacity:1; }
+.arp3-wbar { width: 3px; border-radius: 2px; background: var(--c-primary); animation: waveA .65s ease-in-out infinite alternate; }
+.arp3-wbar:nth-child(1){height:4px;animation-delay:0s}
+.arp3-wbar:nth-child(2){height:12px;animation-delay:.12s}
+.arp3-wbar:nth-child(3){height:7px;animation-delay:.24s}
+.arp3-wbar:nth-child(4){height:14px;animation-delay:.07s}
+.arp3-wbar:nth-child(5){height:5px;animation-delay:.20s}
+@keyframes waveA { from{transform:scaleY(.3);opacity:.3}to{transform:scaleY(1);opacity:1} }
+
+.arp3-pbar {
+  width: 100%; height: {{ section.settings.prog_h }}px;
+  background: color-mix(in srgb,var(--c-text) 12%,transparent);
+  border-radius: 4px; position: relative; cursor: pointer;
+}
+.arp3-pfill { height:100%; width:0%; background:var(--c-primary); border-radius:4px; pointer-events:none; transition:background .5s; }
+.arp3-pknob {
+  position: absolute; top: 50%; transform: translate(50%,-50%); right: 100%;
+  width: {{ section.settings.prog_knob }}px; height: {{ section.settings.prog_knob }}px;
+  border-radius: 50%; background: var(--c-primary);
+  box-shadow: 0 0 8px color-mix(in srgb,var(--c-primary) 45%,transparent);
+  pointer-events: none; transition: background .5s;
+}
+.arp3-ptimes { width:100%; display:flex; justify-content:space-between; font-size:10px; color:var(--c-muted); font-family:var(--f); }
+
+.arp3-mini-cta {
+  font-size: var(--sz-minicta); font-weight: 700; color: var(--c-primary);
+  text-decoration: none; border-bottom: 1px solid color-mix(in srgb,var(--c-primary) 38%,transparent);
+  padding-bottom: 2px; opacity: 0; transition: opacity .4s .2s, color .2s, border-color .2s;
+  cursor: pointer; display: inline-block;
+}
+.arp3-mini-cta:hover { color: var(--c-text); border-color: var(--c-text); }
+.arp3-mini-cta.on { opacity:1; }
+
+/* ══════════════════════════════════════════════════════
+   PRODUCTS — FIX الكامل لمشكلة الصور
+══════════════════════════════════════════════════════ */
+.arp3-products {
+  position: relative; z-index: 2;
+  max-width: var(--sp-max-w); margin: 0 auto;
+  padding: 0 0 var(--sp-prod-b);
+  /* FIX: مسافة أكبر بين المنتجات وزر التصفح */
+  margin-bottom: 28px;
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .45s, transform .45s cubic-bezier(.25,.46,.45,.94);
+}
+.arp3-products.on { opacity:1; transform:translateY(0); }
+
+.arp3-prod-scroll {
+  display: flex; gap: var(--prod-gap);
+  overflow-x: auto; overflow-y: visible;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  padding: 6px 4px {{ section.settings.prod_scroll_pb }}px;
+  scrollbar-width: none; -ms-overflow-style: none; cursor: grab;
+}
+.arp3-prod-scroll:active { cursor: grabbing; }
+.arp3-prod-scroll::-webkit-scrollbar { display: none; }
+
+/* ── FIX الرئيسي: كارد المنتج ── */
+.arp3-prod {
+  display: flex; flex-direction: column;
+  border-radius: var(--prod-radius); overflow: hidden;
+  background: var(--c-card-bg); border: var(--card-bdr-w) solid var(--c-card-bdr);
+  text-decoration: none;
+  box-shadow: var(--cta-sh-x) var(--cta-sh-y) 0 color-mix(in srgb,var(--c-card-bdr) 40%,transparent);
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+  cursor: pointer; position: relative; flex-shrink: 0;
+  scroll-snap-align: start;
+  width: var(--prod-min-w);
+  min-width: var(--prod-min-w);
+}
+.arp3-prod::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: var(--pat-h); z-index: 2;
+  background: repeating-linear-gradient(90deg, var(--c-pat1) 0, var(--c-pat1) var(--pat-stripe), var(--c-pat2) var(--pat-stripe), var(--c-pat2) calc(var(--pat-stripe)*2), var(--c-pat3) calc(var(--pat-stripe)*2), var(--c-pat3) calc(var(--pat-stripe)*3));
+}
+.arp3-prod:hover {
+  transform: translate(calc(var(--cta-sh-x)*-.5), calc(var(--cta-sh-y)*-.5));
+  box-shadow: calc(var(--cta-sh-x)*.5) calc(var(--cta-sh-y)*.5) 0 color-mix(in srgb,var(--c-card-bdr) 40%,transparent), 0 0 0 1px color-mix(in srgb,var(--c-primary) 20%,transparent);
+}
+
+/* ── FIX الصور: منع overflow يقطع الصورة ── */
+.arp3-prod-img-wrap {
+  width: 100%;
+  padding-top: var(--pat-h);
+  background: color-mix(in srgb,var(--c-text) 4%,transparent);
+  position: relative;
+  flex-shrink: 0;
+  /* FIX: overflow visible للـ wrapper لكن hidden للـ ratio */
+  overflow: hidden;
+}
+
+/* ── FIX: الـ ratio box يحمل الصورة بشكل صحيح ── */
+.arp3-prod-img-ratio {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  /* FIX: نسبة ثابتة واضحة */
+  padding-bottom: var(--prod-img-ratio);
+  background: color-mix(in srgb,var(--c-text) 5%,transparent);
+  display: block;
+  min-height: 120px;
+}
+
+/* ── FIX الصورة نفسها: position absolute صحيحة ── */
+.arp3-prod-img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: {{ section.settings.prod_img_fit }};
+  object-position: {{ section.settings.prod_img_position }};
+  display: block;
+  transition: transform .35s;
+  background: color-mix(in srgb,var(--c-card-bg) 100%,transparent);
+  /* FIX: ضمان أن الصورة تظهر */
+  z-index: 1;
+  border: none;
+  outline: none;
+}
+.arp3-prod:hover .arp3-prod-img { transform: scale(1.04); }
+
+.arp3-prod-placeholder-box {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb,var(--c-text) 5%,transparent);
+  z-index: 0;
+}
+
+/* ── FIX: body المنتج بمساحة كافية ── */
+.arp3-prod-body {
+  padding: var(--sp-card-p);
+  padding-top: calc(var(--sp-card-p) + 8px);
+  display: flex; flex-direction: column; gap: 8px;
+  flex: 1; position: relative;
+}
+.arp3-prod-body::before {
+  content: ''; position: absolute; top: 0; left: var(--sp-card-p); right: var(--sp-card-p); height: 2px;
+  background: repeating-linear-gradient(90deg, var(--c-primary) 0, var(--c-primary) 4px, transparent 4px, transparent 8px);
+  opacity: .35;
+}
+.arp3-prod-name {
+  font-size: var(--sz-prod-name); font-weight: 700; color: var(--c-text); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: 4px;
+  /* FIX: مساحة كافية للنص */
+  min-height: 2.8em;
+  word-break: break-word;
+}
+.arp3-prod-price {
+  font-size: var(--sz-prod-price); font-weight: 900; color: var(--c-primary);
+  padding: 4px 0;
+}
+
+/* ── FIX: footer المنتج — مسافة ومرونة ── */
+.arp3-prod-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+  flex-wrap: nowrap;
+}
+
+.arp3-prod-link {
+  font-size: {{ section.settings.sz_prod_link }}px; font-weight: 800; color: var(--c-primary);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  position: relative; transition: color .2s; white-space: nowrap;
+  flex-shrink: 0;
+  padding: 4px 0;
+}
+.arp3-prod-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:var(--c-primary); transition:width .3s; }
+.arp3-prod-link:hover { color:var(--c-text); }
+.arp3-prod-link:hover::after { width:100%; }
+
+/* ── FIX: زر أضف للسلة — مساحة ومرونة ── */
+.arp3-atc-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  font-size: var(--sz-atc); font-weight: 800; font-family: var(--f);
+  color: var(--cta-text); background: var(--cta-bg);
+  border: var(--cta-bdr) solid var(--cta-border);
+  border-radius: calc(var(--cta-r) * 0.6);
+  /* FIX: حشوة مناسبة وmin-width ضمان العرض */
+  padding: {{ section.settings.atc_pv }}px {{ section.settings.atc_ph }}px;
+  min-height: 34px;
+  cursor: pointer; white-space: nowrap;
+  box-shadow: 2px 2px 0 var(--cta-shadow);
+  transition: transform .18s, box-shadow .18s, background .18s, color .18s;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
+}
+.arp3-atc-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.16),transparent); transform:translateX(-100%); transition:transform .4s; }
+.arp3-atc-btn:hover::before { transform:translateX(100%); }
+.arp3-atc-btn:hover { background:var(--cta-hover-bg); color:var(--cta-hover-txt); border-color:var(--cta-hover-bg); transform:translate(1px,1px); box-shadow:1px 1px 0 var(--cta-shadow); }
+.arp3-atc-btn:active { transform:translate(2px,2px); box-shadow:none; }
+.arp3-atc-btn.loading { opacity:.7; pointer-events:none; }
+.arp3-atc-btn.added { background: color-mix(in srgb,var(--c-primary) 12%,var(--cta-bg)); animation: atcPop .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes atcPop { 0%{transform:scale(1)}40%{transform:scale(1.12)}70%{transform:scale(.96)}100%{transform:scale(1)} }
+.arp3-atc-btn svg { width:13px; height:13px; fill:currentColor; flex-shrink:0; }
+
+/* skeleton */
+.arp3-skel {
+  background: linear-gradient(90deg, color-mix(in srgb,var(--c-text) 5%,transparent) 25%, color-mix(in srgb,var(--c-text) 10%,transparent) 50%, color-mix(in srgb,var(--c-text) 5%,transparent) 75%);
+  background-size: 200% 100%; animation: skelAnim 1.3s ease infinite; border-radius: 4px;
+}
+@keyframes skelAnim { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+
+/* ══════════════════════════════════════════════════════
+   CTA — مسافة واضحة من المنتجات
+══════════════════════════════════════════════════════ */
+.arp3-cta-wrap {
+  position: relative; z-index: 2; display: flex; justify-content: center;
+  /* FIX: مسافة إضافية من المنتجات */
+  padding: {{ section.settings.cta_pt }}px var(--sp-section-h) {{ section.settings.cta_pb }}px;
+  margin-top: 16px;
+  opacity: 0; transform: translateY(6px); transition: opacity .4s .25s, transform .4s .25s;
+}
+.arp3-cta-wrap.on { opacity:1; transform:translateY(0); }
+
+.arp3-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: var(--sz-cta); font-weight: 800; font-family: var(--f);
+  color: var(--cta-text); background: var(--cta-bg);
+  border: var(--cta-bdr) solid var(--cta-border);
+  border-radius: var(--cta-r);
+  padding: {{ section.settings.cta_pv }}px {{ section.settings.cta_ph }}px;
+  text-decoration: none; cursor: pointer; position: relative; overflow: hidden;
+  letter-spacing: .02em;
+  box-shadow: var(--cta-sh-x) var(--cta-sh-y) 0 var(--cta-shadow);
+  transition: color .2s, background .2s, border-color .2s, transform .18s, box-shadow .18s;
+}
+.arp3-cta::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.18) 50%, transparent 60%);
+  transform: translateX(-100%); transition: transform .55s ease;
+}
+.arp3-cta:hover::after { transform: translateX(100%); }
+.arp3-cta:hover {
+  background: var(--cta-hover-bg); color: var(--cta-hover-txt);
+  border-color: var(--cta-hover-bg);
+  transform: translate(calc(var(--cta-sh-x)*.5), calc(var(--cta-sh-y)*.5));
+  box-shadow: calc(var(--cta-sh-x)*.5) calc(var(--cta-sh-y)*.5) 0 var(--cta-shadow);
+}
+.arp3-cta:active { transform: translate(var(--cta-sh-x), var(--cta-sh-y)); box-shadow: none; }
+.arp3-cta-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: color-mix(in srgb, var(--cta-border) 18%, transparent);
+  transition: background .2s, transform .25s; flex-shrink: 0;
+}
+.arp3-cta:hover .arp3-cta-icon { background: color-mix(in srgb, var(--cta-hover-txt) 18%, transparent); transform: translateX(-3px); }
+.arp3-cta-icon svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  #arp3 {
+    --arc-center: min({{ section.settings.center_size }}px, 40vw);
+    --arc-side:   min({{ section.settings.side_size }}px, 28vw);
+    --arc-step:   min({{ section.settings.card_step }}px, 32vw);
+    --arc-h:      min({{ section.settings.arc_height }}px, 55vw);
+    --prod-min-w: min({{ section.settings.prod_min_w }}px, 62vw);
+    --sp-section-h: {{ section.settings.sp_section_h_mob }}px;
+  }
+  .arp3-title::before, .arp3-title::after { display: none; }
+  /* FIX موبايل: footer المنتج يتكيف */
+  .arp3-prod-footer { flex-wrap: wrap; gap: 6px; }
+  .arp3-atc-btn { flex: 1; justify-content: center; }
+}
+@media (max-width: 480px) {
+  #arp3 {
+    --arc-center: min({{ section.settings.center_size }}px, 44vw);
+    --arc-side:   min({{ section.settings.side_size }}px, 26vw);
+    --arc-step:   min({{ section.settings.card_step }}px, 33vw);
+    --prod-min-w: min({{ section.settings.prod_min_w }}px, 74vw);
+  }
+}
+</style>
+
+<!-- ════════════════ HTML ════════════════ -->
+<section id="arp3">
+  <div class="arp3-ambient" id="arp3-ambient"></div>
+
+  <header class="arp3-header">
+    <p class="arp3-eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="arp3-title">
+      {{ section.settings.title_before }}
+      {% if section.settings.title_hl != blank %}<em>{{ section.settings.title_hl }}</em>{% endif %}
+      {{ section.settings.title_after }}
+    </h2>
+  </header>
+
+  <div class="arp3-stage" id="arp3-stage">
+    <div class="arp3-cards-wrap" id="arp3-cards"></div>
+    <div class="arp3-tuner" id="arp3-tuner">
+      {% for i in (1..12) %}<div class="arp3-tuner-bar" style="height:{{ forloop.index | modulo: 3 | plus: 1 | times: 4 }}px"></div>{% endfor %}
+    </div>
+  </div>
+
+  <div class="arp3-info" id="arp3-info">
+    <div class="arp3-tape"></div>
+    <div class="arp3-artist-name" id="arp3-name">—</div>
+    {% if section.settings.show_genre %}<div class="arp3-genre" id="arp3-genre"></div>{% endif %}
+    {% if section.settings.show_description %}<p class="arp3-desc" id="arp3-desc"></p>{% endif %}
+    {% if section.settings.show_progress %}
+    <div class="arp3-prog-wrap" id="arp3-prog">
+      <div class="arp3-waves" id="arp3-waves">
+        <div class="arp3-wbar"></div><div class="arp3-wbar"></div><div class="arp3-wbar"></div><div class="arp3-wbar"></div><div class="arp3-wbar"></div>
+      </div>
+      <div class="arp3-pbar" id="arp3-pbar">
+        <div class="arp3-pfill" id="arp3-pfill"></div>
+        <div class="arp3-pknob" id="arp3-pknob"></div>
+      </div>
+      <div class="arp3-ptimes"><span id="arp3-tcur">0:00</span><span id="arp3-tdur">0:00</span></div>
+    </div>
+    {% endif %}
+    <a class="arp3-mini-cta" id="arp3-mini-cta" href="#">{{ section.settings.mini_cta_text }}</a>
+  </div>
+
+  {% if section.settings.show_products %}
+  <div class="arp3-products" id="arp3-products">
+    <div class="arp3-prod-scroll" id="arp3-scroll">
+      {%- for i in (1..section.settings.prod_count) -%}
+      <div class="arp3-prod" style="pointer-events:none">
+        <div class="arp3-prod-img-wrap">
+          <div class="arp3-prod-img-ratio">
+            <div class="arp3-prod-placeholder-box">
+              <div class="arp3-skel" style="width:60%;height:55%;border-radius:8px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="arp3-prod-body">
+          <div class="arp3-skel" style="height:13px;margin-bottom:7px"></div>
+          <div class="arp3-skel" style="height:10px;width:50%"></div>
+        </div>
+      </div>
+      {%- endfor -%}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if section.settings.show_cta %}
+  <div class="arp3-cta-wrap" id="arp3-cta-wrap">
+    <a class="arp3-cta" id="arp3-cta" href="#">
+      {{ section.settings.cta_text }}
+      <span class="arp3-cta-icon">
+        <svg viewBox="0 0 16 16"><path d="M10 8L6 4M10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </span>
+    </a>
+  </div>
+  {% endif %}
+</section>
+
+<!-- ════════════════ ARTISTS DATA ════════════════ -->
+<script>
+(function(){
+"use strict";
+
+const ARTISTS = [
+  {%- for block in section.blocks -%}
+  {%- if block.type == 'artist' -%}
+  {%- assign coll = block.settings.collection -%}
+  {
+    name:  {{ block.settings.name | json }},
+    label: {{ block.settings.card_label | default: block.settings.name | json }},
+    image: {{ block.settings.image | img_url: '600x600', crop: 'center' | json }},
+    thumb: {{ block.settings.image | img_url: '280x280', crop: 'center' | json }},
+    desc:  {{ block.settings.description | json }},
+    genre: {{ block.settings.genre | json }},
+    color: {{ block.settings.color | json }},
+    audio: {{ block.settings.preview_audio | json }},
+    url:   {% if coll %}{{ coll.url | json }}{% else %}{{ block.settings.collection_url | json }}{% endif %},
+    products: [
+      {%- if coll -%}
+        {%- for prod in coll.products limit: section.settings.prod_count -%}
+        {
+          t:   {{ prod.title | json }},
+          p:   {{ prod.price | money | json }},
+          i:   {{ prod.featured_image | img_url: '500x500' | json }},
+          u:   {{ prod.url | json }},
+          vid: {{ prod.first_available_variant.id | json }}
+        }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for pi in (1..4) -%}
+        {%- assign pk = 'product_' | append: pi -%}
+        {%- assign pv = block.settings[pk] -%}
+        {%- if pv -%}
+        { t:{{ pv.title | json }}, p:{{ pv.price | money | json }}, i:{{ pv.featured_image | img_url: '500x500' | json }}, u:{{ pv.url | json }}, vid:{{ pv.first_available_variant.id | json }} }{% unless forloop.last %},{% endunless %}
+        {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    ]
+  }{% unless forloop.last %},{% endunless %}
+  {%- endif -%}
+  {%- endfor -%}
+].filter(a => a.name && a.name.trim());
+
+if (!ARTISTS.length) return;
+const N = ARTISTS.length;
+
+const C = {
+  CENTER:   parseFloat(getComputedStyle(document.getElementById('arp3')).getPropertyValue('--arc-center')) || {{ section.settings.center_size }},
+  SIDE:     parseFloat(getComputedStyle(document.getElementById('arp3')).getPropertyValue('--arc-side'))   || {{ section.settings.side_size }},
+  DROP:     {{ section.settings.arc_drop }},
+  STEP:     parseFloat(getComputedStyle(document.getElementById('arp3')).getPropertyValue('--arc-step'))   || {{ section.settings.card_step }},
+  SNAP_MS:  {{ section.settings.snap_ms }},
+  FRICTION: {{ section.settings.friction | divided_by: 100.0 }},
+  DRAG_S:   {{ section.settings.drag_speed | divided_by: 100.0 }},
+  EN_AUD:   {{ section.settings.enable_audio | json }},
+  AUTO_PLAY:{{ section.settings.auto_play | json }},
+  EN_NOISE: {{ section.settings.enable_noise | json }},
+  EN_TICK:  {{ section.settings.enable_tick  | json }},
+  VOL:      {{ section.settings.master_vol | divided_by: 100.0 }},
+  FADE_IN:  {{ section.settings.fade_in  | default: 0.7 }},
+  FADE_OUT: {{ section.settings.fade_out | default: 0.5 }},
+  USE_CLR:  {{ section.settings.use_artist_color | json }},
+  PROD_N:   {{ section.settings.prod_count }},
+  SHOW_PRG: {{ section.settings.show_progress | json }},
+  DEFAULT_CLR: {{ section.settings.color_primary | json }},
+  ATC_TEXT:  {{ section.settings.atc_text | json }},
+  ATC_ADDED: {{ section.settings.atc_added_text | json }},
+  PROD_LINK: {{ section.settings.prod_link_text | json }},
+};
+
+/* ── STATE ── */
+let offset=0, velocity=0, activeIdx=0;
+let dragging=false, lastX=null, lastT=0;
+let snapRaf=null, inertiaRaf=null, didDrag=false;
+
+/* ── DOM ── */
+const root   = document.getElementById('arp3');
+const stage  = document.getElementById('arp3-stage');
+const cardsW = document.getElementById('arp3-cards');
+const ambient= document.getElementById('arp3-ambient');
+const nameEl = document.getElementById('arp3-name');
+const genreEl= document.getElementById('arp3-genre');
+const descEl = document.getElementById('arp3-desc');
+const miniCta= document.getElementById('arp3-mini-cta');
+const prodW  = document.getElementById('arp3-products');
+const scroll = document.getElementById('arp3-scroll');
+const ctaW   = document.getElementById('arp3-cta-wrap');
+const ctaEl  = document.getElementById('arp3-cta');
+const progW  = document.getElementById('arp3-prog');
+const pfill  = document.getElementById('arp3-pfill');
+const pknob  = document.getElementById('arp3-pknob');
+const tcur   = document.getElementById('arp3-tcur');
+const tdur   = document.getElementById('arp3-tdur');
+const waves  = document.getElementById('arp3-waves');
+const pbar   = document.getElementById('arp3-pbar');
+const tuner  = document.getElementById('arp3-tuner');
+
+/* ── CARDS ── */
+let cardEls = [];
+function buildCards(){
+  cardsW.innerHTML=''; cardEls=[];
+  ARTISTS.forEach((a,i)=>{
+    const el=document.createElement('div');
+    el.className='arp3-card';
+    el.innerHTML=`<div class="arp3-card-img-box"><div class="arp3-card-ring"></div><img class="arp3-card-img" src="${a.thumb||a.image||''}" alt="${a.name}" loading="${i===0?'eager':'lazy'}" decoding="async"><button class="arp3-play-btn" aria-label="تشغيل"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button></div><span class="arp3-card-name">${a.label||a.name}</span>`;
+    cardsW.appendChild(el); cardEls.push(el);
+    el.addEventListener('click',()=>{ if(!didDrag) snapToReal(i); });
+    el.querySelector('.arp3-play-btn').addEventListener('click',e=>{
+      e.stopPropagation(); unlockAudio();
+      if(activeIdx!==i){ snapToReal(i); return; }
+      e.currentTarget.classList.add('pulse');
+      setTimeout(()=>e.currentTarget.classList.remove('pulse'),300);
+      togglePlay();
+    });
+  });
+}
+
+/* ── LAYOUT ── */
+const MAX_VIS=3;
+function layoutCards(){
+  const sr=C.SIDE/C.CENTER;
+  cardEls.forEach((el,i)=>{
+    let rel=i-offset;
+    rel=rel-Math.round(rel/N)*N;
+    const ar=Math.abs(rel);
+    if(ar>MAX_VIS+.8){ el.style.visibility='hidden'; return; }
+    el.style.visibility='visible';
+    const x=rel*C.STEP, y=(rel*rel/(MAX_VIS*MAX_VIS))*C.DROP;
+    const sc=sr+(1-sr)*Math.max(0,1-ar);
+    const op={{ section.settings.side_opacity | divided_by: 100.0 }}+(1-{{ section.settings.side_opacity | divided_by: 100.0 }})*Math.max(0,1-ar*.75);
+    const sz=C.CENTER*sc;
+    const box=el.querySelector('.arp3-card-img-box');
+    if(box){ box.style.width=sz+'px'; box.style.height=sz+'px'; }
+    el.style.transform=`translateX(${x}px) translateY(${-y}px)`;
+    el.style.opacity=op;
+    el.style.zIndex=Math.round(10-ar*2);
+    el.classList.toggle('is-active',ar<.38);
+    el.classList.toggle('is-near',ar>=.38&&ar<1.4);
+  });
+}
+
+/* ── SNAP ── */
+function snapToReal(idx){
+  if(snapRaf){cancelAnimationFrame(snapRaf);snapRaf=null;}
+  if(inertiaRaf){cancelAnimationFrame(inertiaRaf);inertiaRaf=null;}
+  const cr=Math.round(offset);
+  let t=idx;
+  while(t<cr-N/2) t+=N;
+  while(t>cr+N/2) t-=N;
+  const s=offset,e=t,dur=C.SNAP_MS,t0=performance.now();
+  velocity=0;
+  function frame(now){
+    const p=Math.min((now-t0)/dur,1),ease=1-Math.pow(1-p,3);
+    offset=s+(e-s)*ease; layoutCards();
+    if(p<1){ snapRaf=requestAnimationFrame(frame); }
+    else { offset=e; activeIdx=((Math.round(e)%N)+N)%N; layoutCards(); onSnapped(activeIdx); }
+  }
+  snapRaf=requestAnimationFrame(frame);
+}
+function nearestReal(){ return((Math.round(offset)%N)+N)%N; }
+
+function onSnapped(idx){
+  updateInfo(idx); updateTheme(idx); stopNoise(); tunerHide();
+  if(C.EN_AUD && C.AUTO_PLAY) setTimeout(()=>startPreview(idx),220);
+}
+
+/* ── THEME ── */
+function updateTheme(idx){
+  const col=(C.USE_CLR&&ARTISTS[idx].color)?ARTISTS[idx].color:C.DEFAULT_CLR;
+  root.style.setProperty('--c-primary',col);
+  if(ambient) ambient.style.background=`radial-gradient(ellipse at center,color-mix(in srgb,${col} 9%,transparent) 0%,transparent 68%)`;
+}
+
+/* ── INFO ── */
+let lastInfoIdx=-1;
+function updateInfo(idx){
+  if(idx===lastInfoIdx) return; lastInfoIdx=idx;
+  const a=ARTISTS[idx]; if(!a) return;
+  if(nameEl){ nameEl.classList.remove('on'); nameEl.textContent=a.name; requestAnimationFrame(()=>setTimeout(()=>nameEl.classList.add('on'),20)); }
+  if(genreEl){ genreEl.classList.remove('on'); genreEl.textContent=a.genre||''; if(a.genre) setTimeout(()=>genreEl.classList.add('on'),60); }
+  if(descEl){ descEl.classList.remove('on'); descEl.textContent=a.desc||''; if(a.desc) setTimeout(()=>descEl.classList.add('on'),100); }
+  if(miniCta){ miniCta.href=a.url||'#'; setTimeout(()=>miniCta.classList.add('on'),160); }
+  if(ctaEl) ctaEl.href=a.url||'#';
+  if(ctaW) setTimeout(()=>ctaW.classList.add('on'),200);
+  if(progW&&C.SHOW_PRG) setTimeout(()=>progW.classList.add('on'),140);
+  renderProducts(idx);
+}
+
+/* ══════════════════════════════════════════════════════
+   PRODUCTS — FIX الصور + مساحات
+══════════════════════════════════════════════════════ */
+let lastProdIdx=-1;
+function renderProducts(idx){
+  if(!scroll||!prodW) return;
+  if(idx===lastProdIdx) return; lastProdIdx=idx;
+  const prods=(ARTISTS[idx].products||[]).slice(0,C.PROD_N);
+  prodW.classList.remove('on');
+  scroll.innerHTML='';
+  if(!prods.length){ setTimeout(()=>prodW.classList.add('on'),180); return; }
+
+  prods.forEach((p,i)=>{
+    const card=document.createElement('div');
+    card.className='arp3-prod';
+    card.style.transitionDelay=`${i*55}ms`;
+
+    /* ── FIX الصورة: استخدام <img> مباشرة مع onload ── */
+    let imgHtml;
+    if(p.i){
+      imgHtml=`<div class="arp3-prod-img-ratio">
+        <div class="arp3-prod-placeholder-box" id="ph_${i}">
+          <div class="arp3-skel" style="width:60%;height:55%;border-radius:8px"></div>
+        </div>
+        <img class="arp3-prod-img" 
+             src="${p.i}" 
+             alt="${(p.t||'').replace(/"/g,'&quot;')}" 
+             loading="lazy"
+             decoding="async"
+             onerror="this.style.display='none'"
+             onload="var ph=this.parentNode.querySelector('.arp3-prod-placeholder-box');if(ph)ph.style.display='none';"
+        >
+      </div>`;
+    } else {
+      imgHtml=`<div class="arp3-prod-img-ratio">
+        <div class="arp3-prod-placeholder-box">
+          <svg viewBox="0 0 120 80" fill="none" width="55%" style="opacity:.15">
+            <rect x="4" y="4" width="112" height="72" rx="6" stroke="currentColor" stroke-width="3" fill="none"/>
+            <circle cx="38" cy="42" r="13" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <circle cx="82" cy="42" r="13" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <circle cx="38" cy="42" r="4.5" fill="currentColor" opacity=".4"/>
+            <circle cx="82" cy="42" r="4.5" fill="currentColor" opacity=".4"/>
+            <path d="M52 42 Q60 36 68 42" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>`;
+    }
+
+    const atcHtml=p.vid
+      ?`<button class="arp3-atc-btn" data-vid="${p.vid}" data-url="${p.u||'#'}">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.8"/><path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+          ${C.ATC_TEXT}
+        </button>`
+      :`<a href="${p.u||'#'}" class="arp3-prod-link">${C.PROD_LINK}</a>`;
+
+    card.innerHTML=`
+      <div class="arp3-prod-img-wrap">${imgHtml}</div>
+      <div class="arp3-prod-body">
+        <div class="arp3-prod-name">${p.t||''}</div>
+        <div class="arp3-prod-price">${p.p||''}</div>
+        <div class="arp3-prod-footer">
+          <a href="${p.u||'#'}" class="arp3-prod-link">${C.PROD_LINK}</a>
+          ${atcHtml}
+        </div>
+      </div>`;
+
+    const btn=card.querySelector('.arp3-atc-btn');
+    if(btn) btn.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); addToCart(btn); });
+    card.addEventListener('click',e=>{ if(e.target.closest('.arp3-atc-btn,.arp3-prod-link')) return; if(p.u) window.location.href=p.u; });
+    scroll.appendChild(card);
+  });
+  scroll.scrollLeft=0;
+  setTimeout(()=>prodW.classList.add('on'),170);
+}
+
+/* ATC handler */
+function addToCart(btn){
+  const vid=btn.dataset.vid; if(!vid) return;
+  btn.classList.add('loading');
+  fetch('/cart/add.js',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
+    body:JSON.stringify({id:parseInt(vid),quantity:1})
+  }).then(r=>r.json()).then(()=>{
+    btn.classList.remove('loading'); btn.classList.add('added');
+    btn.innerHTML=`<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${C.ATC_ADDED}`;
+    document.dispatchEvent(new CustomEvent('cart:refresh'));
+    setTimeout(()=>{
+      btn.classList.remove('added');
+      btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.8"/><path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>${C.ATC_TEXT}`;
+    },2500);
+  }).catch(()=>{ btn.classList.remove('loading'); window.location.href=btn.dataset.url||'#'; });
+}
+
+/* ── SCROLL DRAG on product strip ── */
+(function(){
+  if(!scroll) return;
+  let down=false,sx,ssl;
+  scroll.addEventListener('mousedown',e=>{ down=true; sx=e.pageX-scroll.offsetLeft; ssl=scroll.scrollLeft; e.stopPropagation(); });
+  scroll.addEventListener('mouseleave',()=>down=false);
+  scroll.addEventListener('mouseup',()=>down=false);
+  scroll.addEventListener('mousemove',e=>{ if(!down) return; e.preventDefault(); scroll.scrollLeft=ssl-(e.pageX-scroll.offsetLeft-sx)*1.2; });
+})();
+
+/* ════════════════════════════════════════
+   AUDIO ENGINE v3.3 — Smart Loop + Auto Fade
+   ✓ تشغيل تلقائي للـ loop بدون إدخال مدة
+   ✓ fade in عند البداية
+   ✓ fade out ناعم قبل نهاية الملف بثانية
+   ✓ إعادة تشغيل تلقائية (loop)
+   ✓ إيقاف عند التبديل لفنان آخر
+════════════════════════════════════════ */
+let audioCtx=null, unlocked=false;
+let activeAudio=null;
+let playToken=0;
+let progRaf=null, isPlaying=false;
+let noiseSrc=null, noiseGain=null;
+let fiTimer=null, foTimer=null;
+let loopTimeout=null;  /* timeout للـ loop الذكي */
+
+function unlockAudio(){
+  if(unlocked||!C.EN_AUD) return;
+  try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); unlocked=true; }catch(e){}
+}
+
+function playTick(){
+  if(!C.EN_TICK||!unlocked||!audioCtx) return;
+  try{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.type='sine';o.frequency.value=310+Math.random()*140;
+    g.gain.setValueAtTime(.05,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.09);
+    o.start();o.stop(audioCtx.currentTime+.1);
+  }catch(e){}
+}
+
+function playStatic(sec){
+  if(!C.EN_NOISE||!unlocked||!audioCtx) return;
+  try{
+    const sr=audioCtx.sampleRate,len=Math.floor(sr*sec),buf=audioCtx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*.28;
+    const src=audioCtx.createBufferSource(),lp=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
+    src.buffer=buf; lp.type='bandpass';lp.frequency.value=1800;lp.Q.value=.8;
+    src.connect(lp);lp.connect(g);g.connect(audioCtx.destination);
+    const now=audioCtx.currentTime;
+    g.gain.setValueAtTime(0,now);
+    g.gain.linearRampToValueAtTime(.07,now+sec*.35);
+    g.gain.linearRampToValueAtTime(0,now+sec);
+    src.start();src.stop(now+sec);
+  }catch(e){}
+}
+
+function startNoise(){
+  if(!C.EN_NOISE||!unlocked||!audioCtx||noiseSrc) return;
+  try{
+    const sr=audioCtx.sampleRate,buf=audioCtx.createBuffer(1,Math.floor(sr*.5),sr),d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+    noiseSrc=audioCtx.createBufferSource();noiseSrc.buffer=buf;noiseSrc.loop=true;
+    const lp=audioCtx.createBiquadFilter();lp.type='bandpass';lp.frequency.value=1600;lp.Q.value=.7;
+    noiseGain=audioCtx.createGain();noiseGain.gain.value=0;
+    noiseSrc.connect(lp);lp.connect(noiseGain);noiseGain.connect(audioCtx.destination);
+    noiseSrc.start();noiseGain.gain.setTargetAtTime(.03,audioCtx.currentTime,.1);
+  }catch(e){}
+}
+function stopNoise(){
+  if(!noiseSrc) return;
+  try{noiseGain.gain.setTargetAtTime(0,audioCtx.currentTime,.18);}catch(e){}
+  const s=noiseSrc; noiseSrc=noiseGain=null;
+  setTimeout(()=>{try{s.stop();}catch(e){}},500);
+}
+
+function tunerShow(){ if(!tuner) return; tuner.classList.add('show'); tuner.querySelectorAll('.arp3-tuner-bar').forEach(b=>b.style.height=(3+Math.random()*14)+'px'); }
+function tunerHide(){ if(tuner) tuner.classList.remove('show'); }
+
+function setPlayUI(play){
+  isPlaying=play;
+  cardEls.forEach((el,i)=>{
+    const pb=el.querySelector('.arp3-play-btn'),ring=el.querySelector('.arp3-card-ring');
+    if(i===activeIdx){
+      el.classList.toggle('is-playing',play);
+      if(ring) ring.style.opacity=play?'1':'0';
+      if(pb){
+        pb.classList.toggle('is-playing',play);
+        const svg=pb.querySelector('svg');
+        if(svg) svg.innerHTML=play?'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>':'<path d="M8 5v14l11-7z"/>';
+      }
+    } else {
+      el.classList.remove('is-playing');
+      if(ring) ring.style.opacity='0';
+    }
+  });
+  if(waves) waves.classList.toggle('on',play);
+}
+
+function startProg(){
+  stopProg();
+  function t(){
+    if(!activeAudio||activeAudio.paused){stopProg();return;}
+    const p=activeAudio.duration?(activeAudio.currentTime/activeAudio.duration)*100:0;
+    if(pfill) pfill.style.width=p+'%';
+    if(pknob) pknob.style.right=(100-p)+'%';
+    if(tcur) tcur.textContent=fmt(activeAudio.currentTime);
+    if(tdur) tdur.textContent=fmt(activeAudio.duration||0);
+    progRaf=requestAnimationFrame(t);
+  }
+  progRaf=requestAnimationFrame(t);
+}
+function stopProg(){ if(progRaf){cancelAnimationFrame(progRaf);progRaf=null;} }
+function fmt(s){ const m=Math.floor(s/60); return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
+
+/* ── clearLoopTimeout ── */
+function clearLoop(){
+  if(loopTimeout){ clearTimeout(loopTimeout); loopTimeout=null; }
+}
+
+/* ── stopCurrent: يوقف الصوت مع fade out ── */
+function stopCurrent(fast){
+  clearLoop();
+  clearInterval(fiTimer); clearInterval(foTimer); stopProg();
+  return new Promise(res=>{
+    const au=activeAudio;
+    if(!au||au.paused||au.ended){ if(au){ try{au.pause();}catch(e){} activeAudio=null; } setPlayUI(false); res(); return; }
+    const dur=fast?0.12:C.FADE_OUT, steps=Math.max(1,Math.round(dur*25));
+    let v=au.volume; const step=v/steps;
+    foTimer=setInterval(()=>{
+      v=Math.max(0,v-step);
+      try{au.volume=v;}catch(e){}
+      if(v<.002){ clearInterval(foTimer); try{au.pause();}catch(e){} activeAudio=null; setPlayUI(false); res(); }
+    },40);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   startPreview v3.3 — Smart Loop
+   يستخدم حدث 'ended' + timeupdate للـ fade out مبكر
+   يُعيد التشغيل تلقائياً مع static radio بين الدورات
+══════════════════════════════════════════════════════ */
+function startPreview(idx){
+  if(!C.EN_AUD||!unlocked) return;
+  const a=ARTISTS[idx]; if(!a||!a.audio) return;
+  const myToken=++playToken;
+
+  stopCurrent(false).then(()=>{
+    if(playToken!==myToken) return;
+    if(C.EN_NOISE) playStatic(.32);
+
+    setTimeout(()=>{
+      if(playToken!==myToken) return;
+      _doPlay(idx, myToken);
+    }, C.EN_NOISE?300:0);
+  });
+}
+
+/* داخلي: ينشئ ويشغل الـ audio ويضبط الـ loop */
+function _doPlay(idx, myToken){
+  if(playToken!==myToken) return;
+  const a=ARTISTS[idx]; if(!a||!a.audio) return;
+
+  const au=new Audio();
+  au.crossOrigin='anonymous';
+  au.preload='auto';
+  au.volume=0;
+  au.src=a.audio;
+  activeAudio=au;
+  clearLoop();
+
+  au.play().then(()=>{
+    if(playToken!==myToken||activeAudio!==au){ try{au.pause();}catch(e){} return; }
+    setPlayUI(true);
+
+    /* ── Fade In ── */
+    clearInterval(fiTimer);
+    let v=0; const step=C.VOL/Math.max(1,Math.round(C.FADE_IN*25));
+    fiTimer=setInterval(()=>{ v=Math.min(C.VOL,v+step); try{au.volume=v;}catch(e){} if(v>=C.VOL-.01) clearInterval(fiTimer); },40);
+    startProg();
+
+    /* ── Smart Loop: fade out قبل نهاية الملف بـ fade_out ثانية ── */
+    au.addEventListener('timeupdate', function onTU(){
+      if(!au.duration||au.duration===Infinity) return;
+      const remaining=au.duration-au.currentTime;
+      /* إذا بقي fade_out ثانية أو أقل → ابدأ fade out وأعد التشغيل */
+      if(remaining<=C.FADE_OUT+0.05){
+        au.removeEventListener('timeupdate',onTU);
+        /* fade out تدريجي */
+        clearInterval(foTimer);
+        let fv=au.volume; const fstep=fv/Math.max(1,Math.round(C.FADE_OUT*25));
+        foTimer=setInterval(()=>{
+          fv=Math.max(0,fv-fstep);
+          try{au.volume=fv;}catch(e){}
+          if(fv<.002){ clearInterval(foTimer); try{au.pause();}catch(e){}; }
+        },40);
+
+        /* بعد fade_out + استراحة قصيرة → أعد التشغيل من البداية */
+        const loopDelay=(C.FADE_OUT*1000)+(C.EN_NOISE?350:50);
+        clearLoop();
+        loopTimeout=setTimeout(()=>{
+          if(playToken!==myToken) return;
+          activeAudio=null;
+          setPlayUI(false); stopProg();
+          if(C.EN_NOISE) playStatic(.25);
+          setTimeout(()=>{
+            if(playToken!==myToken) return;
+            _doPlay(idx, myToken);
+          }, C.EN_NOISE?280:0);
+        }, loopDelay);
+      }
+    });
+
+    /* fallback: حدث ended إذا لم يُمسك timeupdate */
+    au.addEventListener('ended',()=>{
+      if(playToken!==myToken||activeAudio!==au) return;
+      activeAudio=null; setPlayUI(false); stopProg(); clearLoop();
+      if(C.EN_NOISE) playStatic(.25);
+      loopTimeout=setTimeout(()=>{
+        if(playToken!==myToken) return;
+        _doPlay(idx, myToken);
+      }, C.EN_NOISE?280:0);
+    },{once:true});
+
+  }).catch(()=>{
+    if(activeAudio===au){activeAudio=null; setPlayUI(false);}
+  });
+}
+
+/* ── togglePlay ── */
+function togglePlay(){
+  unlockAudio();
+  if(!activeAudio||activeAudio.paused||activeAudio.ended){
+    if(activeAudio&&activeAudio.ended){ activeAudio=null; }
+    startPreview(activeIdx); return;
+  }
+  /* إيقاف مؤقت */
+  clearLoop();
+  stopCurrent(false);
+}
+
+/* progress seek */
+if(pbar) pbar.addEventListener('click',e=>{
+  if(!activeAudio||!activeAudio.duration) return;
+  const r=e.currentTarget.getBoundingClientRect();
+  activeAudio.currentTime=((e.clientX-r.left)/r.width)*activeAudio.duration;
+});
+
+/* ── DRAG on arc ── */
+function getX(e){ return e.touches?e.touches[0].clientX:e.clientX; }
+function inZone(e){ const r=stage.getBoundingClientRect(),x=getX(e); return x>=r.left&&x<=r.right; }
+
+function onDown(e){
+  if(!inZone(e)) return;
+  unlockAudio(); dragging=true; didDrag=false; velocity=0;
+  lastX=getX(e); lastT=performance.now();
+  if(snapRaf){cancelAnimationFrame(snapRaf);snapRaf=null;}
+  if(inertiaRaf){cancelAnimationFrame(inertiaRaf);inertiaRaf=null;}
+  stopCurrent(true); startNoise(); tunerShow();
+  if(e.cancelable) e.preventDefault();
+}
+function onMove(e){
+  if(!dragging) return; if(e.cancelable) e.preventDefault();
+  const x=getX(e),now=performance.now(),dt=Math.max(now-lastT,1),dx=(lastX-x)*C.DRAG_S;
+  if(Math.abs(dx)>1.5) didDrag=true;
+  velocity=dx/C.STEP/dt*16; offset+=dx/C.STEP; lastX=x; lastT=now;
+  layoutCards();
+  if(tuner) tuner.querySelectorAll('.arp3-tuner-bar').forEach(b=>b.style.height=(2+Math.random()*15)+'px');
+  const ni=nearestReal(); if(ni!==activeIdx){activeIdx=ni; updateTheme(ni); playTick();}
+}
+function onUp(){ if(!dragging) return; dragging=false; runInertia(); }
+
+function runInertia(){
+  if(inertiaRaf){cancelAnimationFrame(inertiaRaf);inertiaRaf=null;}
+  function frame(){
+    velocity*=C.FRICTION; offset+=velocity; layoutCards();
+    const ni=nearestReal(); if(ni!==activeIdx){activeIdx=ni; updateTheme(ni); playTick();}
+    if(Math.abs(velocity)<.006){velocity=0; snapToReal(nearestReal());}
+    else inertiaRaf=requestAnimationFrame(frame);
+  }
+  inertiaRaf=requestAnimationFrame(frame);
+}
+
+/* ── EVENTS ── */
+stage.addEventListener('mousedown',onDown);
+window.addEventListener('mousemove',onMove);
+window.addEventListener('mouseup',onUp);
+stage.addEventListener('touchstart',onDown,{passive:false});
+window.addEventListener('touchmove',onMove,{passive:false});
+window.addEventListener('touchend',onUp);
+
+document.addEventListener('keydown',e=>{
+  if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','Enter'].includes(e.key)) return;
+  unlockAudio();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') snapToReal(((activeIdx-1)%N+N)%N);
+  else if(e.key==='ArrowRight'||e.key==='ArrowDown') snapToReal((activeIdx+1)%N);
+  else if(e.key===' '||e.key==='Enter'){togglePlay();e.preventDefault();}
+});
+
+new IntersectionObserver(entries=>{ if(!entries[0].isIntersecting) stopCurrent(true); },{threshold:.15}).observe(root);
+
+let rszT=null;
+window.addEventListener('resize',()=>{
+  clearTimeout(rszT); rszT=setTimeout(()=>{
+    const cs=getComputedStyle(root);
+    C.CENTER=parseFloat(cs.getPropertyValue('--arc-center'))||C.CENTER;
+    C.SIDE=parseFloat(cs.getPropertyValue('--arc-side'))||C.SIDE;
+    C.STEP=parseFloat(cs.getPropertyValue('--arc-step'))||C.STEP;
+    layoutCards();
+  },200);
+});
+
+/* ── INIT ── */
+buildCards(); layoutCards();
+setTimeout(()=>onSnapped(0),180);
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🎧 ARC Radio v3.3",
+  "tag": "section",
+  "class": "arp3-section",
+  "settings": [
+    {"type":"header","content":"📝 النصوص"},
+    {"type":"text","id":"eyebrow","label":"النص الصغير","default":"اختر فنانك المفضل"},
+    {"type":"text","id":"title_before","label":"العنوان — قبل","default":"اكتشف"},
+    {"type":"text","id":"title_hl","label":"العنوان — مضيء","default":"فنانك"},
+    {"type":"text","id":"title_after","label":"العنوان — بعد","default":"المفضل"},
+    {"type":"text","id":"mini_cta_text","label":"رابط تحت اسم الفنان","default":"تصفح منتجات مطربك ←"},
+    {"type":"text","id":"cta_text","label":"نص زر تصفح المزيد","default":"تصفح المزيد"},
+    {"type":"text","id":"prod_link_text","label":"نص رابط المنتج","default":"▶ استمع الآن"},
+    {"type":"text","id":"atc_text","label":"نص زر أضف للسلة","default":"أضف للسلة"},
+    {"type":"text","id":"atc_added_text","label":"نص بعد الإضافة","default":"تمت الإضافة ✓"},
+
+    {"type":"header","content":"🎨 الألوان"},
+    {"type":"color","id":"color_bg","label":"خلفية القسم","default":"#F2EFDD"},
+    {"type":"color","id":"color_primary","label":"اللون الرئيسي","default":"#910F3F"},
+    {"type":"color","id":"color_accent","label":"لون ثانوي","default":"#3D081B"},
+    {"type":"color","id":"color_text","label":"لون النص","default":"#3D081B"},
+    {"type":"color","id":"color_card_bg","label":"خلفية البطاقات","default":"#FAF9E1"},
+    {"type":"color","id":"color_card_border","label":"حدود البطاقات","default":"#3D081B"},
+    {"type":"checkbox","id":"use_artist_color","label":"لون الفنان ديناميكي","default":true},
+
+    {"type":"header","content":"🎨 شريط الكاسيت"},
+    {"type":"color","id":"color_pattern1","label":"لون الشريط 1","default":"#910F3F"},
+    {"type":"color","id":"color_pattern2","label":"لون الشريط 2","default":"#3D081B"},
+    {"type":"color","id":"color_pattern3","label":"لون الشريط 3","default":"#F9E547"},
+    {"type":"range","id":"pattern_h","label":"ارتفاع الشريط (px)","min":3,"max":16,"step":1,"default":7},
+    {"type":"range","id":"pattern_stripe","label":"عرض كل لون (px)","min":4,"max":20,"step":2,"default":10},
+
+    {"type":"header","content":"🔤 أحجام الخطوط"},
+    {"type":"range","id":"sz_eyebrow","label":"النص الصغير","min":10,"max":18,"step":1,"default":12},
+    {"type":"range","id":"sz_title","label":"العنوان الكبير","min":22,"max":62,"step":1,"default":38},
+    {"type":"range","id":"sz_artname","label":"اسم الفنان","min":20,"max":54,"step":1,"default":30},
+    {"type":"range","id":"sz_cardname","label":"اسم الكارد","min":9,"max":16,"step":1,"default":12},
+    {"type":"range","id":"sz_genre","label":"بادج النوع","min":10,"max":16,"step":1,"default":12},
+    {"type":"range","id":"sz_desc","label":"الوصف","min":11,"max":17,"step":1,"default":13},
+    {"type":"range","id":"sz_minicta","label":"رابط تصفح","min":11,"max":18,"step":1,"default":13},
+    {"type":"range","id":"sz_cta","label":"زر تصفح المزيد","min":12,"max":20,"step":1,"default":15},
+    {"type":"range","id":"sz_prod_name","label":"اسم المنتج","min":10,"max":15,"step":1,"default":12},
+    {"type":"range","id":"sz_prod_price","label":"سعر المنتج","min":12,"max":18,"step":1,"default":14},
+    {"type":"range","id":"sz_prod_link","label":"رابط المنتج","min":10,"max":17,"step":1,"default":12},
+    {"type":"range","id":"sz_atc","label":"زر السلة","min":10,"max":16,"step":1,"default":11},
+
+    {"type":"header","content":"🖼️ صور الفنانين"},
+    {"type":"select","id":"img_fit","label":"طريقة عرض الصورة","options":[{"value":"cover","label":"Cover"},{"value":"contain","label":"Contain"},{"value":"fill","label":"Fill"}],"default":"contain"},
+
+    {"type":"header","content":"🖼️ صور المنتجات"},
+    {"type":"select","id":"prod_img_fit","label":"طريقة عرض صورة المنتج","options":[{"value":"contain","label":"Contain — كاملة (موصى به)"},{"value":"cover","label":"Cover — تعبئة"},{"value":"fill","label":"Fill — تمدد"},{"value":"scale-down","label":"Scale-down"}],"default":"contain"},
+    {"type":"select","id":"prod_img_position","label":"موضع الصورة","options":[{"value":"center","label":"وسط"},{"value":"top","label":"أعلى"},{"value":"bottom","label":"أسفل"},{"value":"right","label":"يمين"},{"value":"left","label":"يسار"}],"default":"center"},
+    {"type":"select","id":"prod_img_ratio","label":"نسبة الصورة","options":[{"value":"56.25%","label":"16:9"},{"value":"66.66%","label":"3:2"},{"value":"75%","label":"4:3"},{"value":"100%","label":"1:1 مربعة"},{"value":"125%","label":"4:5"},{"value":"133.33%","label":"3:4"},{"value":"150%","label":"2:3"}],"default":"100%"},
+
+    {"type":"header","content":"⚙️ أبعاد Arc"},
+    {"type":"range","id":"center_size","label":"حجم الكارد المركزي (px)","min":100,"max":300,"step":5,"default":190},
+    {"type":"range","id":"side_size","label":"حجم كروت الجانب (px)","min":50,"max":180,"step":5,"default":120},
+    {"type":"range","id":"arc_drop","label":"انحدار القوس (px)","min":0,"max":130,"step":5,"default":60},
+    {"type":"range","id":"card_step","label":"المسافة بين الكروت (px)","min":80,"max":220,"step":5,"default":140},
+    {"type":"range","id":"arc_height","label":"ارتفاع منطقة Arc (px)","min":160,"max":420,"step":10,"default":270},
+    {"type":"range","id":"side_opacity","label":"شفافية كروت الجانب (%)","min":25,"max":90,"step":5,"default":55},
+    {"type":"range","id":"active_zoom","label":"تكبير الكارد النشط (%)","min":100,"max":115,"step":1,"default":105},
+    {"type":"range","id":"ring_inset","label":"هامش حلقة التشغيل (px)","min":2,"max":16,"step":1,"default":6},
+    {"type":"range","id":"card_border_w","label":"سُمك إطار الكارد (px)","min":0,"max":5,"step":1,"default":2},
+
+    {"type":"header","content":"▶️ زر التشغيل"},
+    {"type":"range","id":"play_btn_sz","label":"حجم زر التشغيل (px)","min":24,"max":64,"step":2,"default":40},
+    {"type":"range","id":"play_btn_bot","label":"موضع الزر من الأسفل (%)","min":8,"max":30,"step":1,"default":15},
+
+    {"type":"header","content":"🎮 الحركة"},
+    {"type":"range","id":"drag_speed","label":"حساسية السحب (%)","min":40,"max":200,"step":10,"default":100},
+    {"type":"range","id":"friction","label":"الاحتكاك (%)","min":85,"max":99,"step":1,"default":93},
+    {"type":"range","id":"snap_ms","label":"سرعة التثبيت (ms)","min":200,"max":600,"step":20,"default":320},
+
+    {"type":"header","content":"🔊 الصوت"},
+    {"type":"checkbox","id":"enable_audio","label":"تفعيل الصوت","default":true},
+    {"type":"checkbox","id":"auto_play","label":"تشغيل تلقائي عند التبديل","info":"عند الإيقاف: الصوت يعمل فقط بزر التشغيل","default":true},
+    {"type":"range","id":"master_vol","label":"مستوى الصوت (%)","min":10,"max":100,"step":5,"default":65},
+    {"type":"range","id":"fade_in","label":"تلاشي الدخول (ث)","min":0.2,"max":3.0,"step":0.1,"default":0.7},
+    {"type":"range","id":"fade_out","label":"تلاشي الخروج (ث)","min":0.1,"max":2.0,"step":0.1,"default":0.5},
+    {"type":"checkbox","id":"enable_noise","label":"تشويش راديو","default":true},
+    {"type":"checkbox","id":"enable_tick","label":"نقرة عند التقليب","default":true},
+
+    {"type":"header","content":"📊 شريط التقدم"},
+    {"type":"checkbox","id":"show_progress","label":"إظهار شريط التقدم","default":true},
+    {"type":"range","id":"prog_max_w","label":"أقصى عرض (px)","min":180,"max":400,"step":10,"default":280},
+    {"type":"range","id":"prog_h","label":"سُمك الشريط (px)","min":2,"max":8,"step":1,"default":3},
+    {"type":"range","id":"prog_knob","label":"حجم كرة التقدم (px)","min":6,"max":16,"step":1,"default":10},
+
+    {"type":"header","content":"👁️ إظهار / إخفاء"},
+    {"type":"checkbox","id":"show_genre","label":"بادج النوع","default":true},
+    {"type":"checkbox","id":"show_description","label":"وصف الفنان","default":true},
+    {"type":"checkbox","id":"show_products","label":"قسم المنتجات","default":true},
+    {"type":"checkbox","id":"show_cta","label":"زر تصفح المزيد","default":true},
+    {"type":"checkbox","id":"disable_grain","label":"إيقاف تأثير الحبوب","default":false},
+
+    {"type":"header","content":"📝 الوصف"},
+    {"type":"range","id":"desc_max_w","label":"أقصى عرض للوصف (px)","min":280,"max":560,"step":10,"default":400},
+
+    {"type":"header","content":"🛍️ المنتجات"},
+    {"type":"range","id":"prod_count","label":"عدد المنتجات المعروضة","min":1,"max":8,"step":1,"default":4},
+    {"type":"range","id":"prod_min_w","label":"عرض كارد المنتج (px)","min":140,"max":320,"step":10,"default":200},
+    {"type":"range","id":"prod_gap","label":"المسافة بين المنتجات (px)","min":8,"max":28,"step":2,"default":14},
+    {"type":"range","id":"prod_radius","label":"استدارة زوايا المنتج (px)","min":0,"max":20,"step":1,"default":10},
+    {"type":"range","id":"prod_scroll_pb","label":"حشوة أسفل الشريط (px)","min":4,"max":20,"step":2,"default":8},
+
+    {"type":"header","content":"📐 المسافات"},
+    {"type":"range","id":"sp_section_t","label":"حشوة من الأعلى (px)","min":20,"max":100,"step":4,"default":44},
+    {"type":"range","id":"sp_section_b","label":"حشوة من الأسفل (px)","min":20,"max":100,"step":4,"default":48},
+    {"type":"range","id":"sp_section_h","label":"حشوة أفقية (px)","min":10,"max":60,"step":2,"default":16},
+    {"type":"range","id":"sp_section_h_mob","label":"حشوة أفقية موبايل (px)","min":8,"max":32,"step":4,"default":12},
+    {"type":"range","id":"sp_header_b","label":"مسافة العنوان من Arc (px)","min":10,"max":60,"step":2,"default":24},
+    {"type":"range","id":"sp_info_t","label":"مسافة Info من Arc (px)","min":10,"max":56,"step":2,"default":20},
+    {"type":"range","id":"sp_info_b","label":"مسافة أسفل Info (px)","min":8,"max":48,"step":4,"default":16},
+    {"type":"range","id":"sp_info_gap","label":"مسافة بين عناصر Info (px)","min":6,"max":24,"step":2,"default":10},
+    {"type":"range","id":"sp_prod_b","label":"مسافة أسفل المنتجات (px)","min":8,"max":40,"step":4,"default":16},
+    {"type":"range","id":"sp_max_w","label":"أقصى عرض للمحتوى (px)","min":320,"max":960,"step":20,"default":720},
+    {"type":"range","id":"sp_card_name_gap","label":"مسافة الاسم عن الصورة (px)","min":4,"max":16,"step":1,"default":8},
+    {"type":"range","id":"sp_card_p","label":"حشوة داخل كارد المنتج (px)","min":8,"max":24,"step":2,"default":12},
+    {"type":"range","id":"tape_w","label":"عرض خط الكاسيت (px)","min":60,"max":300,"step":10,"default":190},
+    {"type":"range","id":"tape_h","label":"سُمك خط الكاسيت (px)","min":1,"max":5,"step":1,"default":2},
+
+    {"type":"header","content":"📌 زخارف العنوان"},
+    {"type":"range","id":"title_deco_w","label":"عرض الزخرفة (px)","min":0,"max":100,"step":5,"default":50},
+    {"type":"range","id":"title_deco_h","label":"سُمك الزخرفة (px)","min":1,"max":5,"step":1,"default":2},
+    {"type":"range","id":"title_deco_gap","label":"مسافة الزخرفة (px)","min":8,"max":40,"step":2,"default":18},
+
+    {"type":"header","content":"🎨 الأزرار (Cassette Style)"},
+    {"type":"color","id":"cta_bg","label":"خلفية الزر","default":"#F9E547"},
+    {"type":"color","id":"cta_text_color","label":"لون النص","default":"#3D081B"},
+    {"type":"color","id":"cta_border_color","label":"لون الحدود","default":"#3D081B"},
+    {"type":"color","id":"cta_shadow_color","label":"لون الظل","default":"#3D081B"},
+    {"type":"color","id":"cta_hover_bg","label":"خلفية عند التمرير","default":"#910F3F"},
+    {"type":"color","id":"cta_hover_text","label":"نص عند التمرير","default":"#F2EFDD"},
+    {"type":"range","id":"cta_radius","label":"استدارة (px)","min":0,"max":30,"step":2,"default":6},
+    {"type":"range","id":"cta_border_w","label":"سُمك الحدود (px)","min":1,"max":5,"step":1,"default":2},
+    {"type":"range","id":"cta_shadow_x","label":"ظل أفقي (px)","min":0,"max":10,"step":1,"default":4},
+    {"type":"range","id":"cta_shadow_y","label":"ظل عمودي (px)","min":0,"max":10,"step":1,"default":4},
+    {"type":"range","id":"cta_pv","label":"حشوة الزر الكبير عمودية (px)","min":8,"max":22,"step":1,"default":15},
+    {"type":"range","id":"cta_ph","label":"حشوة الزر الكبير أفقية (px)","min":16,"max":60,"step":2,"default":32},
+    {"type":"range","id":"atc_pv","label":"حشوة زر السلة عمودية (px)","min":4,"max":14,"step":1,"default":8},
+    {"type":"range","id":"atc_ph","label":"حشوة زر السلة أفقية (px)","min":6,"max":20,"step":2,"default":12},
+    {"type":"range","id":"cta_pt","label":"مسافة الزر من الأعلى (px)","min":0,"max":32,"step":4,"default":16},
+    {"type":"range","id":"cta_pb","label":"مسافة الزر من الأسفل (px)","min":0,"max":32,"step":4,"default":8}
+  ],
+
+  "blocks": [
+    {
+      "type": "artist",
+      "name": "🎤 فنان",
+      "limit": 10,
+      "settings": [
+        {"type":"text","id":"name","label":"اسم الفنان","default":"الفنان"},
+        {"type":"text","id":"card_label","label":"النص تحت الكارد (اختياري)"},
+        {"type":"image_picker","id":"image","label":"صورة الفنان"},
+        {"type":"textarea","id":"description","label":"وصف قصير","default":"وصف الفنان يظهر هنا."},
+        {"type":"text","id":"genre","label":"النوع الموسيقي","default":"طرب"},
+        {"type":"color","id":"color","label":"اللون المميز","default":"#910F3F"},
+        {"type":"text","id":"preview_audio","label":"رابط صوت MP3","info":"رابط مباشر — يُشغّل ويُعاد تلقائياً مع fade ذكي"},
+        {"type":"header","content":"🛍️ مصدر المنتجات"},
+        {"type":"collection","id":"collection","label":"كوليكشن الفنان","info":"سيعرض أول N منتج تلقائياً"},
+        {"type":"url","id":"collection_url","label":"رابط الكوليكشن (fallback)"},
+        {"type":"header","content":"🛍️ منتجات يدوية (fallback)"},
+        {"type":"product","id":"product_1","label":"المنتج الأول"},
+        {"type":"product","id":"product_2","label":"المنتج الثاني"},
+        {"type":"product","id":"product_3","label":"المنتج الثالث"},
+        {"type":"product","id":"product_4","label":"المنتج الرابع"}
+      ]
+    }
+  ],
+
+  "presets": [{
+    "name": "🎧 ARC Radio v3.3",
+    "blocks": [
+      {"type":"artist","settings":{"name":"وردة الجزائرية","card_label":"وردة","description":"أميرة الغناء العربي بصوت خلّد الزمن.","genre":"طرب","color":"#910F3F"}},
+      {"type":"artist","settings":{"name":"عبدالحليم حافظ","card_label":"العندليب","description":"العندليب الأسمر وصوت جيل لا يُنسى.","genre":"طرب","color":"#7A3B0E"}},
+      {"type":"artist","settings":{"name":"فيروز","card_label":"فيروز","description":"عندليب الشرق وصوت لبنان الخالد للأبد.","genre":"كلاسيكي","color":"#1A3A5C"}},
+      {"type":"artist","settings":{"name":"محمد عبده","card_label":"عبده","description":"أسطورة الطرب الخليجي وعميد الفن.","genre":"خليجي","color":"#4A2C0A"}}
+    ]
+  }]
+}
+{% endschema %}

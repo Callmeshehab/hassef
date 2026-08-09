@@ -1,0 +1,164 @@
+/* ============================================================
+   الحصيف — Header Customization
+   الصق هذا الكود في نهاية ملف base.css في Assets
+   ============================================================ */
+
+/* ── 1. خلفية وألوان الهيدر ── */
+.header-wrapper.color-scheme-1,
+.header-wrapper.gradient {
+  background-color: #f0ece3 !important;
+  background: #f0ece3 !important;
+  border-bottom: 1px solid rgba(44, 74, 110, 0.12) !important;
+}
+
+.shopify-section-header-sticky .header-wrapper {
+  box-shadow: 0 2px 20px rgba(44, 74, 110, 0.10) !important;
+}
+
+/* ── 2. الشعار — حجم + انيميشن زووم ── */
+.header__heading-logo-wrapper {
+  overflow: visible !important;
+}
+
+.header__heading-logo {
+  /* ─── غيّر هذه القيمة لتحكم بحجم الشعار ─── */
+  width: 140px !important;          /* desktop: جرب 100px / 140px / 180px / 220px */
+  height: auto !important;
+  max-width: none !important;
+  display: block;
+
+  /* انيميشن الزووم */
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter     0.35s ease !important;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.header__heading-link:hover .header__heading-logo,
+.header__heading-link:focus-visible .header__heading-logo {
+  /* ─── شدة الزووم: 1.05 خفيف / 1.08 متوسط / 1.13 قوي ─── */
+  transform: scale(1.08) !important;
+  filter: drop-shadow(0 6px 16px rgba(44, 74, 110, 0.25)) !important;
+}
+
+/* اسم المتجر النصي لو ما في صورة شعار */
+.header__heading-link .h2 {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #2c4a6e !important;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  letter-spacing: -0.01em;
+}
+.header__heading-link:hover .h2 {
+  transform: scale(1.08) !important;
+}
+
+@media screen and (max-width: 749px) {
+  .header__heading-logo {
+    /* ─── حجم الشعار على الموبايل ─── */
+    width: 100px !important;        /* جرب 80px / 100px / 120px */
+  }
+}
+
+/* ── 3. أيقونات الهيدر (سلة، بحث، قائمة) ── */
+.header__icon,
+.header__icon--cart,
+.header__icon--account {
+  /* ─── شكل الأيقونة: 50% = دائرة / 10px = مستطيل مدوّر / 0 = مربع ─── */
+  border-radius: 50% !important;
+
+  /* ─── حجم الأيقونة ─── */
+  width:  42px !important;          /* جرب 36px / 42px / 48px */
+  height: 42px !important;
+
+  background: transparent !important;
+  border: none !important;
+  color: #2c4a6e !important;
+  transition: background 0.2s ease, transform 0.18s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.header__icon:hover,
+.header__icon--cart:hover,
+.header__icon--account:hover {
+  background: rgba(44, 74, 110, 0.09) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* SVG داخل الأيقونات */
+.header__icon .icon,
+.header__icon--cart .icon {
+  width: 20px !important;
+  height: 20px !important;
+  fill: none;
+  stroke: #2c4a6e;
+  stroke-width: 1.5;
+}
+
+/* ── 4. رقم السلة ── */
+.cart-count-bubble {
+  background-color: #2c4a6e !important;
+  color: #f0ece3 !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1.5px solid #f0ece3 !important;
+
+  /* ─── موضع الرقم (غيّر حسب اتجاه موقعك) ─── */
+  bottom: 6px !important;
+  left: 20px !important;
+}
+
+/* ── 5. روابط القائمة ── */
+.header__menu-item,
+.list-menu__item--link {
+  color: rgba(44, 74, 110, 0.75) !important;
+  font-weight: 500 !important;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s !important;
+  position: relative;
+}
+
+.header__menu-item:hover,
+.list-menu__item--link:hover {
+  color: #2c4a6e !important;
+  background: rgba(44, 74, 110, 0.06) !important;
+}
+
+/* ── 6. قيم سريعة للتعديل ──────────────────────────────────
+
+   حجم الشعار desktop:
+     صغير   → width: 100px
+     متوسط  → width: 140px  ← الحالي
+     كبير   → width: 180px
+     كبير جداً → width: 240px
+
+   حجم الشعار موبايل:
+     صغير   → width: 80px
+     متوسط  → width: 100px  ← الحالي
+     كبير   → width: 130px
+
+   زووم الشعار عند hover:
+     خفيف   → scale(1.04)
+     متوسط  → scale(1.08)   ← الحالي
+     قوي    → scale(1.14)
+
+   شكل الأيقونات:
+     دائرة         → border-radius: 50%   ← الحالي
+     مستطيل مدوّر  → border-radius: 10px
+     مربع          → border-radius: 0
+
+   حجم الأيقونات:
+     صغير   → 36px
+     متوسط  → 42px           ← الحالي
+     كبير   → 48px
+
+─────────────────────────────────────────────────────────── */

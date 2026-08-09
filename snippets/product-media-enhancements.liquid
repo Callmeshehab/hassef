@@ -1,0 +1,164 @@
+{% comment %}
+  HASSEF — Product Media Enhancements
+  أضف {% render 'product-media-enhancements' %} في نهاية main-product.liquid
+  قبل </product-info>
+{% endcomment %}
+
+<style>
+/* ══ إزالة الفراغ الزائد فوق الصورة ══ */
+.product__media-wrapper,
+.product__media-list,
+.product__media-item:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* ══ Lightbox Overlay ══ */
+.product-media-modal {
+  background: rgba(0, 0, 0, 0.94) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* ══ زر إغلاق الـ Modal — يظهر فقط عند الحاجة ══ */
+.product-media-modal__toggle {
+  width: 44px !important;
+  height: 44px !important;
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+  transition: background 0.2s, opacity 0.2s, transform 0.15s !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+}
+
+/* يظهر عند لمس الشاشة أو التفاعل */
+.product-media-modal[open] .product-media-modal__toggle,
+.product-media-modal .product-media-modal__toggle {
+  opacity: 0 !important;
+}
+
+.product-media-modal--show-close .product-media-modal__toggle {
+  opacity: 1 !important;
+}
+
+@media (pointer: coarse) {
+  /* موبايل: يظهر الزر دائماً لكن بشفافية خفيفة */
+  .product-media-modal .product-media-modal__toggle {
+    opacity: 0.6 !important;
+  }
+  .product-media-modal--show-close .product-media-modal__toggle {
+    opacity: 1 !important;
+  }
+}
+
+.product-media-modal__toggle:hover,
+.product-media-modal--show-close .product-media-modal__toggle:hover {
+  background: rgba(255,255,255,0.22) !important;
+  opacity: 1 !important;
+  transform: scale(1.08) !important;
+}
+
+/* ══ صورة الـ Modal — تملأ الشاشة بشكل مريح ══ */
+.product-media-modal__content {
+  cursor: default !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.product-media-modal__content img {
+  max-width: 92vw !important;
+  max-height: 88vh !important;
+  object-fit: contain !important;
+  border-radius: 6px !important;
+  touch-action: pinch-zoom !important;
+  pointer-events: auto !important;
+}
+
+/* ══ منطقة الإغلاق خارج الصورة ══ */
+.hf-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.product-media-modal__content {
+  position: relative;
+  z-index: 2;
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ══ إغلاق الـ Modal بالضغط خارج الصورة ══ */
+  function initModalBackdropClose() {
+    // Shopify product modal هو custom element
+    const modal = document.querySelector('product-modal');
+    if (!modal) return;
+
+    // نراقب فتح الـ modal
+    const observer = new MutationObserver(function() {
+      const isOpen = modal.hasAttribute('open') || 
+                     modal.classList.contains('is-open') ||
+                     modal.getAttribute('aria-hidden') === 'false';
+
+      if (isOpen) {
+        attachBackdropListener(modal);
+        showCloseBtn(modal);
+      }
+    });
+
+    observer.observe(modal, { attributes: true, attributeFilter: ['open', 'class', 'aria-hidden'] });
+
+    // نراقب أيضاً كل كليك على زر التكبير
+    document.addEventListener('click', function(e) {
+      const zoomBtn = e.target.closest('.product__media-toggle, [data-open="product-modal"]');
+      if (zoomBtn) {
+        setTimeout(function() {
+          attachBackdropListener(modal);
+          showCloseBtn(modal);
+        }, 100);
+      }
+    });
+  }
+
+  function attachBackdropListener(modal) {
+    // نشيل الـ listener القديم لو موجود
+    modal.removeEventListener('click', handleModalClick);
+    modal.addEventListener('click', handleModalClick);
+  }
+
+  function handleModalClick(e) {
+    // لو الكليك على الـ modal نفسه (مش على الصورة أو الأزرار)
+    const isOnImage = e.target.closest('.product-media-modal__content img, video, model-viewer');
+    const isOnBtn   = e.target.closest('button, a');
+
+    if (!isOnImage && !isOnBtn) {
+      // نضغط زر الإغلاق
+      const closeBtn = this.querySelector('.product-media-modal__toggle') ||
+                       this.querySelector('[aria-label*="close"], [aria-label*="إغلاق"]');
+      if (closeBtn) closeBtn.click();
+    }
+  }
+
+  function showCloseBtn(modal) {
+    modal.classList.add('product-media-modal--show-close');
+  }
+
+  /* ══ تشغيل كل شيء بعد الـ load ══ */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModalBackdropClose);
+  } else {
+    initModalBackdropClose();
+  }
+
+})();
+</script>

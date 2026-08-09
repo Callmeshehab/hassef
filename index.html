@@ -1,0 +1,2589 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="vintage">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>متجر الحصيف | ثيم شوبيفاي التفاعلي - المعاينة الشاملة</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for crisp icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       Hassef Theme Core CSS Variables & Design Tokens
+       ========================================================================== */
+    :root {
+      /* Theme Palettes - Vintage Cream & Burgundy Default */
+      --color-bg: #f2efdd;
+      --color-card-bg: #faf9e1;
+      --color-surface: #ffffff;
+      --color-primary: #910f3f;
+      --color-primary-hover: #700b30;
+      --color-secondary: #3d081b;
+      --color-accent: #f9e547;
+      --color-accent-hover: #e5d130;
+      --color-navy: #2c4a6e;
+      --color-text: #3d081b;
+      --color-text-muted: #665259;
+      --color-border: #dcd1c1;
+      --color-border-dark: #3d081b;
+      --shadow-sm: 0 4px 12px rgba(61, 8, 27, 0.06);
+      --shadow-md: 0 8px 24px rgba(61, 8, 27, 0.12);
+      --shadow-lg: 0 16px 40px rgba(61, 8, 27, 0.18);
+      --shadow-retro: 4px 4px 0px #3d081b;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      --font-body: 'IBM Plex Sans Arabic', sans-serif;
+      --font-heading: 'Noto Naskh Arabic', serif;
+      --font-accent: 'Cairo', sans-serif;
+      --transition-fast: 0.2s ease;
+      --transition-normal: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="dark-midnight"] {
+      --color-bg: #141118;
+      --color-card-bg: #1e1924;
+      --color-surface: #282230;
+      --color-primary: #d4af37;
+      --color-primary-hover: #b89528;
+      --color-secondary: #f2efdd;
+      --color-accent: #e84c3d;
+      --color-navy: #4a7bb0;
+      --color-text: #f2efdd;
+      --color-text-muted: #a69ea8;
+      --color-border: #383042;
+      --color-border-dark: #d4af37;
+      --shadow-retro: 4px 4px 0px #d4af37;
+    }
+
+    [data-theme="sand-amber"] {
+      --color-bg: #faf4e1;
+      --color-card-bg: #fffbf0;
+      --color-surface: #ffffff;
+      --color-primary: #800000;
+      --color-primary-hover: #5d0000;
+      --color-secondary: #2b1704;
+      --color-accent: #df9e28;
+      --color-navy: #1f506e;
+      --color-text: #2b1704;
+      --color-text-muted: #736050;
+      --color-border: #e3d5be;
+      --color-border-dark: #800000;
+      --shadow-retro: 4px 4px 0px #800000;
+    }
+
+    /* Base Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      direction: rtl;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ==========================================================================
+       SHOWCASE TOP CONTROL TOOLBAR (FOR PREVIEW & INSPECTION)
+       ========================================================================== */
+    .showcase-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100000;
+      background: #111827;
+      color: #f9fafb;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      font-family: var(--font-accent);
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    .showcase-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: #f9e547;
+      font-size: 15px;
+    }
+
+    .showcase-brand i {
+      font-size: 18px;
+    }
+
+    .showcase-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tool-group {
+      display: flex;
+      align-items: center;
+      background: #1f2937;
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      border: 1px solid #374151;
+    }
+
+    .tool-btn {
+      padding: 5px 12px;
+      color: #9ca3af;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tool-btn:hover, .tool-btn.active {
+      background: #374151;
+      color: #ffffff;
+    }
+
+    .tool-btn.active {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .theme-select-btn {
+      background: #1f2937;
+      color: #f3f4f6;
+      border: 1px solid #374151;
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Device Frames */
+    .viewport-wrapper {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      margin: 0 auto;
+    }
+
+    .viewport-wrapper.mode-tablet {
+      max-width: 768px;
+      border: 12px solid #1f2937;
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      margin-top: 20px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+
+    .viewport-wrapper.mode-mobile {
+      max-width: 390px;
+      border: 14px solid #1f2937;
+      border-radius: 36px;
+      box-shadow: var(--shadow-lg);
+      margin-top: 20px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       SECTION 1: ANNOUNCEMENT BAR & TICKER
+       ========================================================================== */
+    .utility-bar {
+      background-color: var(--color-navy);
+      color: #ffffff;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .utility-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .ticker-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .ticker-move {
+      display: inline-block;
+      animation: ticker 35s linear infinite;
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+
+    .ticker-move:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .utility-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 12px;
+    }
+
+    .utility-link {
+      color: #ffffff;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+
+    .utility-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       SECTION 2: MAIN STORE HEADER
+       ========================================================================== */
+    .site-header {
+      background-color: var(--color-bg);
+      border-bottom: 2px solid var(--color-border);
+      position: sticky;
+      top: 47px;
+      z-index: 999;
+      transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    }
+
+    .site-header.is-scrolled {
+      box-shadow: 0 4px 20px rgba(61, 8, 27, 0.1);
+      background-color: var(--color-card-bg);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 80px;
+      gap: 20px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-heading);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-primary);
+      transition: transform var(--transition-normal);
+    }
+
+    .brand-logo:hover {
+      transform: scale(1.04);
+    }
+
+    .brand-logo-badge {
+      background: var(--color-primary);
+      color: var(--color-accent);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-family: var(--font-accent);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--color-text);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--color-primary);
+      background: rgba(145, 15, 63, 0.06);
+    }
+
+    .nav-link.has-badge::after {
+      content: 'جديد';
+      position: absolute;
+      top: -4px;
+      left: -8px;
+      background: var(--color-accent);
+      color: var(--color-secondary);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 800;
+      border: 1px solid var(--color-secondary);
+    }
+
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-secondary);
+      font-size: 18px;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .icon-btn:hover {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--color-primary);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--color-bg);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* Mobile Menu Toggle */
+    .mobile-nav-toggle {
+      display: none;
+    }
+
+    /* ==========================================================================
+       SECTION 3: HERO SLIDESHOW & VINTAGE BANNER
+       ========================================================================== */
+    .hero-section {
+      padding: 40px 0;
+      position: relative;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, var(--color-secondary) 0%, #1f040e 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 60px 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      border: 3px solid var(--color-border-dark);
+      box-shadow: var(--shadow-retro);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: radial-gradient(circle, rgba(249, 229, 71, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-subtitle {
+      color: var(--color-accent);
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 48px;
+      line-height: 1.25;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    .hero-desc {
+      font-size: 17px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 30px;
+      max-width: 500px;
+    }
+
+    .hero-btns {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--color-accent);
+      color: var(--color-secondary);
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 16px;
+      padding: 14px 32px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--color-secondary);
+      box-shadow: 4px 4px 0px var(--color-secondary);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--color-secondary);
+      background: #ffffff;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-media {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .vintage-frame {
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 4/3;
+      background: #2b1704;
+      border: 6px solid var(--color-accent);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vintage-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(0.25) contrast(1.1);
+    }
+
+    .cassette-play-badge {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .spinning-vinyl {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: repeating-radial-gradient(#111 0, #111 3px, #333 4px, #111 5px);
+      border: 2px solid var(--color-accent);
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ==========================================================================
+       SECTION 4: 🎧 ARC RADIO STATION V4.0 (CUSTOM ARTIST WHEEL)
+       ========================================================================== */
+    .section-padding {
+      padding: 60px 0;
+    }
+
+    .section-header-block {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 40px auto;
+    }
+
+    .section-eyebrow {
+      color: var(--color-primary);
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 38px;
+      color: var(--color-secondary);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      color: var(--color-text-muted);
+      font-size: 16px;
+    }
+
+    /* Radio Station Shell */
+    .radio-station-card {
+      background: var(--color-card-bg);
+      border: 3px solid var(--color-border-dark);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow: var(--shadow-retro);
+      position: relative;
+    }
+
+    .artists-wheel-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+
+    .artist-chip {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 12px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .artist-chip:hover, .artist-chip.active {
+      border-color: var(--color-primary);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(145, 15, 63, 0.15);
+      background: rgba(145, 15, 63, 0.04);
+    }
+
+    .artist-chip.active {
+      border-width: 3px;
+      border-color: var(--color-primary);
+    }
+
+    .artist-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--color-accent);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .artist-chip.active .artist-avatar {
+      transform: scale(1.1) rotate(5deg);
+      border-color: var(--color-primary);
+    }
+
+    .artist-name {
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--color-secondary);
+    }
+
+    .artist-tag {
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+
+    /* Radio Player Console */
+    .radio-console {
+      background: var(--color-secondary);
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 30px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 30px;
+      align-items: center;
+      border: 2px solid var(--color-accent);
+    }
+
+    .console-artist-preview {
+      text-align: center;
+      padding-left: 20px;
+      border-left: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .console-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--color-accent);
+      margin: 0 auto 16px auto;
+      box-shadow: 0 0 20px rgba(249, 229, 71, 0.3);
+    }
+
+    .console-name {
+      font-family: var(--font-heading);
+      font-size: 24px;
+      color: var(--color-accent);
+      margin-bottom: 4px;
+    }
+
+    .console-genre {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .console-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .console-track-title {
+      font-family: var(--font-accent);
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .live-badge {
+      background: var(--color-primary);
+      color: #ffffff;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
+    .audio-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .audio-progress-fill {
+      width: 45%;
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+
+    .console-buttons {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .play-btn-large {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: var(--color-secondary);
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(249, 229, 71, 0.4);
+      transition: transform 0.2s ease;
+    }
+
+    .play-btn-large:hover {
+      transform: scale(1.1);
+    }
+
+    /* ==========================================================================
+       SECTION 5: 📼 CASSETTES POPULAR GRID
+       ========================================================================== */
+    .filter-tabs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      color: var(--color-text);
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: var(--radius-full);
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover, .tab-btn.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+    }
+
+    .cassette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .cassette-card {
+      background: var(--color-card-bg);
+      border: 2px solid var(--color-border-dark);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: 4px 4px 0px var(--color-border-dark);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cassette-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 8px 8px 0px var(--color-border-dark);
+    }
+
+    .rank-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--color-accent);
+      color: var(--color-secondary);
+      font-family: var(--font-accent);
+      font-weight: 900;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-secondary);
+      z-index: 2;
+    }
+
+    .cassette-thumb {
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: #e8e5d3;
+      border: 2px solid var(--color-border);
+      position: relative;
+    }
+
+    .cassette-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .cassette-card:hover .cassette-thumb img {
+      transform: scale(1.08);
+    }
+
+    .cassette-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cassette-title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-secondary);
+      margin-bottom: 4px;
+    }
+
+    .cassette-artist {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-bottom: 12px;
+    }
+
+    .cassette-price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px dashed var(--color-border);
+    }
+
+    .price-tag {
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--color-primary);
+    }
+
+    .add-to-cart-btn {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .add-to-cart-btn:hover {
+      background: var(--color-secondary);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       SECTION 6: 📚 BOOK LIBRARY CATEGORIES (أقسام الكتب)
+       ========================================================================== */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .category-card {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 24px 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .category-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-6px);
+      box-shadow: 0 10px 25px rgba(145, 15, 63, 0.1);
+      background: var(--color-card-bg);
+    }
+
+    .category-icon-wrapper {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(249, 229, 71, 0.3);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      transition: transform 0.3s ease;
+    }
+
+    .category-card:hover .category-icon-wrapper {
+      transform: scale(1.15) rotate(-10deg);
+      background: var(--color-primary);
+      color: var(--color-accent);
+    }
+
+    .category-name {
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--color-secondary);
+    }
+
+    .category-count {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    /* ==========================================================================
+       SECTION 7: 🛍️ FEATURED PRODUCTS GRID
+       ========================================================================== */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .product-card {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+
+    .product-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      position: relative;
+      background: #f5f2ec;
+    }
+
+    .product-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-thumb img {
+      transform: scale(1.06);
+    }
+
+    .product-details {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-secondary);
+      margin-bottom: 6px;
+    }
+
+    .product-stars {
+      color: #f59e0b;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 10px;
+    }
+
+    /* ==========================================================================
+       SECTION 8: ✍️ ARTICLES & BLOG (مقالات الحصيف)
+       ========================================================================== */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .article-card {
+      background: var(--color-card-bg);
+      border: 2px solid var(--color-border-dark);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: 4px 4px 0px var(--color-border-dark);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .article-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 6px 6px 0px var(--color-border-dark);
+    }
+
+    .article-date {
+      color: var(--color-primary);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .article-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-secondary);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .article-excerpt {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .read-more-btn {
+      color: var(--color-primary);
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .read-more-btn:hover {
+      color: var(--color-secondary);
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       SECTION 9: 💬 COMMUNITY CORNER (ركن المجتمع)
+       ========================================================================== */
+    .community-card {
+      background: linear-gradient(135deg, var(--color-navy) 0%, #172c44 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      border: 3px solid var(--color-accent);
+      box-shadow: var(--shadow-retro);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .community-quote {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      line-height: 1.6;
+      color: var(--color-accent);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .community-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .community-author-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--color-accent);
+    }
+
+    /* ==========================================================================
+       SECTION 10: 🛒 LIVE SYNCHRONIZED CART DRAWER
+       ========================================================================== */
+    .cart-drawer-overlay {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 100000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .cart-drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .cart-drawer {
+      position: fixed;
+      top: 0; right: -420px; bottom: 0;
+      width: 420px;
+      max-width: 90vw;
+      background: var(--color-bg);
+      z-index: 100001;
+      box-shadow: -8px 0 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cart-drawer-overlay.active .cart-drawer {
+      right: 0;
+    }
+
+    .cart-header {
+      padding: 20px 24px;
+      border-bottom: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--color-card-bg);
+    }
+
+    .cart-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-secondary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .close-drawer-btn {
+      font-size: 20px;
+      color: var(--color-text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-drawer-btn:hover {
+      background: rgba(0,0,0,0.06);
+      color: var(--color-secondary);
+    }
+
+    .free-shipping-progress {
+      padding: 12px 24px;
+      background: rgba(249, 229, 71, 0.25);
+      border-bottom: 1px solid var(--color-border);
+      font-size: 13px;
+      text-align: center;
+      color: var(--color-secondary);
+      font-weight: 600;
+    }
+
+    .cart-items-body {
+      padding: 24px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .empty-cart-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--color-text-muted);
+    }
+
+    .empty-cart-msg i {
+      font-size: 48px;
+      color: var(--color-border);
+      margin-bottom: 16px;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 14px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      position: relative;
+    }
+
+    .cart-item-img {
+      width: 70px;
+      height: 70px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+    }
+
+    .cart-item-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cart-item-name {
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--color-secondary);
+    }
+
+    .cart-item-price {
+      font-weight: 800;
+      color: var(--color-primary);
+      font-size: 14px;
+    }
+
+    .cart-qty-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--color-bg);
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+      width: max-content;
+      border: 1px solid var(--color-border);
+    }
+
+    .qty-btn {
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .cart-footer {
+      padding: 20px 24px;
+      border-top: 2px solid var(--color-border);
+      background: var(--color-card-bg);
+    }
+
+    .cart-total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: 800;
+      font-family: var(--font-accent);
+      margin-bottom: 16px;
+      color: var(--color-secondary);
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: var(--color-primary);
+      color: #ffffff;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 16px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(145, 15, 63, 0.3);
+      transition: background 0.2s ease;
+    }
+
+    .checkout-btn:hover {
+      background: var(--color-secondary);
+    }
+
+    /* ==========================================================================
+       SECTION 11: 🔍 PREDICTIVE SEARCH OVERLAY
+       ========================================================================== */
+    .search-overlay {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: rgba(61, 8, 27, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 20px 40px 20px;
+    }
+
+    .search-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .search-box-wrap {
+      width: 100%;
+      max-width: 680px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-full);
+      padding: 18px 28px 18px 60px;
+      color: #ffffff;
+      font-size: 18px;
+      font-family: var(--font-accent);
+      outline: none;
+      box-shadow: 0 0 30px rgba(249, 229, 71, 0.2);
+    }
+
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .search-close-btn {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      color: var(--color-accent);
+      font-size: 28px;
+    }
+
+    .search-results-container {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 30px;
+      max-height: 60vh;
+      overflow-y: auto;
+      color: #ffffff;
+    }
+
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      transition: background 0.2s ease;
+      cursor: pointer;
+    }
+
+    .search-result-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ==========================================================================
+       SECTION 12: 🎵 GLOBAL STICKY BOTTOM AUDIO PLAYER
+       ========================================================================== */
+    .sticky-audio-player {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--color-secondary);
+      color: #ffffff;
+      border-radius: var(--radius-full);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-accent);
+      transform: translateY(120px);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sticky-audio-player.active {
+      transform: translateY(0);
+    }
+
+    .mini-track-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mini-vinyl {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #111;
+      border: 2px solid var(--color-accent);
+      animation: spin 3s linear infinite;
+    }
+
+    .mini-title {
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--color-accent);
+    }
+
+    .mini-artist {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ==========================================================================
+       SECTION 13: 🦶 FOOTER & NEWSLETTER
+       ========================================================================== */
+    .site-footer {
+      background: var(--color-secondary);
+      color: #ffffff;
+      padding: 60px 0 30px 0;
+      border-top: 4px solid var(--color-accent);
+      margin-top: 60px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-brand {
+      font-family: var(--font-heading);
+      font-size: 26px;
+      color: var(--color-accent);
+      margin-bottom: 16px;
+    }
+
+    .footer-desc {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .footer-title {
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--color-accent);
+      margin-bottom: 16px;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.8);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-accent);
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .newsletter-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: #ffffff;
+      font-size: 14px;
+      flex: 1;
+      outline: none;
+    }
+
+    .newsletter-btn {
+      background: var(--color-accent);
+      color: var(--color-secondary);
+      font-weight: 800;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .payment-icons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 100002;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--color-secondary);
+      color: #ffffff;
+      border-right: 4px solid var(--color-accent);
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Component Inspector Modal */
+    .inspector-modal {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 200000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .inspector-modal.active {
+      display: flex;
+    }
+
+    .inspector-card {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      width: 100%;
+      max-width: 800px;
+      border-radius: var(--radius-md);
+      border: 1px solid #333;
+      overflow: hidden;
+      font-family: monospace;
+      font-size: 13px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .inspector-header {
+      background: #252526;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #333;
+      color: #007acc;
+      font-weight: bold;
+    }
+
+    .inspector-code {
+      padding: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: #ce9178;
+      direction: ltr;
+      text-align: left;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+      .hero-card, .community-card {
+        grid-template-columns: 1fr;
+      }
+      .radio-console {
+        grid-template-columns: 1fr;
+      }
+      .console-artist-preview {
+        border-left: none;
+        border-bottom: 2px solid rgba(255,255,255,0.15);
+        padding-bottom: 20px;
+        padding-left: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-nav {
+        display: none;
+      }
+      .hero-title {
+        font-size: 32px;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SHOWCASE TOP CONTROL TOOLBAR -->
+  <div class="showcase-toolbar">
+    <div class="showcase-brand">
+      <i class="fa-solid fa-record-vinyl"></i>
+      <span>معاينة ثيم الحصيف الشاملة (Hassef Shopify Theme)</span>
+    </div>
+
+    <div class="showcase-controls">
+      <!-- Viewport Switcher -->
+      <div class="tool-group">
+        <button class="tool-btn active" onclick="setViewport('full')"><i class="fa-solid fa-desktop"></i> كامل</button>
+        <button class="tool-btn" onclick="setViewport('tablet')"><i class="fa-solid fa-tablet-screen-button"></i> تابلت</button>
+        <button class="tool-btn" onclick="setViewport('mobile')"><i class="fa-solid fa-mobile-screen-button"></i> جوال</button>
+      </div>
+
+      <!-- Color Theme Preset Switcher -->
+      <select class="theme-select-btn" onchange="setThemePreset(this.value)">
+        <option value="vintage">🎨 الثيم الأصلي (عاجي وعنابي)</option>
+        <option value="dark-midnight">🌙 ليل كلاسيكي (أسود وذهبي)</option>
+        <option value="sand-amber">🏜️ رماد الصحراء (دافئ)</option>
+      </select>
+
+      <!-- Inspector Trigger -->
+      <button class="tool-btn" style="background:#007acc; color:#fff;" onclick="openInspector('theme.liquid')">
+        <i class="fa-solid fa-code"></i> فحص كود Liquid
+      </button>
+    </div>
+  </div>
+
+  <!-- VIEWPORT FRAME WRAPPER -->
+  <div id="viewportContainer" class="viewport-wrapper">
+
+    <!-- ANNOUNCEMENT BAR & TICKER -->
+    <div class="utility-bar">
+      <div class="container utility-inner">
+        <div class="ticker-wrap">
+          <div class="ticker-move">
+            ✦ ركن المجتمع: مساحة لمشاركة شغفك في الموسيقى والكتابة &nbsp;&nbsp;&nbsp;&nbsp; ● شحن مجاني لكافة الطلبات فوق 200 ر.س &nbsp;&nbsp;&nbsp;&nbsp; ✦ كاسيتات طرب أصيل ونوادر التسجيلات الفنية ✦
+          </div>
+        </div>
+        <div class="utility-actions">
+          <a href="#" class="utility-link" onclick="openToast('تم تغيير العملة إلى الريال السعودي')"><i class="fa-solid fa-globe"></i> SAR (ر.س)</a>
+          <a href="#" class="utility-link" onclick="openToast('الوضع الحالي: العربية (RTL)')">العربية</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SITE HEADER -->
+    <header class="site-header" id="siteHeader">
+      <div class="container header-content">
+        <!-- Logo -->
+        <a href="#" class="brand-logo">
+          <span>الحَصِيف</span>
+          <span class="brand-logo-badge">ثيم تراثي</span>
+        </a>
+
+        <!-- Navigation Menu -->
+        <nav>
+          <ul class="main-nav">
+            <li><a href="#hero" class="nav-link active">الرئيسية</a></li>
+            <li><a href="#radio" class="nav-link has-badge">راديو ARC v4</a></li>
+            <li><a href="#cassettes" class="nav-link">كاسيتات طرب</a></li>
+            <li><a href="#books" class="nav-link">أقسام الكتب</a></li>
+            <li><a href="#featured" class="nav-link">منتجات مميزة</a></li>
+            <li><a href="#blog" class="nav-link">مقالات الحصيف</a></li>
+            <li><a href="#community" class="nav-link">ركن المجتمع</a></li>
+          </ul>
+        </nav>
+
+        <!-- Header Action Icons -->
+        <div class="header-icons">
+          <button class="icon-btn" onclick="toggleSearchOverlay()" title="البحث الحثيث">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+          <button class="icon-btn" onclick="openToast('حساب المستخدم: مسجل كضيف')" title="حسابي">
+            <i class="fa-regular fa-user"></i>
+          </button>
+          <button class="icon-btn" onclick="toggleCartDrawer()" title="سلة التسوق">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span class="cart-badge" id="cartCountBadge">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="hero">
+      <div class="container">
+        <div class="hero-card">
+          <div class="hero-content">
+            <div class="hero-subtitle">
+              <i class="fa-solid fa-compact-disc"></i> إصدار خاص للثيم
+            </div>
+            <h1 class="hero-title">جفرا - قصة الجبل وتراث الكاسيت الأصيل</h1>
+            <p class="hero-desc">
+              تصفح التشكيلة الكاملة من التسجيلات الصوتية النادرة، الكتب التاريخية، والراديو التفاعلي التراثي الذي تم تصميمه خصيصاً لمتجر الحصيف.
+            </p>
+            <div class="hero-btns">
+              <a href="#radio" class="btn-primary">
+                <i class="fa-solid fa-play"></i> استمع للراديو الآن
+              </a>
+              <a href="#cassettes" class="btn-secondary">
+                استكشف الكاسيتات
+              </a>
+            </div>
+          </div>
+          <div class="hero-media">
+            <div class="vintage-frame">
+              <img src="https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?auto=format&fit=crop&w=800&q=80" alt="Cassette Vintage">
+              <div class="cassette-play-badge">
+                <div class="spinning-vinyl"></div>
+                <span>يعزف الآن: تسجيل نادر 1978</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: 🎧 ARC RADIO STATION V4.0 -->
+    <section class="section-padding" id="radio">
+      <div class="container">
+        <div class="section-header-block">
+          <div class="section-eyebrow">مكون مخصص خاص بالحصيف</div>
+          <h2 class="section-title">🎧 راديو ARC Radio v4.0 التفاعلي</h2>
+          <p class="section-desc">اختر الفنان المفضّل لديك للاستماع المباشر واستعراض نوادر ألبومات الكاسيت التابعة له.</p>
+        </div>
+
+        <div class="radio-station-card">
+          <!-- Artist Selector Grid -->
+          <div class="artists-wheel-grid" id="artistsGrid">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Radio Console -->
+          <div class="radio-console">
+            <div class="console-artist-preview">
+              <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80" class="console-avatar" id="currentArtistImg" alt="Artist">
+              <h3 class="console-name" id="currentArtistName">عبد الحليم حافظ</h3>
+              <div class="console-genre" id="currentArtistGenre">العندليب الأسمر ● سلطنة وطرب</div>
+            </div>
+
+            <div class="console-controls">
+              <div class="console-track-title">
+                <span class="live-badge">مباشر</span>
+                <span id="currentTrackTitle">أغنية: قارئة الفنجان (تسجيل حفلة سينما قصر النيل)</span>
+              </div>
+
+              <div class="audio-progress-bar" onclick="seekAudio(event)">
+                <div class="audio-progress-fill" id="radioProgressFill"></div>
+              </div>
+
+              <div class="console-buttons">
+                <button class="play-btn-large" id="radioPlayBtn" onclick="toggleRadioPlay()">
+                  <i class="fa-solid fa-play"></i>
+                </button>
+                <div style="font-size: 13px; color: rgba(255,255,255,0.8);">
+                  <i class="fa-solid fa-volume-high"></i> صوت الاستريو نقاوة 100%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: 📼 CASSETTES POPULAR GRID -->
+    <section class="section-padding" id="cassettes" style="background: rgba(0,0,0,0.02);">
+      <div class="container">
+        <div class="section-header-block">
+          <div class="section-eyebrow">مجموعة الكاسيتات النادرة</div>
+          <h2 class="section-title">📼 كاسيتات طرب أصيل</h2>
+          <p class="section-desc">الأكثر استماعاً وطلباً خلال هذا الأسبوع لدى عشاق الفن التراثي.</p>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+          <button class="tab-btn active" onclick="filterCassettes('all', this)">الكل</button>
+          <button class="tab-btn" onclick="filterCassettes('khaleeji', this)">خليجي</button>
+          <button class="tab-btn" onclick="filterCassettes('shami', this)">شامي</button>
+          <button class="tab-btn" onclick="filterCassettes('masri', this)">مصري</button>
+          <button class="tab-btn" onclick="filterCassettes('maghrebi', this)">مغاربي</button>
+        </div>
+
+        <!-- Cassette Grid -->
+        <div class="cassette-grid" id="cassetteGrid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: 📚 BOOK LIBRARY & CATEGORIES -->
+    <section class="section-padding" id="books">
+      <div class="container">
+        <div class="section-header-block">
+          <div class="section-eyebrow">مكتبة الحصيف الرقمية</div>
+          <h2 class="section-title">📚 تصفّح أقسام الكتب</h2>
+          <p class="section-desc">مؤلفات كلاسيكية، تاريخية، وفلسفية تم اختيارها بعناية لزيادة حصيلتك الفكرية.</p>
+        </div>
+
+        <div class="categories-grid">
+          <div class="category-card" onclick="openToast('قسم الكتب: التاريخ الإسلامي والعربي')">
+            <div class="category-icon-wrapper"><i class="fa-solid fa-book-atlas"></i></div>
+            <div class="category-name">التاريخ</div>
+            <div class="category-count">142 كتاب</div>
+          </div>
+          <div class="category-card" onclick="openToast('قسم الكتب: الأدب العربي والشعر')">
+            <div class="category-icon-wrapper"><i class="fa-solid fa-feather-pointed"></i></div>
+            <div class="category-name">الأدب العربي</div>
+            <div class="category-count">210 كتاب</div>
+          </div>
+          <div class="category-card" onclick="openToast('قسم الكتب: الفلسفة والمنطق')">
+            <div class="category-icon-wrapper"><i class="fa-solid fa-brain"></i></div>
+            <div class="category-name">الفلسفة</div>
+            <div class="category-count">88 كتاب</div>
+          </div>
+          <div class="category-card" onclick="openToast('قسم الكتب: علوم ومعارف')">
+            <div class="category-icon-wrapper"><i class="fa-solid fa-microscope"></i></div>
+            <div class="category-name">علمية</div>
+            <div class="category-count">64 كتاب</div>
+          </div>
+          <div class="category-card" onclick="openToast('قسم الكتب: قصص الأطفال والتراث')">
+            <div class="category-icon-wrapper"><i class="fa-solid fa-child-reaching"></i></div>
+            <div class="category-name">أطفال</div>
+            <div class="category-count">95 كتاب</div>
+          </div>
+          <div class="category-card" onclick="openToast('قسم الكتب: كتب مستعملة ونادرة')">
+            <div class="category-icon-wrapper"><i class="fa-solid fa-box-archive"></i></div>
+            <div class="category-name">كتب مستعملة</div>
+            <div class="category-count">120 كتاب</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: 🛍️ FEATURED PRODUCTS -->
+    <section class="section-padding" id="featured" style="background: rgba(0,0,0,0.02);">
+      <div class="container">
+        <div class="section-header-block">
+          <div class="section-eyebrow">إكسسوارات ومشغلات الكاسيت</div>
+          <h2 class="section-title">🛍️ منتجات المتجر المميزة</h2>
+          <p class="section-desc">أجهزة تشغيل الكاسيت الكلاسيكية، الفواصل المذهبة، ومجموعات المقتنيات.</p>
+        </div>
+
+        <div class="products-grid" id="featuredProductsGrid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: ✍️ ARTICLES & BLOG -->
+    <section class="section-padding" id="blog">
+      <div class="container">
+        <div class="section-header-block">
+          <div class="section-eyebrow">مدونة الحصيف الثقافية</div>
+          <h2 class="section-title">✍️ مقالات ونشرات أدبية</h2>
+          <p class="section-desc">قراءات نقدية، تحليلات موسيقية، وتوثيق للسير التراثية.</p>
+        </div>
+
+        <div class="articles-grid">
+          <article class="article-card">
+            <div class="article-date">📅 14 أغسطس 2026 ● بقلم: د. أحمد السالم</div>
+            <h3 class="article-title">أحمد قعبور وتوثيق ذاكرة بيروت الموسيقية</h3>
+            <p class="article-excerpt">استعراض للمسيرة الفنية ومرحلة الثمانينيات الذهبية في صناعة أشرطة الكاسيت والمسرح النضالي.</p>
+            <a href="#" class="read-more-btn" onclick="openToast('جارٍ فتح مقاله أحمد قعبور...'); return false;">
+              اقرأ المقال كاملاً <i class="fa-solid fa-arrow-left"></i>
+            </a>
+          </article>
+
+          <article class="article-card">
+            <div class="article-date">📅 02 أغسطس 2026 ● بقلم: سارة الخالد</div>
+            <h3 class="article-title">ابن خلدون في رداء جديد: قراءة في المline الفكري</h3>
+            <p class="article-excerpt">كيف ساهمت مقدمة ابن خلدون في تشكيل فهمنا الحديث للعلوم الاجتماعية وفلسفة التاريخ العربي.</p>
+            <a href="#" class="read-more-btn" onclick="openToast('جارٍ فتح المقال...'); return false;">
+              اقرأ المقال كاملاً <i class="fa-solid fa-arrow-left"></i>
+            </a>
+          </article>
+
+          <article class="article-card">
+            <div class="article-date">📅 28 يوليو 2026 ● بقلم: الأرشيف الموسيقي</div>
+            <h3 class="article-title">صناعة أجهزة الكاسيت وتأثيرها على استماع التسجيلات</h3>
+            <p class="article-excerpt">رحلة مع الهندسة الصوتية القديمة وكيف يمكنك الحفاظ على أشرطتك المغناطيسية من التلف.</p>
+            <a href="#" class="read-more-btn" onclick="openToast('جارٍ فتح المقال...'); return false;">
+              اقرأ المقال كاملاً <i class="fa-solid fa-arrow-left"></i>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: 💬 COMMUNITY CORNER -->
+    <section class="section-padding" id="community">
+      <div class="container">
+        <div class="community-card">
+          <div>
+            <div class="community-quote">
+              "الكتاب الذي تحبه ليس مجرد ورقات مطبوعة، بل هو رفيق لروحك وصدى لأفكارك."
+            </div>
+            <div class="community-author">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="community-author-img" alt="User">
+              <div>
+                <strong style="display:block; color:var(--color-accent);">م. مريم العتيبي</strong>
+                <span style="font-size:12px; color:rgba(255,255,255,0.7);">عضوة في ركن المجتمع منذ 2024</span>
+              </div>
+            </div>
+          </div>
+          <div style="text-align: center;">
+            <h3 style="font-family:var(--font-heading); font-size:26px; color:#fff; margin-bottom:12px;">انضم إلى ركن مجتمع الحصيف</h3>
+            <p style="font-size:14px; color:rgba(255,255,255,0.8); margin-bottom:20px;">شاركنَا اقتباساتك المفضلّة ومراجعات الأشرطة والكتب ليتم نشرها في التيكر الرسمي.</p>
+            <button class="btn-primary" onclick="openToast('تم فتح نموذج مشاركة الاقتباس!')">
+              <i class="fa-solid fa-pen-nib"></i> شارك اقتباسك الآن
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <div class="footer-brand">متجر الحَصِيف</div>
+            <p class="footer-desc">
+              وجهتك الأولى للكاسيتات الطربية التراثية، الكتب الكلاسيكية، ومستلزمات الثقافة والأدب الأصيل.
+            </p>
+            <div class="payment-icons">
+              <i class="fa-brands fa-cc-visa"></i>
+              <i class="fa-brands fa-cc-mastercard"></i>
+              <i class="fa-brands fa-apple-pay"></i>
+              <i class="fa-solid fa-credit-card"></i>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="footer-title">روابط سريعة</h4>
+            <ul class="footer-links">
+              <li><a href="#hero">الرئيسية</a></li>
+              <li><a href="#radio">راديو ARC v4.0</a></li>
+              <li><a href="#cassettes">كاسيتات طرب</a></li>
+              <li><a href="#books">أقسام الكتب</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="footer-title">خدمة العملاء</h4>
+            <ul class="footer-links">
+              <li><a href="#" onclick="openToast('سياسة الشحن والتوصيل')">الشحن والتوصيل</a></li>
+              <li><a href="#" onclick="openToast('الأسئلة الشائعة')">الأسئلة الشائعة</a></li>
+              <li><a href="#" onclick="openToast('سياسة الاسترجاع')">الاسترجاع والاستبدال</a></li>
+              <li><a href="#" onclick="openToast('اتصل بنا')">اتصل بنا</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="footer-title">النشرة البريدية</h4>
+            <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:12px;">اشترك ليصلك نوادر الكاسيت والكتب فور إضافتها.</p>
+            <form class="newsletter-form" onsubmit="handleSubscribe(event)">
+              <input type="email" placeholder="بريدك الإلكتروني..." class="newsletter-input" required>
+              <button type="submit" class="newsletter-btn">اشتراك</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div>جميع الحقوق محفوظة © 2026 لـ متجر الحصيف (Al-Hassef Shopify Theme)</div>
+          <div>تم التطوير للعرض والمعاينة الدقيقة التفاعلية</div>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /viewportContainer -->
+
+  <!-- CART DRAWER OVERLAY -->
+  <div class="cart-drawer-overlay" id="cartOverlay" onclick="closeCartOnOverlay(event)">
+    <div class="cart-drawer">
+      <div class="cart-header">
+        <div class="cart-title">
+          <i class="fa-solid fa-bag-shopping"></i> سلة التسوق
+        </div>
+        <button class="close-drawer-btn" onclick="toggleCartDrawer()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="free-shipping-progress" id="freeShippingBanner">
+        🎉 تبقّى لك 80 ر.س للحصول على شحن مجاني!
+      </div>
+
+      <div class="cart-items-body" id="cartItemsContainer">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="cart-footer">
+        <div class="cart-total-row">
+          <span>المجموع الكلي:</span>
+          <span id="cartSubtotalVal" style="color:var(--color-primary);">0 ر.س</span>
+        </div>
+        <button class="checkout-btn" onclick="openToast('جارٍ الانتقال لصفحة إتمام الدفع (Shopify Checkout)...')">
+          إتمام الطلب <i class="fa-solid fa-arrow-left"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH OVERLAY -->
+  <div class="search-overlay" id="searchOverlay">
+    <button class="search-close-btn" onclick="toggleSearchOverlay()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="search-box-wrap">
+      <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن كاسيت، مغني، كتاب، أو مقالة..." oninput="handleSearch(this.value)">
+    </div>
+    <div class="search-results-container" id="searchResults">
+      <!-- Search results -->
+    </div>
+  </div>
+
+  <!-- STICKY AUDIO PLAYER -->
+  <div class="sticky-audio-player" id="stickyAudioPlayer">
+    <div class="mini-track-info">
+      <div class="mini-vinyl"></div>
+      <div>
+        <div class="mini-title" id="stickyTrackTitle">اسم الأغنية الكلاسيكية</div>
+        <div class="mini-artist" id="stickyArtistName">الفنان</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <button onclick="toggleRadioPlay()" style="color:var(--color-accent); font-size:20px;">
+        <i class="fa-solid fa-pause" id="stickyPlayIcon"></i>
+      </button>
+      <button onclick="hideStickyPlayer()" style="color:rgba(255,255,255,0.6); font-size:14px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- LIQUID COMPONENT INSPECTOR MODAL -->
+  <div class="inspector-modal" id="inspectorModal">
+    <div class="inspector-card">
+      <div class="inspector-header">
+        <span id="inspectorTitle">sections/header.liquid</span>
+        <button onclick="closeInspector()" style="color:#fff;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="inspector-code" id="inspectorCode">
+        <!-- Liquid Code Snippet -->
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT STATE ENGINE & INTERACTIVITY -->
+  <script>
+    /* ==========================================================================
+       DATA STRUCTURES (Hassef Theme Master Data)
+       ========================================================================== */
+    const ARTISTS_DATA = [
+      { id: 1, name: "عبد الحليم حافظ", genre: "العندليب الأسمر ● طرب", track: "قارئة الفنجان - تسجبل حي", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80" },
+      { id: 2, name: "راشد الماجد", genre: "سندباد الأغنية الخليجية", track: "أبشر من عيوني الثنتين", img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=300&q=80" },
+      { id: 3, name: "وردة الجزائرية", genre: "أميرة الطرب العربي", track: "بتؤنسني وتؤنس روحي", img: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=300&q=80" },
+      { id: 4, name: "ميادة الحناوي", genre: "مطربة الجيل الأصيل", track: "كان ياما كان الحب", img: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=300&q=80" },
+      { id: 5, name: "أحلام", genre: "الملكة ● الفن الخليجي", track: "تدري ليش أزعل عليك", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" },
+      { id: 6, name: "عبادي الجوهر", genre: "أخطبوط العود الأصيل", track: "قالوا تودع قلت يا صعب الوداع", img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=300&q=80" },
+      { id: 7, name: "محمد عبده", genre: "فنان العرب الكلاسيكي", track: "الأماكن كلها مشتاقة لك", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" },
+      { id: 8, name: "عبد المجيد عبد الله", genre: "أمير الأغنية الشرقية", track: "يا طيب القلب وينك", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" },
+      { id: 9, name: "فيروز", genre: "جارة القمر ● الصوت الخالد", track: "أعطني الناي وغنِّ", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" },
+      { id: 10, name: "أم كلثوم", genre: "كوكب الشرق الخالدة", track: "أنت عمري - تسجيل الاستوديو", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80" },
+      { id: 11, name: "جورج وسوف", genre: "سلطان الطرب الكلاسيكي", track: "كلام الناس لا بيقدم ولا يئخر", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80" },
+      { id: 12, name: "طلال مداح", genre: "صوت الأرض الإنساني", track: "زمان الصمت والقول الجميل", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80" }
+    ];
+
+    const CASSETTES_DATA = [
+      { id: 101, region: "khaleeji", rank: "🔥 #1 الأبرز", title: "كاسيت محمد عبده - الأماكن (1989)", artist: "محمد عبده", price: 120, img: "https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?auto=format&fit=crop&w=400&q=80" },
+      { id: 102, region: "masri", rank: "#2 طرب", title: "كاسيت عبد الحليم - قارئة الفنجان", artist: "عبد الحليم حافظ", price: 145, img: "https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=400&q=80" },
+      { id: 103, region: "shami", rank: "#3 شامي", title: "كاسيت فيروز - سهرة الحب والورد", artist: "فيروز", price: 130, img: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=400&q=80" },
+      { id: 104, region: "khaleeji", rank: "#4 خليجي", title: "كاسيت عبادي الجوهر - جلسة عود", artist: "عبادي الجوهر", price: 110, img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&q=80" },
+      { id: 105, region: "maghrebi", rank: "#5 مغاربي", title: "كاسيت وردة الجزائرية - بتؤنسني", artist: "وردة الجزائرية", price: 125, img: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=400&q=80" },
+      { id: 106, region: "masri", rank: "✨ نادر", title: "كاسيت أم كلثوم - سيرة الحب الاصلي", artist: "أم كلثوم", price: 190, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80" }
+    ];
+
+    const FEATURED_PRODUCTS = [
+      { id: 201, title: "مشغل كاسيت ريترو خشبي يدوي", price: 340, stars: 5, img: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=400&q=80" },
+      { id: 202, title: "فاصل كتب نحاسي مذهب بنقوش عربية", price: 65, stars: 5, img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80" },
+      { id: 203, title: "حقيبة الحصيف القماشية لحمل الأشرطة", price: 85, stars: 4, img: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80" },
+      { id: 204, title: "حافظة كاسيتات جلدية تتسع لـ 24 شريط", price: 160, stars: 5, img: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400&q=80" }
+    ];
+
+    // State Variables
+    let cart = [];
+    let isRadioPlaying = false;
+    let selectedArtistId = 1;
+
+    /* ==========================================================================
+       INITIALIZATION
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      renderArtists();
+      renderCassettes(CASSETTES_DATA);
+      renderFeaturedProducts();
+      updateCartUI();
+
+      // Header Sticky Effect
+      window.addEventListener('scroll', () => {
+        const header = document.getElementById('siteHeader');
+        if (window.scrollY > 40) {
+          header.classList.add('is-scrolled');
+        } else {
+          header.classList.remove('is-scrolled');
+        }
+      });
+    });
+
+    /* ==========================================================================
+       ARTIST WHEEL & RADIO PLAYER FUNCTIONS
+       ========================================================================== */
+    function renderArtists() {
+      const grid = document.getElementById('artistsGrid');
+      grid.innerHTML = ARTISTS_DATA.map(artist => `
+        <div class="artist-chip ${artist.id === selectedArtistId ? 'active' : ''}" onclick="selectArtist(${artist.id})">
+          <img src="${artist.img}" class="artist-avatar" alt="${artist.name}">
+          <div>
+            <div class="artist-name">${artist.name}</div>
+            <div class="artist-tag">${artist.genre.split('●')[0]}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectArtist(id) {
+      selectedArtistId = id;
+      const artist = ARTISTS_DATA.find(a => a.id === id);
+      if (!artist) return;
+
+      document.getElementById('currentArtistImg').src = artist.img;
+      document.getElementById('currentArtistName').innerText = artist.name;
+      document.getElementById('currentArtistGenre').innerText = artist.genre;
+      document.getElementById('currentTrackTitle').innerText = `أغنية: ${artist.track}`;
+
+      // Sticky audio player sync
+      document.getElementById('stickyTrackTitle').innerText = artist.track;
+      document.getElementById('stickyArtistName').innerText = artist.name;
+
+      renderArtists();
+      openToast(`تم اختيار راديو الفنان: ${artist.name}`);
+    }
+
+    function toggleRadioPlay() {
+      isRadioPlaying = !isRadioPlaying;
+      const playBtn = document.getElementById('radioPlayBtn');
+      const stickyPlayer = document.getElementById('stickyAudioPlayer');
+      const stickyIcon = document.getElementById('stickyPlayIcon');
+
+      if (isRadioPlaying) {
+        playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        stickyIcon.className = 'fa-solid fa-pause';
+        stickyPlayer.classList.add('active');
+        openToast('جارٍ تشغيل الراديو التراسل المباشر 🎵');
+      } else {
+        playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+        stickyIcon.className = 'fa-solid fa-play';
+        openToast('تم إيقاف تشغيل الراديو مؤقتاً');
+      }
+    }
+
+    function hideStickyPlayer() {
+      document.getElementById('stickyAudioPlayer').classList.remove('active');
+      isRadioPlaying = false;
+      document.getElementById('radioPlayBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
+    }
+
+    function seekAudio(e) {
+      const fill = document.getElementById('radioProgressFill');
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const widthPct = Math.min(100, Math.max(0, (clickX / rect.width) * 100));
+      fill.style.width = widthPct + '%';
+    }
+
+    /* ==========================================================================
+       CASSETTES & FEATURED PRODUCTS RENDER
+       ========================================================================== */
+    function renderCassettes(items) {
+      const grid = document.getElementById('cassetteGrid');
+      grid.innerHTML = items.map(c => `
+        <div class="cassette-card">
+          <span class="rank-badge">${c.rank}</span>
+          <div class="cassette-thumb">
+            <img src="${c.img}" alt="${c.title}">
+          </div>
+          <div class="cassette-info">
+            <h3 class="cassette-title">${c.title}</h3>
+            <div class="cassette-artist">${c.artist}</div>
+            <div class="cassette-price-row">
+              <span class="price-tag">${c.price} ر.س</span>
+              <button class="add-to-cart-btn" onclick="addToCart(${c.id}, '${c.title.replace(/'/g, "\\'")}', ${c.price}, '${c.img}')">
+                <i class="fa-solid fa-plus"></i> أضف للسلة
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCassettes(region, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (region === 'all') {
+        renderCassettes(CASSETTES_DATA);
+      } else {
+        const filtered = CASSETTES_DATA.filter(c => c.region === region);
+        renderCassettes(filtered);
+      }
+    }
+
+    function renderFeaturedProducts() {
+      const grid = document.getElementById('featuredProductsGrid');
+      grid.innerHTML = FEATURED_PRODUCTS.map(p => `
+        <div class="product-card">
+          <div class="product-thumb">
+            <img src="${p.img}" alt="${p.title}">
+          </div>
+          <div class="product-details">
+            <h3 class="product-title">${p.title}</h3>
+            <div class="product-stars">
+              ${'<i class="fa-solid fa-star"></i>'.repeat(p.stars)}
+            </div>
+            <div class="product-footer">
+              <span class="price-tag">${p.price} ر.س</span>
+              <button class="add-to-cart-btn" onclick="addToCart(${p.id}, '${p.title.replace(/'/g, "\\'")}', ${p.price}, '${p.img}')">
+                <i class="fa-solid fa-cart-plus"></i> إضافة
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* ==========================================================================
+       CART STATE MANAGEMENT & SYNCHRONIZATION
+       ========================================================================== */
+    function addToCart(id, title, price, img) {
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ id, title, price, img, qty: 1 });
+      }
+      updateCartUI();
+      toggleCartDrawer(true);
+      openToast(`تمت إضافة "${title}" إلى سلة التسوق 🛒`);
+    }
+
+    function updateQuantity(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.id !== id);
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
+      const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+      document.getElementById('cartCountBadge').innerText = totalCount;
+      document.getElementById('cartSubtotalVal').innerText = `${subtotal} ر.س`;
+
+      // Free shipping bar calculation (Free over 200 SAR)
+      const freeShippingMsg = document.getElementById('freeShippingBanner');
+      if (subtotal >= 200) {
+        freeShippingMsg.innerHTML = '🎉 تهانينا! حصلت على شحن مجاني لكافة طلباتك.';
+        freeShippingMsg.style.background = '#d1fae5';
+        freeShippingMsg.style.color = '#065f46';
+      } else {
+        const remaining = 200 - subtotal;
+        freeShippingMsg.innerHTML = `🎉 تبقّى لك ${remaining} ر.س للحصول على شحن مجاني!`;
+        freeShippingMsg.style.background = 'rgba(249, 229, 71, 0.25)';
+        freeShippingMsg.style.color = 'var(--color-secondary)';
+      }
+
+      // Render Items
+      const container = document.getElementById('cartItemsContainer');
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-cart-msg">
+            <i class="fa-solid fa-basket-shopping"></i>
+            <p>سلة التسوق فارغة حالياً</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = cart.map(item => `
+          <div class="cart-item">
+            <img src="${item.img}" class="cart-item-img" alt="${item.title}">
+            <div class="cart-item-details">
+              <div class="cart-item-name">${item.title}</div>
+              <div class="cart-item-price">${item.price * item.qty} ر.س</div>
+              <div class="cart-qty-ctrl">
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                <span style="font-size:12px; font-weight:700;">${item.qty}</span>
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function toggleCartDrawer(forceOpen = false) {
+      const overlay = document.getElementById('cartOverlay');
+      if (forceOpen) {
+        overlay.classList.add('active');
+      } else {
+        overlay.classList.toggle('active');
+      }
+    }
+
+    function closeCartOnOverlay(e) {
+      if (e.target.id === 'cartOverlay') {
+        toggleCartDrawer(false);
+      }
+    }
+
+    /* ==========================================================================
+       SEARCH OVERLAY ENGINE
+       ========================================================================== */
+    function toggleSearchOverlay() {
+      const overlay = document.getElementById('searchOverlay');
+      overlay.classList.toggle('active');
+      if (overlay.classList.contains('active')) {
+        document.getElementById('searchInput').focus();
+      }
+    }
+
+    function handleSearch(query) {
+      const resultsContainer = document.getElementById('searchResults');
+      if (!query.trim()) {
+        resultsContainer.innerHTML = '';
+        return;
+      }
+
+      const q = query.toLowerCase();
+      const matchedCassettes = CASSETTES_DATA.filter(c => c.title.toLowerCase().includes(q) || c.artist.toLowerCase().includes(q));
+      const matchedProducts = FEATURED_PRODUCTS.filter(p => p.title.toLowerCase().includes(q));
+
+      const allResults = [...matchedCassettes, ...matchedProducts];
+
+      if (allResults.length === 0) {
+        resultsContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.7);">لا توجد نتائج مطابقة لبحثك</div>';
+      } else {
+        resultsContainer.innerHTML = allResults.map(item => `
+          <div class="search-result-item" onclick="toggleSearchOverlay(); addToCart(${item.id}, '${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.img}')">
+            <img src="${item.img}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">
+            <div>
+              <div style="font-weight:700; font-size:14px;">${item.title}</div>
+              <div style="font-size:12px; color:var(--color-accent);">${item.price} ر.س</div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    /* ==========================================================================
+       SHOWCASE TOOLBAR ENGINE (VIEWPORT & THEMES)
+       ========================================================================== */
+    function setViewport(mode) {
+      const container = document.getElementById('viewportContainer');
+      document.querySelectorAll('.tool-group .tool-btn').forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      container.className = 'viewport-wrapper';
+      if (mode === 'tablet') {
+        container.classList.add('mode-tablet');
+        openToast('تم التغيير إلى وضع التابلت (768px)');
+      } else if (mode === 'mobile') {
+        container.classList.add('mode-mobile');
+        openToast('تم التغيير إلى وضع الجوال (390px)');
+      } else {
+        openToast('تم التغيير إلى العرض الشامل الكامل');
+      }
+    }
+
+    function setThemePreset(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      openToast(`تم تفعيل نغمة الألوان: ${theme}`);
+    }
+
+    /* ==========================================================================
+       LIQUID COMPONENT INSPECTOR
+       ========================================================================== */
+    const LIQUID_TEMPLATES = {
+      'theme.liquid': `{% comment %} Hassef Main Theme Layout {% endcomment %}
+<!doctype html>
+<html dir="{{ page_dir }}" lang="{{ locale_code }}">
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;700&family=Noto+Naskh+Arabic:wght@700&display=swap" rel="stylesheet">
+  {{ 'base.css' | asset_url | stylesheet_tag }}
+  {{ 'haseef-header-override.css' | asset_url | stylesheet_tag }}
+</head>
+<body class="gradient color-{{ settings.color_schemes.first.id }}">
+  {% sections 'header-group' %}
+  <main id="MainContent" role="main" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+  {% sections 'footer-group' %}
+</body>
+</html>`,
+      'arc-radio-v4.liquid': `{% comment %} Hassef Custom Section: ARC Radio v4.0 {% endcomment %}
+<div class="radio-station-card">
+  <div class="artists-wheel-grid">
+    {% for block in section.blocks %}
+      <div class="artist-chip" data-artist-id="{{ block.id }}">
+        <img src="{{ block.settings.image | image_url: width: 140 }}" class="artist-avatar">
+        <span class="artist-name">{{ block.settings.name }}</span>
+      </div>
+    {% endfor %}
+  </div>
+</div>`
+    };
+
+    function openInspector(fileName) {
+      document.getElementById('inspectorTitle').innerText = fileName;
+      document.getElementById('inspectorCode').innerText = LIQUID_TEMPLATES[fileName] || '// Liquid Section Template Code';
+      document.getElementById('inspectorModal').classList.add('active');
+    }
+
+    function closeInspector() {
+      document.getElementById('inspectorModal').classList.remove('active');
+    }
+
+    /* ==========================================================================
+       TOAST UTILITY & SUBSCRIPTION
+       ========================================================================== */
+    function openToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--color-accent);"></i> <span>${msg}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function handleSubscribe(e) {
+      e.preventDefault();
+      openToast('شكراً لاشتراكك في النشرة البريدية لمتجر الحصيف! 💌');
+      e.target.reset();
+    }
+  </script>
+</body>
+</html>

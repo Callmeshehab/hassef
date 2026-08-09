@@ -1,0 +1,471 @@
+{% doc %}
+  @prompt
+    <div class="hassif-ticker-container">
+      <div class="hassif-ticker-header">
+        مرحباً بك في الحصيف! استكشف عوالم المعرفة.
+      </div>
+    
+      <a href="/pages/community" class="hassif-ticker-link">
+        <div class="hassif-ticker-content">
+          <span class="hassif-ticker-text">
+            ✨ شاركونا مقتطفاتكم وأشعاركم في ركن المجتمع ✨&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            📖 "الكتب هي الآثار الأكثر بقاءً للزمن"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            ✒️ مراجعة جديدة لكتاب "مقدمة ابن خلدون"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            📸 Flatlay مميز من قارئنا العزيز&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            🌟 اترك أثراً، شارك مراجعتك الآن!
+          </span>
+          <span class="hassif-ticker-text hassif-ticker-duplicate">
+            ✨ شاركونا مقتطفاتكم وأشعاركم في ركن المجتمع ✨&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            📖 "الكتب هي الآثار الأكثر بقاءً للزمن"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            ✒️ مراجعة جديدة لكتاب "مقدمة ابن خلدون"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            📸 Flatlay مميز من قارئنا العزيز&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            🌟 اترك أثراً، شارك مراجعتك الآن!
+          </span>
+        </div>
+      </a>
+    </div>
+    
+    <style>
+    /* 1. Container Styling */
+    .hassif-ticker-container {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 8px; /* Rounded corners to match categories */
+      overflow: hidden;
+      font-family: 'Aref Ruqaa', serif; /* Or your site's main Arabic font */
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border: 1px solid #dcd1c1; /* Light beige border */
+      margin-bottom: 20px; /* Space below */
+    }
+    
+    /* 2. Optional Header Styling */
+    .hassif-ticker-header {
+      background-color: #800000; /* Dark maroon/burgundy */
+      color: #f5f1e6; /* Off-white/cream text */
+      padding: 10px 20px;
+      text-align: center;
+      font-weight: bold;
+      border-bottom: 2px solid #a00000; /* Darker red accent line */
+    }
+    
+    /* 3. Marquee Link Styling */
+    .hassif-ticker-link {
+      text-decoration: none;
+      display: block;
+      background-color: #f5f1e6; /* Cream background */
+      color: #800000; /* Dark maroon text */
+      overflow: hidden;
+      position: relative;
+      height: 40px; /* Fixed height for consistency */
+      border-bottom: 1px solid #dcd1c1; /* Bottom border */
+    }
+    
+    /* 4. Marquee Content Styling */
+    .hassif-ticker-content {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      line-height: 40px; /* Vertically center text */
+      text-align: center;
+      /* Starting point of animation */
+      transform: translateX(0%);
+    }
+    
+    /* 5. Marquee Text Styling */
+    .hassif-ticker-text {
+      display: inline-block;
+      padding-left: 100%; /* Start off-screen to the right */
+      white-space: nowrap; /* Prevent line breaks */
+      animation: hassifMarquee 20s linear infinite; /* Control speed here */
+    }
+    
+    /* 6. Duplicate Text for Seamless Looping */
+    .hassif-ticker-duplicate {
+      animation-delay: 10s; /* Half of total animation time */
+    }
+    
+    /* 7. Hover Effect to Pause */
+    .hassif-ticker-link:hover .hassif-ticker-text {
+      animation-play-state: paused;
+    }
+    
+    /* 8. The Animation Keyframes */
+    @keyframes hassifMarquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-100%); }
+    }
+    </style>
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-ticker-container-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    margin-bottom: {{ block.settings.margin_bottom }}px;
+  }
+
+  .ai-ticker-header-{{ ai_gen_id }} {
+    background-color: {{ block.settings.header_bg_color }};
+    color: {{ block.settings.header_text_color }};
+    padding: {{ block.settings.header_padding }}px 20px;
+    text-align: {{ block.settings.header_alignment }};
+    font-weight: {{ block.settings.header_font_weight }};
+    font-size: {{ block.settings.header_font_size }}px;
+    {% if block.settings.show_header_border %}
+      border-bottom: 2px solid {{ block.settings.header_border_color }};
+    {% endif %}
+  }
+
+  .ai-ticker-link-{{ ai_gen_id }} {
+    text-decoration: none;
+    display: block;
+    background-color: {{ block.settings.ticker_bg_color }};
+    color: {{ block.settings.ticker_text_color }};
+    overflow: hidden;
+    position: relative;
+    height: {{ block.settings.ticker_height }}px;
+    {% if block.settings.show_ticker_border %}
+      border-bottom: 1px solid {{ block.settings.ticker_border_color }};
+    {% endif %}
+  }
+
+  .ai-ticker-content-{{ ai_gen_id }} {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    line-height: {{ block.settings.ticker_height }}px;
+    text-align: center;
+    transform: translateX(0%);
+  }
+
+  .ai-ticker-text-{{ ai_gen_id }} {
+    display: inline-block;
+    padding-left: 100%;
+    white-space: nowrap;
+    font-size: {{ block.settings.ticker_font_size }}px;
+    animation: ai-ticker-marquee-{{ ai_gen_id }} {{ block.settings.animation_speed }}s linear infinite;
+  }
+
+  .ai-ticker-duplicate-{{ ai_gen_id }} {
+    animation-delay: {{ block.settings.animation_speed | divided_by: 2.0 }}s;
+  }
+
+  {% if block.settings.pause_on_hover %}
+    .ai-ticker-link-{{ ai_gen_id }}:hover .ai-ticker-text-{{ ai_gen_id }} {
+      animation-play-state: paused;
+    }
+  {% endif %}
+
+  @keyframes ai-ticker-marquee-{{ ai_gen_id }} {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-ticker-container-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-ticker-header-{{ ai_gen_id }} {
+      font-size: {{ block.settings.header_font_size | times: 0.9 }}px;
+      padding: {{ block.settings.header_padding | times: 0.8 }}px 15px;
+    }
+
+    .ai-ticker-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.ticker_font_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<ticker-block-{{ ai_gen_id }} class="ai-ticker-container-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.show_header and block.settings.header_text != blank %}
+    <div class="ai-ticker-header-{{ ai_gen_id }}">
+      {{ block.settings.header_text }}
+    </div>
+  {% endif %}
+
+  <a href="{{ block.settings.ticker_link }}" class="ai-ticker-link-{{ ai_gen_id }}">
+    <div class="ai-ticker-content-{{ ai_gen_id }}">
+      <span class="ai-ticker-text-{{ ai_gen_id }}">
+        {{ block.settings.ticker_text }}
+      </span>
+      <span class="ai-ticker-text-{{ ai_gen_id }} ai-ticker-duplicate-{{ ai_gen_id }}">
+        {{ block.settings.ticker_text }}
+      </span>
+    </div>
+  </a>
+</ticker-block-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class TickerBlock{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.link = this.querySelector('.ai-ticker-link-{{ ai_gen_id }}');
+        if (this.link) {
+          this.link.addEventListener('click', this.handleClick.bind(this));
+        }
+      }
+
+      handleClick(event) {
+        const href = this.link.getAttribute('href');
+        if (!href || href === '' || href === '#') {
+          event.preventDefault();
+        }
+      }
+    }
+
+    customElements.define('ticker-block-{{ ai_gen_id }}', TickerBlock{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Announcement ticker",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "Show header",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "header_text",
+      "label": "Header text",
+      "default": "مرحباً بك في الحصيف! استكشف عوالم المعرفة."
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Background color",
+      "default": "#800000"
+    },
+    {
+      "type": "color",
+      "id": "header_text_color",
+      "label": "Text color",
+      "default": "#f5f1e6"
+    },
+    {
+      "type": "range",
+      "id": "header_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "header_padding",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding",
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "header_font_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "bold",
+          "label": "Bold"
+        }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header_border",
+      "label": "Show bottom border",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "header_border_color",
+      "label": "Border color",
+      "default": "#a00000"
+    },
+    {
+      "type": "header",
+      "content": "Ticker"
+    },
+    {
+      "type": "textarea",
+      "id": "ticker_text",
+      "label": "Ticker text",
+      "default": "✨ شاركونا مقتطفاتكم وأشعاركم في ركن المجتمع ✨        📖 الكتب هي الآثار الأكثر بقاءً للزمن        ✒️ مراجعة جديدة لكتاب مقدمة ابن خلدون        📸 Flatlay مميز من قارئنا العزيز        🌟 اترك أثراً، شارك مراجعتك الآن!"
+    },
+    {
+      "type": "url",
+      "id": "ticker_link",
+      "label": "Ticker link"
+    },
+    {
+      "type": "color",
+      "id": "ticker_bg_color",
+      "label": "Background color",
+      "default": "#f5f1e6"
+    },
+    {
+      "type": "color",
+      "id": "ticker_text_color",
+      "label": "Text color",
+      "default": "#800000"
+    },
+    {
+      "type": "range",
+      "id": "ticker_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "ticker_height",
+      "min": 30,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Height",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "show_ticker_border",
+      "label": "Show bottom border",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "ticker_border_color",
+      "label": "Border color",
+      "default": "#dcd1c1"
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "animation_speed",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "s",
+      "label": "Speed",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Container style"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Border thickness",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#dcd1c1"
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement ticker"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1188 @@
+{% doc %}
+  @prompt
+    ركن المجتمع التفاعلي - نسخة مصححة
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-community-hub-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: {{ block.settings.background_color }};
+    padding: 40px 20px;
+    font-family: {{ block.settings.body_font.family }}, {{ block.settings.body_font.fallback_families }};
+    direction: rtl;
+  }
+
+  .ai-community-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-community-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .ai-community-title-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+
+  .ai-community-subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+  }
+
+  .ai-login-notice-{{ ai_gen_id }} {
+    background: {{ block.settings.notice_bg_color }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.card_radius }}px;
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 40px;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ai-login-notice-{{ ai_gen_id }} h3 {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px;
+    font-size: 24px;
+  }
+
+  .ai-login-notice-{{ ai_gen_id }} p {
+    color: {{ block.settings.text_color }};
+    margin: 0 0 20px;
+  }
+
+  .ai-login-button-{{ ai_gen_id }} {
+    display: inline-block;
+    background: {{ block.settings.button_bg }};
+    color: {{ block.settings.button_text }};
+    padding: 12px 32px;
+    border-radius: {{ block.settings.button_radius }}px;
+    text-decoration: none;
+    font-weight: 600;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    transition: transform 0.2s;
+  }
+
+  .ai-login-button-{{ ai_gen_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: {{ block.settings.shadow_x | plus: 2 }}px {{ block.settings.shadow_y | plus: 2 }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ai-member-section-{{ ai_gen_id }} {
+    margin-bottom: 60px;
+  }
+
+  .ai-tabs-container-{{ ai_gen_id }} {
+    margin-bottom: 30px;
+  }
+
+  .ai-tabs-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ai-tab-{{ ai_gen_id }} {
+    background: {{ block.settings.tab_bg }};
+    color: {{ block.settings.tab_text }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    padding: 12px 24px;
+    border-radius: {{ block.settings.button_radius }}px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    transition: all 0.2s;
+  }
+
+  .ai-tab-{{ ai_gen_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: {{ block.settings.shadow_x | plus: 2 }}px {{ block.settings.shadow_y | plus: 2 }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ai-tab-{{ ai_gen_id }}.active {
+    background: {{ block.settings.tab_active_bg }};
+    color: {{ block.settings.tab_active_text }};
+  }
+
+  .ai-tab-content-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-tab-content-{{ ai_gen_id }}.active {
+    display: block;
+  }
+
+  .ai-form-card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.card_radius }}px;
+    padding: 30px;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    margin-bottom: 30px;
+  }
+
+  .ai-form-card-{{ ai_gen_id }} h3 {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    color: {{ block.settings.title_color }};
+    margin: 0 0 20px;
+    font-size: 20px;
+  }
+
+  .ai-form-group-{{ ai_gen_id }} {
+    margin-bottom: 20px;
+  }
+
+  .ai-form-group-{{ ai_gen_id }} label {
+    display: block;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .ai-form-input-{{ ai_gen_id }},
+  .ai-form-textarea-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 12px;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.input_radius }}px;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fff;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,0.1);
+    box-sizing: border-box;
+  }
+
+  .ai-form-textarea-{{ ai_gen_id }} {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .ai-submit-button-{{ ai_gen_id }} {
+    background: {{ block.settings.button_bg }};
+    color: {{ block.settings.button_text }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    padding: 12px 32px;
+    border-radius: {{ block.settings.button_radius }}px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    transition: transform 0.2s;
+    width: 100%;
+  }
+
+  .ai-submit-button-{{ ai_gen_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: {{ block.settings.shadow_x | plus: 2 }}px {{ block.settings.shadow_y | plus: 2 }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ai-success-message-{{ ai_gen_id }} {
+    background: #d4edda;
+    border: {{ block.settings.border_thickness }}px solid #28a745;
+    color: #155724;
+    padding: 16px;
+    border-radius: {{ block.settings.input_radius }}px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .ai-public-section-{{ ai_gen_id }} {
+    margin-bottom: 60px;
+  }
+
+  .ai-section-title-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: 32px;
+    color: {{ block.settings.title_color }};
+    text-align: center;
+    margin: 0 0 30px;
+    font-weight: 700;
+  }
+
+  .ai-posts-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 30px;
+  }
+
+  .ai-post-card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.card_radius }}px;
+    padding: 20px;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-post-card-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 8px;
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.accent_color_1 }} 0px,
+      {{ block.settings.accent_color_1 }} 4px,
+      {{ block.settings.accent_color_2 }} 4px,
+      {{ block.settings.accent_color_2 }} 8px,
+      {{ block.settings.accent_color_3 }} 8px,
+      {{ block.settings.accent_color_3 }} 12px
+    );
+  }
+
+  .ai-post-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: {{ block.settings.input_radius }}px;
+    margin-bottom: 16px;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+  }
+
+  .ai-post-quote-{{ ai_gen_id }} {
+    font-size: 18px;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 16px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .ai-post-comment-{{ ai_gen_id }} {
+    font-size: 16px;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .ai-post-meta-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 2px solid {{ block.settings.border_color }};
+    font-size: 12px;
+    color: {{ block.settings.meta_color }};
+  }
+
+  .ai-post-author-{{ ai_gen_id }} {
+    font-weight: 600;
+    color: {{ block.settings.title_color }};
+  }
+
+  .ai-post-date-{{ ai_gen_id }} {
+    font-size: 11px;
+  }
+
+  .ai-empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: {{ block.settings.meta_color }};
+    font-style: italic;
+  }
+
+  .ai-blog-section-{{ ai_gen_id }} {
+    margin-top: 60px;
+  }
+
+  .ai-blog-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .ai-blog-card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.card_radius }}px;
+    overflow: hidden;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    transition: transform 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+
+  .ai-blog-card-{{ ai_gen_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: {{ block.settings.shadow_x | plus: 2 }}px {{ block.settings.shadow_y | plus: 2 }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ai-blog-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .ai-blog-content-{{ ai_gen_id }} {
+    padding: 20px;
+  }
+
+  .ai-blog-title-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: 20px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+
+  .ai-blog-excerpt-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 12px;
+  }
+
+  .ai-blog-date-{{ ai_gen_id }} {
+    font-size: 12px;
+    color: {{ block.settings.meta_color }};
+  }
+
+  @media (max-width: 768px) {
+    .ai-community-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;
+    }
+
+    .ai-posts-grid-{{ ai_gen_id }},
+    .ai-blog-grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-tabs-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-tab-{{ ai_gen_id }} {
+      width: 100%;
+    }
+  }
+{% endstyle %}
+
+<community-hub-{{ ai_gen_id }} class="ai-community-hub-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-community-container-{{ ai_gen_id }}">
+
+    <div class="ai-community-header-{{ ai_gen_id }}">
+      <h2 class="ai-community-title-{{ ai_gen_id }}">{{ block.settings.main_title }}</h2>
+      <p class="ai-community-subtitle-{{ ai_gen_id }}">{{ block.settings.main_subtitle }}</p>
+    </div>
+
+    {% if customer %}
+      <div class="ai-member-section-{{ ai_gen_id }}">
+        <div class="ai-tabs-container-{{ ai_gen_id }}">
+          <div class="ai-tabs-{{ ai_gen_id }}">
+            <button class="ai-tab-{{ ai_gen_id }} active" data-tab="photos">
+              {{ block.settings.tab_photos_title }}
+            </button>
+            <button class="ai-tab-{{ ai_gen_id }}" data-tab="quotes">
+              {{ block.settings.tab_quotes_title }}
+            </button>
+            <button class="ai-tab-{{ ai_gen_id }}" data-tab="comments">
+              {{ block.settings.tab_comments_title }}
+            </button>
+          </div>
+
+          {%- comment -%} TAB: PHOTOS {%- endcomment -%}
+          <div class="ai-tab-content-{{ ai_gen_id }} active" data-content="photos">
+            <div class="ai-form-card-{{ ai_gen_id }}">
+              <h3>{{ block.settings.form_photos_title }}</h3>
+              {%- form 'contact', id: 'photo-form' -%}
+                {% if form.posted_successfully? %}
+                  <div class="ai-success-message-{{ ai_gen_id }}">
+                    شكراً لمشاركتك! سيتم مراجعة التقاطك ونشره قريباً.
+                  </div>
+                {% endif %}
+
+                <input type="hidden" name="contact[subject]" value="[التقاط] من {{ customer.name }}">
+                <input type="hidden" name="contact[post_type]" value="photo">
+                <input type="hidden" name="contact[customer_name]" value="{{ customer.name }}">
+                <input type="hidden" name="contact[customer_email]" value="{{ customer.email }}">
+                <input type="hidden" name="contact[timestamp]" value="{{ 'now' | date: '%Y-%m-%d %H:%M' }}">
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>عنوان الصورة</label>
+                  <input type="text" name="contact[photo_title]" class="ai-form-input-{{ ai_gen_id }}" required>
+                </div>
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>رابط الصورة</label>
+                  <input type="url" name="contact[photo_url]" class="ai-form-input-{{ ai_gen_id }}" placeholder="https://..." required>
+                  <small style="color: {{ block.settings.meta_color }}; display: block; margin-top: 4px;">
+                    قم برفع الصورة على خدمة مثل Imgur أو Google Drive ثم الصق الرابط هنا
+                  </small>
+                </div>
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>وصف قصير (اختياري)</label>
+                  <textarea name="contact[description]" class="ai-form-textarea-{{ ai_gen_id }}" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="ai-submit-button-{{ ai_gen_id }}">
+                  مشاركة الالتقاط
+                </button>
+              {%- endform -%}
+            </div>
+          </div>
+
+          {%- comment -%} TAB: QUOTES {%- endcomment -%}
+          <div class="ai-tab-content-{{ ai_gen_id }}" data-content="quotes">
+            <div class="ai-form-card-{{ ai_gen_id }}">
+              <h3>{{ block.settings.form_quotes_title }}</h3>
+              {%- form 'contact', id: 'quote-form' -%}
+                {% if form.posted_successfully? %}
+                  <div class="ai-success-message-{{ ai_gen_id }}">
+                    شكراً لمشاركتك! سيتم مراجعة اقتباسك ونشره قريباً.
+                  </div>
+                {% endif %}
+
+                <input type="hidden" name="contact[subject]" value="[اقتباس] من {{ customer.name }}">
+                <input type="hidden" name="contact[post_type]" value="quote">
+                <input type="hidden" name="contact[customer_name]" value="{{ customer.name }}">
+                <input type="hidden" name="contact[customer_email]" value="{{ customer.email }}">
+                <input type="hidden" name="contact[timestamp]" value="{{ 'now' | date: '%Y-%m-%d %H:%M' }}">
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>الاقتباس</label>
+                  <textarea name="contact[quote_text]" class="ai-form-textarea-{{ ai_gen_id }}" rows="4" required></textarea>
+                </div>
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>اسم الكتاب</label>
+                  <input type="text" name="contact[book_name]" class="ai-form-input-{{ ai_gen_id }}" required>
+                </div>
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>اسم المؤلف</label>
+                  <input type="text" name="contact[author_name]" class="ai-form-input-{{ ai_gen_id }}" required>
+                </div>
+
+                <button type="submit" class="ai-submit-button-{{ ai_gen_id }}">
+                  مشاركة الاقتباس
+                </button>
+              {%- endform -%}
+            </div>
+          </div>
+
+          {%- comment -%} TAB: COMMENTS {%- endcomment -%}
+          <div class="ai-tab-content-{{ ai_gen_id }}" data-content="comments">
+            <div class="ai-form-card-{{ ai_gen_id }}">
+              <h3>{{ block.settings.form_comments_title }}</h3>
+              {%- form 'contact', id: 'comment-form' -%}
+                {% if form.posted_successfully? %}
+                  <div class="ai-success-message-{{ ai_gen_id }}">
+                    شكراً لمشاركتك! سيتم مراجعة تعليقك ونشره قريباً.
+                  </div>
+                {% endif %}
+
+                <input type="hidden" name="contact[subject]" value="[تعليق] من {{ customer.name }}">
+                <input type="hidden" name="contact[post_type]" value="comment">
+                <input type="hidden" name="contact[customer_name]" value="{{ customer.name }}">
+                <input type="hidden" name="contact[customer_email]" value="{{ customer.email }}">
+                <input type="hidden" name="contact[timestamp]" value="{{ 'now' | date: '%Y-%m-%d %H:%M' }}">
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>عنوان التعليق</label>
+                  <input type="text" name="contact[comment_title]" class="ai-form-input-{{ ai_gen_id }}" required>
+                </div>
+
+                <div class="ai-form-group-{{ ai_gen_id }}">
+                  <label>التعليق</label>
+                  <textarea name="contact[comment_text]" class="ai-form-textarea-{{ ai_gen_id }}" rows="5" required></textarea>
+                </div>
+
+                <button type="submit" class="ai-submit-button-{{ ai_gen_id }}">
+                  مشاركة التعليق
+                </button>
+              {%- endform -%}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    {% else %}
+      <div class="ai-login-notice-{{ ai_gen_id }}">
+        <h3>{{ block.settings.login_title }}</h3>
+        <p>{{ block.settings.login_message }}</p>
+        <a href="/account/login" class="ai-login-button-{{ ai_gen_id }}">
+          {{ block.settings.login_button_text }}
+        </a>
+      </div>
+    {% endif %}
+
+    {%- comment -%} PUBLIC POSTS SECTION {%- endcomment -%}
+    {% if block.settings.show_public_posts %}
+      <div class="ai-public-section-{{ ai_gen_id }}">
+        <h2 class="ai-section-title-{{ ai_gen_id }}">{{ block.settings.public_section_title }}</h2>
+
+        <div class="ai-tabs-container-{{ ai_gen_id }}">
+          <div class="ai-tabs-{{ ai_gen_id }}">
+            <button class="ai-tab-{{ ai_gen_id }} active" data-tab="public-photos">
+              {{ block.settings.public_tab_photos }}
+            </button>
+            <button class="ai-tab-{{ ai_gen_id }}" data-tab="public-quotes">
+              {{ block.settings.public_tab_quotes }}
+            </button>
+            <button class="ai-tab-{{ ai_gen_id }}" data-tab="public-comments">
+              {{ block.settings.public_tab_comments }}
+            </button>
+          </div>
+
+          <div class="ai-tab-content-{{ ai_gen_id }} active" data-content="public-photos">
+            <div class="ai-posts-grid-{{ ai_gen_id }}" id="photos-container-{{ ai_gen_id }}">
+              <div class="ai-empty-state-{{ ai_gen_id }}">
+                لا توجد التقاطات بعد. كن أول من يشارك!
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-tab-content-{{ ai_gen_id }}" data-content="public-quotes">
+            <div class="ai-posts-grid-{{ ai_gen_id }}" id="quotes-container-{{ ai_gen_id }}">
+              <div class="ai-empty-state-{{ ai_gen_id }}">
+                لا توجد اقتباسات بعد. شارك اقتباسك المفضل!
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-tab-content-{{ ai_gen_id }}" data-content="public-comments">
+            <div class="ai-posts-grid-{{ ai_gen_id }}" id="comments-container-{{ ai_gen_id }}">
+              <div class="ai-empty-state-{{ ai_gen_id }}">
+                لا توجد تعليقات بعد. شارك رأيك معنا!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} BLOG SECTION {%- endcomment -%}
+    {% if block.settings.show_blog_section and block.settings.blog != blank %}
+      <div class="ai-blog-section-{{ ai_gen_id }}">
+        <h2 class="ai-section-title-{{ ai_gen_id }}">{{ block.settings.blog_section_title }}</h2>
+        <div class="ai-blog-grid-{{ ai_gen_id }}">
+          {% for article in block.settings.blog.articles limit: block.settings.blog_posts_count %}
+            <a href="{{ article.url }}" class="ai-blog-card-{{ ai_gen_id }}">
+              {% if article.image %}
+                <img
+                  src="{{ article.image | image_url: width: 600 }}"
+                  alt="{{ article.title }}"
+                  class="ai-blog-image-{{ ai_gen_id }}"
+                  loading="lazy"
+                  width="600"
+                  height="400"
+                >
+              {% else %}
+                <div style="width:100%;height:200px;background:{{ block.settings.border_color }};display:flex;align-items:center;justify-content:center;">
+                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="{{ block.settings.meta_color }}" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                </div>
+              {% endif %}
+              <div class="ai-blog-content-{{ ai_gen_id }}">
+                <h3 class="ai-blog-title-{{ ai_gen_id }}">{{ article.title }}</h3>
+                {% if article.excerpt != blank %}
+                  <p class="ai-blog-excerpt-{{ ai_gen_id }}">
+                    {{ article.excerpt | strip_html | truncate: 120 }}
+                  </p>
+                {% endif %}
+                <p class="ai-blog-date-{{ ai_gen_id }}">
+                  {{ article.published_at | date: "%d %B %Y" }}
+                </p>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</community-hub-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  const genId = '{{ ai_gen_id }}';
+
+  class CommunityHub extends HTMLElement {
+    constructor() {
+      super();
+      this.storageKey = 'community_posts_hassef_v1';
+      this.maxPosts = {{ block.settings.posts_per_section }};
+    }
+
+    connectedCallback() {
+      this.initTabs();
+      this.loadAndRenderPosts();
+      this.attachFormListeners();
+    }
+
+    /* ---------- TABS ---------- */
+    initTabs() {
+      const tabs     = this.querySelectorAll(`.ai-tab-${genId}`);
+      const contents = this.querySelectorAll(`.ai-tab-content-${genId}`);
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.getAttribute('data-tab');
+
+          // Only toggle tabs in the same parent container
+          const container = tab.closest(`.ai-tabs-container-${genId}`);
+          container.querySelectorAll(`.ai-tab-${genId}`).forEach(t => t.classList.remove('active'));
+          container.querySelectorAll(`.ai-tab-content-${genId}`).forEach(c => c.classList.remove('active'));
+
+          tab.classList.add('active');
+          const targetContent = container.querySelector(`[data-content="${target}"]`);
+          if (targetContent) targetContent.classList.add('active');
+        });
+      });
+    }
+
+    /* ---------- STORAGE ---------- */
+    getPosts() {
+      try {
+        const raw = localStorage.getItem(this.storageKey);
+        return raw ? JSON.parse(raw) : { photos: [], quotes: [], comments: [] };
+      } catch(e) {
+        return { photos: [], quotes: [], comments: [] };
+      }
+    }
+
+    savePosts(posts) {
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(posts));
+      } catch(e) {}
+    }
+
+    /* ---------- FORM LISTENERS ---------- */
+    attachFormListeners() {
+      // Intercept form submit to also save data locally for instant display
+      const forms = this.querySelectorAll('form');
+      forms.forEach(form => {
+        form.addEventListener('submit', () => {
+          // Small delay to let Shopify set posted_successfully
+          setTimeout(() => this.captureAndSave(form), 300);
+        });
+      });
+    }
+
+    captureAndSave(form) {
+      const data     = new FormData(form);
+      const type     = data.get('contact[post_type]');
+      const author   = data.get('contact[customer_name]') || 'قارئ';
+      const now      = new Date();
+      const dateStr  = now.toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
+      const timeStr  = now.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' });
+
+      let post = { author, date: dateStr + ' - ' + timeStr, ts: now.getTime() };
+
+      if (type === 'photo') {
+        post.photoUrl   = data.get('contact[photo_url]') || '';
+        post.photoTitle = data.get('contact[photo_title]') || '';
+        post.description = data.get('contact[description]') || '';
+      } else if (type === 'quote') {
+        post.quoteText  = data.get('contact[quote_text]') || '';
+        post.bookName   = data.get('contact[book_name]') || '';
+        post.authorName = data.get('contact[author_name]') || '';
+      } else if (type === 'comment') {
+        post.commentTitle = data.get('contact[comment_title]') || '';
+        post.commentText  = data.get('contact[comment_text]') || '';
+      } else {
+        return;
+      }
+
+      const posts = this.getPosts();
+      const key   = type === 'photo' ? 'photos' : type === 'quote' ? 'quotes' : 'comments';
+      posts[key].unshift(post);
+      posts[key] = posts[key].slice(0, this.maxPosts);
+      this.savePosts(posts);
+      this.renderAll(posts);
+    }
+
+    /* ---------- RENDER ---------- */
+    loadAndRenderPosts() {
+      this.renderAll(this.getPosts());
+    }
+
+    renderAll(posts) {
+      this.renderPhotos(posts.photos   || []);
+      this.renderQuotes(posts.quotes   || []);
+      this.renderComments(posts.comments || []);
+    }
+
+    renderPhotos(photos) {
+      const el = this.querySelector(`#photos-container-${genId}`);
+      if (!el) return;
+      if (!photos.length) {
+        el.innerHTML = `<div class="ai-empty-state-${genId}">لا توجد التقاطات بعد. كن أول من يشارك!</div>`;
+        return;
+      }
+      el.innerHTML = photos.map(p => `
+        <div class="ai-post-card-${genId}">
+          <img src="${this.escHtml(p.photoUrl)}" alt="${this.escHtml(p.photoTitle)}"
+               class="ai-post-image-${genId}" loading="lazy">
+          ${p.description ? `<p class="ai-post-comment-${genId}">${this.escHtml(p.description)}</p>` : ''}
+          <div class="ai-post-meta-${genId}">
+            <span class="ai-post-author-${genId}">${this.escHtml(p.author)}</span>
+            <span class="ai-post-date-${genId}">${this.escHtml(p.date)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderQuotes(quotes) {
+      const el = this.querySelector(`#quotes-container-${genId}`);
+      if (!el) return;
+      if (!quotes.length) {
+        el.innerHTML = `<div class="ai-empty-state-${genId}">لا توجد اقتباسات بعد. شارك اقتباسك المفضل!</div>`;
+        return;
+      }
+      el.innerHTML = quotes.map(q => `
+        <div class="ai-post-card-${genId}">
+          <p class="ai-post-quote-${genId}">"${this.escHtml(q.quoteText)}"</p>
+          <p style="font-size:14px;margin-bottom:8px;">
+            <strong>${this.escHtml(q.bookName)}</strong> — ${this.escHtml(q.authorName)}
+          </p>
+          <div class="ai-post-meta-${genId}">
+            <span class="ai-post-author-${genId}">${this.escHtml(q.author)}</span>
+            <span class="ai-post-date-${genId}">${this.escHtml(q.date)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderComments(comments) {
+      const el = this.querySelector(`#comments-container-${genId}`);
+      if (!el) return;
+      if (!comments.length) {
+        el.innerHTML = `<div class="ai-empty-state-${genId}">لا توجد تعليقات بعد. شارك رأيك معنا!</div>`;
+        return;
+      }
+      el.innerHTML = comments.map(c => `
+        <div class="ai-post-card-${genId}">
+          <h4 style="margin:0 0 12px;font-size:18px;">${this.escHtml(c.commentTitle)}</h4>
+          <p class="ai-post-comment-${genId}">${this.escHtml(c.commentText)}</p>
+          <div class="ai-post-meta-${genId}">
+            <span class="ai-post-author-${genId}">${this.escHtml(c.author)}</span>
+            <span class="ai-post-date-${genId}">${this.escHtml(c.date)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* ---------- HELPERS ---------- */
+    escHtml(str) {
+      return String(str || '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+  }
+
+  customElements.define(`community-hub-${genId}`, CommunityHub);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "ركن المجتمع التفاعلي",
+  "settings": [
+    {
+      "type": "header",
+      "content": "العنوان الرئيسي"
+    },
+    {
+      "type": "text",
+      "id": "main_title",
+      "label": "العنوان",
+      "default": "ركن أصدقاء الحصيف"
+    },
+    {
+      "type": "text",
+      "id": "main_subtitle",
+      "label": "العنوان الفرعي",
+      "default": "شارك التقاطاتك واقتباساتك وتعليقاتك مع المجتمع"
+    },
+    {
+      "type": "header",
+      "content": "إشعار تسجيل الدخول"
+    },
+    {
+      "type": "text",
+      "id": "login_title",
+      "label": "عنوان الإشعار",
+      "default": "سجل دخولك للمشاركة"
+    },
+    {
+      "type": "textarea",
+      "id": "login_message",
+      "label": "رسالة الإشعار",
+      "default": "انضم إلى مجتمع أصدقاء الحصيف وشارك التقاطاتك واقتباساتك المفضلة"
+    },
+    {
+      "type": "text",
+      "id": "login_button_text",
+      "label": "نص زر الدخول",
+      "default": "تسجيل الدخول"
+    },
+    {
+      "type": "header",
+      "content": "تبويبات الأعضاء"
+    },
+    {
+      "type": "text",
+      "id": "tab_photos_title",
+      "label": "تبويب الالتقاطات",
+      "default": "التقاطات أصدقاء الحصيف"
+    },
+    {
+      "type": "text",
+      "id": "tab_quotes_title",
+      "label": "تبويب الاقتباسات",
+      "default": "اقتباسات أصدقاء الحصيف"
+    },
+    {
+      "type": "text",
+      "id": "tab_comments_title",
+      "label": "تبويب التعليقات",
+      "default": "تعليقات أصدقاء الحصيف"
+    },
+    {
+      "type": "header",
+      "content": "عناوين النماذج"
+    },
+    {
+      "type": "text",
+      "id": "form_photos_title",
+      "label": "عنوان نموذج الالتقاطات",
+      "default": "شارك التقاطك المفضل"
+    },
+    {
+      "type": "text",
+      "id": "form_quotes_title",
+      "label": "عنوان نموذج الاقتباسات",
+      "default": "شارك اقتباسك المفضل"
+    },
+    {
+      "type": "text",
+      "id": "form_comments_title",
+      "label": "عنوان نموذج التعليقات",
+      "default": "شارك تعليقك"
+    },
+    {
+      "type": "header",
+      "content": "القسم العام"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_public_posts",
+      "label": "عرض المشاركات العامة",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "public_section_title",
+      "label": "عنوان القسم العام",
+      "default": "مشاركات القراء"
+    },
+    {
+      "type": "text",
+      "id": "public_tab_photos",
+      "label": "تبويب التقاطات القراء",
+      "default": "التقاطات القراء"
+    },
+    {
+      "type": "text",
+      "id": "public_tab_quotes",
+      "label": "تبويب اقتباسات القراء",
+      "default": "اقتباسات القراء"
+    },
+    {
+      "type": "text",
+      "id": "public_tab_comments",
+      "label": "تبويب تعليقات القراء",
+      "default": "تعليقات القراء"
+    },
+    {
+      "type": "range",
+      "id": "posts_per_section",
+      "label": "عدد المشاركات لكل قسم",
+      "min": 3,
+      "max": 12,
+      "step": 3,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "قسم المقالات"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_blog_section",
+      "label": "عرض قسم المقالات",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "blog_section_title",
+      "label": "عنوان قسم المقالات",
+      "default": "أحدث المقالات"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "المدونة"
+    },
+    {
+      "type": "range",
+      "id": "blog_posts_count",
+      "label": "عدد المقالات",
+      "min": 3,
+      "max": 12,
+      "step": 3,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "الألوان"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "لون خلفية البطاقات",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العناوين",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "meta_color",
+      "label": "لون النص الثانوي",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "لون الظل",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "لون خلفية الأزرار",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "لون نص الأزرار",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "tab_bg",
+      "label": "لون خلفية التبويبات",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "tab_text",
+      "label": "لون نص التبويبات",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_bg",
+      "label": "لون التبويب النشط",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_text",
+      "label": "لون نص التبويب النشط",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "notice_bg_color",
+      "label": "لون خلفية الإشعار",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "header",
+      "content": "ألوان التطريز الفلسطيني"
+    },
+    {
+      "type": "color",
+      "id": "accent_color_1",
+      "label": "لون التطريز 1",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "accent_color_2",
+      "label": "لون التطريز 2",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "accent_color_3",
+      "label": "لون التطريز 3",
+      "default": "#f9e547"
+    },
+    {
+      "type": "header",
+      "content": "الأحجام"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "العرض الأقصى",
+      "min": 800,
+      "max": 1400,
+      "step": 100,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان الرئيسي",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم العنوان الفرعي",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "label": "سمك الحدود",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "انحناء البطاقات",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "انحناء الأزرار",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "input_radius",
+      "label": "انحناء الحقول",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "shadow_x",
+      "label": "إزاحة الظل أفقياً",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "shadow_y",
+      "label": "إزاحة الظل عمودياً",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "الخطوط"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "خط العناوين",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "خط النص",
+      "default": "assistant_n4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "ركن المجتمع التفاعلي"
+    }
+  ]
+}
+{% endschema %}

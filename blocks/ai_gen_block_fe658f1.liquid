@@ -1,0 +1,1223 @@
+{% doc %}
+  @prompt
+    }
+    ت Shopify Liquid Developer محترف + Frontend Engineer متخصص في إنشاء تجارب تفاعلية فاخرة.
+    أ
+    ن🎯 الهدف:
+    بناء نظام مجلة رقمية داخل Shopify (Online Store 2.0) يحتوي على Flipbook حقيقي بالصور (Page Flip Effect) — بدون استخدام PDF — ليحاكي تجربة المجلات الواقعية.
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    📦 المطلوب: 3 Sections مستقلة
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    🧩 Section 1 — magazine-hero.liquid
+    (Featured Issue)
+    
+    - صورة غلاف Full Width
+    - Overlay gradi
+    ent فاخر
+    - عنوان + وصف + زر CTA
+    - Fade-in animation (CSS)
+    - Parallax effect خفيف (Vanilla JS)
+    - زر Dark Mode toggle
+    
+    Settings:
+    - featured_image
+    - featured_title
+    - featured_desc
+    ollection
+    - كل - featured_link
+    - cta_label
+    
+    Blocks:
+    - image
+    - text
+    - button
+    - divider
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    🧩 Section 2 — magazine-archive.liquid
+    (Archive — Netflix Style)
+    
+    - عرض الأعداد من 
+    CProduct = عدد
+    - Cards مع:
+      - صورة
+      - عنوان
+      - زر قراءة
+    
+    Features:
+    - Horizontal scroll
+    - Hover scale + overlay
+    - Responsive
+    
+    Settings:
+    - collection
+    - section_title
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    🧩 Section 3 — magazine-flipbook.liquid
+     كل مرة (الصفحة الحالية)
+    
+    2. أزرار:(Flipbook Viewer بالصور — بدون PDF)
+    
+    🎯 الفكرة:
+    عرض صفحات المجلة كصور يتم تقليبها بتأثير يشبه الكتاب.
+    
+    📸 مصدر الصور:
+    - Product Images (gallery)
+    - كل صورة = صفحة
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    🧠 المطلوب في Flipbook:
+    
+    1. عرض صورة واحدة ف
+    ي
+    - التالي →
+    - السابق ←
+    
+    3. Page Flip Animation:
+    - استخدام CSS transform + rotateY
+    - perspective effect
+    - transition ناعم
+    
+    4. تحسين التجربة:
+    - preload للصور التالية
+    - lazy loading
+    - swipe support للموبايل (اختياري بسيط)
+    
+    5. تصميم:
+    - container في المنتصف
+    - aspect ratio ثابت (مثل 3:4)
+    olor-dark: #121212;
+    }
+    
+    -- shadow يعطي إحساس كتاب
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    ⚠️ قيود مهمة:
+    
+    - بدون مكتبات خارجية (no turn.js)
+    - Vanilla JS فقط (خفيف جداً)
+    - كود بسيط وقابل للتعديل
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    🎨 Design System:
+    
+    :root {
+      --color-beige: #f4efe6;
+      --color-burgundy: #6b1d2a;
+      --color-gold: #e6c200;
+      --
+    c دعم Dark Mode باستخدام data-theme
+    - Typography:
+      - Georgia للعناوين
+      - system-ui للنصوص
+    - RTL support
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    ⚡ Performance:
+    
+    - loading="lazy" للصور
+    - لا يوجد JavaScript ثقيل
+    - responsive بالكامل
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    ⚠️ قواعد الكود:
+    
+    - Production-ready
+    - كل شيء editable من Theme Editor
+    - تعليقات عربية داخل الكود
+    دم يقلب الصفحات مثل كتا- fallback لو ما في صور
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    📦 المطلوب في الإخراج:
+    
+    3 ملفات Liquid كاملة:
+    
+    1. magazine-hero.liquid
+    2. magazine-archive.liquid
+    3. magazine-flipbook.liquid
+    
+    كل ملف يحتوي:
+    - HTML + Liquid
+    - CSS داخلي
+    - JS خفيف (لو لازم)
+    - Schema كامل
+    - Preset جاهز
+    
+    ━━━━━━━━━━━━━━━━━━━
+    
+    🔥 النتيجة النهائية:
+    
+    نظام مجلة تفاعلي:
+    - المست
+    خب حقيقي
+    - تجربة فاخرة جداً
+    - بدون PDF
+    - يشبه تطبيقات المجلات الع, بدي المجله أنا ارفع صورها من الجهاز وليس كمنتج, بدي التأثير عند التقليب مثل تاثير تاثير تقليب صفحات الكتاب, لا بدي شي احترافي زي مثلا الورقه نفسها اللي اقف عندها عند لمسها تتحرك بانسيابيه من الحواف كانّها ورقه وعند ثنيها تظهر الورقه اللي تحتها بانسيابية 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .magazine-flipbook-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.section_padding }}px 20px;
+    background: {{ block.settings.background_color }};
+    direction: {{ block.settings.text_direction }};
+  }
+
+  .magazine-flipbook__container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .magazine-flipbook__header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .magazine-flipbook__title-{{ ai_gen_id }} {
+    font-family: Georgia, serif;
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+
+  .magazine-flipbook__subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .magazine-flipbook__viewer-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    max-width: {{ block.settings.viewer_max_width }}px;
+    margin: 0 auto;
+    perspective: 2000px;
+    perspective-origin: center center;
+  }
+
+  .magazine-flipbook__stage-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: {{ block.settings.aspect_ratio }}%;
+    background: {{ block.settings.stage_background }};
+    border-radius: {{ block.settings.border_radius }}px;
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, {{ block.settings.shadow_opacity }}),
+      0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+  }
+
+  .magazine-flipbook__pages-container-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform-origin: {% if block.settings.text_direction == 'rtl' %}right{% else %}left{% endif %} center;
+    transition: transform {{ block.settings.flip_duration }}s cubic-bezier(0.645, 0.045, 0.355, 1);
+    cursor: grab;
+    will-change: transform;
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }}:active {
+    cursor: grabbing;
+  }
+
+  .magazine-flipbook__page-front-{{ ai_gen_id }},
+  .magazine-flipbook__page-back-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+  }
+
+  .magazine-flipbook__page-front-{{ ai_gen_id }} {
+    transform: rotateY(0deg);
+    z-index: 2;
+  }
+
+  .magazine-flipbook__page-back-{{ ai_gen_id }} {
+    transform: rotateY(180deg);
+    z-index: 1;
+  }
+
+  .magazine-flipbook__page-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: {{ block.settings.image_fit }};
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }}.flipped {
+    transform: rotateY({% if block.settings.text_direction == 'rtl' %}-180deg{% else %}180deg{% endif %});
+    pointer-events: none;
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }}.interactive {
+    transition: none;
+  }
+
+  .magazine-flipbook__page-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to {% if block.settings.text_direction == 'rtl' %}left{% else %}right{% endif %},
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.1) 50%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }}:hover .magazine-flipbook__page-overlay-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }}.interactive .magazine-flipbook__page-overlay-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .magazine-flipbook__page-shadow-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    {% if block.settings.text_direction == 'rtl' %}
+      right: 0;
+    {% else %}
+      left: 0;
+    {% endif %}
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to {% if block.settings.text_direction == 'rtl' %}left{% else %}right{% endif %},
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0) 20%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }}.interactive .magazine-flipbook__page-shadow-{{ ai_gen_id }},
+  .magazine-flipbook__page-{{ ai_gen_id }}.flipped .magazine-flipbook__page-shadow-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .magazine-flipbook__hint-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    {% if block.settings.text_direction == 'rtl' %}
+      right: 30px;
+    {% else %}
+      left: 30px;
+    {% endif %}
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    animation: hintPulse-{{ ai_gen_id }} 2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @keyframes hintPulse-{{ ai_gen_id }} {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.8; }
+  }
+
+  .magazine-flipbook__page-{{ ai_gen_id }}:hover ~ .magazine-flipbook__hint-{{ ai_gen_id }} {
+    animation: none;
+    opacity: 0;
+  }
+
+  .magazine-flipbook__controls-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .magazine-flipbook__button-{{ ai_gen_id }} {
+    background: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: 2px solid {{ block.settings.button_border_color }};
+    border-radius: {{ block.settings.button_radius }}px;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .magazine-flipbook__button-{{ ai_gen_id }}:hover:not(:disabled) {
+    background: {{ block.settings.button_hover_background }};
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .magazine-flipbook__button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .magazine-flipbook__counter-{{ ai_gen_id }} {
+    font-size: 20px;
+    font-weight: 700;
+    color: {{ block.settings.counter_color }};
+    padding: 12px 24px;
+    background: {{ block.settings.counter_background }};
+    border-radius: {{ block.settings.button_radius }}px;
+    min-width: 140px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    font-family: Georgia, serif;
+  }
+
+  .magazine-flipbook__empty-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: {{ block.settings.subtitle_color }};
+    opacity: 0.6;
+    z-index: 1;
+    padding: 20px;
+  }
+
+  .magazine-flipbook__empty-icon-{{ ai_gen_id }} {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+    opacity: 0.3;
+  }
+
+  @media screen and (max-width: 749px) {
+    .magazine-flipbook__viewer-{{ ai_gen_id }} {
+      perspective: 1200px;
+    }
+
+    .magazine-flipbook__title-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.title_size }}px * 0.75);
+    }
+
+    .magazine-flipbook__subtitle-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.subtitle_size }}px * 0.9);
+    }
+
+    .magazine-flipbook__button-{{ ai_gen_id }} {
+      padding: 12px 20px;
+      font-size: 14px;
+    }
+
+    .magazine-flipbook__counter-{{ ai_gen_id }} {
+      font-size: 18px;
+      min-width: 110px;
+      padding: 10px 20px;
+    }
+
+    .magazine-flipbook__hint-{{ ai_gen_id }} {
+      font-size: 12px;
+      padding: 10px 16px;
+      {% if block.settings.text_direction == 'rtl' %}
+        right: 20px;
+      {% else %}
+        left: 20px;
+      {% endif %}
+    }
+  }
+
+  [data-theme="dark"] .magazine-flipbook-{{ ai_gen_id }} {
+    background: #121212;
+  }
+
+  [data-theme="dark"] .magazine-flipbook__stage-{{ ai_gen_id }} {
+    background: #1e1e1e;
+  }
+{% endstyle %}
+
+<magazine-flipbook-{{ ai_gen_id }}
+  class="magazine-flipbook-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  data-flip-duration="{{ block.settings.flip_duration }}"
+  data-direction="{{ block.settings.text_direction }}"
+  data-sensitivity="{{ block.settings.drag_sensitivity }}"
+>
+  <div class="magazine-flipbook__container-{{ ai_gen_id }}">
+    {% if block.settings.title != blank or block.settings.subtitle != blank %}
+      <div class="magazine-flipbook__header-{{ ai_gen_id }}">
+        {% if block.settings.title != blank %}
+          <h2 class="magazine-flipbook__title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+        {% endif %}
+        {% if block.settings.subtitle != blank %}
+          <p class="magazine-flipbook__subtitle-{{ ai_gen_id }}">{{ block.settings.subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="magazine-flipbook__viewer-{{ ai_gen_id }}">
+      <div class="magazine-flipbook__stage-{{ ai_gen_id }}">
+        <div class="magazine-flipbook__pages-container-{{ ai_gen_id }}">
+          {% liquid
+            assign pages = ''
+            
+            for i in (1..20)
+              assign page_key = 'page_' | append: i
+              assign page_image = block.settings[page_key]
+              
+              if page_image != blank
+                if pages != ''
+                  assign pages = pages | append: ','
+                endif
+                assign pages = pages | append: page_image.src
+              endif
+            endfor
+            
+            assign pages_array = pages | split: ','
+            assign page_count = pages_array.size
+          %}
+
+          {% if page_count > 0 %}
+            {% for i in (1..20) %}
+              {% assign page_key = 'page_' | append: i %}
+              {% assign page_image = block.settings[page_key] %}
+              
+              {% if page_image != blank %}
+                {% assign next_index = forloop.index %}
+                {% assign next_page_key = 'page_' | append: next_index %}
+                {% assign next_page_image = block.settings[next_page_key] %}
+                
+                <div
+                  class="magazine-flipbook__page-{{ ai_gen_id }}"
+                  data-page-index="{{ forloop.index0 }}"
+                  style="z-index: {{ page_count | minus: forloop.index0 }};"
+                >
+                  <div class="magazine-flipbook__page-front-{{ ai_gen_id }}">
+                    <img
+                      src="{{ page_image | image_url: width: 1200 }}"
+                      alt="صفحة {{ forloop.index }}"
+                      width="{{ page_image.width }}"
+                      height="{{ page_image.height }}"
+                      loading="{% if forloop.index <= 2 %}eager{% else %}lazy{% endif %}"
+                      class="magazine-flipbook__page-image-{{ ai_gen_id }}"
+                    >
+                    <div class="magazine-flipbook__page-overlay-{{ ai_gen_id }}"></div>
+                  </div>
+                  
+                  {% if next_page_image != blank %}
+                    <div class="magazine-flipbook__page-back-{{ ai_gen_id }}">
+                      <img
+                        src="{{ next_page_image | image_url: width: 1200 }}"
+                        alt="صفحة {{ next_index }}"
+                        width="{{ next_page_image.width }}"
+                        height="{{ next_page_image.height }}"
+                        loading="lazy"
+                        class="magazine-flipbook__page-image-{{ ai_gen_id }}"
+                        style="transform: scaleX(-1);"
+                      >
+                    </div>
+                  {% endif %}
+                  
+                  <div class="magazine-flipbook__page-shadow-{{ ai_gen_id }}"></div>
+                </div>
+              {% endif %}
+            {% endfor %}
+
+            {% if block.settings.show_hint %}
+              <div class="magazine-flipbook__hint-{{ ai_gen_id }}">
+                {{ block.settings.hint_text }}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="magazine-flipbook__empty-{{ ai_gen_id }}">
+              <div class="magazine-flipbook__empty-icon-{{ ai_gen_id }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">ابدأ بإضافة صور المجلة</p>
+              <p style="font-size: 14px; opacity: 0.7;">المس الصفحة واسحبها لتقليبها</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if page_count > 0 %}
+        <div class="magazine-flipbook__controls-{{ ai_gen_id }}">
+          <button
+            class="magazine-flipbook__button-{{ ai_gen_id }} magazine-flipbook__prev-{{ ai_gen_id }}"
+            aria-label="الصفحة السابقة"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{% if block.settings.text_direction == 'rtl' %}M9 5l7 7-7 7{% else %}M15 19l-7-7 7-7{% endif %}" />
+            </svg>
+            <span>{{ block.settings.prev_label }}</span>
+          </button>
+
+          <div class="magazine-flipbook__counter-{{ ai_gen_id }}">
+            <span class="current-page">1</span>
+            <span style="opacity: 0.5; margin: 0 4px;">/</span>
+            <span class="total-pages">{{ page_count }}</span>
+          </div>
+
+          <button
+            class="magazine-flipbook__button-{{ ai_gen_id }} magazine-flipbook__next-{{ ai_gen_id }}"
+            aria-label="الصفحة التالية"
+          >
+            <span>{{ block.settings.next_label }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{% if block.settings.text_direction == 'rtl' %}M15 19l-7-7 7-7{% else %}M9 5l7 7-7 7{% endif %}" />
+            </svg>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</magazine-flipbook-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  class MagazineFlipbook{{ ai_gen_id }} extends HTMLElement {
+    constructor() {
+      super();
+      this.currentPage = 0;
+      this.isDragging = false;
+      this.startX = 0;
+      this.startY = 0;
+      this.currentX = 0;
+      this.currentRotation = 0;
+      this.activePage = null;
+    }
+
+    connectedCallback() {
+      this.pages = Array.from(this.querySelectorAll('.magazine-flipbook__page-{{ ai_gen_id }}'));
+      this.totalPages = this.pages.length;
+
+      if (this.totalPages === 0) return;
+
+      this.prevButton = this.querySelector('.magazine-flipbook__prev-{{ ai_gen_id }}');
+      this.nextButton = this.querySelector('.magazine-flipbook__next-{{ ai_gen_id }}');
+      this.currentPageEl = this.querySelector('.current-page');
+      this.stage = this.querySelector('.magazine-flipbook__stage-{{ ai_gen_id }}');
+
+      this.flipDuration = parseFloat(this.dataset.flipDuration);
+      this.direction = this.dataset.direction;
+      this.sensitivity = parseFloat(this.dataset.sensitivity);
+
+      this.setupEventListeners();
+      this.updateButtons();
+      this.updateActivePage();
+    }
+
+    setupEventListeners() {
+      this.pages.forEach((page, index) => {
+        page.addEventListener('mousedown', (e) => this.handleDragStart(e, page, index));
+        page.addEventListener('touchstart', (e) => this.handleDragStart(e, page, index), { passive: false });
+      });
+
+      document.addEventListener('mousemove', (e) => this.handleDragMove(e));
+      document.addEventListener('touchmove', (e) => this.handleDragMove(e), { passive: false });
+
+      document.addEventListener('mouseup', (e) => this.handleDragEnd(e));
+      document.addEventListener('touchend', (e) => this.handleDragEnd(e));
+
+      if (this.prevButton) {
+        this.prevButton.addEventListener('click', () => this.previousPage());
+      }
+
+      if (this.nextButton) {
+        this.nextButton.addEventListener('click', () => this.nextPage());
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+          this.direction === 'rtl' ? this.nextPage() : this.previousPage();
+        } else if (e.key === 'ArrowRight') {
+          this.direction === 'rtl' ? this.previousPage() : this.nextPage();
+        }
+      });
+    }
+
+    handleDragStart(e, page, index) {
+      if (index !== this.currentPage || page.classList.contains('flipped')) return;
+
+      this.isDragging = true;
+      this.activePage = page;
+      
+      const touch = e.type.includes('touch') ? e.touches[0] : e;
+      this.startX = touch.clientX;
+      this.startY = touch.clientY;
+
+      page.classList.add('interactive');
+      page.style.transition = 'none';
+
+      e.preventDefault();
+    }
+
+    handleDragMove(e) {
+      if (!this.isDragging || !this.activePage) return;
+
+      const touch = e.type.includes('touch') ? e.touches[0] : e;
+      this.currentX = touch.clientX;
+      const currentY = touch.clientY;
+
+      const deltaX = this.currentX - this.startX;
+      const deltaY = currentY - this.startY;
+
+      if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+
+      const stageRect = this.stage.getBoundingClientRect();
+      const maxDrag = stageRect.width * 0.8;
+      
+      let dragAmount = this.direction === 'rtl' ? -deltaX : deltaX;
+      dragAmount = Math.max(0, Math.min(dragAmount, maxDrag));
+
+      const rotationAngle = (dragAmount / maxDrag) * 180 * this.sensitivity;
+      this.currentRotation = rotationAngle;
+
+      const rotationDirection = this.direction === 'rtl' ? -1 : 1;
+      this.activePage.style.transform = `rotateY(${rotationAngle * rotationDirection}deg)`;
+
+      e.preventDefault();
+    }
+
+    handleDragEnd(e) {
+      if (!this.isDragging || !this.activePage) return;
+
+      this.isDragging = false;
+
+      const threshold = 30;
+      const shouldFlip = this.currentRotation > threshold;
+
+      this.activePage.style.transition = `transform ${this.flipDuration}s cubic-bezier(0.645, 0.045, 0.355, 1)`;
+
+      if (shouldFlip) {
+        const rotationDirection = this.direction === 'rtl' ? -1 : 1;
+        this.activePage.style.transform = `rotateY(${180 * rotationDirection}deg)`;
+        
+        setTimeout(() => {
+          this.activePage.classList.add('flipped');
+          this.activePage.classList.remove('interactive');
+          this.activePage.style.transform = '';
+          this.currentPage++;
+          this.updateButtons();
+          this.updateCounter();
+          this.updateActivePage();
+        }, this.flipDuration * 1000);
+      } else {
+        this.activePage.style.transform = 'rotateY(0deg)';
+        setTimeout(() => {
+          this.activePage.classList.remove('interactive');
+          this.activePage.style.transform = '';
+        }, this.flipDuration * 1000);
+      }
+
+      this.activePage = null;
+      this.currentRotation = 0;
+    }
+
+    nextPage() {
+      if (this.currentPage >= this.totalPages) return;
+
+      const page = this.pages[this.currentPage];
+      if (!page || page.classList.contains('flipped')) return;
+
+      const rotationDirection = this.direction === 'rtl' ? -1 : 1;
+      page.style.transition = `transform ${this.flipDuration}s cubic-bezier(0.645, 0.045, 0.355, 1)`;
+      page.style.transform = `rotateY(${180 * rotationDirection}deg)`;
+
+      setTimeout(() => {
+        page.classList.add('flipped');
+        page.style.transform = '';
+        this.currentPage++;
+        this.updateButtons();
+        this.updateCounter();
+        this.updateActivePage();
+      }, this.flipDuration * 1000);
+    }
+
+    previousPage() {
+      if (this.currentPage <= 0) return;
+
+      this.currentPage--;
+      const page = this.pages[this.currentPage];
+      if (!page) return;
+
+      page.classList.remove('flipped');
+      page.style.transition = `transform ${this.flipDuration}s cubic-bezier(0.645, 0.045, 0.355, 1)`;
+      page.style.transform = 'rotateY(0deg)';
+
+      setTimeout(() => {
+        page.style.transform = '';
+        this.updateButtons();
+        this.updateCounter();
+        this.updateActivePage();
+      }, this.flipDuration * 1000);
+    }
+
+    updateActivePage() {
+      this.pages.forEach((page, index) => {
+        if (index < this.currentPage) {
+          page.classList.add('flipped');
+        } else {
+          page.classList.remove('flipped');
+        }
+      });
+    }
+
+    updateButtons() {
+      if (this.prevButton) {
+        this.prevButton.disabled = this.currentPage === 0;
+      }
+
+      if (this.nextButton) {
+        this.nextButton.disabled = this.currentPage >= this.totalPages;
+      }
+    }
+
+    updateCounter() {
+      if (this.currentPageEl) {
+        this.currentPageEl.textContent = this.currentPage + 1;
+      }
+    }
+  }
+
+  customElements.define('magazine-flipbook-{{ ai_gen_id }}', MagazineFlipbook{{ ai_gen_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Magazine Flipbook Pro",
+  "tag": null,
+  "class": "magazine-flipbook-block",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "العنوان",
+      "default": "تصفح المجلة التفاعلية"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "العنوان الفرعي",
+      "default": "المس الصفحة واسحبها لتقليبها بشكل واقعي"
+    },
+    {
+      "type": "header",
+      "content": "صفحات المجلة (حتى 20 صفحة)"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_1",
+      "label": "صفحة 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_2",
+      "label": "صفحة 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_3",
+      "label": "صفحة 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_4",
+      "label": "صفحة 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_5",
+      "label": "صفحة 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_6",
+      "label": "صفحة 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_7",
+      "label": "صفحة 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_8",
+      "label": "صفحة 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_9",
+      "label": "صفحة 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_10",
+      "label": "صفحة 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_11",
+      "label": "صفحة 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_12",
+      "label": "صفحة 12"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_13",
+      "label": "صفحة 13"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_14",
+      "label": "صفحة 14"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_15",
+      "label": "صفحة 15"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_16",
+      "label": "صفحة 16"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_17",
+      "label": "صفحة 17"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_18",
+      "label": "صفحة 18"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_19",
+      "label": "صفحة 19"
+    },
+    {
+      "type": "image_picker",
+      "id": "page_20",
+      "label": "صفحة 20"
+    },
+    {
+      "type": "header",
+      "content": "إعدادات التفاعل"
+    },
+    {
+      "type": "range",
+      "id": "flip_duration",
+      "label": "مدة التقليب",
+      "min": 0.5,
+      "max": 2,
+      "step": 0.1,
+      "unit": "s",
+      "default": 0.8
+    },
+    {
+      "type": "range",
+      "id": "drag_sensitivity",
+      "label": "حساسية السحب",
+      "min": 0.5,
+      "max": 1.5,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hint",
+      "label": "إظهار تلميح التفاعل",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "hint_text",
+      "label": "نص التلميح",
+      "default": "اسحب الصفحة لتقليبها ←"
+    },
+    {
+      "type": "header",
+      "content": "التخطيط"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "العرض الأقصى للحاوية",
+      "min": 800,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "viewer_max_width",
+      "label": "العرض الأقصى للعارض",
+      "min": 400,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "aspect_ratio",
+      "label": "نسبة العرض للارتفاع",
+      "min": 100,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 130
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "ملاءمة الصورة",
+      "options": [
+        {
+          "value": "cover",
+          "label": "تغطية"
+        },
+        {
+          "value": "contain",
+          "label": "احتواء"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "المسافة الداخلية",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "select",
+      "id": "text_direction",
+      "label": "اتجاه النص والتقليب",
+      "options": [
+        {
+          "value": "rtl",
+          "label": "من اليمين لليسار"
+        },
+        {
+          "value": "ltr",
+          "label": "من اليسار لليمين"
+        }
+      ],
+      "default": "rtl"
+    },
+    {
+      "type": "header",
+      "content": "الألوان"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f4efe6"
+    },
+    {
+      "type": "color",
+      "id": "stage_background",
+      "label": "لون خلفية المسرح",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "لون العنوان الفرعي",
+      "default": "#6b1d2a"
+    },
+    {
+      "type": "header",
+      "content": "الأزرار"
+    },
+    {
+      "type": "text",
+      "id": "prev_label",
+      "label": "نص زر السابق",
+      "default": "السابق"
+    },
+    {
+      "type": "text",
+      "id": "next_label",
+      "label": "نص زر التالي",
+      "default": "التالي"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "خلفية الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "خلفية الزر عند التمرير",
+      "default": "#6b1d2a"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "لون نص الزر",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "لون حدود الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "استدارة الزر",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "العداد"
+    },
+    {
+      "type": "color",
+      "id": "counter_color",
+      "label": "لون العداد",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "counter_background",
+      "label": "خلفية العداد",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "header",
+      "content": "التصميم"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم العنوان الفرعي",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الحواف",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "shadow_opacity",
+      "label": "شفافية الظل",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.3
+    }
+  ],
+  "presets": [
+    {
+      "name": "Magazine Flipbook Pro"
+    }
+  ]
+}
+{% endschema %}

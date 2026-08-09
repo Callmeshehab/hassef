@@ -1,0 +1,276 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+
+.ai-tv-frame-container-{{ ai_gen_id }}{
+  position:relative;
+  width:{{ block.settings.desktop_width_percent }}%;
+  margin:0 auto;
+}
+
+.ai-tv-frame-wrapper-{{ ai_gen_id }}{
+  position:relative;
+  width:100%;
+}
+
+.ai-tv-video-container-{{ ai_gen_id }}{
+  position:absolute;
+  top:{{ block.settings.video_position_top }}%;
+  left:{{ block.settings.video_position_left }}%;
+  width:{{ block.settings.video_width }}%;
+  height:{{ block.settings.video_height }}%;
+  transform:translate(-50%,-50%);
+  overflow:hidden;
+  z-index:1;
+}
+
+.ai-tv-video-{{ ai_gen_id }}{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.ai-tv-frame-image-{{ ai_gen_id }}{
+  width:100%;
+  display:block;
+  position:relative;
+  z-index:5;
+  pointer-events:none;
+}
+
+/* ===== STATIC EFFECT ===== */
+
+.ai-tv-static-overlay-{{ ai_gen_id }}{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  opacity:0;
+  pointer-events:none;
+  background:black;
+}
+
+.ai-tv-static-overlay-{{ ai_gen_id }}::before{
+  content:"";
+  position:absolute;
+  inset:-50%;
+  background-image:repeating-radial-gradient(circle,#fff 0px,#000 2px);
+  opacity:.15;
+  animation:staticMove-{{ ai_gen_id }} .2s infinite linear;
+}
+
+.ai-tv-static-overlay-{{ ai_gen_id }}.active{
+  opacity:1;
+}
+
+@keyframes staticMove-{{ ai_gen_id }}{
+  0%{transform:translate(0,0);}
+  25%{transform:translate(-5%,5%);}
+  50%{transform:translate(5%,-5%);}
+  75%{transform:translate(-5%,0);}
+  100%{transform:translate(0,0);}
+}
+
+/* ===== THUMBNAILS ===== */
+
+.ai-tv-thumbnails-track-{{ ai_gen_id }}{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+  overflow-x:auto;
+}
+
+.ai-tv-thumbnail-{{ ai_gen_id }}{
+  width:120px;
+  height:80px;
+  cursor:pointer;
+  overflow:hidden;
+  border:2px solid #ccc;
+  flex-shrink:0;
+}
+
+.ai-tv-thumbnail-{{ ai_gen_id }}.active{
+  border:4px solid #000;
+}
+
+.ai-tv-thumbnail-{{ ai_gen_id }} video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+{% endstyle %}
+
+<tv-frame-video-{{ ai_gen_id }} class="ai-tv-frame-container-{{ ai_gen_id }}">
+
+  <div class="ai-tv-frame-wrapper-{{ ai_gen_id }}">
+
+    <div class="ai-tv-video-container-{{ ai_gen_id }}">
+
+      {% if block.settings.video_1 %}
+      <video class="ai-tv-video-{{ ai_gen_id }}" muted playsinline>
+        <source src="{{ block.settings.video_1.sources[1].url }}" type="video/mp4">
+      </video>
+      {% endif %}
+
+      <div class="ai-tv-static-overlay-{{ ai_gen_id }}"></div>
+
+      <audio class="ai-tv-static-sound-{{ ai_gen_id }}" preload="auto">
+        <source src="{{ 'tv-static.mp3' | asset_url }}" type="audio/mpeg">
+      </audio>
+
+    </div>
+
+    {% if block.settings.tv_frame_image %}
+    <img
+      src="{{ block.settings.tv_frame_image | image_url: width:2000 }}"
+      class="ai-tv-frame-image-{{ ai_gen_id }}"
+      loading="lazy">
+    {% endif %}
+
+  </div>
+
+  <div class="ai-tv-thumbnails-track-{{ ai_gen_id }}">
+    {% for i in (1..10) %}
+      {% assign key = 'video_' | append: i %}
+      {% assign video = block.settings[key] %}
+      {% if video %}
+      <div class="ai-tv-thumbnail-{{ ai_gen_id }} {% if i == 1 %}active{% endif %}"
+           data-video-url="{{ video.sources[1].url }}"
+           data-index="{{ i | minus: 1 }}">
+        <video muted>
+          <source src="{{ video.sources[1].url }}" type="video/mp4">
+        </video>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+</tv-frame-video-{{ ai_gen_id }}>
+
+<script>
+class TvFrameVideo{{ ai_gen_id }} extends HTMLElement{
+  connectedCallback(){
+    this.video = this.querySelector('.ai-tv-video-{{ ai_gen_id }}');
+    this.overlay = this.querySelector('.ai-tv-static-overlay-{{ ai_gen_id }}');
+    this.sound = this.querySelector('.ai-tv-static-sound-{{ ai_gen_id }}');
+    this.thumbnails = this.querySelectorAll('.ai-tv-thumbnail-{{ ai_gen_id }}');
+    this.staticDuration = {{ block.settings.static_duration }} * 1000;
+
+    this.thumbnails.forEach((thumb)=>{
+      thumb.addEventListener('click',()=>{
+        this.switchVideo(thumb.dataset.videoUrl,thumb);
+      });
+    });
+  }
+
+  switchVideo(url,thumb){
+    if(!this.video) return;
+
+    this.overlay.classList.add('active');
+
+    if(this.sound){
+      this.sound.currentTime = 0;
+      this.sound.volume = .4;
+      this.sound.play().catch(()=>{});
+    }
+
+    setTimeout(()=>{
+      this.video.src = url;
+      this.video.play().catch(()=>{});
+      this.overlay.classList.remove('active');
+
+      if(this.sound){
+        this.sound.pause();
+        this.sound.currentTime = 0;
+      }
+
+      this.thumbnails.forEach(t=>t.classList.remove('active'));
+      thumb.classList.add('active');
+
+    },this.staticDuration);
+  }
+}
+
+customElements.define('tv-frame-video-{{ ai_gen_id }}',TvFrameVideo{{ ai_gen_id }});
+</script>
+
+{% schema %}
+{
+  "name": "TV Frame Player",
+  "settings": [
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "default": 100,
+      "label": "عرض المشغل %"
+    },
+    {
+      "type": "image_picker",
+      "id": "tv_frame_image",
+      "label": "صورة الإطار"
+    },
+    {
+      "type": "range",
+      "id": "video_position_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 50,
+      "label": "موضع الفيديو عمودي"
+    },
+    {
+      "type": "range",
+      "id": "video_position_left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 50,
+      "label": "موضع الفيديو أفقي"
+    },
+    {
+      "type": "range",
+      "id": "video_width",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "default": 70,
+      "label": "عرض الفيديو %"
+    },
+    {
+      "type": "range",
+      "id": "video_height",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "default": 60,
+      "label": "ارتفاع الفيديو %"
+    },
+    {
+      "type": "range",
+      "id": "static_duration",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "default": 0.6,
+      "label": "مدة التشويش (ثواني)"
+    },
+
+    { "type": "video", "id": "video_1", "label": "فيديو 1" },
+    { "type": "video", "id": "video_2", "label": "فيديو 2" },
+    { "type": "video", "id": "video_3", "label": "فيديو 3" },
+    { "type": "video", "id": "video_4", "label": "فيديو 4" },
+    { "type": "video", "id": "video_5", "label": "فيديو 5" },
+    { "type": "video", "id": "video_6", "label": "فيديو 6" },
+    { "type": "video", "id": "video_7", "label": "فيديو 7" },
+    { "type": "video", "id": "video_8", "label": "فيديو 8" },
+    { "type": "video", "id": "video_9", "label": "فيديو 9" },
+    { "type": "video", "id": "video_10", "label": "فيديو 10" }
+  ],
+  "presets": [
+    { "name": "TV Frame Player" }
+  ]
+}
+{% endschema %}

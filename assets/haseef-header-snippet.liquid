@@ -1,0 +1,65 @@
+{{-- ضع هذا الكود في أعلى header.liquid، قبل أي شيء آخر --}}
+
+<div class="hf-header">
+
+  {{-- الصف الأول --}}
+  <div class="hf-header__top">
+
+    {{-- يمين: شعار + بحث --}}
+    <div class="hf-header__right">
+
+      {{-- الشعار --}}
+      <a href="{{ routes.root_url }}" class="hf-logo">
+        {%- if settings.logo != blank -%}
+          {{
+            settings.logo
+            | image_url: width: 300
+            | image_tag: loading: 'eager'
+          }}
+        {%- else -%}
+          {{ shop.name }}
+        {%- endif -%}
+      </a>
+
+      {{-- زر البحث --}}
+      <button class="hf-search-btn" onclick="document.querySelector('details[id*=Search]')?.setAttribute('open','')">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      </button>
+
+    </div>
+
+    {{-- يسار: أزرار --}}
+    <div class="hf-header__left">
+
+      {{-- زر الدخول --}}
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_login_url }}" class="hf-btn-login">
+          الدخول
+        </a>
+      {%- endif -%}
+
+      {{-- زر السلة (بدل الاشتراك) --}}
+      <a href="{{ routes.cart_url }}" class="hf-btn-subscribe">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        السلة
+        {%- if cart.item_count > 0 -%}
+          <span class="hf-cart-count">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+
+    </div>
+  </div>
+
+  {{-- الصف الثاني: القائمة --}}
+  <nav class="hf-header__nav">
+    {%- for link in linklists[section.settings.menu].links -%}
+      <a
+        href="{{ link.url }}"
+        class="hf-nav-link{% if link.active %} active{% endif %}"
+      >
+        {{ link.title }}
+      </a>
+    {%- endfor -%}
+  </nav>
+
+</div>

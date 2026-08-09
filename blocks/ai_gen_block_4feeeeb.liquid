@@ -1,0 +1,399 @@
+{%- comment -%} 
+  قسم تصفح الكاسيتات حسب المطرب — 3D models دوّارة بتأثيرات فخمة مع نفس هوية التطريز الفلسطيني
+{%- endcomment -%}
+
+{% assign ai_gen_id = section.id | replace: '_', '' | downcase %}
+
+<style>
+/* ══════════════════════════════════════════
+   SECTION WRAPPER
+══════════════════════════════════════════ */
+.ai-artist-{{ ai_gen_id }} {
+  display: block;
+  width: 100%;
+  min-height: {{ section.settings.section_min_height }}px;
+  padding: {{ section.settings.section_padding_top }}px {{ section.settings.section_padding_h }}px {{ section.settings.section_padding_bottom }}px;
+  background: {{ section.settings.bg_color }};
+  position: relative;
+  overflow: hidden;
+}
+
+/* نمط التطريز في الأعلى والأسفل — هوية موحّدة */
+.ai-artist-{{ ai_gen_id }}::before,
+.ai-artist-{{ ai_gen_id }}::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: {{ section.settings.pattern_height }}px;
+  background: repeating-linear-gradient(
+    90deg,
+    {{ section.settings.pattern_color_1 }} 0px,
+    {{ section.settings.pattern_color_1 }} {{ section.settings.pattern_stripe }}px,
+    {{ section.settings.pattern_color_2 }} {{ section.settings.pattern_stripe }}px,
+    {{ section.settings.pattern_color_2 }} {{ section.settings.pattern_stripe | times: 2 }}px,
+    {{ section.settings.pattern_color_3 }} {{ section.settings.pattern_stripe | times: 2 }}px,
+    {{ section.settings.pattern_color_3 }} {{ section.settings.pattern_stripe | times: 3 }}px
+  );
+  z-index: 10;
+}
+.ai-artist-{{ ai_gen_id }}::before { top: 0; }
+.ai-artist-{{ ai_gen_id }}::after  { bottom: 0; }
+
+/* خلفية ambient glow */
+.ai-artist-bg-glow-{{ ai_gen_id }} {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, {{ section.settings.accent_color }}18 0%, transparent 70%),
+    radial-gradient(ellipse 30% 40% at 20% 80%, {{ section.settings.pattern_color_1 }}10 0%, transparent 60%),
+    radial-gradient(ellipse 30% 40% at 80% 20%, {{ section.settings.pattern_color_3 }}10 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* noise texture overlay */
+.ai-artist-noise-{{ ai_gen_id }} {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ai-artist-container-{{ ai_gen_id }} {
+  max-width: {{ section.settings.container_width }}px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ */
+.ai-artist-header-{{ ai_gen_id }} {
+  text-align: center;
+  margin-bottom: {{ section.settings.header_mb }}px;
+}
+
+.ai-artist-main-title-{{ ai_gen_id }} {
+  font-size: {{ section.settings.title_size }}px;
+  color: {{ section.settings.title_color }};
+  font-weight: 700;
+  margin: 0 0 12px;
+  position: relative;
+  display: inline-block;
+}
+
+.ai-artist-main-title-{{ ai_gen_id }}::before,
+.ai-artist-main-title-{{ ai_gen_id }}::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: {{ section.settings.deco_width }}px;
+  height: {{ section.settings.deco_height }}px;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(
+    90deg,
+    {{ section.settings.accent_color }} 0px, {{ section.settings.accent_color }} 8px,
+    transparent 8px, transparent 12px
+  );
+}
+
+.ai-artist-main-title-{{ ai_gen_id }}::before { right: calc(100% + {{ section.settings.deco_gap }}px); }
+.ai-artist-main-title-{{ ai_gen_id }}::after  { left:  calc(100% + {{ section.settings.deco_gap }}px); }
+
+.ai-artist-subtitle-{{ ai_gen_id }} {
+  font-size: {{ section.settings.subtitle_size }}px;
+  color: {{ section.settings.accent_color }};
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════
+   THREE-COLUMN LAYOUT
+══════════════════════════════════════════ */
+.ai-artist-stage-{{ ai_gen_id }} {
+  display: grid;
+  grid-template-columns: {{ section.settings.side_col_width }}px 1fr {{ section.settings.side_col_width }}px;
+  align-items: center;
+  gap: {{ section.settings.stage_gap }}px;
+  min-height: {{ section.settings.stage_height }}px;
+}
+
+.ai-artist-side-label-{{ ai_gen_id }} {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.ai-artist-side-text-{{ ai_gen_id }} {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: {{ section.settings.side_text_size }}px;
+  font-weight: 800;
+  letter-spacing: {{ section.settings.side_letter_spacing }}px;
+  color: {{ section.settings.side_text_color }};
+  opacity: 0.35;
+  transition: opacity 0.4s;
+  text-transform: uppercase;
+}
+
+.ai-artist-side-label-{{ ai_gen_id }}[data-side="right"] .ai-artist-side-text-{{ ai_gen_id }} {
+  transform: rotate(180deg);
+}
+
+.ai-artist-side-label-{{ ai_gen_id }}:hover .ai-artist-side-text-{{ ai_gen_id }} { opacity: 0.7; }
+
+.ai-artist-side-line-{{ ai_gen_id }} {
+  width: {{ section.settings.deco_height }}px;
+  flex: 1;
+  max-height: 120px;
+  background: repeating-linear-gradient(
+    180deg,
+    {{ section.settings.accent_color }} 0px, {{ section.settings.accent_color }} 6px,
+    transparent 6px, transparent 10px
+  );
+  opacity: 0.4;
+}
+
+/* ══════════════════════════════════════════
+   3D CAROUSEL CENTER
+══════════════════════════════════════════ */
+.ai-artist-carousel-wrap-{{ ai_gen_id }} {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ai-artist-name-display-{{ ai_gen_id }} {
+  font-size: {{ section.settings.artist_name_size }}px;
+  font-weight: 900;
+  color: {{ section.settings.title_color }};
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: {{ section.settings.name_mb }}px;
+  min-height: 1.4em;
+  text-align: center;
+  transition: opacity 0.3s ease;
+  position: relative;
+}
+
+.ai-artist-name-display-{{ ai_gen_id }}::after {
+  content: '';
+  display: block;
+  width: 60%;
+  margin: 8px auto 0;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    {{ section.settings.accent_color }} 0px, {{ section.settings.accent_color }} 4px,
+    transparent 4px, transparent 8px
+  );
+}
+
+.ai-artist-scene-{{ ai_gen_id }} {
+  width: {{ section.settings.model_size }}px;
+  height: {{ section.settings.model_size }}px;
+  perspective: {{ section.settings.perspective }}px;
+  position: relative;
+  cursor: grab;
+}
+
+.ai-artist-carousel3d-{{ ai_gen_id }} {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform {{ section.settings.rotation_speed }}ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ai-artist-model-card-{{ ai_gen_id }} {
+  position: absolute;
+  inset: 0;
+  border-radius: {{ section.settings.card_radius }}px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  border: {{ section.settings.card_border_w }}px solid {{ section.settings.card_border_color }};
+  box-shadow: {{ section.settings.card_shadow_x }}px {{ section.settings.card_shadow_y }}px {{ section.settings.card_shadow_blur }}px {{ section.settings.card_shadow_color }};
+  background: {{ section.settings.card_bg }};
+}
+
+.ai-artist-model-card-{{ ai_gen_id }}::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: {{ section.settings.pattern_height }}px;
+  background: repeating-linear-gradient(
+    90deg,
+    {{ section.settings.pattern_color_1 }} 0px,
+    {{ section.settings.pattern_color_1 }} {{ section.settings.pattern_stripe }}px,
+    {{ section.settings.pattern_color_2 }} {{ section.settings.pattern_stripe }}px,
+    {{ section.settings.pattern_color_2 }} {{ section.settings.pattern_stripe | times: 2 }}px,
+    {{ section.settings.pattern_color_3 }} {{ section.settings.pattern_stripe | times: 2 }}px,
+    {{ section.settings.pattern_color_3 }} {{ section.settings.pattern_stripe | times: 3 }}px
+  );
+  z-index: 3;
+}
+
+.ai-artist-model-card-{{ ai_gen_id }}.is-active {
+  border-color: {{ section.settings.accent_color }};
+  box-shadow: 0 0 {{ section.settings.glow_size }}px {{ section.settings.glow_size | divided_by: 2 }}px {{ section.settings.accent_color }}55;
+}
+
+.ai-artist-model-img-{{ ai_gen_id }} {
+  width: 100%;
+  height: 100%;
+  object-fit: {{ section.settings.img_fit }};
+  filter: brightness(0.75);
+}
+
+.ai-artist-model-card-{{ ai_gen_id }}.is-active .ai-artist-model-img-{{ ai_gen_id }} {
+  filter: brightness(1);
+}
+
+.ai-artist-nav-{{ ai_gen_id }} {
+  display: flex;
+  align-items: center;
+  gap: {{ section.settings.nav_gap }}px;
+  margin-top: {{ section.settings.nav_mt }}px;
+}
+
+.ai-artist-nav-btn-{{ ai_gen_id }} {
+  width: {{ section.settings.nav_btn_size }}px;
+  height: {{ section.settings.nav_btn_size }}px;
+  background: {{ section.settings.card_bg }};
+  border: {{ section.settings.card_border_w }}px solid {{ section.settings.card_border_color }};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 749px) {
+  .ai-artist-scene-{{ ai_gen_id }} {
+    width: {{ section.settings.model_size_mobile }}px;
+    height: {{ section.settings.model_size_mobile }}px;
+  }
+}
+</style>
+
+<div class="ai-artist-{{ ai_gen_id }}" {{ section.shopify_attributes }}>
+  <div class="ai-artist-bg-glow-{{ ai_gen_id }}"></div>
+  <div class="ai-artist-noise-{{ ai_gen_id }}"></div>
+
+  <div class="ai-artist-container-{{ ai_gen_id }}">
+    {%- if section.settings.show_header -%}
+      <div class="ai-artist-header-{{ ai_gen_id }}">
+        <h2 class="ai-artist-main-title-{{ ai_gen_id }}">{{ section.settings.section_title }}</h2>
+        <p class="ai-artist-subtitle-{{ ai_gen_id }}">{{ section.settings.section_subtitle }}</p>
+      </div>
+    {%- endif -%}
+
+    <div class="ai-artist-stage-{{ ai_gen_id }}">
+      <div class="ai-artist-side-label-{{ ai_gen_id }}" data-side="left">
+        <div class="ai-artist-side-line-{{ ai_gen_id }}"></div>
+        <span class="ai-artist-side-text-{{ ai_gen_id }}">{{ section.settings.left_label }}</span>
+        <div class="ai-artist-side-line-{{ ai_gen_id }}"></div>
+      </div>
+
+      <div class="ai-artist-carousel-wrap-{{ ai_gen_id }}">
+        <div class="ai-artist-name-display-{{ ai_gen_id }}" id="artist-name-{{ ai_gen_id }}"></div>
+
+        <div class="ai-artist-scene-{{ ai_gen_id }}" id="artist-scene-{{ ai_gen_id }}">
+          <div class="ai-artist-carousel3d-{{ ai_gen_id }}" id="artist-carousel-{{ ai_gen_id }}">
+            {% for i in (1..10) %}
+              {% assign name_key = 'artist_' | append: i | append: '_name' %}
+              {% assign img_key = 'artist_' | append: i | append: '_image' %}
+              {% assign url_key = 'artist_' | append: i | append: '_url' %}
+              {% if section.settings[name_key] != blank %}
+                <div class="ai-artist-model-card-{{ ai_gen_id }}" data-index="{{ forloop.index0 }}" data-name="{{ section.settings[name_key] | escape }}">
+                  {% if section.settings[img_key] %}
+                    <img src="{{ section.settings[img_key] | image_url: width: 600 }}" class="ai-artist-model-img-{{ ai_gen_id }}" loading="lazy">
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="ai-artist-nav-{{ ai_gen_id }}">
+          <button class="ai-artist-nav-btn-{{ ai_gen_id }}" id="artist-prev-{{ ai_gen_id }}">◀</button>
+          <button class="ai-artist-nav-btn-{{ ai_gen_id }}" id="artist-next-{{ ai_gen_id }}">▶</button>
+        </div>
+      </div>
+
+      <div class="ai-artist-side-label-{{ ai_gen_id }}" data-side="right">
+        <div class="ai-artist-side-line-{{ ai_gen_id }}"></div>
+        <span class="ai-artist-side-text-{{ ai_gen_id }}">{{ section.settings.right_label }}</span>
+        <div class="ai-artist-side-line-{{ ai_gen_id }}"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var GEN = '{{ ai_gen_id }}';
+  var carousel = document.getElementById('artist-carousel-' + GEN);
+  var nameEl = document.getElementById('artist-name-' + GEN);
+  if (!carousel) return;
+
+  var cards = carousel.querySelectorAll('.ai-artist-model-card-' + GEN);
+  var total = cards.length;
+  var current = 0;
+  var radius = {{ section.settings.carousel_radius }};
+
+  function update() {
+    cards.forEach(function(card, i) {
+      var relIdx = (i - current + total) % total;
+      var angleStep = 360 / total;
+      var angle = angleStep * relIdx;
+      var rad = (angle * Math.PI) / 180;
+      var tx = Math.sin(rad) * radius;
+      var tz = Math.cos(rad) * radius - radius;
+      var scale = 0.7 + 0.3 * Math.cos(rad);
+      
+      card.style.transform = 'translateX('+tx+'px) translateZ('+tz+'px) rotateY('+(-angle)+'deg) scale('+scale+')';
+      card.style.zIndex = Math.round(scale * 100);
+      card.style.opacity = (i === current) ? 1 : 0.5;
+      card.classList.toggle('is-active', i === current);
+      if(i === current) nameEl.textContent = card.dataset.name;
+    });
+  }
+
+  document.getElementById('artist-prev-' + GEN).onclick = function() { current = (current - 1 + total) % total; update(); };
+  document.getElementById('artist-next-' + GEN).onclick = function() { current = (current + 1) % total; update(); };
+  update();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "تصفح حسب المطرب",
+  "settings": [
+    { "type": "checkbox", "id": "show_header", "label": "إظهار العنوان", "default": true },
+    { "type": "text", "id": "section_title", "label": "العنوان", "default": "تصفح حسب الفنان" },
+    { "type": "text", "id": "section_subtitle", "label": "وصف", "default": "اختر فنانك المفضل" },
+    { "type": "text", "id": "left_label", "label": "نص يسار", "default": "تصفح" },
+    { "type": "text", "id": "right_label", "label": "نص يمين", "default": "مطربك" },
+    { "type": "header", "content": "الفنانين (1-3 كمثال)" },
+    { "type": "text", "id": "artist_1_name", "label": "اسم الفنان 1", "default": "فيروز" },
+    { "type": "image_picker", "id": "artist_1_image", "label": "صورة الفنان 1" },
+    { "type": "text", "id": "artist_2_name", "label": "اسم الفنان 2" },
+    { "type": "image_picker", "id": "artist_2_image", "label": "صورة الفنان 2" },
+    { "type": "header", "content": "الإعدادات التقنية" },
+    { "type": "range", "id": "model_size", "min": 200, "max": 500, "step": 10, "unit": "px", "label": "حجم الموديل", "default": 300 },
+    { "type": "range", "id": "carousel_radius", "min": 50, "max": 400, "step": 10, "unit": "px", "label": "نصف قطر الدوران", "default": 150 },
+    { "type": "range", "id": "rotation_speed", "min": 300, "max": 1500, "step": 50, "unit": "ms", "label": "سرعة الحركة", "default": 700 },
+    { "type": "color", "id": "bg_color", "label": "خلفية القسم", "default": "#f2efdd" },
+    { "type": "color", "id": "accent_color", "label": "اللون المميز", "default": "#910f3f" },
+    { "type": "color", "id": "title_color", "label": "لون الخط", "default": "#3d081b" },
+    { "type": "range", "id": "section_padding_top", "min": 0, "max": 100, "default": 50, "label": "Padding Top" },
+    { "type": "range", "id": "section_padding_bottom", "min": 0, "max": 100, "default": 50, "label": "Padding Bottom" }
+  ],
+  "presets": [{ "name": "تصفح حسب المطرب" }]
+}
+{% endschema %}

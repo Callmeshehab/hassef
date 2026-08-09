@@ -1,0 +1,1184 @@
+{% doc %}
+  @prompt
+    بدي قسم يعرض أقسام الكتب المختلفه ويتحرك تلقائيا وإمكانيه التقليب بالإزاحة يمين او يسار وفي كل قسم إسم القسم وشعار له وإمكانيه الضغط عليه للتحويل لصفحة القسم , البطاقات لا تتحرك بدي تتحرك تلقائيا وعند الضغط عليها تتوقف وتنتقل للقسم, بدي يكون ذكي بحيث يكون التنقل على حسب البطاقات المختاره فقط, بدي شكل انيق اكثر وجميل يحاكي المواقع المحترفه والمعقدة يكون ذكي , ممتاز بس بدي خيار يمنع تحديد الزجصوره عند الصغط عليها وتحميلها كنوع من الحمايه كانّها صوره مدمجه
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+.ai-collection-carousel-{{ ai_gen_id }} {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: {{ block.settings.section_padding }}px 0;
+  background: {{ block.settings.background_gradient }};
+  overflow: hidden;
+  position: relative;
+
+  /* 👇 أضف دول */
+  z-index: 1;
+  isolation: isolate;
+}
+
+  .ai-collection-carousel__container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.container_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-collection-carousel__header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+  }
+
+  .ai-collection-carousel__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px 0;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .ai-collection-carousel__subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .ai-collection-carousel__wrapper-{{ ai_gen_id }} {
+    position: relative;
+    padding: 20px 0;
+  }
+
+  .ai-collection-carousel__track-container-{{ ai_gen_id }} {
+    overflow: hidden;
+    margin: 0 60px;
+    position: relative;
+  }
+
+  .ai-collection-carousel__track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.card_gap }}px;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  .ai-collection-carousel__card-{{ ai_gen_id }} {
+    flex: 0 0 {{ block.settings.card_width }}px;
+    background: {{ block.settings.card_background }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    padding: {{ block.settings.card_padding }}px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: {{ block.settings.card_shadow }};
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid {{ block.settings.card_border_color }};
+  }
+
+  .ai-collection-carousel__card-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, {{ block.settings.card_overlay_start }} 0%, {{ block.settings.card_overlay_end }} 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+  }
+
+  .ai-collection-carousel__card-{{ ai_gen_id }}:hover::before {
+    opacity: {{ block.settings.card_overlay_opacity | divided_by: 100.0 }};
+  }
+
+  .ai-collection-carousel__card-{{ ai_gen_id }}:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: {{ block.settings.card_hover_shadow }};
+  }
+
+  .ai-collection-carousel__card-content-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+  }
+
+  .ai-collection-carousel__icon-wrapper-{{ ai_gen_id }} {
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    border-radius: {{ block.settings.icon_border_radius }}px;
+    background: {{ block.settings.icon_background }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s ease;
+    {% if block.settings.disable_image_selection %}
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      pointer-events: none;
+    {% endif %}
+  }
+
+  .ai-collection-carousel__card-{{ ai_gen_id }}:hover .ai-collection-carousel__icon-wrapper-{{ ai_gen_id }} {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .ai-collection-carousel__icon-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: {{ block.settings.icon_border_radius }}px;
+    {% if block.settings.disable_image_selection %}
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      pointer-events: none;
+    {% endif %}
+  }
+
+  .ai-collection-carousel__icon-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: {{ block.settings.icon_border_radius }}px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  }
+
+  .ai-collection-carousel__icon-placeholder-{{ ai_gen_id }} svg {
+    width: 50%;
+    height: 50%;
+    opacity: 0.4;
+  }
+
+  .ai-collection-carousel__name-{{ ai_gen_id }} {
+    font-size: {{ block.settings.card_text_size }}px;
+    color: {{ block.settings.card_text_color }};
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+    transition: color 0.3s ease;
+    {% if block.settings.disable_text_selection %}
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    {% endif %}
+  }
+
+  .ai-collection-carousel__card-{{ ai_gen_id }}:hover .ai-collection-carousel__name-{{ ai_gen_id }} {
+    color: {{ block.settings.card_text_hover_color }};
+  }
+
+  .ai-collection-carousel__count-{{ ai_gen_id }} {
+    font-size: {{ block.settings.count_text_size }}px;
+    color: {{ block.settings.count_text_color }};
+    opacity: 0.7;
+    margin: 0;
+    {% if block.settings.disable_text_selection %}
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    {% endif %}
+  }
+
+  .ai-collection-carousel__nav-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: {{ block.settings.nav_button_color }};
+    color: {{ block.settings.nav_button_icon_color }};
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-collection-carousel__nav-{{ ai_gen_id }}:hover:not(:disabled) {
+    background: {{ block.settings.nav_button_hover_color }};
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .ai-collection-carousel__nav-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-collection-carousel__nav--prev-{{ ai_gen_id }} {
+    left: 0;
+  }
+
+  .ai-collection-carousel__nav--next-{{ ai_gen_id }} {
+    right: 0;
+  }
+
+  .ai-collection-carousel__indicators-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+  }
+
+  .ai-collection-carousel__indicator-{{ ai_gen_id }} {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: {{ block.settings.indicator_color }};
+    opacity: 0.3;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    padding: 0;
+  }
+
+  .ai-collection-carousel__indicator-{{ ai_gen_id }}.active {
+    opacity: 1;
+    width: 24px;
+    border-radius: 4px;
+    background: {{ block.settings.indicator_active_color }};
+  }
+
+  .ai-collection-carousel__empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 80px 20px;
+    color: #999;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    border: 2px dashed #ddd;
+  }
+
+  .ai-collection-carousel__progress-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: {{ block.settings.progress_color }};
+    transition: width 0.1s linear;
+    border-radius: 3px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-collection-carousel__track-container-{{ ai_gen_id }} {
+      margin: 0 50px;
+    }
+
+    .ai-collection-carousel__card-{{ ai_gen_id }} {
+      flex: 0 0 {{ block.settings.card_width | times: 0.85 }}px;
+    }
+
+    .ai-collection-carousel__nav-{{ ai_gen_id }} {
+      width: 42px;
+      height: 42px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-carousel__track-container-{{ ai_gen_id }} {
+      margin: 0 45px;
+    }
+
+    .ai-collection-carousel__card-{{ ai_gen_id }} {
+      flex: 0 0 {{ block.settings.card_width | times: 0.75 }}px;
+    }
+
+    .ai-collection-carousel__nav-{{ ai_gen_id }} {
+      width: 38px;
+      height: 38px;
+    }
+
+    .ai-collection-carousel__title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<collection-carousel-{{ ai_gen_id }}
+  class="ai-collection-carousel-{{ ai_gen_id }}"
+  data-autoplay="{{ block.settings.autoplay }}"
+  data-autoplay-speed="{{ block.settings.autoplay_speed }}"
+  data-show-progress="{{ block.settings.show_progress }}"
+  data-disable-image-selection="{{ block.settings.disable_image_selection }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-collection-carousel__container-{{ ai_gen_id }}">
+    {% if block.settings.section_title != blank or block.settings.section_subtitle != blank %}
+      <div class="ai-collection-carousel__header-{{ ai_gen_id }}">
+        {% if block.settings.section_title != blank %}
+          <h2 class="ai-collection-carousel__title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+        {% endif %}
+        {% if block.settings.section_subtitle != blank %}
+          <p class="ai-collection-carousel__subtitle-{{ ai_gen_id }}">{{ block.settings.section_subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% assign has_collections = false %}
+    {% for i in (1..8) %}
+      {% assign collection_key = 'collection_' | append: i %}
+      {% if block.settings[collection_key] != blank %}
+        {% assign has_collections = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_collections %}
+      <div class="ai-collection-carousel__wrapper-{{ ai_gen_id }}">
+        <button
+          class="ai-collection-carousel__nav-{{ ai_gen_id }} ai-collection-carousel__nav--prev-{{ ai_gen_id }}"
+          aria-label="السابق"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="ai-collection-carousel__track-container-{{ ai_gen_id }}">
+          <div class="ai-collection-carousel__track-{{ ai_gen_id }}">
+            {% for i in (1..8) %}
+              {% liquid
+                assign collection_key = 'collection_' | append: i
+                assign icon_key = 'collection_' | append: i | append: '_icon'
+                assign collection = block.settings[collection_key]
+                assign icon = block.settings[icon_key]
+              %}
+
+              {% if collection != blank %}
+                <a
+                  href="{{ collection.url }}"
+                  class="ai-collection-carousel__card-{{ ai_gen_id }}"
+                  data-collection-card
+                >
+                  <div class="ai-collection-carousel__card-content-{{ ai_gen_id }}">
+                    <div class="ai-collection-carousel__icon-wrapper-{{ ai_gen_id }}">
+                      {% if icon %}
+                        <img
+                          src="{{ icon | image_url: width: 300 }}"
+                          alt="{{ collection.title | escape }}"
+                          class="ai-collection-carousel__icon-{{ ai_gen_id }}"
+                          loading="lazy"
+                          width="300"
+                          height="300"
+                          {% if block.settings.disable_image_selection %}
+                            oncontextmenu="return false;"
+                            ondragstart="return false;"
+                          {% endif %}
+                        >
+                      {% else %}
+                        <div class="ai-collection-carousel__icon-placeholder-{{ ai_gen_id }}">
+                          {{ 'collection-1' | placeholder_svg_tag }}
+                        </div>
+                      {% endif %}
+                    </div>
+                    <h3 class="ai-collection-carousel__name-{{ ai_gen_id }}">{{ collection.title }}</h3>
+                    {% if block.settings.show_product_count %}
+                      <p class="ai-collection-carousel__count-{{ ai_gen_id }}">
+                        {{ collection.products_count }} 
+                        {% if collection.products_count == 1 %}
+                          منتج
+                        {% else %}
+                          منتجات
+                        {% endif %}
+                      </p>
+                    {% endif %}
+                  </div>
+                  {% if block.settings.show_progress %}
+                    <div class="ai-collection-carousel__progress-{{ ai_gen_id }}" data-progress></div>
+                  {% endif %}
+                </a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <button
+          class="ai-collection-carousel__nav-{{ ai_gen_id }} ai-collection-carousel__nav--next-{{ ai_gen_id }}"
+          aria-label="التالي"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        {% if block.settings.show_indicators %}
+          <div class="ai-collection-carousel__indicators-{{ ai_gen_id }}" data-indicators></div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="ai-collection-carousel__empty-{{ ai_gen_id }}">
+        ✨ أضف أقسام الكتب لعرضها في الدوار الاحترافي
+      </div>
+    {% endif %}
+  </div>
+</collection-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CollectionCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.autoplayInterval = null;
+        this.progressInterval = null;
+        this.isAutoplayPaused = false;
+        this.progressValue = 0;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-collection-carousel__track-{{ ai_gen_id }}');
+        this.cards = this.querySelectorAll('[data-collection-card]');
+        this.prevButton = this.querySelector('.ai-collection-carousel__nav--prev-{{ ai_gen_id }}');
+        this.nextButton = this.querySelector('.ai-collection-carousel__nav--next-{{ ai_gen_id }}');
+        this.indicatorsContainer = this.querySelector('[data-indicators]');
+        this.progressBar = this.querySelector('[data-progress]');
+        this.autoplay = this.dataset.autoplay === 'true';
+        this.autoplaySpeed = parseInt(this.dataset.autoplaySpeed) || 3000;
+        this.showProgress = this.dataset.showProgress === 'true';
+        this.disableImageSelection = this.dataset.disableImageSelection === 'true';
+
+        if (this.cards.length === 0) return;
+
+        this.setupEventListeners();
+        this.createIndicators();
+        this.updateCarousel();
+        this.updateNavigationButtons();
+        this.updateIndicators();
+
+        if (this.disableImageSelection) {
+          this.preventImageActions();
+        }
+
+        if (this.autoplay) {
+          this.startAutoplay();
+        }
+      }
+
+      preventImageActions() {
+        const images = this.querySelectorAll('.ai-collection-carousel__icon-{{ ai_gen_id }}');
+        images.forEach((img) => {
+          img.addEventListener('contextmenu', (e) => e.preventDefault());
+          img.addEventListener('dragstart', (e) => e.preventDefault());
+          img.addEventListener('selectstart', (e) => e.preventDefault());
+        });
+      }
+
+      createIndicators() {
+        if (!this.indicatorsContainer) return;
+        
+        this.indicatorsContainer.innerHTML = '';
+        this.cards.forEach((card, index) => {
+          const indicator = document.createElement('button');
+          indicator.className = 'ai-collection-carousel__indicator-{{ ai_gen_id }}';
+          indicator.setAttribute('aria-label', `الانتقال إلى القسم ${index + 1}`);
+          indicator.addEventListener('click', () => {
+            this.pauseAutoplay();
+            this.goToSlide(index);
+          });
+          this.indicatorsContainer.appendChild(indicator);
+        });
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => {
+            this.pauseAutoplay();
+            this.prev();
+          });
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => {
+            this.pauseAutoplay();
+            this.next();
+          });
+        }
+
+        this.cards.forEach((card) => {
+          card.addEventListener('click', () => {
+            this.pauseAutoplay();
+          });
+        });
+
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        const handleDragStart = (clientX) => {
+          startX = clientX;
+          isDragging = true;
+          this.pauseAutoplay();
+        };
+
+        const handleDragMove = (clientX) => {
+          if (!isDragging) return;
+          currentX = clientX;
+        };
+
+        const handleDragEnd = () => {
+          if (!isDragging) return;
+          isDragging = false;
+          const diff = startX - currentX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+              this.next();
+            } else {
+              this.prev();
+            }
+          }
+        };
+
+        this.track.addEventListener('touchstart', (e) => {
+          handleDragStart(e.touches[0].clientX);
+        });
+
+        this.track.addEventListener('touchmove', (e) => {
+          handleDragMove(e.touches[0].clientX);
+        });
+
+        this.track.addEventListener('touchend', handleDragEnd);
+
+        this.track.addEventListener('mousedown', (e) => {
+          handleDragStart(e.clientX);
+          e.preventDefault();
+        });
+
+        this.track.addEventListener('mousemove', (e) => {
+          handleDragMove(e.clientX);
+        });
+
+        this.track.addEventListener('mouseup', handleDragEnd);
+        this.track.addEventListener('mouseleave', () => {
+          isDragging = false;
+        });
+      }
+
+      startAutoplay() {
+        this.autoplayInterval = setInterval(() => {
+          if (!this.isAutoplayPaused) {
+            this.next();
+          }
+        }, this.autoplaySpeed);
+
+        if (this.showProgress && this.progressBar) {
+          this.startProgress();
+        }
+      }
+
+      startProgress() {
+        this.progressValue = 0;
+        const increment = 100 / (this.autoplaySpeed / 50);
+        
+        this.progressInterval = setInterval(() => {
+          if (!this.isAutoplayPaused) {
+            this.progressValue += increment;
+            if (this.progressValue >= 100) {
+              this.progressValue = 0;
+            }
+            if (this.progressBar) {
+              this.progressBar.style.width = this.progressValue + '%';
+            }
+          }
+        }, 50);
+      }
+
+      pauseAutoplay() {
+        this.isAutoplayPaused = true;
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+        }
+        if (this.progressInterval) {
+          clearInterval(this.progressInterval);
+        }
+        if (this.progressBar) {
+          this.progressBar.style.width = '0%';
+        }
+      }
+
+      next() {
+        if (this.currentIndex < this.cards.length - 1) {
+          this.currentIndex++;
+        } else {
+          this.currentIndex = 0;
+        }
+        this.updateCarousel();
+        this.updateNavigationButtons();
+        this.updateIndicators();
+        this.resetProgress();
+      }
+
+      prev() {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+        } else {
+          this.currentIndex = this.cards.length - 1;
+        }
+        this.updateCarousel();
+        this.updateNavigationButtons();
+        this.updateIndicators();
+        this.resetProgress();
+      }
+
+      goToSlide(index) {
+        this.currentIndex = index;
+        this.updateCarousel();
+        this.updateNavigationButtons();
+        this.updateIndicators();
+        this.resetProgress();
+      }
+
+      resetProgress() {
+        this.progressValue = 0;
+        if (this.progressBar) {
+          this.progressBar.style.width = '0%';
+        }
+      }
+
+      updateNavigationButtons() {
+        if (!this.prevButton || !this.nextButton || this.cards.length === 0) return;
+
+        if (this.cards.length === 1) {
+          this.prevButton.disabled = true;
+          this.nextButton.disabled = true;
+        } else {
+          this.prevButton.disabled = false;
+          this.nextButton.disabled = false;
+        }
+      }
+
+      updateIndicators() {
+        if (!this.indicatorsContainer) return;
+        
+        const indicators = this.indicatorsContainer.querySelectorAll('.ai-collection-carousel__indicator-{{ ai_gen_id }}');
+        indicators.forEach((indicator, index) => {
+          if (index === this.currentIndex) {
+            indicator.classList.add('active');
+          } else {
+            indicator.classList.remove('active');
+          }
+        });
+      }
+
+      updateCarousel() {
+        if (!this.track || this.cards.length === 0) return;
+        const cardWidth = this.cards[0].offsetWidth;
+        const gap = parseInt(getComputedStyle(this.track).gap) || 0;
+        const offset = -(this.currentIndex * (cardWidth + gap));
+        this.track.style.transform = `translateX(${offset}px)`;
+      }
+
+      disconnectedCallback() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+        }
+        if (this.progressInterval) {
+          clearInterval(this.progressInterval);
+        }
+      }
+    }
+
+    customElements.define('collection-carousel-{{ ai_gen_id }}', CollectionCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "دوار أقسام احترافي",
+  "settings": [
+    {
+      "type": "header",
+      "content": "العنوان"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "العنوان الرئيسي",
+      "default": "استكشف مكتبتنا"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "العنوان الفرعي",
+      "default": "تصفح أقسام الكتب المتنوعة"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان الرئيسي",
+      "min": 20,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم العنوان الفرعي",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "لون العنوان الفرعي",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "التخطيط العام"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "عرض الحاوية",
+      "min": 1000,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "color",
+      "id": "background_gradient",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "المسافة الداخلية",
+      "min": 20,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "البطاقات"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "عرض البطاقة",
+      "min": 140,
+      "max": 320,
+      "step": 10,
+      "unit": "px",
+      "default": 220
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "المسافة بين البطاقات",
+      "min": 15,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "خلفية البطاقة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "لون حدود البطاقة",
+      "default": "#e8e8e8"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "استدارة حواف البطاقة",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "المسافة الداخلية للبطاقة",
+      "min": 15,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "text",
+      "id": "card_shadow",
+      "label": "ظل البطاقة",
+      "default": "0 4px 20px rgba(0, 0, 0, 0.08)"
+    },
+    {
+      "type": "text",
+      "id": "card_hover_shadow",
+      "label": "ظل البطاقة عند التمرير",
+      "default": "0 12px 40px rgba(0, 0, 0, 0.15)"
+    },
+    {
+      "type": "header",
+      "content": "تأثير التمرير"
+    },
+    {
+      "type": "color",
+      "id": "card_overlay_start",
+      "label": "لون التراكب - البداية",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "card_overlay_end",
+      "label": "لون التراكب - النهاية",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "card_overlay_opacity",
+      "label": "شفافية التراكب",
+      "min": 0,
+      "max": 30,
+      "step": 5,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "النصوص"
+    },
+    {
+      "type": "range",
+      "id": "card_text_size",
+      "label": "حجم نص البطاقة",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "لون نص البطاقة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "card_text_hover_color",
+      "label": "لون النص عند التمرير",
+      "default": "#910f3f"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "عرض عدد المنتجات",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "count_text_size",
+      "label": "حجم نص العدد",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "count_text_color",
+      "label": "لون نص العدد",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "الشعارات"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "حجم الشعار",
+      "min": 60,
+      "max": 140,
+      "step": 10,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "icon_border_radius",
+      "label": "استدارة الشعار",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "color",
+      "id": "icon_background",
+      "label": "خلفية الشعار",
+      "default": "#f9e547"
+    },
+    {
+      "type": "header",
+      "content": "حماية المحتوى"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_image_selection",
+      "label": "منع تحديد وحفظ الصور",
+      "info": "يمنع النقر بالزر الأيمن والسحب والتحديد للصور",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_text_selection",
+      "label": "منع تحديد النصوص",
+      "info": "يمنع تحديد ونسخ النصوص",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "أزرار التنقل"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_color",
+      "label": "لون الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_hover_color",
+      "label": "لون الزر عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_icon_color",
+      "label": "لون أيقونة الزر",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "المؤشرات"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_indicators",
+      "label": "عرض المؤشرات",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "indicator_color",
+      "label": "لون المؤشر",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "indicator_active_color",
+      "label": "لون المؤشر النشط",
+      "default": "#910f3f"
+    },
+    {
+      "type": "header",
+      "content": "التشغيل التلقائي"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تفعيل التشغيل التلقائي",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "سرعة التشغيل",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "unit": "ms",
+      "default": 4000
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress",
+      "label": "عرض شريط التقدم",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "progress_color",
+      "label": "لون شريط التقدم",
+      "default": "#910f3f"
+    },
+    {
+      "type": "header",
+      "content": "القسم 1"
+    },
+    {
+      "type": "collection",
+      "id": "collection_1",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_1_icon",
+      "label": "شعار القسم"
+    },
+    {
+      "type": "header",
+      "content": "القسم 2"
+    },
+    {
+      "type": "collection",
+      "id": "collection_2",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_2_icon",
+      "label": "شعار القسم"
+    },
+    {
+      "type": "header",
+      "content": "القسم 3"
+    },
+    {
+      "type": "collection",
+      "id": "collection_3",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_3_icon",
+      "label": "شعار القسم"
+    },
+    {
+      "type": "header",
+      "content": "القسم 4"
+    },
+    {
+      "type": "collection",
+      "id": "collection_4",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_4_icon",
+      "label": "شعار القسم"
+    },
+    {
+      "type": "header",
+      "content": "القسم 5"
+    },
+    {
+      "type": "collection",
+      "id": "collection_5",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_5_icon",
+      "label": "شعار القسم"
+    },
+    {
+      "type": "header",
+      "content": "القسم 6"
+    },
+    {
+      "type": "collection",
+      "id": "collection_6",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_6_icon",
+      "label": "شعار القسم"
+    },
+    {
+      "type": "header",
+      "content": "القسم 7"
+    },
+    {
+      "type": "collection",
+      "id": "collection_7",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_7_icon",
+      "label": "شعار القسم"
+    },
+    {
+      "type": "header",
+      "content": "القسم 8"
+    },
+    {
+      "type": "collection",
+      "id": "collection_8",
+      "label": "القسم"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_8_icon",
+      "label": "شعار القسم"
+    }
+  ],
+  "presets": [
+    {
+      "name": "دوار أقسام احترافي"
+    }
+  ]
+}
+{% endschema %}

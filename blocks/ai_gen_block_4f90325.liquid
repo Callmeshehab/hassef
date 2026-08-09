@@ -1,0 +1,1465 @@
+{% comment %}
+تم إصلاح خطأ عدد الخطوات (101 steps) في إعدادات الموبايل.
+{% endcomment %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% style %}
+.ai-tv-player-{{ ai_gen_id }} {
+display: block;
+width: {{ block.settings.desktop_width_percent }}%;
+max-width: 100%;
+margin: 0 auto;
+position: relative;
+z-index: 0;
+}
+.ai-tv-outer-frame-{{ ai_gen_id }} {
+position: relative;
+background-color: {{ block.settings.outer_frame_color }};
+padding-top: {{ block.settings.outer_frame_top }}px;
+padding-right: {{ block.settings.outer_frame_right }}px;
+padding-bottom: {{ block.settings.outer_frame_bottom }}px;
+padding-left: {{ block.settings.outer_frame_left }}px;
+border-radius: {{ block.settings.outer_frame_radius }}px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+z-index: 1;
+}
+.ai-tv-nav-button-{{ ai_gen_id }} {
+position: absolute;
+top: {{ block.settings.nav_button_position_y }}%;
+transform: translateY(-50%);
+width: {{ block.settings.nav_button_size }}px;
+height: {{ block.settings.nav_button_size }}px;
+background-color: {{ block.settings.nav_button_bg_color }};
+border: none;
+border-radius: {{ block.settings.nav_button_radius }}px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 9999;
+opacity: {{ block.settings.nav_button_opacity | divided_by: 100.0 }};
+transition: opacity 0.3s ease, transform 0.2s ease;
+{% if block.settings.show_nav_buttons == false %}
+display: none;
+{% endif %}
+}
+.ai-tv-nav-button-{{ ai_gen_id }}:hover {
+opacity: 1;
+transform: translateY(-50%) scale(1.1);
+}
+.ai-tv-nav-button-prev-{{ ai_gen_id }} {
+left: {{ block.settings.nav_button_position_x }}%;
+}
+.ai-tv-nav-button-next-{{ ai_gen_id }} {
+right: {{ block.settings.nav_button_position_x }}%;
+}
+.ai-tv-nav-button-{{ ai_gen_id }} svg {
+width: 50%;
+height: 50%;
+fill: {{ block.settings.nav_button_icon_color }};
+}
+.ai-tv-frame-image-{{ ai_gen_id }} {
+position: absolute;
+z-index: 50;
+object-fit: contain;
+pointer-events: none;
+}
+.ai-tv-frame-image-top-{{ ai_gen_id }} {
+top: {{ block.settings.top_image_position_y }}%;
+left: {{ block.settings.top_image_position_x }}%;
+transform: translate(-50%, -50%);
+width: {{ block.settings.top_image_width }}px;
+height: {{ block.settings.top_image_height }}px;
+}
+.ai-tv-frame-image-right-{{ ai_gen_id }} {
+top: {{ block.settings.right_image_position_y }}%;
+right: {{ block.settings.right_image_position_x }}%;
+transform: translate(50%, -50%);
+width: {{ block.settings.right_image_width }}px;
+height: {{ block.settings.right_image_height }}px;
+}
+.ai-tv-frame-image-bottom-{{ ai_gen_id }} {
+bottom: {{ block.settings.bottom_image_position_y }}%;
+left: {{ block.settings.bottom_image_position_x }}%;
+transform: translate(-50%, 50%);
+width: {{ block.settings.bottom_image_width }}px;
+height: {{ block.settings.bottom_image_height }}px;
+}
+.ai-tv-frame-image-left-{{ ai_gen_id }} {
+top: {{ block.settings.left_image_position_y }}%;
+left: {{ block.settings.left_image_position_x }}%;
+transform: translate(-50%, -50%);
+width: {{ block.settings.left_image_width }}px;
+height: {{ block.settings.left_image_height }}px;
+}
+.ai-tv-inner-frame-{{ ai_gen_id }} {
+background-color: #000000;
+padding: {{ block.settings.inner_frame_thickness }}px;
+border-radius: {{ block.settings.inner_frame_radius }}px;
+z-index: 2;
+}
+.ai-tv-screen-wrapper-{{ ai_gen_id }} {
+position: relative;
+width: 100%;
+background-color: #000000;
+border-radius: {{ block.settings.screen_radius }}px;
+overflow: hidden;
+z-index: 3;
+}
+.ai-tv-screen-container-{{ ai_gen_id }} {
+position: relative;
+width: 100%;
+{% if block.settings.use_custom_height %}
+height: {{ block.settings.desktop_height }}px;
+{% else %}
+{% if block.settings.aspect_ratio_preset == 'custom' %}
+padding-bottom: {{ block.settings.custom_aspect_ratio }}%;
+{% elsif block.settings.aspect_ratio_preset == '16:9' %}
+padding-bottom: 56.25%;
+{% elsif block.settings.aspect_ratio_preset == '4:3' %}
+padding-bottom: 75%;
+{% elsif block.settings.aspect_ratio_preset == '1:1' %}
+padding-bottom: 100%;
+{% elsif block.settings.aspect_ratio_preset == '21:9' %}
+padding-bottom: 42.85%;
+{% endif %}
+{% endif %}
+}
+.ai-tv-video-{{ ai_gen_id }} {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+object-fit: {{ block.settings.video_fit }};
+display: block;
+z-index: 1;
+}
+.ai-tv-static-overlay-{{ ai_gen_id }} {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: #000;
+z-index: 15;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.2s ease;
+}
+.ai-tv-static-overlay-{{ ai_gen_id }}.active {
+opacity: 1;
+}
+.ai-tv-static-canvas-{{ ai_gen_id }} {
+width: 100%;
+height: 100%;
+display: block;
+}
+.ai-tv-glass-reflection-{{ ai_gen_id }} {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+background: linear-gradient(
+135deg,
+rgba(255, 255, 255, {{ block.settings.reflection_opacity | divided_by: 100.0 }}) 0%,
+transparent 30%,
+transparent 70%,
+rgba(255, 255, 255, {{ block.settings.reflection_opacity | divided_by: 200.0 }}) 100%
+);
+z-index: 5;
+}
+.ai-tv-empty-state-{{ ai_gen_id }} {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 40px 20px;
+text-align: center;
+color: #666;
+z-index: 1;
+}
+.ai-tv-empty-state-{{ ai_gen_id }} svg {
+width: 80px;
+height: 80px;
+margin-bottom: 16px;
+opacity: 0.3;
+}
+@media screen and (max-width: 749px) {
+.ai-tv-player-{{ ai_gen_id }} {
+width: {{ block.settings.mobile_width_percent }}%;
+}
+.ai-tv-nav-button-{{ ai_gen_id }} {
+  width: {{ block.settings.mobile_nav_button_size }}px;
+  height: {{ block.settings.mobile_nav_button_size }}px;
+}
+.ai-tv-outer-frame-{{ ai_gen_id }} {
+  padding-top: {{ block.settings.mobile_outer_frame_top }}px;
+  padding-right: {{ block.settings.mobile_outer_frame_right }}px;
+  padding-bottom: {{ block.settings.mobile_outer_frame_bottom }}px;
+  padding-left: {{ block.settings.mobile_outer_frame_left }}px;
+}
+.ai-tv-frame-image-top-{{ ai_gen_id }} {
+  width: {{ block.settings.mobile_top_image_width }}px;
+  height: {{ block.settings.mobile_top_image_height }}px;
+}
+.ai-tv-frame-image-right-{{ ai_gen_id }} {
+  width: {{ block.settings.mobile_right_image_width }}px;
+  height: {{ block.settings.mobile_right_image_height }}px;
+}
+.ai-tv-frame-image-bottom-{{ ai_gen_id }} {
+  width: {{ block.settings.mobile_bottom_image_width }}px;
+  height: {{ block.settings.mobile_bottom_image_height }}px;
+}
+.ai-tv-frame-image-left-{{ ai_gen_id }} {
+  width: {{ block.settings.mobile_left_image_width }}px;
+  height: {{ block.settings.mobile_left_image_height }}px;
+}
+.ai-tv-inner-frame-{{ ai_gen_id }} {
+  padding: {{ block.settings.mobile_inner_frame_thickness }}px;
+}
+.ai-tv-screen-container-{{ ai_gen_id }} {
+  {% if block.settings.use_custom_mobile_height %}
+    height: {{ block.settings.mobile_height }}px;
+    padding-bottom: 0;
+  {% else %}
+    {% if block.settings.mobile_aspect_ratio_preset == 'custom' %}
+      padding-bottom: {{ block.settings.mobile_custom_aspect_ratio }}%;
+    {% elsif block.settings.mobile_aspect_ratio_preset == '16:9' %}
+      padding-bottom: 56.25%;
+    {% elsif block.settings.mobile_aspect_ratio_preset == '4:3' %}
+      padding-bottom: 75%;
+    {% elsif block.settings.mobile_aspect_ratio_preset == '1:1' %}
+      padding-bottom: 100%;
+    {% elsif block.settings.mobile_aspect_ratio_preset == '9:16' %}
+      padding-bottom: 177.78%;
+    {% endif %}
+  {% endif %}
+}
+}
+{% endstyle %}
+<tv-player-{{ ai_gen_id }}
+class="ai-tv-player-{{ ai_gen_id }}"
+data-autoplay="{{ block.settings.autoplay }}"
+data-auto-advance="{{ block.settings.auto_advance }}"
+data-muted="{{ block.settings.muted }}"
+data-show-static="{{ block.settings.show_static_effect }}"
+data-static-duration="{{ block.settings.static_duration }}"
+{{ block.shopify_attributes }}>
+
+{% if block.settings.show_nav_buttons %}
+<button
+class="ai-tv-nav-button-{{ ai_gen_id }} ai-tv-nav-button-prev-{{ ai_gen_id }}"
+aria-label="الفيديو السابق"
+data-nav="prev"
+>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+</svg>
+</button>
+
+<button
+  class="ai-tv-nav-button-{{ ai_gen_id }} ai-tv-nav-button-next-{{ ai_gen_id }}"
+  aria-label="الفيديو التالي"
+  data-nav="next"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+  </svg>
+</button>
+{% endif %}
+<div class="ai-tv-outer-frame-{{ ai_gen_id }}">
+    {% if block.settings.top_frame_image %}
+      <img
+        src="{{ block.settings.top_frame_image | image_url: width: 400 }}"
+        alt="{{ block.settings.top_frame_image.alt | escape }}"
+        class="ai-tv-frame-image-{{ ai_gen_id }} ai-tv-frame-image-top-{{ ai_gen_id }}"
+        loading="lazy"
+      >
+    {% endif %}
+
+{% if block.settings.right_frame_image %}
+  <img
+    src="{{ block.settings.right_frame_image | image_url: width: 400 }}"
+    alt="{{ block.settings.right_frame_image.alt | escape }}"
+    class="ai-tv-frame-image-{{ ai_gen_id }} ai-tv-frame-image-right-{{ ai_gen_id }}"
+    loading="lazy"
+  >
+{% endif %}
+
+{% if block.settings.bottom_frame_image %}
+  <img
+    src="{{ block.settings.bottom_frame_image | image_url: width: 400 }}"
+    alt="{{ block.settings.bottom_frame_image.alt | escape }}"
+    class="ai-tv-frame-image-{{ ai_gen_id }} ai-tv-frame-image-bottom-{{ ai_gen_id }}"
+    loading="lazy"
+  >
+{% endif %}
+
+{% if block.settings.left_frame_image %}
+  <img
+    src="{{ block.settings.left_frame_image | image_url: width: 400 }}"
+    alt="{{ block.settings.left_frame_image.alt | escape }}"
+    class="ai-tv-frame-image-{{ ai_gen_id }} ai-tv-frame-image-left-{{ ai_gen_id }}"
+    loading="lazy"
+  >
+{% endif %}
+
+<div class="ai-tv-inner-frame-{{ ai_gen_id }}">
+  <div class="ai-tv-screen-wrapper-{{ ai_gen_id }}">
+    {% liquid
+      assign video_sources = ''
+      
+      for i in (1..10)
+        assign video_key = 'video_' | append: i
+        assign url_key = 'video_url_' | append: i
+        assign current_video = block.settings[video_key]
+        assign current_url = block.settings[url_key]
+        
+        if current_video != blank
+          if current_video.sources[0]
+            assign video_sources = video_sources | append: current_video.sources[0].url | append: '||' | append: current_video.sources[0].mime_type | append: ';;'
+          endif
+        elsif current_url != blank
+          assign video_sources = video_sources | append: current_url | append: '||video/mp4;;'
+        endif
+      endfor
+    %}
+
+    <div class="ai-tv-screen-container-{{ ai_gen_id }}">
+      {% if video_sources != blank %}
+        <video
+          class="ai-tv-video-{{ ai_gen_id }}"
+          {% if block.settings.show_controls %}controls{% endif %}
+          {% if block.settings.prevent_zoom %}playsinline webkit-playsinline{% endif %}
+          preload="metadata"
+          data-videos="{{ video_sources | escape }}"
+        ></video>
+
+        <div class="ai-tv-static-overlay-{{ ai_gen_id }}">
+          <canvas class="ai-tv-static-canvas-{{ ai_gen_id }}"></canvas>
+        </div>
+        
+        {% if block.settings.show_reflection %}
+          <div class="ai-tv-glass-reflection-{{ ai_gen_id }}"></div>
+        {% endif %}
+      {% else %}
+        <div class="ai-tv-empty-state-{{ ai_gen_id }}">
+          {{ 'image' | placeholder_svg_tag }}
+          <p>أضف مقاطع الفيديو من الإعدادات</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+</div>
+</tv-player-{{ ai_gen_id }}>
+<script>
+  (function() {
+    class TvPlayer{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.videos = [];
+        this.autoplay = this.dataset.autoplay === 'true';
+        this.autoAdvance = this.dataset.autoAdvance === 'true';
+        this.muted = this.dataset.muted === 'true';
+        this.showStatic = this.dataset.showStatic === 'true';
+        this.staticDuration = parseInt(this.dataset.staticDuration) || 1000;
+        this.staticAnimationId = null;
+      }
+
+      connectedCallback() {
+        this.videoElement = this.querySelector('.ai-tv-video-{{ ai_gen_id }}');
+        this.staticOverlay = this.querySelector('.ai-tv-static-overlay-{{ ai_gen_id }}');
+        this.staticCanvas = this.querySelector('.ai-tv-static-canvas-{{ ai_gen_id }}');
+        
+        if (!this.videoElement) return;
+
+        if (this.staticCanvas) {
+          this.staticCtx = this.staticCanvas.getContext('2d');
+          this.resizeCanvas();
+          window.addEventListener('resize', () => this.resizeCanvas());
+        }
+
+        this.parseVideos();
+        
+        if (this.videos.length > 0) {
+          this.setupNavButtons();
+          this.setupEventListeners();
+          this.loadVideo(0);
+        }
+      }
+
+      resizeCanvas() {
+        if (!this.staticCanvas) return;
+        const rect = this.staticCanvas.getBoundingClientRect();
+        this.staticCanvas.width = rect.width;
+        this.staticCanvas.height = rect.height;
+      }
+
+      parseVideos() {
+        const videosData = this.videoElement.dataset.videos;
+        if (!videosData) return;
+
+        const videoEntries = videosData.split(';;').filter(entry => entry.trim());
+        
+        videoEntries.forEach(entry => {
+          const parts = entry.split('||');
+          if (parts.length === 2 && parts[0].trim()) {
+            this.videos.push({
+              src: parts[0].trim(),
+              type: parts[1].trim() || 'video/mp4'
+            });
+          }
+        });
+      }
+
+      setupNavButtons() {
+        const prevButton = this.querySelector('[data-nav="prev"]');
+        const nextButton = this.querySelector('[data-nav="next"]');
+
+        if (prevButton) {
+          prevButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.playPrevious();
+          });
+        }
+
+        if (nextButton) {
+          nextButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.playNext();
+          });
+        }
+      }
+
+      setupEventListeners() {
+        if (this.autoAdvance && this.videos.length > 1) {
+          this.videoElement.addEventListener('ended', () => {
+            this.playNext();
+          });
+        }
+
+        this.videoElement.addEventListener('loadeddata', () => {
+          if (this.autoplay && this.currentIndex === 0) {
+            this.attemptPlay();
+          }
+        });
+
+        this.videoElement.addEventListener('error', (e) => {
+          console.error('Video error:', e);
+          if (this.autoAdvance && this.videos.length > 1) {
+            setTimeout(() => this.playNext(), 1000);
+          }
+        });
+      }
+
+      playNext() {
+        if (this.videos.length <= 1) return;
+        this.currentIndex = (this.currentIndex + 1) % this.videos.length;
+        this.loadVideo(this.currentIndex);
+      }
+
+      playPrevious() {
+        if (this.videos.length <= 1) return;
+        this.currentIndex = (this.currentIndex - 1 + this.videos.length) % this.videos.length;
+        this.loadVideo(this.currentIndex);
+      }
+
+      showStaticEffect() {
+        if (!this.showStatic || !this.staticOverlay || !this.staticCanvas) return Promise.resolve();
+
+        return new Promise((resolve) => {
+          this.staticOverlay.classList.add('active');
+          this.animateStatic();
+
+          setTimeout(() => {
+            this.stopStatic();
+            this.staticOverlay.classList.remove('active');
+            resolve();
+          }, this.staticDuration);
+        });
+      }
+
+      animateStatic() {
+        if (!this.staticCtx || !this.staticCanvas) return;
+
+        const drawStatic = () => {
+          const imageData = this.staticCtx.createImageData(this.staticCanvas.width, this.staticCanvas.height);
+          const data = imageData.data;
+
+          for (let i = 0; i < data.length; i += 4) {
+            const value = Math.random() * 255;
+            data[i] = value;
+            data[i + 1] = value;
+            data[i + 2] = value;
+            data[i + 3] = 255;
+          }
+
+          this.staticCtx.putImageData(imageData, 0, 0);
+          this.staticAnimationId = requestAnimationFrame(drawStatic);
+        };
+
+        drawStatic();
+      }
+
+      stopStatic() {
+        if (this.staticAnimationId) {
+          cancelAnimationFrame(this.staticAnimationId);
+          this.staticAnimationId = null;
+        }
+        if (this.staticCtx && this.staticCanvas) {
+          this.staticCtx.clearRect(0, 0, this.staticCanvas.width, this.staticCanvas.height);
+        }
+      }
+
+      loadVideo(index) {
+        if (index < 0 || index >= this.videos.length) return;
+
+        const videoData = this.videos[index];
+        const wasPlaying = !this.videoElement.paused;
+        
+        this.videoElement.pause();
+
+        this.showStaticEffect().then(() => {
+          this.videoElement.innerHTML = '';
+          
+          const sourceElement = document.createElement('source');
+          sourceElement.src = videoData.src;
+          sourceElement.type = videoData.type;
+          this.videoElement.appendChild(sourceElement);
+
+          if (this.muted) {
+            this.videoElement.muted = true;
+          }
+
+          this.videoElement.load();
+
+          if (wasPlaying || (this.autoplay && index === 0)) {
+            this.videoElement.addEventListener('loadeddata', () => {
+              this.attemptPlay();
+            }, { once: true });
+          }
+        });
+      }
+
+      attemptPlay() {
+        const playPromise = this.videoElement.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log('Autoplay prevented:', error.message);
+            if (error.name === 'NotAllowedError' && !this.muted) {
+              this.videoElement.muted = true;
+              this.videoElement.play().catch(e => console.log('Muted play failed:', e));
+            }
+          });
+        }
+      }
+
+      disconnectedCallback() {
+        this.stopStatic();
+      }
+    }
+
+    customElements.define('tv-player-{{ ai_gen_id }}', TvPlayer{{ ai_gen_id }});
+  })();
+</script>
+{% schema %}
+{
+"name": "مشغل فيديو شاشة تلفاز",
+"settings": [
+{
+"type": "header",
+"content": "إعدادات التشغيل"
+},
+{
+"type": "checkbox",
+"id": "autoplay",
+"label": "التشغيل التلقائي",
+"default": false
+},
+{
+"type": "checkbox",
+"id": "muted",
+"label": "الكتم التلقائي",
+"default": true
+},
+{
+"type": "checkbox",
+"id": "auto_advance",
+"label": "الانتقال التلقائي للفيديو التالي",
+"default": false
+},
+{
+"type": "checkbox",
+"id": "show_controls",
+"label": "إظهار أدوات التحكم",
+"default": true
+},
+{
+"type": "checkbox",
+"id": "prevent_zoom",
+"label": "منع التكبير القهري عند التشغيل",
+"default": true
+},
+{
+"type": "select",
+"id": "video_fit",
+"label": "ملاءمة الفيديو",
+"options": [
+{
+"value": "contain",
+"label": "احتواء"
+},
+{
+"value": "cover",
+"label": "تغطية"
+},
+{
+"value": "fill",
+"label": "ملء"
+}
+],
+"default": "contain"
+},
+{
+"type": "header",
+"content": "تأثير التشويش"
+},
+{
+"type": "checkbox",
+"id": "show_static_effect",
+"label": "إظهار تأثير التشويش عند التنقل",
+"default": true
+},
+{
+"type": "range",
+"id": "static_duration",
+"label": "مدة التشويش",
+"min": 500,
+"max": 3000,
+"step": 100,
+"unit": "ms",
+"default": 1000
+},
+{
+"type": "header",
+"content": "أزرار التنقل"
+},
+{
+"type": "checkbox",
+"id": "show_nav_buttons",
+"label": "إظهار أزرار التنقل",
+"default": true
+},
+{
+"type": "range",
+"id": "nav_button_size",
+"label": "حجم الزر - سطح المكتب",
+"min": 30,
+"max": 100,
+"step": 5,
+"unit": "px",
+"default": 50
+},
+{
+"type": "range",
+"id": "mobile_nav_button_size",
+"label": "حجم الزر - الموبايل",
+"min": 20,
+"max": 60,
+"step": 5,
+"unit": "px",
+"default": 35
+},
+{
+"type": "range",
+"id": "nav_button_position_x",
+"label": "الموضع الأفقي",
+"min": 0,
+"max": 20,
+"step": 1,
+"unit": "%",
+"default": 2
+},
+{
+"type": "range",
+"id": "nav_button_position_y",
+"label": "الموضع العمودي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 50
+},
+{
+"type": "color",
+"id": "nav_button_bg_color",
+"label": "لون خلفية الزر",
+"default": "#000000"
+},
+{
+"type": "color",
+"id": "nav_button_icon_color",
+"label": "لون أيقونة الزر",
+"default": "#ffffff"
+},
+{
+"type": "range",
+"id": "nav_button_opacity",
+"label": "شفافية الزر",
+"min": 20,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 70
+},
+{
+"type": "range",
+"id": "nav_button_radius",
+"label": "انحناء الزر",
+"min": 0,
+"max": 40,
+"step": 2,
+"unit": "px",
+"default": 20
+},
+{
+"type": "header",
+"content": "تأثير الانعكاس الزجاجي"
+},
+{
+"type": "checkbox",
+"id": "show_reflection",
+"label": "إظهار الانعكاس الزجاجي",
+"default": true
+},
+{
+"type": "range",
+"id": "reflection_opacity",
+"label": "شدة الانعكاس",
+"min": 0,
+"max": 30,
+"step": 5,
+"unit": "%",
+"default": 15
+},
+{
+"type": "header",
+"content": "صورة الإطار العلوي"
+},
+{
+"type": "image_picker",
+"id": "top_frame_image",
+"label": "الصورة"
+},
+{
+"type": "range",
+"id": "top_image_position_x",
+"label": "الموضع الأفقي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 50
+},
+{
+"type": "range",
+"id": "top_image_position_y",
+"label": "الموضع العمودي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 0
+},
+{
+"type": "range",
+"id": "top_image_width",
+"label": "العرض - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "top_image_height",
+"label": "الارتفاع - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "mobile_top_image_width",
+"label": "العرض - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "range",
+"id": "mobile_top_image_height",
+"label": "الارتفاع - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "header",
+"content": "صورة الإطار الأيمن"
+},
+{
+"type": "image_picker",
+"id": "right_frame_image",
+"label": "الصورة"
+},
+{
+"type": "range",
+"id": "right_image_position_x",
+"label": "الموضع الأفقي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 0
+},
+{
+"type": "range",
+"id": "right_image_position_y",
+"label": "الموضع العمودي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 50
+},
+{
+"type": "range",
+"id": "right_image_width",
+"label": "العرض - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "right_image_height",
+"label": "الارتفاع - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "mobile_right_image_width",
+"label": "العرض - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "range",
+"id": "mobile_right_image_height",
+"label": "الارتفاع - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "header",
+"content": "صورة الإطار السفلي"
+},
+{
+"type": "image_picker",
+"id": "bottom_frame_image",
+"label": "الصورة"
+},
+{
+"type": "range",
+"id": "bottom_image_position_x",
+"label": "الموضع الأفقي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 50
+},
+{
+"type": "range",
+"id": "bottom_image_position_y",
+"label": "الموضع العمودي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 0
+},
+{
+"type": "range",
+"id": "bottom_image_width",
+"label": "العرض - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "bottom_image_height",
+"label": "الارتفاع - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "mobile_bottom_image_width",
+"label": "العرض - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "range",
+"id": "mobile_bottom_image_height",
+"label": "الارتفاع - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "header",
+"content": "صورة الإطار الأيسر"
+},
+{
+"type": "image_picker",
+"id": "left_frame_image",
+"label": "الصورة"
+},
+{
+"type": "range",
+"id": "left_image_position_x",
+"label": "الموضع الأفقي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 0
+},
+{
+"type": "range",
+"id": "left_image_position_y",
+"label": "الموضع العمودي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 50
+},
+{
+"type": "range",
+"id": "left_image_width",
+"label": "العرض - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "left_image_height",
+"label": "الارتفاع - سطح المكتب",
+"min": 20,
+"max": 300,
+"step": 10,
+"unit": "px",
+"default": 100
+},
+{
+"type": "range",
+"id": "mobile_left_image_width",
+"label": "العرض - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "range",
+"id": "mobile_left_image_height",
+"label": "الارتفاع - الموبايل",
+"min": 20,
+"max": 150,
+"step": 10,
+"unit": "px",
+"default": 60
+},
+{
+"type": "header",
+"content": "الإطار الخارجي - سطح المكتب"
+},
+{
+"type": "color",
+"id": "outer_frame_color",
+"label": "لون الإطار الخارجي",
+"default": "#808080"
+},
+{
+"type": "range",
+"id": "outer_frame_top",
+"label": "سمك الإطار العلوي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "px",
+"default": 30
+},
+{
+"type": "range",
+"id": "outer_frame_right",
+"label": "سمك الإطار الأيمن",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "px",
+"default": 30
+},
+{
+"type": "range",
+"id": "outer_frame_bottom",
+"label": "سمك الإطار السفلي",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "px",
+"default": 40
+},
+{
+"type": "range",
+"id": "outer_frame_left",
+"label": "سمك الإطار الأيسر",
+"min": 0,
+"max": 100,
+"step": 5,
+"unit": "px",
+"default": 30
+},
+{
+"type": "range",
+"id": "outer_frame_radius",
+"label": "انحناء الإطار الخارجي",
+"min": 0,
+"max": 40,
+"step": 2,
+"unit": "px",
+"default": 16
+},
+{
+"type": "header",
+"content": "الإطار الداخلي - سطح المكتب"
+},
+{
+"type": "range",
+"id": "inner_frame_thickness",
+"label": "سمك الإطار الداخلي",
+"min": 0,
+"max": 20,
+"step": 1,
+"unit": "px",
+"default": 4
+},
+{
+"type": "range",
+"id": "inner_frame_radius",
+"label": "انحناء الإطار الداخلي",
+"min": 0,
+"max": 30,
+"step": 2,
+"unit": "px",
+"default": 12
+},
+{
+"type": "range",
+"id": "screen_radius",
+"label": "انحناء الشاشة",
+"min": 0,
+"max": 20,
+"step": 2,
+"unit": "px",
+"default": 8
+},
+{
+"type": "header",
+"content": "الإطار الخارجي - الموبايل"
+},
+{
+"type": "range",
+"id": "mobile_outer_frame_top",
+"label": "سمك الإطار العلوي",
+"min": 0,
+"max": 50,
+"step": 5,
+"unit": "px",
+"default": 15
+},
+{
+"type": "range",
+"id": "mobile_outer_frame_right",
+"label": "سمك الإطار الأيمن",
+"min": 0,
+"max": 50,
+"step": 5,
+"unit": "px",
+"default": 15
+},
+{
+"type": "range",
+"id": "mobile_outer_frame_bottom",
+"label": "سمك الإطار السفلي",
+"min": 0,
+"max": 50,
+"step": 5,
+"unit": "px",
+"default": 20
+},
+{
+"type": "range",
+"id": "mobile_outer_frame_left",
+"label": "سمك الإطار الأيسر",
+"min": 0,
+"max": 50,
+"step": 5,
+"unit": "px",
+"default": 15
+},
+{
+"type": "header",
+"content": "الإطار الداخلي - الموبايل"
+},
+{
+"type": "range",
+"id": "mobile_inner_frame_thickness",
+"label": "سمك الإطار الداخلي",
+"min": 0,
+"max": 10,
+"step": 1,
+"unit": "px",
+"default": 2
+},
+{
+"type": "header",
+"content": "أبعاد سطح المكتب"
+},
+{
+"type": "range",
+"id": "desktop_width_percent",
+"label": "العرض",
+"min": 50,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 100
+},
+{
+"type": "checkbox",
+"id": "use_custom_height",
+"label": "استخدام ارتفاع مخصص",
+"default": false
+},
+{
+"type": "range",
+"id": "desktop_height",
+"label": "الارتفاع المخصص",
+"min": 200,
+"max": 1000,
+"step": 50,
+"unit": "px",
+"default": 500
+},
+{
+"type": "select",
+"id": "aspect_ratio_preset",
+"label": "نسبة العرض إلى الارتفاع",
+"options": [
+{
+"value": "16:9",
+"label": "16:9 (قياسي)"
+},
+{
+"value": "4:3",
+"label": "4:3 (تقليدي)"
+},
+{
+"value": "1:1",
+"label": "1:1 (مربع)"
+},
+{
+"value": "21:9",
+"label": "21:9 (عريض)"
+},
+{
+"value": "custom",
+"label": "مخصص"
+}
+],
+"default": "16:9"
+},
+{
+"type": "range",
+"id": "custom_aspect_ratio",
+"label": "نسبة العرض المخصصة",
+"min": 30,
+"max": 100,
+"step": 1,
+"unit": "%",
+"default": 55
+},
+{
+"type": "header",
+"content": "أبعاد الموبايل"
+},
+{
+"type": "range",
+"id": "mobile_width_percent",
+"label": "العرض",
+"min": 50,
+"max": 100,
+"step": 5,
+"unit": "%",
+"default": 100
+},
+{
+"type": "checkbox",
+"id": "use_custom_mobile_height",
+"label": "استخدام ارتفاع مخصص",
+"default": false
+},
+{
+"type": "range",
+"id": "mobile_height",
+"label": "الارتفاع المخصص",
+"min": 150,
+"max": 600,
+"step": 25,
+"unit": "px",
+"default": 300
+},
+{
+"type": "select",
+"id": "mobile_aspect_ratio_preset",
+"label": "نسبة العرض إلى الارتفاع",
+"options": [
+{
+"value": "16:9",
+"label": "16:9 (أفقي)"
+},
+{
+"value": "4:3",
+"label": "4:3 (تقليدي)"
+},
+{
+"value": "1:1",
+"label": "1:1 (مربع)"
+},
+{
+"value": "9:16",
+"label": "9:16 (عمودي)"
+},
+{
+"value": "custom",
+"label": "مخصص"
+}
+],
+"default": "16:9"
+},
+{
+"type": "range",
+"id": "mobile_custom_aspect_ratio",
+"label": "نسبة العرض المخصصة",
+"min": 30,
+"max": 180,
+"step": 2,
+"unit": "%",
+"default": 56
+},
+{
+"type": "header",
+"content": "الفيديو 1"
+},
+{
+"type": "video",
+"id": "video_1",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_1",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 2"
+},
+{
+"type": "video",
+"id": "video_2",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_2",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 3"
+},
+{
+"type": "video",
+"id": "video_3",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_3",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 4"
+},
+{
+"type": "video",
+"id": "video_4",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_4",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 5"
+},
+{
+"type": "video",
+"id": "video_5",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_5",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 6"
+},
+{
+"type": "video",
+"id": "video_6",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_6",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 7"
+},
+{
+"type": "video",
+"id": "video_7",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_7",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 8"
+},
+{
+"type": "video",
+"id": "video_8",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_8",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 9"
+},
+{
+"type": "video",
+"id": "video_9",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_9",
+"label": "رابط الفيديو"
+},
+{
+"type": "header",
+"content": "الفيديو 10"
+},
+{
+"type": "video",
+"id": "video_10",
+"label": "فيديو من الجهاز"
+},
+{
+"type": "url",
+"id": "video_url_10",
+"label": "رابط الفيديو"
+}
+],
+"presets": [
+{
+"name": "مشغل فيديو شاشة تلفاز"
+}
+]
+}
+{% endschema %}

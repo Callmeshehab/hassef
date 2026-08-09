@@ -1,0 +1,457 @@
+{% doc %}
+  @prompt
+    بدي ارفع فيديو تشويقي هيك يكون لجزء جديد من الموقع عباره عن فيديو يعاد كانه gif, الفيديو لا يظهر وكمان أنا خلفية الفيديو المرفوع بيضاء سيسبب تعارض مع ثيم المتصفح تقدر تشيل الخلفيه من الفيديو المرفوع, بدي الفيديو ارفعه من الجهاز
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-promo-video-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-promo-video-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-promo-video-aspect-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: {{ block.settings.aspect_ratio }}%;
+  }
+
+  .ai-promo-video-element-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: {{ block.settings.video_fit }};
+    {% if block.settings.blend_mode != 'normal' %}
+      mix-blend-mode: {{ block.settings.blend_mode }};
+    {% endif %}
+  }
+
+  .ai-promo-video-placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .ai-promo-video-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+    margin-bottom: 20px;
+  }
+
+  .ai-promo-video-instructions-{{ ai_gen_id }} {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    text-align: right;
+    direction: rtl;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .ai-promo-video-instructions-{{ ai_gen_id }} h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .ai-promo-video-instructions-{{ ai_gen_id }} ol {
+    margin: 0;
+    padding: 0 20px 0 0;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  .ai-promo-video-instructions-{{ ai_gen_id }} li {
+    margin-bottom: 8px;
+  }
+
+  .ai-promo-video-instructions-{{ ai_gen_id }} strong {
+    color: #910f3f;
+  }
+
+  .ai-promo-video-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, {{ block.settings.overlay_opacity | divided_by: 100.0 }}) 100%
+    );
+    pointer-events: none;
+  }
+
+  .ai-promo-video-content-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: {{ block.settings.content_vertical_position }}%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: {{ block.settings.text_color }};
+    width: 90%;
+    max-width: 600px;
+    z-index: 2;
+  }
+
+  .ai-promo-video-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_size }}px;
+    margin: 0 0 12px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-promo-video-text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.text_size }}px;
+    margin: 0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-promo-video-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-promo-video-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.7 }}px;
+    }
+
+    .ai-promo-video-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size | times: 0.85 }}px;
+    }
+
+    .ai-promo-video-instructions-{{ ai_gen_id }} {
+      max-width: 90%;
+    }
+  }
+{% endstyle %}
+
+<promo-video-{{ ai_gen_id }}
+  class="ai-promo-video-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-promo-video-wrapper-{{ ai_gen_id }}">
+    <div class="ai-promo-video-aspect-{{ ai_gen_id }}">
+      {% if block.settings.video_url != blank %}
+        <video
+          class="ai-promo-video-element-{{ ai_gen_id }}"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="auto"
+        >
+          <source src="{{ block.settings.video_url }}" type="video/mp4">
+        </video>
+        
+        {% if block.settings.show_overlay %}
+          <div class="ai-promo-video-overlay-{{ ai_gen_id }}"></div>
+        {% endif %}
+
+        {% if block.settings.heading != blank or block.settings.text != blank %}
+          <div class="ai-promo-video-content-{{ ai_gen_id }}">
+            {% if block.settings.heading != blank %}
+              <h2 class="ai-promo-video-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <div class="ai-promo-video-text-{{ ai_gen_id }}">{{ block.settings.text }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="ai-promo-video-placeholder-{{ ai_gen_id }}">
+          {{ 'hero-apparel-1' | placeholder_svg_tag }}
+          <div class="ai-promo-video-instructions-{{ ai_gen_id }}">
+            <h3>📹 كيف ترفع الفيديو؟</h3>
+            <ol>
+              <li>اذهب إلى <strong>Settings → Files</strong></li>
+              <li>اضغط <strong>Upload files</strong></li>
+              <li>اختر الفيديو من جهازك</li>
+              <li>بعد الرفع، اضغط على الفيديو</li>
+              <li>انسخ الرابط من <strong>Copy link</strong></li>
+              <li>الصق الرابط في حقل "رابط الفيديو" أدناه</li>
+            </ol>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</promo-video-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class PromoVideo{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.video = this.querySelector('.ai-promo-video-element-{{ ai_gen_id }}');
+        
+        if (this.video) {
+          this.setupVideo();
+        }
+      }
+
+      setupVideo() {
+        this.video.addEventListener('loadeddata', () => {
+          this.video.play().catch((error) => {
+            console.log('Video autoplay prevented:', error);
+          });
+        });
+
+        this.video.addEventListener('error', (e) => {
+          console.error('Video loading error:', e);
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              this.video.play().catch(() => {});
+            } else {
+              this.video.pause();
+            }
+          });
+        }, { threshold: 0.25 });
+
+        observer.observe(this);
+      }
+    }
+
+    customElements.define('promo-video-{{ ai_gen_id }}', PromoVideo{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "فيديو تشويقي",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "رفع الفيديو"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "رابط الفيديو"
+    },
+    {
+      "type": "paragraph",
+      "content": "ارفع الفيديو: Settings → Files → Upload files، ثم انسخ الرابط والصقه هنا"
+    },
+    {
+      "type": "header",
+      "content": "إعدادات الفيديو"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "نسبة العرض للارتفاع",
+      "options": [
+        {
+          "value": "42.86",
+          "label": "21:9 عريض جداً"
+        },
+        {
+          "value": "56.25",
+          "label": "16:9 عريض"
+        },
+        {
+          "value": "75",
+          "label": "4:3 قياسي"
+        },
+        {
+          "value": "100",
+          "label": "1:1 مربع"
+        },
+        {
+          "value": "125",
+          "label": "4:5 عمودي"
+        }
+      ],
+      "default": "56.25"
+    },
+    {
+      "type": "select",
+      "id": "video_fit",
+      "label": "ملائمة الفيديو",
+      "options": [
+        {
+          "value": "cover",
+          "label": "تغطية كاملة"
+        },
+        {
+          "value": "contain",
+          "label": "احتواء كامل"
+        },
+        {
+          "value": "fill",
+          "label": "تمديد"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "العرض على الكمبيوتر",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الحواف",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "الخلفية والمزج"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "select",
+      "id": "blend_mode",
+      "label": "وضع المزج (لإخفاء الخلفية البيضاء)",
+      "options": [
+        {
+          "value": "normal",
+          "label": "عادي"
+        },
+        {
+          "value": "multiply",
+          "label": "ضرب (يخفي الأبيض)"
+        },
+        {
+          "value": "screen",
+          "label": "شاشة"
+        },
+        {
+          "value": "darken",
+          "label": "تغميق"
+        },
+        {
+          "value": "lighten",
+          "label": "تفتيح"
+        }
+      ],
+      "default": "normal",
+      "info": "جرب 'ضرب' لإخفاء الخلفية البيضاء من الفيديو"
+    },
+    {
+      "type": "header",
+      "content": "التراكب والمحتوى"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "إظهار تراكب داكن",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "شفافية التراكب",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "العنوان"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "النص"
+    },
+    {
+      "type": "range",
+      "id": "content_vertical_position",
+      "label": "موضع المحتوى العمودي",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "تنسيق النص"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "حجم العنوان",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "حجم النص",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    }
+  ],
+  "presets": [
+    {
+      "name": "فيديو تشويقي"
+    }
+  ]
+}
+{% endschema %}

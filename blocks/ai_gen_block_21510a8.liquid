@@ -1,0 +1,303 @@
+{% doc %}
+  @prompt
+    أريد مربع يعمل كمشغل فيديو مدمج ارفعه للكود في الموقع يعمل تلقائياً ومن فرق الفيديو مساحه لتحرير نص , بدي الكلام يكون فوق الفيديوات تحته, خلي الفيديو اي أضعه مدمج من الملفات اي بدون رابط أريد مشغل الفيديو ليس بعرض الصفحة لا بدي اقدر اعدل حجمه في الصفحة وايضاً حول المشغل ايطار بلون ما اقد اعدله وأقدر اعدل أبعاده وكل شيء مخصص, رفعت الفيديو لكن لا يشتغل في الموقع
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-video-player-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.container_padding }}px;
+  }
+
+  .ai-video-player-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.desktop_width_percent }}%;
+    margin: 0 auto;
+  }
+
+  .ai-video-player-content-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.text_video_spacing }}px;
+  }
+
+  .ai-video-player-text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: 1.5;
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-video-player-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+    background-color: #000000;
+  }
+
+  .ai-video-player-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ai-video-player-placeholder-{{ ai_gen_id }} {
+    padding: 60px 20px;
+    text-align: center;
+    color: #666;
+    background-color: #f4f4f4;
+  }
+
+  .ai-video-player-placeholder-{{ ai_gen_id }} svg {
+    margin: 0 auto 20px;
+    display: block;
+  }
+
+  .ai-video-player-placeholder-{{ ai_gen_id }} p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-video-player-container-{{ ai_gen_id }} {
+      max-width: 100%;
+    }
+  }
+{% endstyle %}
+
+<ai-video-player-{{ ai_gen_id }}
+  class="ai-video-player-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-video-player-container-{{ ai_gen_id }}">
+    <div class="ai-video-player-content-{{ ai_gen_id }}">
+      {% if block.settings.text != blank %}
+        <div class="ai-video-player-text-{{ ai_gen_id }}">
+          {{ block.settings.text }}
+        </div>
+      {% endif %}
+
+      <div class="ai-video-player-wrapper-{{ ai_gen_id }}">
+        {% if block.settings.video != blank %}
+          {% if block.settings.video.sources != blank %}
+            <video
+              class="ai-video-player-video-{{ ai_gen_id }}"
+              {% if block.settings.autoplay %}autoplay{% endif %}
+              {% if block.settings.loop %}loop{% endif %}
+              {% if block.settings.muted %}muted{% endif %}
+              {% if block.settings.controls %}controls{% endif %}
+              playsinline
+            >
+              {% for source in block.settings.video.sources %}
+                <source src="{{ source.url }}" type="{{ source.mime_type }}">
+              {% endfor %}
+              المتصفح الخاص بك لا يدعم تشغيل الفيديو.
+            </video>
+          {% else %}
+            <div class="ai-video-player-placeholder-{{ ai_gen_id }}">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <p>جاري تحميل الفيديو...</p>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="ai-video-player-placeholder-{{ ai_gen_id }}">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <p>قم برفع ملف الفيديو من الإعدادات</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</ai-video-player-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class AIVideoPlayer{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.video = this.querySelector('.ai-video-player-video-{{ ai_gen_id }}');
+        
+        if (this.video) {
+          this.video.addEventListener('loadedmetadata', () => {
+            if (this.video.videoWidth && this.video.videoHeight) {
+              this.video.style.aspectRatio = this.video.videoWidth / this.video.videoHeight;
+            }
+          });
+
+          this.video.addEventListener('error', () => {
+            console.error('خطأ في تحميل الفيديو');
+          });
+        }
+      }
+    }
+
+    customElements.define('ai-video-player-{{ ai_gen_id }}', AIVideoPlayer{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "مشغل فيديو مخصص",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "النص"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "النص",
+      "default": "<p>شاهد الفيديو الخاص بنا</p>"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "حجم النص",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "محاذاة النص",
+      "options": [
+        {
+          "value": "right",
+          "label": "يمين"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "text_video_spacing",
+      "label": "المسافة بين النص والفيديو",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "الفيديو"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "ملف الفيديو"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تشغيل تلقائي",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "إعادة التشغيل",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "كتم الصوت",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "controls",
+      "label": "إظهار أدوات التحكم",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "الحجم والتخطيط"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض المشغل على الكمبيوتر",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "container_padding",
+      "label": "المسافة الخارجية",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "الإطار"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "label": "سمك الإطار",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "لون الإطار",
+      "default": "#910f3f"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الزوايا",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "مشغل فيديو مخصص"
+    }
+  ]
+}
+{% endschema %}

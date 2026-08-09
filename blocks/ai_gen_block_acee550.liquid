@@ -1,0 +1,1440 @@
+{% doc %}
+  @prompt
+    اعمل لي مشغل فيديو على كل تلفاز قديم وفيه وحده تحكم في الإطار السفلي تتكون من ثلاث أزرار زر تشغيل وإيقاف وزر التكبير وزر كتم الصوت وبجواره مباشره مؤشر مسار مستوى الصوت , التحكم في حشوه إطار كل جهة على حدة وكمان امكانيه إضافه الفيديو من الجهاز وخلي لحد ٣ فيديوهات, خيار للتحكم في التنقل بين الفيديوهات عبر زرين زر يمين في منتصف الإطار الأيمن وزر في يسار منتصف الإطار الأيسر وكمان صلح مشغل الفيديو المدمج لأنه تالف ولا يشغل اي فيديو , المشغل المدمج للفيديوهات لا يعمل مطلقا عليك ان تصلحه, بدي الازرار التنقل تكون على الإطار الخارجي مش في الشاشه واتحكم في مواضعهم بالتفصيل كل زر على حده وكمان غيره لإخفاءهم باي وقت ولالوانهم وحجم رمز داخل الإطار لكل منهم, خيار لتعديل حجم الأيقونات التي في أزرار وحده التحكم وخيار لتعديل ارتفاع وعرض التلفاز مع المشغل واضف خيارات للفيديو المدمج زي التنقل التلقائي والكتم وخاصية منع التكبير التلقائي عند تشغيل الفيديو خصوصا في متصفح سفاري بالآيفون وخاصية مثل نوع عرض الفيديو سواء امتلاء او احتواء او تكبير او غيره وخيار لإظهار أدوات التحكم المدمجه في بالمشغل , خيار لتشغيل الفيديو التالي وايضا أضف خيارات للأزرار الجانبيه للتنقل تتحرك عكس الاتجاه بحريه ليس فقط باتجاه الشاشه يعني امكانيه ان تخرج خارج الإطار وكمان أضف زر على شريط مسار مستوى الصوت لسحبه والتحكم في مستوى الصوت وايضا خلي الجزء الممتلئ في المسار بلون مميز عن الفارغ, أعيد برمجة مسار التحكم فقط بمستوى الصوت بدي يكون بزر وقابل للسحب ويمتلئ جزء ملون بلون غير الفارغ , مؤشر الصوت تالف بدي تحذفه كله مع الزر وتضيف مؤشر للتحكم بالصوت يكون بزر صغير يمكن سحبه لرفع الصوت او خفضه والجزء المسحوب يتلون بلون ليظهر انه ممتلئ عن الاخر, احذف مؤشر الصوت ورجع زر كتم الصوت واضف خيار للتحكم في حجم الرمز داخل الايقونه, أضف مسار بجنب زر الصوت للتحكم في مستوى الصوت في المشغل بواسطة زر قابل للسحب , المؤشر تالف حيث لا يظهر اي زر اطلاقاً للسحب وايضا لا يتلون بلون مغايرللجزء الممتلئ عليك ان تصلح هذا فورا , أريد تعديل شريط الصوت داخل مشغل الفيديو في Shopify theme.المطلوب تنفيذ التالي بدقة:
+    	1.	استخدام input type=“range” حقيقي وليس div.
+    إضافة Thumb دائري واضح 14p	2.	إزالة الشكل الافتراضي:
+    appearance: none;
+    -webkit-appearance: none;
+    	3.
+    	x بلون #ff8c42.
+    	4.	تلوين الجزء الممتلئ بلون #ff8c42.
+    	5.	تلوين الجزء الفارغ بلون #444.
+    	6.	تحديث الخلفية باستخدام JS عبر linear-gradient حسب القيمة.
+    	7.	يجب دعم Webkit بالكامل لأن المتصفح Chromium, أريد إضافة تأثير تشويش تلفزيونات قديمة (TV Static) عند التقليب بين الفيديوهات فقط في بدايتها.
+    المطلوب تنفيذ التالي بدقة:
+    	1.	يظهر تأثير تشويش قديم (Noise / Static) عند تغيير الفيديو فقط.
+    شويش من متغير واحد في الأعلى.
+    	4.	يجب أن أستطيع تعطيل التأ	2.	يستمر التأثير لمدة قابلة للتحكم (مثلاً 0.5 – 2 ثانية).
+    	3.	يجب أن أستطيع التحكم في مدة ال
+    تثير بالكامل عبر متغير:
+    ENABLE_STATIC = true / false
+    	5.	التأثير يجب أن:
+    	•	يظهر فوق الفيديو مباشرة
+    	•	لا يمنع أزرار التحكم
+    	•	يختفي تلقائيًا بعد انتهاء المدة
+    	6.	لا يؤثر على أداء الموقع.
+    	7.	متوافق مع Shopify , أريد إضافة خيار في إعدادات مشغل الفيديو داخل Shopify لمنع Safari على iPhone من إجبار الفيديو على الفتح في المشغل المدمج (Fullscreen).
+    المطلوب تنفيذ التالي بدقة:
+    	1.	إضافة خيار في إعدادات الـ section باسم:
+    “Enable Inline Playback on iPhone (Prevent Fullscreen)”
+    	2.	عند تفعيل الخيار يجب إضافة الخصائص التالية لعنصر الفيديو:
+    ثيم بدون تعplaysinline
+    webkit-playsinline
+    muted
+    	3.	يجب ضمان أن الفيديو يعمل داخل نفس المشغل المخصص بدون الانتقال إلى مشغل Safari الافتراضي.
+    	4.	يجب أن يكون الخيار قابل للتفعيل أو الإلغاء من إعدادات ا
+    لديل الكود يدويًا.
+    	5.	لا تكسر خصائص autoplay أو التحكم الحالية, لا أنا بدي وحدة التحكم تكون في الإطار السفلي للتلفاز , خيار لنسبة عرض التلفاز على سطح المكتب والهاتف, خيار لارتفاع وعرض التلفاز اللي هو المشغل وكمان اصلح المشغل المدمج لأنه لا يعمل أبدا, مشغل الفيديوهات المدمج لا يعمل أبدا, عليك انت تصلح مشغل الفيديوهات المدمج لأنه لا يشتغل اي فيديو, مشغل الفيديو المدمج تالف ولا يعرض اي فيديوهات أصلحه من الاول, اصلح المشغل الفيديوهات لا تعمل مطلقا , أريد إضافة تأثير تشويش تلفزيونات قديمة (TV Static) عند التقليب بين الفيديوهات فقط في بدايتها.
+    المطلوب تنفيذ التالي بدقة:
+    	1.	يظهر تأثير تشويش قديم (Noise / Static) عند تغيير الفيديو فقط.
+    شويش من متغير واحد في الأعلى.
+    	4.	يجب أن أستطيع تعطيل التأ	2.	يستمر التأثير لمدة قابلة للتحكم (مثلاً 0.5 – 2 ثانية).
+    	3.	يجب أن أستطيع التحكم في مدة ال
+    تثير بالكامل عبر متغير:
+    ENABLE_STATIC = true / false
+    	5.	التأثير يجب أن:
+    	•	يظهر فوق الفيديو مباشرة
+    	•	لا يمنع أزرار التحكم
+    	•	يختفي تلقائيًا بعد انتهاء المدة
+    	6.	لا يؤثر على أداء الموقع.
+    	7.	متوافق مع Shopify section
+    s, غير شكل التشويش بدي يكون زي اللي في التلفزيونات القديمه او ضيف لي قايمه من التشويشات من هذي النوع وأنا اختار بينهم , أضف التشويش لهم العادي جدا اللي في التلفزيونات القديمه يكون ثابت هيك ويتحرك بشكل خفيف فيه نقاط سوداء صغيره ورصاصيه, لا انت لم تضف التشويش اللي اقصده معهم بدي تشويش التلفزيونات القديمه للغايه, أضف التشويش اللي في التلفزيونات القديمه لهم لحد الآن لم تضفه أنا اقصد اللي يكون ثابت هيك , ضيف أزرار التحكم في الاسفل داخل إطار بلون متناسق مع الألوان الأخرى وخلي زر الكتم يكون علامه شرطه مش اكس عند الكتم, اجعل زر الكتم يكون بخط عمودي بزاويه على رمز الصوت, التشويش لا يعمل عند التنقل مطلقا اصلح هذا, احذف التشويش وخياراته وعدل زر الكتم ليصبح شكله خط بميل على الرمز نفسه, أضف تاثير انعكاس على شاشه التلفاز كانّها زجاجيه هيك وكمان عدل شكل زر الكتم بدي الخط تبع الكتم يكون على رمز الصوت نفسه اي مطبق عليه زي الأشكال الشائعة تبع الميوت, لا أنا بدي الزر نفسه تبع الصوت اللي في وحده التحكم تكون قدامها اكثر من شرطه تفاعليه يعني لو الصوت عالي تكون كل الشرطات لو متوسط شرطتين لو منخفض شرطه لو مكتوم يكون خط زي هيك / على رمز المكبر نفسه فوقه يعني كانّه انكتم, زر الصوت اصبح شكله غير متناسق بدي شي متناسق اكثر ولكن نفس الفكره, زر الصوت شرطه الكتم تبدو طويله جدا خلي طولها متوسط وكمان الثلاث شرط تبدو مقصوصه خلي شكلها مرتب اكثر, بدي لما ينكتم يكون زي زر الآيفون عند الكتم نفس شكله, حلو ولكن عند الكتم خلي الخط المائل اللي يمر  برمز المكبر يشقه هيك كانه داخل فيه وقصه, اضف خيار لتحريك شرطه الكتم اللي على رمز المكبر عند الكتم , اضف قسم تحت التلفاز فيه صور مصغره مستطيله وأنا أتحكم في إبعادها والاهم أنها تعرض صوره مصغره من الفيديوهات تلقائيا والصور موضوعه بين زرين للتنقل بينهم , ممتاز جدا بس بدي لما أوصل لآخر صوره مصغره تتحرك القائمه معه وترجع هيك وأقدر برضو أتصفحه باللمس وخلي قسم الصور المصغره له خيار الاخفاء, لا بدي أزرار التنقل في قسم الصور المصغره يختفي مع خيار إخفاء الصور المصغره وكمان بدي هذول الزرين يعملوا ايضاً لتقليب الفيديوهات يعني يحرك القائمه عندما يصل لآخر صوره معروضه ليعرض الصور المتبقيه بشكل واضح وبدي اللمس يكون سلس بحريه يعني مثل تصفح الموقع سلس بدون تقييد بحركه معينه, زر تكبير اللي في وحده التحكم لا يعمل أبدا أضعف طريقه لجعل الزائر يتمكن من تكبير عرض الفيديو بالضغط عليه, أريد ان تضيف لي تشويش نفس اللي في التلفزيونات القديمه عند بدايه تشغيل كل مقطع لمده ثواني, أريد ان تضيف لي تشويش نفس اللي في التلفزيونات القديمه عند بدايه تشغيل كل مقطع لمده ثواني, اضف امكانيه رفع 15 فيديو من الجهاز او رابط, حلو بس خيارات للتحكم في ترتيب الازرار التي في وحده التحكم وضيف إطار داخلي نحيف يحيط بالشاشه من الداخل وخلي خيارات للتحكم في عرض وارتفاع قسم الصور المصغر وخيارات لتحديد مسافه أزرار التنقل التي في قسم الصور المصغره وضيف امكانيه رفع الفيديوهات ايضا من الروابط , خلي ترتيب الازرار الافتراضي زر التشغيل بجواره التكبير بجواره الكتم وبجوار زر الكتم هو مؤشر مستوى الصوت, قلت لك خلي مسار مستوى الصوت على طرف الازرار باليمين مش بين الازرار, ممتاز ولكن الصور المصغره لا تعرض صور مصغره من الفيديو ابدا, خلي الصوره المصغره تظهر من الفيديو نفسه لان الصور بالاسفل سوداء لا تظهر اي لقطه, اضف خيار لاضافه تشويش التلفاز القديم عند اختيار اي فيديو او التنقل في بدايته لمده ثواني مع امكانيه إضافه الفيديو هذا من الجهاز كذلك, Very excellent, but I want the controller to be in a frame consistent with the colors, and also the thumbnails do not show anything from the video, followed by just black pictures, fix this, and I want the inner frame at the screen to be at its end exactly because it appears inside the screen, not only on the end, اصلح الإطار الداخلي للشاشه فقط اجهله على حافة شاشة المشغل بالضبط ليس داخلها لأنه تبدو غير متناسقه, Fix the thumbnails only because the thumbnails never show a picture from the video, بدي احرك أزرار التنقل بحريه لخارج حدود الشاشه وكمانها. لتحديد سمك كل جهه من إطار التلفاز على حده وايضا المشغل المدمج للفيديوهات لا يعمل أبدا اصلح هذا, بدي أزرار التنقل تخرج عادي خارج التلفاز وعليك ان تصلح المشغل الفديوهات لا يعمل ابدا, أزرار التنقل الجانبيه بدي تكون على أطراف التلفاز يعني على إطار التلفاز الخارجي مش داخل الشاشه وخيار لإمكانيه اخفائها, Fix the built-in video player because it is damaged and never works. Add an option for the next autoplay, an option to show the built-in controls, an option for autoplay, mute, etc., and an option to prevent automatic video zoom when playing, especially in the Safari browser in the iPhone
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-retro-tv-container-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-retro-tv-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    background-color: {{ block.settings.frame_color }};
+    padding-top: {{ block.settings.frame_top }}px;
+    padding-right: {{ block.settings.frame_right }}px;
+    padding-bottom: {{ block.settings.frame_bottom }}px;
+    padding-left: {{ block.settings.frame_left }}px;
+    border-radius: {{ block.settings.frame_border_radius }}px;
+    overflow: visible;
+  }
+
+  .ai-retro-tv-screen-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background-color: #000;
+    border-radius: {{ block.settings.screen_border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-retro-tv-screen-wrapper-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: {{ block.settings.inner_border_width }}px solid {{ block.settings.inner_border_color }};
+    border-radius: {{ block.settings.screen_border_radius }}px;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .ai-retro-tv-video-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-retro-tv-video-{{ ai_gen_id }}:fullscreen,
+  .ai-retro-tv-video-{{ ai_gen_id }}:-webkit-full-screen {
+    object-fit: contain;
+  }
+
+  .ai-retro-tv-static-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+  }
+
+  .ai-retro-tv-static-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .ai-retro-tv-static-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-retro-tv-nav-button-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: {{ block.settings.nav_button_size }}px;
+    height: {{ block.settings.nav_button_size }}px;
+    background-color: {{ block.settings.nav_button_bg }};
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: background-color 0.3s ease;
+    {% unless block.settings.show_nav_buttons %}
+      display: none;
+    {% endunless %}
+  }
+
+  .ai-retro-tv-nav-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.nav_button_hover_bg }};
+  }
+
+  .ai-retro-tv-nav-button-{{ ai_gen_id }} svg {
+    width: {{ block.settings.nav_icon_size }}px;
+    height: {{ block.settings.nav_icon_size }}px;
+    fill: {{ block.settings.nav_icon_color }};
+  }
+
+  .ai-retro-tv-nav-prev-{{ ai_gen_id }} {
+    left: {{ block.settings.nav_horizontal_position }}px;
+  }
+
+  .ai-retro-tv-nav-next-{{ ai_gen_id }} {
+    right: {{ block.settings.nav_horizontal_position }}px;
+  }
+
+  .ai-retro-tv-controls-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ block.settings.controls_gap }}px;
+    margin-top: {{ block.settings.controls_margin_top }}px;
+    padding: {{ block.settings.controls_padding }}px;
+    background-color: {{ block.settings.controls_bg_color }};
+    border-radius: {{ block.settings.controls_border_radius }}px;
+  }
+
+  .ai-retro-tv-control-button-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-retro-tv-control-button-{{ ai_gen_id }}:hover {
+    opacity: 0.7;
+  }
+
+  .ai-retro-tv-control-button-{{ ai_gen_id }} svg {
+    width: {{ block.settings.control_icon_size }}px;
+    height: {{ block.settings.control_icon_size }}px;
+    fill: {{ block.settings.control_icon_color }};
+  }
+
+  .ai-retro-tv-play-button-{{ ai_gen_id }} {
+    order: {{ block.settings.play_button_order }};
+  }
+
+  .ai-retro-tv-fullscreen-button-{{ ai_gen_id }} {
+    order: {{ block.settings.fullscreen_button_order }};
+  }
+
+  .ai-retro-tv-mute-button-{{ ai_gen_id }} {
+    order: {{ block.settings.mute_button_order }};
+  }
+
+  .ai-retro-tv-volume-slider-{{ ai_gen_id }} {
+    order: {{ block.settings.volume_order }};
+    width: {{ block.settings.volume_slider_width }}px;
+    height: {{ block.settings.volume_slider_height }}px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, {{ block.settings.volume_slider_fill }} 0%, {{ block.settings.volume_slider_fill }} var(--volume-percent), {{ block.settings.volume_slider_bg }} var(--volume-percent), {{ block.settings.volume_slider_bg }} 100%);
+    border-radius: {{ block.settings.volume_slider_radius }}px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .ai-retro-tv-volume-slider-{{ ai_gen_id }}::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: {{ block.settings.volume_thumb_size }}px;
+    height: {{ block.settings.volume_thumb_size }}px;
+    background: {{ block.settings.volume_thumb_color }};
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .ai-retro-tv-volume-slider-{{ ai_gen_id }}::-moz-range-thumb {
+    width: {{ block.settings.volume_thumb_size }}px;
+    height: {{ block.settings.volume_thumb_size }}px;
+    background: {{ block.settings.volume_thumb_color }};
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+
+  .ai-retro-tv-thumbnails-section-{{ ai_gen_id }} {
+    margin-top: {{ block.settings.thumbnails_distance }}px;
+    {% unless block.settings.show_thumbnails %}
+      display: none;
+    {% endunless %}
+  }
+
+  .ai-retro-tv-thumbnails-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: {{ block.settings.thumbnails_section_width }}%;
+    margin: 0 auto;
+  }
+
+  .ai-retro-tv-thumbnails-container-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.thumbnails_gap }}px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ai-retro-tv-thumbnails-container-{{ ai_gen_id }}::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ai-retro-tv-thumbnail-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: {{ block.settings.thumbnail_width }}px;
+    height: {{ block.settings.thumbnail_height }}px;
+    border: {{ block.settings.thumbnail_border_width }}px solid {{ block.settings.thumbnail_border_color }};
+    border-radius: {{ block.settings.thumbnail_border_radius }}px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+
+  .ai-retro-tv-thumbnail-{{ ai_gen_id }}:hover {
+    border-color: {{ block.settings.thumbnail_hover_border }};
+  }
+
+  .ai-retro-tv-thumbnail-{{ ai_gen_id }}.active {
+    border-color: {{ block.settings.thumbnail_active_border }};
+    border-width: {{ block.settings.thumbnail_active_border_width }}px;
+  }
+
+  .ai-retro-tv-thumbnail-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .ai-retro-tv-thumb-nav-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: {{ block.settings.thumb_nav_size }}px;
+    height: {{ block.settings.thumb_nav_size }}px;
+    background-color: {{ block.settings.thumb_nav_bg }};
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-retro-tv-thumb-nav-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.thumb_nav_hover_bg }};
+  }
+
+  .ai-retro-tv-thumb-nav-{{ ai_gen_id }} svg {
+    width: {{ block.settings.thumb_nav_icon_size }}px;
+    height: {{ block.settings.thumb_nav_icon_size }}px;
+    fill: {{ block.settings.thumb_nav_icon_color }};
+  }
+
+  .ai-retro-tv-thumb-prev-{{ ai_gen_id }} {
+    left: -{{ block.settings.thumb_nav_gap }}px;
+  }
+
+  .ai-retro-tv-thumb-next-{{ ai_gen_id }} {
+    right: -{{ block.settings.thumb_nav_gap }}px;
+  }
+{% endstyle %}
+
+<retro-tv-player-{{ ai_gen_id }}
+  class="ai-retro-tv-container-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  data-autoplay="{{ block.settings.autoplay }}"
+  data-muted="{{ block.settings.muted }}"
+  data-loop="{{ block.settings.loop }}"
+  data-auto-play-next="{{ block.settings.auto_play_next }}"
+  data-static-enabled="{{ block.settings.enable_static }}"
+  data-static-duration="{{ block.settings.static_duration }}"
+>
+  <div class="ai-retro-tv-wrapper-{{ ai_gen_id }}">
+    <button class="ai-retro-tv-nav-button-{{ ai_gen_id }} ai-retro-tv-nav-prev-{{ ai_gen_id }}" aria-label="Previous video">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+
+    <div class="ai-retro-tv-screen-wrapper-{{ ai_gen_id }}">
+      {% liquid
+        assign videos = ''
+        for i in (1..15)
+          assign video_key = 'video_' | append: i
+          assign url_key = 'video_url_' | append: i
+          assign video = block.settings[video_key]
+          assign url = block.settings[url_key]
+          
+          if video != blank or url != blank
+            if videos != ''
+              assign videos = videos | append: ','
+            endif
+            if url != blank
+              assign videos = videos | append: url
+            else
+              assign videos = videos | append: video
+            endif
+          endif
+        endfor
+      %}
+
+      {% assign video_array = videos | split: ',' %}
+      {% for video_src in video_array %}
+        <video
+          class="ai-retro-tv-video-{{ ai_gen_id }}"
+          {% if forloop.first %}style="display: block;"{% else %}style="display: none;"{% endif %}
+          playsinline
+          webkit-playsinline
+          {% if block.settings.show_native_controls %}controls{% endif %}
+          {% if block.settings.autoplay and forloop.first %}autoplay{% endif %}
+          {% if block.settings.muted %}muted{% endif %}
+          {% if block.settings.loop and video_array.size == 1 %}loop{% endif %}
+          preload="metadata"
+        >
+          <source src="{{ video_src }}" type="video/mp4">
+        </video>
+      {% endfor %}
+
+      <div class="ai-retro-tv-static-{{ ai_gen_id }}">
+        {% if block.settings.custom_static_video != blank or block.settings.custom_static_url != blank %}
+          <video class="ai-retro-tv-static-video-{{ ai_gen_id }}" autoplay loop muted playsinline>
+            <source src="{% if block.settings.custom_static_url != blank %}{{ block.settings.custom_static_url }}{% else %}{{ block.settings.custom_static_video }}{% endif %}" type="video/mp4">
+          </video>
+        {% endif %}
+      </div>
+    </div>
+
+    <button class="ai-retro-tv-nav-button-{{ ai_gen_id }} ai-retro-tv-nav-next-{{ ai_gen_id }}" aria-label="Next video">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </button>
+
+    <div class="ai-retro-tv-controls-{{ ai_gen_id }}">
+      <button class="ai-retro-tv-control-button-{{ ai_gen_id }} ai-retro-tv-play-button-{{ ai_gen_id }}" aria-label="Play/Pause">
+        <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="pause-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+
+      <button class="ai-retro-tv-control-button-{{ ai_gen_id }} ai-retro-tv-fullscreen-button-{{ ai_gen_id }}" aria-label="Fullscreen">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+
+      <button class="ai-retro-tv-control-button-{{ ai_gen_id }} ai-retro-tv-mute-button-{{ ai_gen_id }}" aria-label="Mute/Unmute">
+        <svg class="volume-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        <svg class="volume-off" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+      </button>
+
+      <input
+        type="range"
+        class="ai-retro-tv-volume-slider-{{ ai_gen_id }}"
+        min="0"
+        max="100"
+        value="{% if block.settings.muted %}0{% else %}70{% endif %}"
+        style="--volume-percent: {% if block.settings.muted %}0%{% else %}70%{% endif %};"
+        aria-label="Volume"
+      >
+    </div>
+  </div>
+
+  {% if block.settings.show_thumbnails %}
+    <div class="ai-retro-tv-thumbnails-section-{{ ai_gen_id }}">
+      <div class="ai-retro-tv-thumbnails-wrapper-{{ ai_gen_id }}">
+        <button class="ai-retro-tv-thumb-nav-{{ ai_gen_id }} ai-retro-tv-thumb-prev-{{ ai_gen_id }}" aria-label="Scroll left">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+
+        <div class="ai-retro-tv-thumbnails-container-{{ ai_gen_id }}">
+          {% for video_src in video_array %}
+            <div class="ai-retro-tv-thumbnail-{{ ai_gen_id }} {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}">
+              <video class="ai-retro-tv-thumbnail-video-{{ ai_gen_id }}" src="{{ video_src }}#t=0.5" preload="metadata" muted playsinline></video>
+            </div>
+          {% endfor %}
+        </div>
+
+        <button class="ai-retro-tv-thumb-nav-{{ ai_gen_id }} ai-retro-tv-thumb-next-{{ ai_gen_id }}" aria-label="Scroll right">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
+      </div>
+    </div>
+  {% endif %}
+</retro-tv-player-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class RetroTVPlayer{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.videos = [];
+        this.thumbnails = [];
+        this.currentVideo = null;
+        this.settings = {
+          autoplay: this.dataset.autoplay === 'true',
+          muted: this.dataset.muted === 'true',
+          loop: this.dataset.loop === 'true',
+          autoPlayNext: this.dataset.autoPlayNext === 'true',
+          staticEnabled: this.dataset.staticEnabled === 'true',
+          staticDuration: parseFloat(this.dataset.staticDuration) * 1000
+        };
+      }
+
+      connectedCallback() {
+        this.videos = Array.from(this.querySelectorAll('.ai-retro-tv-video-{{ ai_gen_id }}'));
+        this.thumbnails = Array.from(this.querySelectorAll('.ai-retro-tv-thumbnail-{{ ai_gen_id }}'));
+        this.currentVideo = this.videos[0];
+        
+        this.playButton = this.querySelector('.ai-retro-tv-play-button-{{ ai_gen_id }}');
+        this.fullscreenButton = this.querySelector('.ai-retro-tv-fullscreen-button-{{ ai_gen_id }}');
+        this.muteButton = this.querySelector('.ai-retro-tv-mute-button-{{ ai_gen_id }}');
+        this.volumeSlider = this.querySelector('.ai-retro-tv-volume-slider-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-retro-tv-nav-prev-{{ ai_gen_id }}');
+        this.nextButton = this.querySelector('.ai-retro-tv-nav-next-{{ ai_gen_id }}');
+        this.thumbPrevButton = this.querySelector('.ai-retro-tv-thumb-prev-{{ ai_gen_id }}');
+        this.thumbNextButton = this.querySelector('.ai-retro-tv-thumb-next-{{ ai_gen_id }}');
+        this.staticOverlay = this.querySelector('.ai-retro-tv-static-{{ ai_gen_id }}');
+
+        this.setupEventListeners();
+        this.initializePlayer();
+      }
+
+      setupEventListeners() {
+        if (this.playButton) {
+          this.playButton.addEventListener('click', () => this.togglePlay());
+        }
+
+        if (this.fullscreenButton) {
+          this.fullscreenButton.addEventListener('click', () => this.toggleFullscreen());
+        }
+
+        if (this.muteButton) {
+          this.muteButton.addEventListener('click', () => this.toggleMute());
+        }
+
+        if (this.volumeSlider) {
+          this.volumeSlider.addEventListener('input', (e) => this.updateVolume(e.target.value));
+        }
+
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.previousVideo());
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.nextVideo());
+        }
+
+        if (this.thumbPrevButton) {
+          this.thumbPrevButton.addEventListener('click', () => this.scrollThumbnails(-1));
+        }
+
+        if (this.thumbNextButton) {
+          this.thumbNextButton.addEventListener('click', () => this.scrollThumbnails(1));
+        }
+
+        this.thumbnails.forEach((thumb, index) => {
+          thumb.addEventListener('click', () => this.switchToVideo(index));
+        });
+
+        this.videos.forEach(video => {
+          video.addEventListener('play', () => this.updatePlayButton(true));
+          video.addEventListener('pause', () => this.updatePlayButton(false));
+          video.addEventListener('ended', () => this.handleVideoEnded());
+        });
+      }
+
+      initializePlayer() {
+        if (this.currentVideo) {
+          if (this.settings.muted) {
+            this.currentVideo.muted = true;
+            this.updateMuteButton(true);
+          }
+          
+          if (this.settings.autoplay) {
+            this.currentVideo.play().catch(e => console.log('Autoplay prevented:', e));
+          }
+        }
+      }
+
+      togglePlay() {
+        if (!this.currentVideo) return;
+
+        try {
+          if (this.currentVideo.paused) {
+            this.currentVideo.play().catch(e => console.log('Play error:', e));
+          } else {
+            this.currentVideo.pause();
+          }
+        } catch (e) {
+          console.log('Toggle play error:', e);
+        }
+      }
+
+      updatePlayButton(isPlaying) {
+        const playIcon = this.playButton?.querySelector('.play-icon');
+        const pauseIcon = this.playButton?.querySelector('.pause-icon');
+        
+        if (playIcon && pauseIcon) {
+          playIcon.style.display = isPlaying ? 'none' : 'block';
+          pauseIcon.style.display = isPlaying ? 'block' : 'none';
+        }
+      }
+
+      toggleFullscreen() {
+        if (!this.currentVideo) return;
+
+        try {
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+              document.webkitExitFullscreen();
+            }
+          } else {
+            if (this.currentVideo.requestFullscreen) {
+              this.currentVideo.requestFullscreen();
+            } else if (this.currentVideo.webkitRequestFullscreen) {
+              this.currentVideo.webkitRequestFullscreen();
+            } else if (this.currentVideo.webkitEnterFullscreen) {
+              this.currentVideo.webkitEnterFullscreen();
+            }
+          }
+        } catch (e) {
+          console.log('Fullscreen error:', e);
+        }
+      }
+
+      toggleMute() {
+        if (!this.currentVideo) return;
+
+        this.currentVideo.muted = !this.currentVideo.muted;
+        this.updateMuteButton(this.currentVideo.muted);
+        
+        if (this.volumeSlider) {
+          this.volumeSlider.value = this.currentVideo.muted ? 0 : this.currentVideo.volume * 100;
+          this.volumeSlider.style.setProperty('--volume-percent', this.volumeSlider.value + '%');
+        }
+      }
+
+      updateMuteButton(isMuted) {
+        const volumeOn = this.muteButton?.querySelector('.volume-on');
+        const volumeOff = this.muteButton?.querySelector('.volume-off');
+        
+        if (volumeOn && volumeOff) {
+          volumeOn.style.display = isMuted ? 'none' : 'block';
+          volumeOff.style.display = isMuted ? 'block' : 'none';
+        }
+      }
+
+      updateVolume(value) {
+        if (!this.currentVideo) return;
+
+        const volume = value / 100;
+        this.currentVideo.volume = volume;
+        this.currentVideo.muted = volume === 0;
+        this.updateMuteButton(volume === 0);
+        this.volumeSlider.style.setProperty('--volume-percent', value + '%');
+      }
+
+      handleVideoEnded() {
+        if (this.settings.autoPlayNext && this.videos.length > 1) {
+          this.nextVideo();
+        }
+      }
+
+      previousVideo() {
+        const newIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.videos.length - 1;
+        this.switchToVideo(newIndex);
+      }
+
+      nextVideo() {
+        const newIndex = this.currentIndex < this.videos.length - 1 ? this.currentIndex + 1 : 0;
+        this.switchToVideo(newIndex);
+      }
+
+      switchToVideo(index) {
+        if (index === this.currentIndex || !this.videos[index]) return;
+
+        const wasPlaying = this.currentVideo && !this.currentVideo.paused;
+
+        if (this.settings.staticEnabled) {
+          this.showStatic();
+          setTimeout(() => {
+            this.performSwitch(index, wasPlaying);
+            this.hideStatic();
+          }, this.settings.staticDuration);
+        } else {
+          this.performSwitch(index, wasPlaying);
+        }
+      }
+
+      performSwitch(index, wasPlaying) {
+        if (this.currentVideo) {
+          this.currentVideo.pause();
+          this.currentVideo.style.display = 'none';
+        }
+
+        this.currentIndex = index;
+        this.currentVideo = this.videos[index];
+        this.currentVideo.style.display = 'block';
+
+        this.thumbnails.forEach((thumb, i) => {
+          thumb.classList.toggle('active', i === index);
+        });
+
+        this.scrollToActiveThumbnail();
+
+        if (wasPlaying || this.settings.autoplay) {
+          this.currentVideo.play().catch(e => console.log('Play error:', e));
+        }
+      }
+
+      showStatic() {
+        if (this.staticOverlay) {
+          this.staticOverlay.classList.add('active');
+        }
+      }
+
+      hideStatic() {
+        if (this.staticOverlay) {
+          this.staticOverlay.classList.remove('active');
+        }
+      }
+
+      scrollThumbnails(direction) {
+        const container = this.querySelector('.ai-retro-tv-thumbnails-container-{{ ai_gen_id }}');
+        if (!container) return;
+
+        const scrollAmount = 200;
+        container.scrollBy({
+          left: direction * scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+
+      scrollToActiveThumbnail() {
+        const container = this.querySelector('.ai-retro-tv-thumbnails-container-{{ ai_gen_id }}');
+        const activeThumbnail = this.thumbnails[this.currentIndex];
+        
+        if (container && activeThumbnail) {
+          const containerRect = container.getBoundingClientRect();
+          const thumbRect = activeThumbnail.getBoundingClientRect();
+          const scrollLeft = thumbRect.left - containerRect.left + container.scrollLeft - (containerRect.width / 2) + (thumbRect.width / 2);
+          
+          container.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
+          });
+        }
+      }
+    }
+
+    customElements.define('retro-tv-player-{{ ai_gen_id }}', RetroTVPlayer{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Retro TV player",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Playback settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay first video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Start muted",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop single video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_play_next",
+      "label": "Auto-play next video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_native_controls",
+      "label": "Show native controls",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Videos"
+    },
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "Video 1"
+    },
+    {
+      "type": "url",
+      "id": "video_url_1",
+      "label": "Video 1 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "Video 2"
+    },
+    {
+      "type": "url",
+      "id": "video_url_2",
+      "label": "Video 2 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_3",
+      "label": "Video 3"
+    },
+    {
+      "type": "url",
+      "id": "video_url_3",
+      "label": "Video 3 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_4",
+      "label": "Video 4"
+    },
+    {
+      "type": "url",
+      "id": "video_url_4",
+      "label": "Video 4 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_5",
+      "label": "Video 5"
+    },
+    {
+      "type": "url",
+      "id": "video_url_5",
+      "label": "Video 5 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_6",
+      "label": "Video 6"
+    },
+    {
+      "type": "url",
+      "id": "video_url_6",
+      "label": "Video 6 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_7",
+      "label": "Video 7"
+    },
+    {
+      "type": "url",
+      "id": "video_url_7",
+      "label": "Video 7 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_8",
+      "label": "Video 8"
+    },
+    {
+      "type": "url",
+      "id": "video_url_8",
+      "label": "Video 8 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_9",
+      "label": "Video 9"
+    },
+    {
+      "type": "url",
+      "id": "video_url_9",
+      "label": "Video 9 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_10",
+      "label": "Video 10"
+    },
+    {
+      "type": "url",
+      "id": "video_url_10",
+      "label": "Video 10 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_11",
+      "label": "Video 11"
+    },
+    {
+      "type": "url",
+      "id": "video_url_11",
+      "label": "Video 11 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_12",
+      "label": "Video 12"
+    },
+    {
+      "type": "url",
+      "id": "video_url_12",
+      "label": "Video 12 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_13",
+      "label": "Video 13"
+    },
+    {
+      "type": "url",
+      "id": "video_url_13",
+      "label": "Video 13 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_14",
+      "label": "Video 14"
+    },
+    {
+      "type": "url",
+      "id": "video_url_14",
+      "label": "Video 14 URL"
+    },
+    {
+      "type": "video",
+      "id": "video_15",
+      "label": "Video 15"
+    },
+    {
+      "type": "url",
+      "id": "video_url_15",
+      "label": "Video 15 URL"
+    },
+    {
+      "type": "header",
+      "content": "Static effect"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_static",
+      "label": "Enable static effect",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "static_duration",
+      "label": "Static duration",
+      "min": 0.5,
+      "max": 2,
+      "step": 0.5,
+      "unit": "s",
+      "default": 1
+    },
+    {
+      "type": "video",
+      "id": "custom_static_video",
+      "label": "Custom static video"
+    },
+    {
+      "type": "url",
+      "id": "custom_static_url",
+      "label": "Custom static video URL"
+    },
+    {
+      "type": "header",
+      "content": "TV frame"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "frame_color",
+      "label": "Frame color",
+      "default": "#8b8b8b"
+    },
+    {
+      "type": "range",
+      "id": "frame_top",
+      "label": "Frame top",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "frame_right",
+      "label": "Frame right",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "frame_bottom",
+      "label": "Frame bottom",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "frame_left",
+      "label": "Frame left",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "frame_border_radius",
+      "label": "Frame border radius",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Screen"
+    },
+    {
+      "type": "range",
+      "id": "screen_border_radius",
+      "label": "Screen border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "inner_border_width",
+      "label": "Inner border width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "inner_border_color",
+      "label": "Inner border color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Navigation buttons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nav_buttons",
+      "label": "Show navigation buttons",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "nav_horizontal_position",
+      "label": "Horizontal position",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "nav_button_size",
+      "label": "Button size",
+      "min": 30,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "nav_icon_size",
+      "label": "Icon size",
+      "min": 15,
+      "max": 35,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "color",
+      "id": "nav_button_bg",
+      "label": "Button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_hover_bg",
+      "label": "Button hover background",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "color",
+      "id": "nav_icon_color",
+      "label": "Icon color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Control panel"
+    },
+    {
+      "type": "range",
+      "id": "controls_margin_top",
+      "label": "Margin top",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "controls_padding",
+      "label": "Padding",
+      "min": 5,
+      "max": 25,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "controls_gap",
+      "label": "Gap between controls",
+      "min": 5,
+      "max": 20,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "controls_bg_color",
+      "label": "Background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "range",
+      "id": "controls_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "control_icon_size",
+      "label": "Icon size",
+      "min": 15,
+      "max": 35,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "color",
+      "id": "control_icon_color",
+      "label": "Icon color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Button order"
+    },
+    {
+      "type": "range",
+      "id": "play_button_order",
+      "label": "Play button order",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "fullscreen_button_order",
+      "label": "Fullscreen button order",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mute_button_order",
+      "label": "Mute button order",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "volume_order",
+      "label": "Volume slider order",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Volume slider"
+    },
+    {
+      "type": "range",
+      "id": "volume_slider_width",
+      "label": "Width",
+      "min": 50,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "volume_slider_height",
+      "label": "Height",
+      "min": 4,
+      "max": 10,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "volume_slider_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 10,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "volume_slider_bg",
+      "label": "Background color",
+      "default": "#ddd"
+    },
+    {
+      "type": "color",
+      "id": "volume_slider_fill",
+      "label": "Fill color",
+      "default": "#000f9f"
+    },
+    {
+      "type": "range",
+      "id": "volume_thumb_size",
+      "label": "Thumb size",
+      "min": 10,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "volume_thumb_color",
+      "label": "Thumb color",
+      "default": "#000f9f"
+    },
+    {
+      "type": "header",
+      "content": "Thumbnails"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "label": "Show thumbnails",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "thumbnails_section_width",
+      "label": "Section width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "thumbnails_distance",
+      "label": "Distance from TV",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_width",
+      "label": "Thumbnail width",
+      "min": 80,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_height",
+      "label": "Thumbnail height",
+      "min": 60,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "thumbnails_gap",
+      "label": "Gap between thumbnails",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_border_width",
+      "label": "Border width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "thumbnail_border_color",
+      "label": "Border color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "color",
+      "id": "thumbnail_hover_border",
+      "label": "Hover border color",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "thumbnail_active_border",
+      "label": "Active border color",
+      "default": "#000f9f"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_active_border_width",
+      "label": "Active border width",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 10,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Thumbnail navigation"
+    },
+    {
+      "type": "range",
+      "id": "thumb_nav_gap",
+      "label": "Gap from thumbnails",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "thumb_nav_size",
+      "label": "Button size",
+      "min": 25,
+      "max": 45,
+      "step": 5,
+      "unit": "px",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "thumb_nav_icon_size",
+      "label": "Icon size",
+      "min": 15,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "thumb_nav_bg",
+      "label": "Button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "thumb_nav_hover_bg",
+      "label": "Button hover background",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "color",
+      "id": "thumb_nav_icon_color",
+      "label": "Icon color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Retro TV player"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,333 @@
+{% doc %}
+  @prompt
+    أريد مربع يعمل كمشغل فيديو مدمج ارفعه للكود في الموقع يعمل تلقائياً ومن فرق الفيديو مساحه لتحرير نص , بدي الكلام يكون فوق الفيديوات تحته, خلي الفيديو اي أضعه مدمج من الملفات اي بدون رابط
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-video-player-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-video-player-container-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.gap }}px;
+    align-items: stretch;
+  }
+
+  .ai-video-player-text-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: {{ block.settings.text_padding }}px;
+    background-color: {{ block.settings.text_background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-video-player-heading-{{ ai_gen_id }} {
+    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-video-player-description-{{ ai_gen_id }} {
+    margin: 0;
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.description_color }};
+    text-align: {{ block.settings.text_alignment }};
+    line-height: 1.6;
+  }
+
+  .ai-video-player-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    background-color: {{ block.settings.video_background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-video-player-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-video-player-placeholder-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-video-player-placeholder-{{ ai_gen_id }} svg {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    opacity: 0.3;
+  }
+
+  .ai-video-player-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+{% endstyle %}
+
+<video-player-{{ ai_gen_id }} class="ai-video-player-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-video-player-container-{{ ai_gen_id }}">
+    {% if block.settings.show_text %}
+      <div class="ai-video-player-text-{{ ai_gen_id }}">
+        {% if block.settings.heading != blank %}
+          <h2 class="ai-video-player-heading-{{ ai_gen_id }}">
+            {{ block.settings.heading }}
+          </h2>
+        {% endif %}
+        {% if block.settings.description != blank %}
+          <div class="ai-video-player-description-{{ ai_gen_id }}">
+            {{ block.settings.description }}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="ai-video-player-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.video_file != blank %}
+        {{ block.settings.video_file | video_tag:
+          autoplay: block.settings.autoplay,
+          loop: block.settings.loop,
+          controls: block.settings.show_controls,
+          muted: block.settings.autoplay,
+          class: 'ai-video-player-video-' | append: ai_gen_id
+        }}
+      {% else %}
+        <div class="ai-video-player-placeholder-{{ ai_gen_id }}">
+          {{ 'image' | placeholder_svg_tag }}
+          <div class="ai-video-player-empty-state-{{ ai_gen_id }}">
+            أضف ملف الفيديو من الملفات
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</video-player-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VideoPlayer{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.style.display = 'block';
+      }
+    }
+
+    customElements.define('video-player-{{ ai_gen_id }}', VideoPlayer{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "مشغل فيديو مع نص",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "إعدادات الفيديو"
+    },
+    {
+      "type": "video",
+      "id": "video_file",
+      "label": "ملف الفيديو"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تشغيل تلقائي",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "تكرار الفيديو",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "إظهار أدوات التحكم",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "video_background_color",
+      "label": "لون خلفية الفيديو",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "التخطيط"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "المسافة بين النص والفيديو",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض سطح المكتب",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الحواف",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "منطقة النص"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_text",
+      "label": "إظهار منطقة النص",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "العنوان",
+      "default": "<p>شاهد الفيديو</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "الوصف",
+      "default": "<p>اكتشف المزيد عن منتجاتنا وخدماتنا من خلال هذا الفيديو التوضيحي.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "محاذاة النص",
+      "options": [
+        {
+          "value": "right",
+          "label": "يمين"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "left",
+          "label": "يسار"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "text_padding",
+      "label": "المسافة الداخلية للنص",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "text_background_color",
+      "label": "لون خلفية النص",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "تنسيق العنوان"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "حجم العنوان",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "label": "المسافة بعد العنوان",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "تنسيق الوصف"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "label": "حجم الوصف",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "لون الوصف",
+      "default": "#3d081b"
+    }
+  ],
+  "presets": [
+    {
+      "name": "مشغل فيديو مع نص"
+    }
+  ]
+}
+{% endschema %}

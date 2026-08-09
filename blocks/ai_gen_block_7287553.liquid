@@ -1,0 +1,1341 @@
+{% doc %}
+  @prompt
+    اعمل مشغل فيديو على شكل تلفاز وحوله اطار اسود خفيف, خيار للتحكم في اللون وسمك الاطار وخصوصا الاطار السفلي , احذف القاعده وخياراتها والان اضف امكانيه لرفع الفيديو من الجهاز وخيارات للمشغل زي التشغيل التلقائي وغيره,  المشغل المدمج لا يعمل لازم تصلحه, اضف خيار اضافه شعار من الجهاز في منتصف الاطار السفلي وخيارات لحجم المشغل مع التلفاز سوا, اعمل اطار داخل حول المشغل مباشره بالاسود الغامق وضيف على شاشه المشغل تاثير الانعكاسات لمحاكاه الشاشات, ممتاز الان اضف امكانيه اضافه مقطع 15 اخريين, خلي المقاطع انا ارفعهم من الجهاز, خبرتك اني بدي ارفع الفيديوهات من الجهاز كخيار, بدي تعرض تحت التلفاز كل الصور المصغره للمقاطع وانا اختار بينهم بالضغط او من خلال زرين التنقل , شيل السهم اللي تحت بدي يتنقل بالسهمين بحيث يمر بالتريب على الفيديوهات فيه وبنفس الوقت يمر للقائمة الجديده اذا وصل لأخر شي في القائمة الحالية وشيل الترقيم اللي على الصور المصغره واضف خيارات للتحكم في ارتفاع وعرض الصور المصغره, المشغل المدمج لا يعمل, التنقل بين الفيديوهات لا يعمل, التنقل بين الفيديوهات لا يعمل ابدا سواء بالضغط او غيره, بدي مع التنقل الفيديو الي انتقلت له يشتغل تلقائي دون الضغط عليه, بدي يشتغل تشويش زي تشويش التلفزيونات القديمه ابحث عنه وضيفه مع التنقل بين الفيديوهات يعني في بدايته, التشويش لم يشتغل اطلاقا لازم تضيف التشويش مثل اللي في التلفيزيونات القديمه مع التغيير بين الفيديوهات ببدايه كل مقطع ليحاكي تغيير القنوات قديما, بدي تضيف 3 ازرار كخيارات يمكن ايقافهم زر للكتم وزر للتشغيل وزر للتكبير كل زر على حده حيث يمكن التعديل على موضعهم كل واحد على حده بشكل حر على طول القسم كامل , زر التكبير لا يعمل ابدا اجعله باي طريقه يعمل بشكل جيد ويظهر المقطع في وضع كامل للزائر وايضا بدي تضيف التحكم في حجم كل من الثلاث ازرار
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-tv-video-player-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .ai-tv-container-{{ ai_gen_id }} {
+    position: relative;
+    background-color: {{ block.settings.frame_color }};
+    border-radius: 20px;
+    padding: {{ block.settings.frame_thickness }}px;
+    padding-bottom: {{ block.settings.bottom_frame_thickness }}px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-tv-container-{{ ai_gen_id }}.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+  }
+
+  .ai-tv-container-{{ ai_gen_id }}.fullscreen .ai-tv-screen-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    padding: 0;
+    background-color: #000;
+  }
+
+  .ai-tv-container-{{ ai_gen_id }}.fullscreen .ai-tv-screen-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .ai-tv-container-{{ ai_gen_id }}.fullscreen .ai-tv-logo-container-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-tv-screen-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    background-color: #000000;
+    border-radius: 12px;
+    padding: 8px;
+    overflow: hidden;
+  }
+
+  .ai-tv-screen-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #000000;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .ai-tv-screen-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 25%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.1) 75%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .ai-tv-screen-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .ai-tv-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ai-tv-static-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+  }
+
+  .ai-tv-static-overlay-{{ ai_gen_id }}.active {
+    display: block;
+    opacity: 1;
+  }
+
+  .ai-tv-static-canvas-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .ai-tv-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1a1a;
+    position: relative;
+  }
+
+  .ai-tv-placeholder-{{ ai_gen_id }} svg {
+    width: 80px;
+    height: 80px;
+    opacity: 0.3;
+  }
+
+  .ai-tv-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .ai-tv-logo-container-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    max-width: {{ block.settings.logo_size }}px;
+    padding: 10px;
+  }
+
+  .ai-tv-logo-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ai-tv-control-button-{{ ai_gen_id }} {
+    position: absolute;
+    width: {{ block.settings.button_size }}px;
+    height: {{ block.settings.button_size }}px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .ai-tv-control-button-{{ ai_gen_id }}:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
+  }
+
+  .ai-tv-control-button-{{ ai_gen_id }} svg {
+    width: calc({{ block.settings.button_size }}px * 0.5);
+    height: calc({{ block.settings.button_size }}px * 0.5);
+    color: white;
+  }
+
+  .ai-tv-control-button-{{ ai_gen_id }}.active {
+    background-color: {{ block.settings.frame_color }};
+    border-color: white;
+  }
+
+  .ai-tv-mute-button-{{ ai_gen_id }} {
+    top: {{ block.settings.mute_button_top }}%;
+    left: {{ block.settings.mute_button_left }}%;
+    {% unless block.settings.show_mute_button %}display: none;{% endunless %}
+  }
+
+  .ai-tv-play-button-{{ ai_gen_id }} {
+    top: {{ block.settings.play_button_top }}%;
+    left: {{ block.settings.play_button_left }}%;
+    {% unless block.settings.show_play_button %}display: none;{% endunless %}
+  }
+
+  .ai-tv-fullscreen-button-{{ ai_gen_id }} {
+    top: {{ block.settings.fullscreen_button_top }}%;
+    left: {{ block.settings.fullscreen_button_left }}%;
+    {% unless block.settings.show_fullscreen_button %}display: none;{% endunless %}
+  }
+
+  .ai-tv-container-{{ ai_gen_id }}.fullscreen .ai-tv-fullscreen-button-{{ ai_gen_id }} {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    left: auto;
+    z-index: 10000;
+  }
+
+  .ai-tv-playlist-section-{{ ai_gen_id }} {
+    margin-top: 30px;
+  }
+
+  .ai-tv-container-{{ ai_gen_id }}.fullscreen ~ .ai-tv-playlist-section-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-tv-playlist-controls-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .ai-tv-nav-button-{{ ai_gen_id }} {
+    background-color: {{ block.settings.frame_color }};
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .ai-tv-nav-button-{{ ai_gen_id }}:hover {
+    background-color: #444;
+    transform: scale(1.1);
+  }
+
+  .ai-tv-nav-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: scale(1);
+  }
+
+  .ai-tv-nav-button-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ai-tv-playlist-wrapper-{{ ai_gen_id }} {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ai-tv-playlist-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding-bottom: 10px;
+  }
+
+  .ai-tv-playlist-{{ ai_gen_id }}::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ai-tv-playlist-item-{{ ai_gen_id }} {
+    position: relative;
+    flex-shrink: 0;
+    width: {{ block.settings.thumbnail_width }}px;
+    height: {{ block.settings.thumbnail_height }}px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+    background-color: #1a1a1a;
+  }
+
+  .ai-tv-playlist-item-{{ ai_gen_id }}:hover {
+    border-color: {{ block.settings.frame_color }};
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-tv-playlist-item-{{ ai_gen_id }}.active {
+    border-color: {{ block.settings.frame_color }};
+    box-shadow: 0 0 0 3px rgba(42, 42, 42, 0.3);
+  }
+
+  .ai-tv-playlist-thumb-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-tv-playlist-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ai-tv-playlist-placeholder-{{ ai_gen_id }} svg {
+    width: 40px;
+    height: 40px;
+    opacity: 0.3;
+    color: white;
+  }
+
+  .ai-tv-play-icon-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+
+  .ai-tv-playlist-item-{{ ai_gen_id }}:hover .ai-tv-play-icon-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .ai-tv-play-icon-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+    color: #000;
+    margin-left: 3px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-tv-video-player-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-tv-playlist-item-{{ ai_gen_id }} {
+      width: {{ block.settings.thumbnail_width | times: 0.8 }}px;
+      height: {{ block.settings.thumbnail_height | times: 0.8 }}px;
+    }
+
+    .ai-tv-nav-button-{{ ai_gen_id }} {
+      width: 35px;
+      height: 35px;
+    }
+
+    .ai-tv-control-button-{{ ai_gen_id }} {
+      width: calc({{ block.settings.button_size }}px * 0.8);
+      height: calc({{ block.settings.button_size }}px * 0.8);
+    }
+
+    .ai-tv-control-button-{{ ai_gen_id }} svg {
+      width: calc({{ block.settings.button_size }}px * 0.4);
+      height: calc({{ block.settings.button_size }}px * 0.4);
+    }
+  }
+{% endstyle %}
+
+<tv-video-player-{{ ai_gen_id }}
+  class="ai-tv-video-player-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-tv-container-{{ ai_gen_id }}" id="ai-tv-container-{{ ai_gen_id }}">
+    <div class="ai-tv-screen-wrapper-{{ ai_gen_id }}">
+      <div class="ai-tv-screen-{{ ai_gen_id }}" id="ai-tv-screen-{{ ai_gen_id }}">
+        {% if block.settings.video_1 %}
+          <video
+            class="ai-tv-video-{{ ai_gen_id }}"
+            id="ai-tv-main-video-{{ ai_gen_id }}"
+            {% if block.settings.autoplay %}autoplay{% endif %}
+            {% if block.settings.loop %}loop{% endif %}
+            {% if block.settings.muted %}muted{% endif %}
+            {% if block.settings.controls %}controls{% endif %}
+            playsinline
+          >
+            <source src="{{ block.settings.video_1.sources[1].url }}" type="{{ block.settings.video_1.sources[1].mime_type }}">
+          </video>
+        {% else %}
+          <div class="ai-tv-placeholder-{{ ai_gen_id }}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <div class="ai-tv-empty-state-{{ ai_gen_id }}">
+              ارفع فيديو لبدء التشغيل
+            </div>
+          </div>
+        {% endif %}
+        <div class="ai-tv-static-overlay-{{ ai_gen_id }}" id="ai-tv-static-{{ ai_gen_id }}">
+          <canvas class="ai-tv-static-canvas-{{ ai_gen_id }}" id="ai-tv-static-canvas-{{ ai_gen_id }}"></canvas>
+        </div>
+      </div>
+    </div>
+
+    {% if block.settings.logo %}
+      <div class="ai-tv-logo-container-{{ ai_gen_id }}">
+        <img
+          src="{{ block.settings.logo | image_url: width: 400 }}"
+          alt="Logo"
+          class="ai-tv-logo-{{ ai_gen_id }}"
+          loading="lazy"
+        >
+      </div>
+    {% endif %}
+  </div>
+
+  <button 
+    class="ai-tv-control-button-{{ ai_gen_id }} ai-tv-mute-button-{{ ai_gen_id }}" 
+    id="ai-tv-mute-btn-{{ ai_gen_id }}"
+    aria-label="كتم الصوت"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ai-tv-volume-on-{{ ai_gen_id }}">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ai-tv-volume-off-{{ ai_gen_id }}" style="display: none;">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <line x1="23" y1="9" x2="17" y2="15"></line>
+      <line x1="17" y1="9" x2="23" y2="15"></line>
+    </svg>
+  </button>
+
+  <button 
+    class="ai-tv-control-button-{{ ai_gen_id }} ai-tv-play-button-{{ ai_gen_id }}" 
+    id="ai-tv-play-btn-{{ ai_gen_id }}"
+    aria-label="تشغيل/إيقاف"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="ai-tv-play-icon-svg-{{ ai_gen_id }}">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="ai-tv-pause-icon-svg-{{ ai_gen_id }}" style="display: none;">
+      <rect x="6" y="4" width="4" height="16"></rect>
+      <rect x="14" y="4" width="4" height="16"></rect>
+    </svg>
+  </button>
+
+  <button 
+    class="ai-tv-control-button-{{ ai_gen_id }} ai-tv-fullscreen-button-{{ ai_gen_id }}" 
+    id="ai-tv-fullscreen-btn-{{ ai_gen_id }}"
+    aria-label="ملء الشاشة"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ai-tv-expand-{{ ai_gen_id }}">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ai-tv-compress-{{ ai_gen_id }}" style="display: none;">
+      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+    </svg>
+  </button>
+
+  {% assign video_count = 0 %}
+  {% for i in (1..16) %}
+    {% liquid
+      assign video_key = 'video_' | append: i
+      assign video = block.settings[video_key]
+      if video != blank
+        assign video_count = video_count | plus: 1
+      endif
+    %}
+  {% endfor %}
+
+  {% if video_count > 1 %}
+    <div class="ai-tv-playlist-section-{{ ai_gen_id }}">
+      <div class="ai-tv-playlist-controls-{{ ai_gen_id }}">
+        <button class="ai-tv-nav-button-{{ ai_gen_id }}" id="ai-tv-prev-{{ ai_gen_id }}" aria-label="السابق">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="ai-tv-playlist-wrapper-{{ ai_gen_id }}">
+          <div class="ai-tv-playlist-{{ ai_gen_id }}" id="ai-tv-playlist-{{ ai_gen_id }}">
+            {% for i in (1..16) %}
+              {% liquid
+                assign video_key = 'video_' | append: i
+                assign video = block.settings[video_key]
+              %}
+              {% if video != blank %}
+                <div 
+                  class="ai-tv-playlist-item-{{ ai_gen_id }} {% if i == 1 %}active{% endif %}" 
+                  data-video-index="{{ i }}"
+                  data-video-url="{{ video.sources[1].url }}"
+                  data-video-type="{{ video.sources[1].mime_type }}"
+                >
+                  <video class="ai-tv-playlist-thumb-{{ ai_gen_id }}" muted playsinline preload="metadata">
+                    <source src="{{ video.sources[1].url }}#t=0.5" type="{{ video.sources[1].mime_type }}">
+                  </video>
+                  <div class="ai-tv-play-icon-{{ ai_gen_id }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <button class="ai-tv-nav-button-{{ ai_gen_id }}" id="ai-tv-next-{{ ai_gen_id }}" aria-label="التالي">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  {% endif %}
+</tv-video-player-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class TvVideoPlayer{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentVideoIndex = 1;
+        this.isTransitioning = false;
+        this.staticAnimationFrame = null;
+        this.isMuted = {{ block.settings.muted | json }};
+        this.isPlaying = {{ block.settings.autoplay | json }};
+        this.isFullscreen = false;
+      }
+
+      connectedCallback() {
+        this.container = document.getElementById('ai-tv-container-{{ ai_gen_id }}');
+        this.screenContainer = document.getElementById('ai-tv-screen-{{ ai_gen_id }}');
+        this.mainVideo = document.getElementById('ai-tv-main-video-{{ ai_gen_id }}');
+        this.staticOverlay = document.getElementById('ai-tv-static-{{ ai_gen_id }}');
+        this.staticCanvas = document.getElementById('ai-tv-static-canvas-{{ ai_gen_id }}');
+        this.playlistContainer = document.getElementById('ai-tv-playlist-{{ ai_gen_id }}');
+        this.prevButton = document.getElementById('ai-tv-prev-{{ ai_gen_id }}');
+        this.nextButton = document.getElementById('ai-tv-next-{{ ai_gen_id }}');
+        this.playlistItems = document.querySelectorAll('.ai-tv-playlist-item-{{ ai_gen_id }}');
+        
+        this.muteButton = document.getElementById('ai-tv-mute-btn-{{ ai_gen_id }}');
+        this.playButton = document.getElementById('ai-tv-play-btn-{{ ai_gen_id }}');
+        this.fullscreenButton = document.getElementById('ai-tv-fullscreen-btn-{{ ai_gen_id }}');
+        
+        this.videoIndices = [];
+        this.playlistItems.forEach(item => {
+          this.videoIndices.push(parseInt(item.dataset.videoIndex));
+        });
+        this.videoIndices.sort((a, b) => a - b);
+        
+        this.setupCanvas();
+        this.setupPlaylist();
+        this.setupNavigation();
+        this.setupControlButtons();
+        this.updateNavigationButtons();
+        this.updateButtonStates();
+        this.setupFullscreenListeners();
+      }
+
+      setupCanvas() {
+        if (this.staticCanvas) {
+          const rect = this.screenContainer.getBoundingClientRect();
+          this.staticCanvas.width = rect.width;
+          this.staticCanvas.height = rect.height;
+          this.ctx = this.staticCanvas.getContext('2d');
+        }
+      }
+
+      drawStatic() {
+        if (!this.ctx || !this.staticCanvas) return;
+        
+        const imageData = this.ctx.createImageData(this.staticCanvas.width, this.staticCanvas.height);
+        const data = imageData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = Math.random() * 255;
+          data[i] = gray;
+          data[i + 1] = gray;
+          data[i + 2] = gray;
+          data[i + 3] = 255;
+        }
+        
+        this.ctx.putImageData(imageData, 0, 0);
+        
+        this.staticAnimationFrame = requestAnimationFrame(() => this.drawStatic());
+      }
+
+      stopStatic() {
+        if (this.staticAnimationFrame) {
+          cancelAnimationFrame(this.staticAnimationFrame);
+          this.staticAnimationFrame = null;
+        }
+        if (this.ctx && this.staticCanvas) {
+          this.ctx.clearRect(0, 0, this.staticCanvas.width, this.staticCanvas.height);
+        }
+      }
+
+      showStatic() {
+        return new Promise((resolve) => {
+          this.staticOverlay.classList.add('active');
+          this.drawStatic();
+          
+          setTimeout(() => {
+            this.stopStatic();
+            this.staticOverlay.classList.remove('active');
+            resolve();
+          }, 600);
+        });
+      }
+
+      setupFullscreenListeners() {
+        document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('webkitfullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('mozfullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('MSFullscreenChange', () => this.handleFullscreenChange());
+      }
+
+      handleFullscreenChange() {
+        const isCurrentlyFullscreen = !!(
+          document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement
+        );
+        
+        if (!isCurrentlyFullscreen && this.isFullscreen) {
+          this.exitFullscreen();
+        }
+      }
+
+      setupControlButtons() {
+        if (this.muteButton) {
+          this.muteButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.toggleMute();
+          });
+        }
+
+        if (this.playButton) {
+          this.playButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.togglePlay();
+          });
+        }
+
+        if (this.fullscreenButton) {
+          this.fullscreenButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.toggleFullscreen();
+          });
+        }
+      }
+
+      toggleMute() {
+        if (!this.mainVideo) return;
+        
+        this.isMuted = !this.isMuted;
+        this.mainVideo.muted = this.isMuted;
+        this.updateButtonStates();
+      }
+
+      togglePlay() {
+        if (!this.mainVideo) return;
+        
+        if (this.isPlaying) {
+          this.mainVideo.pause();
+          this.isPlaying = false;
+        } else {
+          const playPromise = this.mainVideo.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              this.isPlaying = true;
+              this.updateButtonStates();
+            }).catch(err => {
+              console.log('Play prevented:', err);
+            });
+          }
+        }
+        this.updateButtonStates();
+      }
+
+      toggleFullscreen() {
+        if (!this.isFullscreen) {
+          this.enterFullscreen();
+        } else {
+          this.exitFullscreen();
+        }
+      }
+
+      enterFullscreen() {
+        this.container.classList.add('fullscreen');
+        this.isFullscreen = true;
+        
+        if (this.mainVideo) {
+          this.mainVideo.style.objectFit = 'contain';
+        }
+        
+        document.body.style.overflow = 'hidden';
+        
+        this.updateButtonStates();
+      }
+
+      exitFullscreen() {
+        this.container.classList.remove('fullscreen');
+        this.isFullscreen = false;
+        
+        if (this.mainVideo) {
+          this.mainVideo.style.objectFit = 'cover';
+        }
+        
+        document.body.style.overflow = '';
+        
+        this.updateButtonStates();
+      }
+
+      updateButtonStates() {
+        if (this.muteButton) {
+          const volumeOn = this.muteButton.querySelector('.ai-tv-volume-on-{{ ai_gen_id }}');
+          const volumeOff = this.muteButton.querySelector('.ai-tv-volume-off-{{ ai_gen_id }}');
+          
+          if (this.isMuted) {
+            volumeOn.style.display = 'none';
+            volumeOff.style.display = 'block';
+            this.muteButton.classList.add('active');
+          } else {
+            volumeOn.style.display = 'block';
+            volumeOff.style.display = 'none';
+            this.muteButton.classList.remove('active');
+          }
+        }
+
+        if (this.playButton) {
+          const playIcon = this.playButton.querySelector('.ai-tv-play-icon-svg-{{ ai_gen_id }}');
+          const pauseIcon = this.playButton.querySelector('.ai-tv-pause-icon-svg-{{ ai_gen_id }}');
+          
+          if (this.isPlaying) {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            this.playButton.classList.add('active');
+          } else {
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            this.playButton.classList.remove('active');
+          }
+        }
+
+        if (this.fullscreenButton) {
+          const expandIcon = this.fullscreenButton.querySelector('.ai-tv-expand-{{ ai_gen_id }}');
+          const compressIcon = this.fullscreenButton.querySelector('.ai-tv-compress-{{ ai_gen_id }}');
+          
+          if (this.isFullscreen) {
+            expandIcon.style.display = 'none';
+            compressIcon.style.display = 'block';
+            this.fullscreenButton.classList.add('active');
+          } else {
+            expandIcon.style.display = 'block';
+            compressIcon.style.display = 'none';
+            this.fullscreenButton.classList.remove('active');
+          }
+        }
+      }
+
+      setupPlaylist() {
+        this.playlistItems.forEach((item) => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!this.isTransitioning) {
+              const videoIndex = parseInt(item.dataset.videoIndex);
+              this.switchVideo(videoIndex);
+            }
+          });
+        });
+      }
+
+      setupNavigation() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!this.isTransitioning) {
+              this.navigatePrevious();
+            }
+          });
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!this.isTransitioning) {
+              this.navigateNext();
+            }
+          });
+        }
+      }
+
+      navigatePrevious() {
+        const currentIndex = this.videoIndices.indexOf(this.currentVideoIndex);
+        
+        if (currentIndex > 0) {
+          const prevVideoIndex = this.videoIndices[currentIndex - 1];
+          this.switchVideo(prevVideoIndex);
+        }
+      }
+
+      navigateNext() {
+        const currentIndex = this.videoIndices.indexOf(this.currentVideoIndex);
+        
+        if (currentIndex < this.videoIndices.length - 1) {
+          const nextVideoIndex = this.videoIndices[currentIndex + 1];
+          this.switchVideo(nextVideoIndex);
+        }
+      }
+
+      switchVideo(index) {
+        if (this.isTransitioning) return;
+        
+        const targetItem = Array.from(this.playlistItems).find(
+          item => parseInt(item.dataset.videoIndex) === index
+        );
+        
+        if (!targetItem) return;
+        
+        const videoUrl = targetItem.dataset.videoUrl;
+        const videoType = targetItem.dataset.videoType;
+        
+        if (!videoUrl) return;
+        
+        this.isTransitioning = true;
+        this.currentVideoIndex = index;
+        
+        this.showStatic().then(() => {
+          const loop = {{ block.settings.loop | json }};
+          const controls = {{ block.settings.controls | json }};
+
+          const newVideo = document.createElement('video');
+          newVideo.className = 'ai-tv-video-{{ ai_gen_id }}';
+          newVideo.id = 'ai-tv-main-video-{{ ai_gen_id }}';
+          newVideo.autoplay = true;
+          if (loop) newVideo.loop = true;
+          newVideo.muted = this.isMuted;
+          if (controls) newVideo.controls = true;
+          newVideo.playsinline = true;
+          
+          if (this.isFullscreen) {
+            newVideo.style.objectFit = 'contain';
+          }
+
+          const source = document.createElement('source');
+          source.src = videoUrl;
+          source.type = videoType;
+          newVideo.appendChild(source);
+
+          if (this.mainVideo) {
+            this.mainVideo.pause();
+            this.mainVideo.remove();
+          }
+
+          const existingVideo = this.screenContainer.querySelector('.ai-tv-video-{{ ai_gen_id }}');
+          if (existingVideo) {
+            existingVideo.remove();
+          }
+
+          this.screenContainer.insertBefore(newVideo, this.staticOverlay);
+          this.mainVideo = newVideo;
+
+          newVideo.load();
+          
+          setTimeout(() => {
+            const playPromise = newVideo.play();
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                this.isPlaying = true;
+                this.updateButtonStates();
+              }).catch(err => {
+                console.log('Autoplay prevented:', err);
+                this.isPlaying = false;
+                this.updateButtonStates();
+              });
+            }
+            this.isTransitioning = false;
+          }, 100);
+
+          this.updateActiveItem();
+          this.updateNavigationButtons();
+          this.scrollToCurrentVideo();
+        });
+      }
+
+      updateActiveItem() {
+        this.playlistItems.forEach((item) => {
+          const itemIndex = parseInt(item.dataset.videoIndex);
+          if (itemIndex === this.currentVideoIndex) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      }
+
+      updateNavigationButtons() {
+        if (!this.prevButton || !this.nextButton) return;
+
+        const currentIndex = this.videoIndices.indexOf(this.currentVideoIndex);
+
+        this.prevButton.disabled = currentIndex === 0;
+        this.nextButton.disabled = currentIndex === this.videoIndices.length - 1;
+      }
+
+      scrollToCurrentVideo() {
+        const currentItem = Array.from(this.playlistItems).find(
+          item => parseInt(item.dataset.videoIndex) === this.currentVideoIndex
+        );
+        
+        if (currentItem && this.playlistContainer) {
+          const containerWidth = this.playlistContainer.offsetWidth;
+          const itemWidth = currentItem.offsetWidth;
+          const itemLeft = currentItem.offsetLeft;
+          
+          const scrollLeft = itemLeft - (containerWidth / 2) + (itemWidth / 2);
+          
+          this.playlistContainer.scrollTo({
+            left: Math.max(0, scrollLeft),
+            behavior: 'smooth'
+          });
+        }
+      }
+
+      disconnectedCallback() {
+        this.stopStatic();
+        document.body.style.overflow = '';
+      }
+    }
+
+    customElements.define('tv-video-player-{{ ai_gen_id }}', TvVideoPlayer{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "مشغل فيديو تلفاز",
+  "settings": [
+    {
+      "type": "header",
+      "content": "إعدادات التلفاز"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض سطح المكتب",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "frame_color",
+      "label": "لون الإطار",
+      "default": "#2a2a2a"
+    },
+    {
+      "type": "range",
+      "id": "frame_thickness",
+      "label": "سمك الإطار",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "bottom_frame_thickness",
+      "label": "سمك الإطار السفلي",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "الشعار"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "شعار"
+    },
+    {
+      "type": "range",
+      "id": "logo_size",
+      "label": "حجم الشعار",
+      "min": 30,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "أزرار التحكم"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "label": "حجم الأزرار",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mute_button",
+      "label": "إظهار زر الكتم",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "mute_button_top",
+      "label": "موضع زر الكتم - أعلى",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "mute_button_left",
+      "label": "موضع زر الكتم - يسار",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_button",
+      "label": "إظهار زر التشغيل",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "play_button_top",
+      "label": "موضع زر التشغيل - أعلى",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "play_button_left",
+      "label": "موضع زر التشغيل - يسار",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fullscreen_button",
+      "label": "إظهار زر ملء الشاشة",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "fullscreen_button_top",
+      "label": "موضع زر ملء الشاشة - أعلى",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "fullscreen_button_left",
+      "label": "موضع زر ملء الشاشة - يسار",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 90
+    },
+    {
+      "type": "header",
+      "content": "إعدادات الصور المصغرة"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_width",
+      "label": "عرض الصورة المصغرة",
+      "min": 100,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_height",
+      "label": "ارتفاع الصورة المصغرة",
+      "min": 60,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "إعدادات المشغل"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تشغيل تلقائي",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "تكرار",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "كتم الصوت",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "controls",
+      "label": "إظهار عناصر التحكم",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 1"
+    },
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "فيديو 1"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 2"
+    },
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "فيديو 2"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 3"
+    },
+    {
+      "type": "video",
+      "id": "video_3",
+      "label": "فيديو 3"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 4"
+    },
+    {
+      "type": "video",
+      "id": "video_4",
+      "label": "فيديو 4"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 5"
+    },
+    {
+      "type": "video",
+      "id": "video_5",
+      "label": "فيديو 5"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 6"
+    },
+    {
+      "type": "video",
+      "id": "video_6",
+      "label": "فيديو 6"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 7"
+    },
+    {
+      "type": "video",
+      "id": "video_7",
+      "label": "فيديو 7"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 8"
+    },
+    {
+      "type": "video",
+      "id": "video_8",
+      "label": "فيديو 8"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 9"
+    },
+    {
+      "type": "video",
+      "id": "video_9",
+      "label": "فيديو 9"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 10"
+    },
+    {
+      "type": "video",
+      "id": "video_10",
+      "label": "فيديو 10"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 11"
+    },
+    {
+      "type": "video",
+      "id": "video_11",
+      "label": "فيديو 11"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 12"
+    },
+    {
+      "type": "video",
+      "id": "video_12",
+      "label": "فيديو 12"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 13"
+    },
+    {
+      "type": "video",
+      "id": "video_13",
+      "label": "فيديو 13"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 14"
+    },
+    {
+      "type": "video",
+      "id": "video_14",
+      "label": "فيديو 14"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 15"
+    },
+    {
+      "type": "video",
+      "id": "video_15",
+      "label": "فيديو 15"
+    },
+    {
+      "type": "header",
+      "content": "الفيديو 16"
+    },
+    {
+      "type": "video",
+      "id": "video_16",
+      "label": "فيديو 16"
+    }
+  ],
+  "presets": [
+    {
+      "name": "مشغل فيديو تلفاز"
+    }
+  ]
+}
+{% endschema %}

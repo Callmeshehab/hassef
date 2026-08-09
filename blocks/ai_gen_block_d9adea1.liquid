@@ -1,0 +1,508 @@
+{% comment %}
+  ==============================================================================
+  AL-HASEEF ADVANCED STORY ENGINE - ENTERPRISE VERSION
+  ==============================================================================
+  - Full Manual Schema (No Logic Loops in JSON)
+  - Ultra-High Detail Code (1500+ Lines Capability)
+  - Integrated Floating Controls (In-Chapter Only)
+  - Pixel Transition System
+  - Custom Media Handling (5 Items per chapter)
+  ==============================================================================
+{% endcomment %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  :root {
+    --primary-story-color: {{ block.settings.button_bg_color }};
+    --hover-story-color: {{ block.settings.button_hover_color }};
+    --story-font-family: 'Amiri', serif;
+  }
+
+  .ai-story-intro-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 60px 20px;
+    transition: all 0.5s ease-in-out;
+    direction: rtl;
+    position: relative;
+    background-color: transparent;
+  }
+
+  /* Modes Configuration */
+  .ai-story-intro-{{ ai_gen_id }}.dark-mode { 
+    background-color: #0f0f0f !important; 
+    color: #f0f0f0 !important; 
+  }
+  .ai-story-intro-{{ ai_gen_id }}.dark-mode .ai-story-intro__chapter-card-{{ ai_gen_id }} {
+    background: #1a1a1a;
+    border-color: #333;
+  }
+  
+  .ai-story-intro-{{ ai_gen_id }}.reading-mode { 
+    max-width: 900px !important; 
+    padding: 80px 40px; 
+    box-shadow: 0 0 100px rgba(0,0,0,0.15); 
+    background: #fff;
+  }
+
+  /* Floating Control UI - Triggered via JS */
+  .ai-story-intro__controls-{{ ai_gen_id }} {
+    position: fixed;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-250%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px 15px;
+    border-radius: 60px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    backdrop-filter: blur(15px);
+    transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .chapter-is-open .ai-story-intro__controls-{{ ai_gen_id }} {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .ai-story-intro__control-btn-{{ ai_gen_id }} {
+    width: 55px;
+    height: 55px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary-story-color);
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: 0.4s all;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  }
+
+  .ai-story-intro__control-btn-{{ ai_gen_id }}:hover { 
+    transform: scale(1.2) rotate(5deg); 
+    background: var(--hover-story-color); 
+  }
+
+  /* Hero Section */
+  .ai-story-intro__hero-{{ ai_gen_id }} {
+    position: relative;
+    background: #faf3e0;
+    background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
+    border: 3px solid #cdaa7d;
+    border-radius: 15px;
+    padding: 80px 50px;
+    margin-bottom: 80px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  }
+
+  .ai-story-intro__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    text-align: center;
+    margin-bottom: 40px;
+    font-family: var(--story-font-family);
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+
+  .ai-story-intro__text-{{ ai_gen_id }} {
+    line-height: 2.2;
+    font-size: {{ block.settings.text_size }}px;
+    text-align: {{ block.settings.text_alignment }};
+    color: {{ block.settings.text_color }};
+    font-family: var(--story-font-family);
+  }
+
+  /* Pixel Loader UI */
+  .ai-story-loader-{{ ai_gen_id }} {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #ffffff;
+    z-index: 10000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-story-loader-{{ ai_gen_id }}.active { display: flex; }
+
+  .pixel-grid-{{ ai_gen_id }} {
+    width: 80px;
+    height: 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .pixel-grid-{{ ai_gen_id }} div {
+    width: 22px;
+    height: 22px;
+    background: var(--primary-story-color);
+    animation: pixel-pulse 1.2s infinite ease-in-out;
+  }
+
+  @keyframes pixel-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.2; transform: scale(0.5); }
+  }
+
+  /* Chapters List */
+  .ai-story-intro__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    padding: 20px 0;
+  }
+
+  .ai-story-intro__chapter-card-{{ ai_gen_id }} {
+    background: #ffffff;
+    border: 2px solid #f0f0f0;
+    padding: 45px 30px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-story-intro__chapter-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+    border-color: var(--primary-story-color);
+  }
+
+  /* Media Engine Styles */
+  .chapter-media-wrap-{{ ai_gen_id }} {
+    margin: 40px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    align-items: center;
+  }
+
+  .chapter-media-wrap-{{ ai_gen_id }} img, 
+  .chapter-media-wrap-{{ ai_gen_id }} video {
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transition: transform 0.4s ease;
+  }
+
+  .chapter-media-wrap-{{ ai_gen_id }} img:hover { transform: scale(1.02); }
+
+  .chapter-text-content-{{ ai_gen_id }} {
+    font-size: 24px;
+    line-height: 2.5;
+    margin-top: 50px;
+    white-space: pre-wrap;
+    font-family: var(--story-font-family);
+    text-align: justify;
+  }
+
+  .back-to-index-{{ ai_gen_id }} {
+    margin: 80px auto;
+    display: block;
+    padding: 20px 60px;
+    background: var(--primary-story-color);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 700;
+    transition: 0.4s;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+
+  ::selection {
+    background: {{ block.settings.selection_color }};
+    color: {{ block.settings.selection_text_color }};
+  }
+{% endstyle %}
+
+<div class="ai-story-intro-{{ ai_gen_id }}">
+  
+  <div class="ai-story-intro__controls-{{ ai_gen_id }}" id="floating-ui-{{ ai_gen_id }}">
+    <button class="ai-story-intro__control-btn-{{ ai_gen_id }}" onclick="updateStoryFont(3)" title="تكبير">+</button>
+    <button class="ai-story-intro__control-btn-{{ ai_gen_id }}" onclick="updateStoryFont(-3)" title="تصغير">-</button>
+    <button class="ai-story-intro__control-btn-{{ ai_gen_id }}" onclick="triggerNightMode()">🌙</button>
+    <button class="ai-story-intro__control-btn-{{ ai_gen_id }}" onclick="triggerFocusMode()">📖</button>
+  </div>
+
+  <div id="index-view-{{ ai_gen_id }}">
+    <div class="ai-story-intro__hero-{{ ai_gen_id }}">
+      <h1 class="ai-story-intro__title-{{ ai_gen_id }}">{{ block.settings.intro_title }}</h1>
+      <div class="chapter-media-wrap-{{ ai_gen_id }}">
+        {% if block.settings.hero_img_1 %}<img src="{{ block.settings.hero_img_1 | image_url: width: 1400 }}" style="width:100%;">{% endif %}
+      </div>
+      <div class="ai-story-intro__text-{{ ai_gen_id }}">{{ block.settings.intro_text }}</div>
+    </div>
+
+    <h2 style="text-align: center; margin: 60px 0; font-size: 32px;">{{ block.settings.grid_title }}</h2>
+    
+    <div class="ai-story-intro__grid-{{ ai_gen_id }}">
+      {% if block.settings.ch_1_title != blank %}
+        <div class="ai-story-intro__chapter-card-{{ ai_gen_id }}" onclick="launchChapter(1)">
+          <h3>{{ block.settings.ch_1_title }}</h3>
+          <p>{{ block.settings.ch_1_desc }}</p>
+        </div>
+      {% endif %}
+      {% if block.settings.ch_2_title != blank %}
+        <div class="ai-story-intro__chapter-card-{{ ai_gen_id }}" onclick="launchChapter(2)">
+          <h3>{{ block.settings.ch_2_title }}</h3>
+          <p>{{ block.settings.ch_2_desc }}</p>
+        </div>
+      {% endif %}
+      {% if block.settings.ch_3_title != blank %}
+        <div class="ai-story-intro__chapter-card-{{ ai_gen_id }}" onclick="launchChapter(3)">
+          <h3>{{ block.settings.ch_3_title }}</h3>
+          <p>{{ block.settings.ch_3_desc }}</p>
+        </div>
+      {% endif %}
+      {% if block.settings.ch_4_title != blank %}
+        <div class="ai-story-intro__chapter-card-{{ ai_gen_id }}" onclick="launchChapter(4)">
+          <h3>{{ block.settings.ch_4_title }}</h3>
+          <p>{{ block.settings.ch_4_desc }}</p>
+        </div>
+      {% endif %}
+      {% if block.settings.ch_5_title != blank %}
+        <div class="ai-story-intro__chapter-card-{{ ai_gen_id }}" onclick="launchChapter(5)">
+          <h3>{{ block.settings.ch_5_title }}</h3>
+          <p>{{ block.settings.ch_5_desc }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="ai-story-loader-{{ ai_gen_id }}" id="pixel-loader-{{ ai_gen_id }}">
+    <div class="pixel-grid-{{ ai_gen_id }}">
+      {% for i in (1..9) %}<div></div>{% endfor %}
+    </div>
+    <p style="margin-top: 30px; font-weight: 800; font-size: 20px;">{{ block.settings.loading_msg }}</p>
+  </div>
+
+  <div id="content-engine-{{ ai_gen_id }}">
+    {% for i in (1..5) %}
+      {% capture t_id %}ch_{{ i }}_title{% endcapture %}
+      {% capture c_id %}ch_{{ i }}_content{% endcapture %}
+      
+      {% if block.settings[t_id] != blank %}
+        <div class="ai-story-intro__chapter-content-{{ ai_gen_id }}" id="chapter-v-{{ i }}" style="display:none; opacity:0;">
+          <h2 style="font-size: 45px; text-align: center; color: var(--primary-story-color); margin-bottom: 50px;">{{ block.settings[t_id] }}</h2>
+          
+          <div class="chapter-media-wrap-{{ ai_gen_id }}">
+            {% comment %} Media Slot 1 {% endcomment %}
+            {% capture img_1 %}ch_{{ i }}_img_1{% endcapture %}
+            {% capture vid_1 %}ch_{{ i }}_vid_1{% endcapture %}
+            {% capture w_1 %}ch_{{ i }}_w_1{% endcapture %}
+            {% if block.settings[img_1] %}<img src="{{ block.settings[img_1] | image_url: width: 1400 }}" style="width:{{ block.settings[w_1] }}%;">{% endif %}
+            {% if block.settings[vid_1] != blank %}<video src="{{ block.settings[vid_1] }}" controls style="width:{{ block.settings[w_1] }}%;"></video>{% endif %}
+
+            {% comment %} Media Slot 2 {% endcomment %}
+            {% capture img_2 %}ch_{{ i }}_img_2{% endcapture %}
+            {% capture vid_2 %}ch_{{ i }}_vid_2{% endcapture %}
+            {% capture w_2 %}ch_{{ i }}_w_2{% endcapture %}
+            {% if block.settings[img_2] %}<img src="{{ block.settings[img_2] | image_url: width: 1400 }}" style="width:{{ block.settings[w_2] }}%;">{% endif %}
+            {% if block.settings[vid_2] != blank %}<video src="{{ block.settings[vid_2] }}" controls style="width:{{ block.settings[w_2] }}%;"></video>{% endif %}
+
+            {% comment %} Media Slot 3 {% endcomment %}
+            {% capture img_3 %}ch_{{ i }}_img_3{% endcapture %}
+            {% capture vid_3 %}ch_{{ i }}_vid_3{% endcapture %}
+            {% capture w_3 %}ch_{{ i }}_w_3{% endcapture %}
+            {% if block.settings[img_3] %}<img src="{{ block.settings[img_3] | image_url: width: 1400 }}" style="width:{{ block.settings[w_3] }}%;">{% endif %}
+            {% if block.settings[vid_3] != blank %}<video src="{{ block.settings[vid_3] }}" controls style="width:{{ block.settings[w_3] }}%;"></video>{% endif %}
+
+            {% comment %} Media Slot 4 {% endcomment %}
+            {% capture img_4 %}ch_{{ i }}_img_4{% endcapture %}
+            {% capture vid_4 %}ch_{{ i }}_vid_4{% endcapture %}
+            {% capture w_4 %}ch_{{ i }}_w_4{% endcapture %}
+            {% if block.settings[img_4] %}<img src="{{ block.settings[img_4] | image_url: width: 1400 }}" style="width:{{ block.settings[w_4] }}%;">{% endif %}
+            {% if block.settings[vid_4] != blank %}<video src="{{ block.settings[vid_4] }}" controls style="width:{{ block.settings[w_4] }}%;"></video>{% endif %}
+
+            {% comment %} Media Slot 5 {% endcomment %}
+            {% capture img_5 %}ch_{{ i }}_img_5{% endcapture %}
+            {% capture vid_5 %}ch_{{ i }}_vid_5{% endcapture %}
+            {% capture w_5 %}ch_{{ i }}_w_5{% endcapture %}
+            {% if block.settings[img_5] %}<img src="{{ block.settings[img_5] | image_url: width: 1400 }}" style="width:{{ block.settings[w_5] }}%;">{% endif %}
+            {% if block.settings[vid_5] != blank %}<video src="{{ block.settings[vid_5] }}" controls style="width:{{ block.settings[w_5] }}%;"></video>{% endif %}
+          </div>
+
+          <div class="chapter-text-content-{{ ai_gen_id }}" id="txt-{{ i }}">{{ block.settings[c_id] }}</div>
+          <button class="back-to-index-{{ ai_gen_id }}" onclick="window.location.reload()">إغلاق الفصل</button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    const sectionId = "{{ ai_gen_id }}";
+    let storyFontSize = 24;
+
+    window.launchChapter = function(n) {
+      document.getElementById('index-view-' + sectionId).style.display = 'none';
+      const loader = document.getElementById('pixel-loader-' + sectionId);
+      loader.classList.add('active');
+
+      setTimeout(() => {
+        loader.classList.remove('active');
+        const view = document.getElementById('chapter-v-' + n);
+        view.style.display = 'block';
+        setTimeout(() => view.style.opacity = '1', 100);
+        document.querySelector('.ai-story-intro-' + sectionId).classList.add('chapter-is-open');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      }, 1600);
+    };
+
+    window.updateStoryFont = function(d) {
+      storyFontSize += d;
+      document.querySelectorAll('.chapter-text-content-' + sectionId).forEach(t => t.style.fontSize = storyFontSize + 'px');
+    };
+
+    window.triggerNightMode = function() { document.querySelector('.ai-story-intro-' + sectionId).classList.toggle('dark-mode'); };
+    window.triggerFocusMode = function() { document.querySelector('.ai-story-intro-' + sectionId).classList.toggle('reading-mode'); };
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "قسم القصص الاحترافي",
+  "settings": [
+    { "type": "header", "content": "1. التنسيق العام" },
+    { "type": "text", "id": "intro_title", "label": "عنوان الرواية الرئيسي", "default": "مغامرات الحصيف" },
+    { "type": "html", "id": "intro_text", "label": "نص المقدمة الشامل" },
+    { "type": "range", "id": "title_size", "label": "حجم الخط للعناوين", "min": 20, "max": 120, "default": 60 },
+    { "type": "range", "id": "text_size", "label": "حجم خط المقدمة", "min": 14, "max": 40, "default": 20 },
+    { "type": "select", "id": "text_alignment", "label": "محاذاة النص", "options": [{"value":"right","label":"يمين"},{"value":"center","label":"وسط"},{"value":"justify","label":"متساوي"}], "default": "right" },
+    { "type": "color", "id": "title_color", "label": "لون العناوين", "default": "#2c3e50" },
+    { "type": "color", "id": "text_color", "label": "لون النصوص", "default": "#34495e" },
+    { "type": "color", "id": "selection_color", "label": "لون التحديد", "default": "#e74c3c" },
+    { "type": "color", "id": "selection_text_color", "label": "لون نص التحديد", "default": "#ffffff" },
+    { "type": "range", "id": "desktop_width_percent", "label": "عرض القسم (%)", "min": 50, "max": 100, "default": 100 },
+    
+    { "type": "header", "content": "2. الأزرار والمؤثرات" },
+    { "type": "color", "id": "button_bg_color", "label": "لون الأزرار", "default": "#2c3e50" },
+    { "type": "color", "id": "button_hover_color", "label": "لون التحويم", "default": "#e74c3c" },
+    { "type": "text", "id": "loading_msg", "label": "رسالة التحميل", "default": "يتم الآن تحميل الأحداث..." },
+    { "type": "text", "id": "grid_title", "label": "عنوان الفهرس", "default": "فهرس الفصول" },
+
+    { "type": "header", "content": "3. وسائط الغلاف" },
+    { "type": "image_picker", "id": "hero_img_1", "label": "صورة الغلاف الرئيسية" },
+
+    { "type": "header", "content": "4. الفصل الأول التفصيلي" },
+    { "type": "text", "id": "ch_1_title", "label": "عنوان الفصل 1" },
+    { "type": "textarea", "id": "ch_1_desc", "label": "وصف الفصل 1" },
+    { "type": "html", "id": "ch_1_content", "label": "محتوى الفصل 1 الكامل" },
+    { "type": "image_picker", "id": "ch_1_img_1", "label": "فصل 1 - صورة 1" },
+    { "type": "url", "id": "ch_1_vid_1", "label": "فصل 1 - فيديو 1" },
+    { "type": "range", "id": "ch_1_w_1", "label": "عرض وسائط 1 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_1_img_2", "label": "فصل 1 - صورة 2" },
+    { "type": "url", "id": "ch_1_vid_2", "label": "فصل 1 - فيديو 2" },
+    { "type": "range", "id": "ch_1_w_2", "label": "عرض وسائط 2 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_1_img_3", "label": "فصل 1 - صورة 3" },
+    { "type": "url", "id": "ch_1_vid_3", "label": "فصل 1 - فيديو 3" },
+    { "type": "range", "id": "ch_1_w_3", "label": "عرض وسائط 3 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_1_img_4", "label": "فصل 1 - صورة 4" },
+    { "type": "url", "id": "ch_1_vid_4", "label": "فصل 1 - فيديو 4" },
+    { "type": "range", "id": "ch_1_w_4", "label": "عرض وسائط 4 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_1_img_5", "label": "فصل 1 - صورة 5" },
+    { "type": "url", "id": "ch_1_vid_5", "label": "فصل 1 - فيديو 5" },
+    { "type": "range", "id": "ch_1_w_5", "label": "عرض وسائط 5 (%)", "min": 20, "max": 100, "default": 100 },
+
+    { "type": "header", "content": "5. الفصل الثاني التفصيلي" },
+    { "type": "text", "id": "ch_2_title", "label": "عنوان الفصل 2" },
+    { "type": "textarea", "id": "ch_2_desc", "label": "وصف الفصل 2" },
+    { "type": "html", "id": "ch_2_content", "label": "محتوى الفصل 2 الكامل" },
+    { "type": "image_picker", "id": "ch_2_img_1", "label": "فصل 2 - صورة 1" },
+    { "type": "url", "id": "ch_2_vid_1", "label": "فصل 2 - فيديو 1" },
+    { "type": "range", "id": "ch_2_w_1", "label": "عرض وسائط 1 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_2_img_2", "label": "فصل 2 - صورة 2" },
+    { "type": "url", "id": "ch_2_vid_2", "label": "فصل 2 - فيديو 2" },
+    { "type": "range", "id": "ch_2_w_2", "label": "عرض وسائط 2 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_2_img_3", "label": "فصل 2 - صورة 3" },
+    { "type": "url", "id": "ch_2_vid_3", "label": "فصل 2 - فيديو 3" },
+    { "type": "range", "id": "ch_2_w_3", "label": "عرض وسائط 3 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_2_img_4", "label": "فصل 2 - صورة 4" },
+    { "type": "url", "id": "ch_2_vid_4", "label": "فصل 2 - فيديو 4" },
+    { "type": "range", "id": "ch_2_w_4", "label": "عرض وسائط 4 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_2_img_5", "label": "فصل 2 - صورة 5" },
+    { "type": "url", "id": "ch_2_vid_5", "label": "فصل 2 - فيديو 5" },
+    { "type": "range", "id": "ch_2_w_5", "label": "عرض وسائط 5 (%)", "min": 20, "max": 100, "default": 100 },
+
+    { "type": "header", "content": "6. الفصل الثالث التفصيلي" },
+    { "type": "text", "id": "ch_3_title", "label": "عنوان الفصل 3" },
+    { "type": "textarea", "id": "ch_3_desc", "label": "وصف الفصل 3" },
+    { "type": "html", "id": "ch_3_content", "label": "محتوى الفصل 3 الكامل" },
+    { "type": "image_picker", "id": "ch_3_img_1", "label": "فصل 3 - صورة 1" },
+    { "type": "url", "id": "ch_3_vid_1", "label": "فصل 3 - فيديو 1" },
+    { "type": "range", "id": "ch_3_w_1", "label": "عرض وسائط 1 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_3_img_2", "label": "فصل 3 - صورة 2" },
+    { "type": "url", "id": "ch_3_vid_2", "label": "فصل 3 - فيديو 2" },
+    { "type": "range", "id": "ch_3_w_2", "label": "عرض وسائط 2 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_3_img_3", "label": "فصل 3 - صورة 3" },
+    { "type": "url", "id": "ch_3_vid_3", "label": "فصل 3 - فيديو 3" },
+    { "type": "range", "id": "ch_3_w_3", "label": "عرض وسائط 3 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_3_img_4", "label": "فصل 3 - صورة 4" },
+    { "type": "url", "id": "ch_3_vid_4", "label": "فصل 3 - فيديو 4" },
+    { "type": "range", "id": "ch_3_w_4", "label": "عرض وسائط 4 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_3_img_5", "label": "فصل 3 - صورة 5" },
+    { "type": "url", "id": "ch_3_vid_5", "label": "فصل 3 - فيديو 5" },
+    { "type": "range", "id": "ch_3_w_5", "label": "عرض وسائط 5 (%)", "min": 20, "max": 100, "default": 100 },
+
+    { "type": "header", "content": "7. الفصل الرابع التفصيلي" },
+    { "type": "text", "id": "ch_4_title", "label": "عنوان الفصل 4" },
+    { "type": "textarea", "id": "ch_4_desc", "label": "وصف الفصل 4" },
+    { "type": "html", "id": "ch_4_content", "label": "محتوى الفصل 4 الكامل" },
+    { "type": "image_picker", "id": "ch_4_img_1", "label": "فصل 4 - صورة 1" },
+    { "type": "url", "id": "ch_4_vid_1", "label": "فصل 4 - فيديو 1" },
+    { "type": "range", "id": "ch_4_w_1", "label": "عرض وسائط 1 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_4_img_2", "label": "فصل 4 - صورة 2" },
+    { "type": "url", "id": "ch_4_vid_2", "label": "فصل 4 - فيديو 2" },
+    { "type": "range", "id": "ch_4_w_2", "label": "عرض وسائط 2 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_4_img_3", "label": "فصل 4 - صورة 3" },
+    { "type": "url", "id": "ch_4_vid_3", "label": "فصل 4 - فيديو 3" },
+    { "type": "range", "id": "ch_4_w_3", "label": "عرض وسائط 3 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_4_img_4", "label": "فصل 4 - صورة 4" },
+    { "type": "url", "id": "ch_4_vid_4", "label": "فصل 4 - فيديو 4" },
+    { "type": "range", "id": "ch_4_w_4", "label": "عرض وسائط 4 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_4_img_5", "label": "فصل 4 - صورة 5" },
+    { "type": "url", "id": "ch_4_vid_5", "label": "فصل 4 - فيديو 5" },
+    { "type": "range", "id": "ch_4_w_5", "label": "عرض وسائط 5 (%)", "min": 20, "max": 100, "default": 100 },
+
+    { "type": "header", "content": "8. الفصل الخامس التفصيلي" },
+    { "type": "text", "id": "ch_5_title", "label": "عنوان الفصل 5" },
+    { "type": "textarea", "id": "ch_5_desc", "label": "وصف الفصل 5" },
+    { "type": "html", "id": "ch_5_content", "label": "محتوى الفصل 5 الكامل" },
+    { "type": "image_picker", "id": "ch_5_img_1", "label": "فصل 5 - صورة 1" },
+    { "type": "url", "id": "ch_5_vid_1", "label": "فصل 5 - فيديو 1" },
+    { "type": "range", "id": "ch_5_w_1", "label": "عرض وسائط 1 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_5_img_2", "label": "فصل 5 - صورة 2" },
+    { "type": "url", "id": "ch_5_vid_2", "label": "فصل 5 - فيديو 2" },
+    { "type": "range", "id": "ch_5_w_2", "label": "عرض وسائط 2 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_5_img_3", "label": "فصل 5 - صورة 3" },
+    { "type": "url", "id": "ch_5_vid_3", "label": "فصل 5 - فيديو 3" },
+    { "type": "range", "id": "ch_5_w_3", "label": "عرض وسائط 3 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_5_img_4", "label": "فصل 5 - صورة 4" },
+    { "type": "url", "id": "ch_5_vid_4", "label": "فصل 5 - فيديو 4" },
+    { "type": "range", "id": "ch_5_w_4", "label": "عرض وسائط 4 (%)", "min": 20, "max": 100, "default": 100 },
+    { "type": "image_picker", "id": "ch_5_img_5", "label": "فصل 5 - صورة 5" },
+    { "type": "url", "id": "ch_5_vid_5", "label": "فصل 5 - فيديو 5" },
+    { "type": "range", "id": "ch_5_w_5", "label": "عرض وسائط 5 (%)", "min": 20, "max": 100, "default": 100 }
+  ],
+  "presets": [
+    { "name": "قسم القصص الاحترافي" }
+  ]
+}
+{% endschema %}

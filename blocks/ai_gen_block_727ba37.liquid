@@ -1,0 +1,568 @@
+{% doc %}
+  @prompt
+    تصفح الكتب المستعمل لعرض الكتب لبيعها ويكون تعرض الكتب اللي بصفحة الكتب المستعمله بشكل انيق وحركه تلقائيه وتأثيرات تفاعليه احترافيه لطيفه متناسقه مع الشكل العام
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-used-books-browser-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    padding: {{ block.settings.section_padding }}px 0;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-used-books-browser__container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-used-books-browser__header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .ai-used-books-browser__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px;
+  }
+
+  .ai-used-books-browser__description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.description_color }};
+    margin: 0;
+  }
+
+  .ai-used-books-browser__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-used-books-browser__grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
+  .ai-used-books-browser__card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_background }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .ai-used-books-browser__card-{{ ai_gen_id }}.ai-visible-{{ ai_gen_id }} {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .ai-used-books-browser__card-{{ ai_gen_id }}:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-used-books-browser__card-link-{{ ai_gen_id }} {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .ai-used-books-browser__image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 140%;
+    overflow: hidden;
+    background-color: #f5f5f5;
+  }
+
+  .ai-used-books-browser__image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .ai-used-books-browser__card-{{ ai_gen_id }}:hover .ai-used-books-browser__image-{{ ai_gen_id }} {
+    transform: scale(1.05);
+  }
+
+  .ai-used-books-browser__badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: {{ block.settings.badge_background }};
+    color: {{ block.settings.badge_text_color }};
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .ai-used-books-browser__content-{{ ai_gen_id }} {
+    padding: 16px;
+  }
+
+  .ai-used-books-browser__book-title-{{ ai_gen_id }} {
+    font-size: 16px;
+    font-weight: 600;
+    color: {{ block.settings.card_text_color }};
+    margin: 0 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .ai-used-books-browser__book-vendor-{{ ai_gen_id }} {
+    font-size: 13px;
+    color: {{ block.settings.vendor_color }};
+    margin: 0 0 12px;
+  }
+
+  .ai-used-books-browser__price-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .ai-used-books-browser__price-{{ ai_gen_id }} {
+    font-size: 18px;
+    font-weight: 700;
+    color: {{ block.settings.price_color }};
+  }
+
+  .ai-used-books-browser__compare-price-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+  }
+
+  .ai-used-books-browser__button-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 12px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .ai-used-books-browser__button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    transform: scale(1.02);
+  }
+
+  .ai-used-books-browser__empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+  }
+
+  .ai-used-books-browser__empty-state-{{ ai_gen_id }} svg {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+  }
+
+  .ai-used-books-browser__load-more-{{ ai_gen_id }} {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .ai-used-books-browser__load-more-button-{{ ai_gen_id }} {
+    padding: 14px 32px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .ai-used-books-browser__load-more-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    transform: translateY(-2px);
+  }
+{% endstyle %}
+
+<used-books-browser-{{ ai_gen_id }} class="ai-used-books-browser-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-used-books-browser__container-{{ ai_gen_id }}">
+    {% if block.settings.title != blank or block.settings.description != blank %}
+      <div class="ai-used-books-browser__header-{{ ai_gen_id }}">
+        {% if block.settings.title != blank %}
+          <h2 class="ai-used-books-browser__title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+        {% endif %}
+        {% if block.settings.description != blank %}
+          <div class="ai-used-books-browser__description-{{ ai_gen_id }}">{{ block.settings.description }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if block.settings.collection != blank %}
+      <div class="ai-used-books-browser__grid-{{ ai_gen_id }}">
+        {% for product in block.settings.collection.products limit: block.settings.products_to_show %}
+          <div class="ai-used-books-browser__card-{{ ai_gen_id }}" data-card-index="{{ forloop.index }}">
+            <a href="{{ product.url }}" class="ai-used-books-browser__card-link-{{ ai_gen_id }}">
+              <div class="ai-used-books-browser__image-wrapper-{{ ai_gen_id }}">
+                {% if product.featured_image %}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 400 }}"
+                    alt="{{ product.featured_image.alt | escape }}"
+                    class="ai-used-books-browser__image-{{ ai_gen_id }}"
+                    loading="lazy"
+                    width="400"
+                    height="560"
+                  >
+                {% else %}
+                  <div class="ai-used-books-browser__image-placeholder-{{ ai_gen_id }}">
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_badge and product.available == false %}
+                  <span class="ai-used-books-browser__badge-{{ ai_gen_id }}">{{ block.settings.sold_out_text }}</span>
+                {% elsif block.settings.show_badge and product.compare_at_price > product.price %}
+                  <span class="ai-used-books-browser__badge-{{ ai_gen_id }}">{{ block.settings.sale_text }}</span>
+                {% endif %}
+              </div>
+
+              <div class="ai-used-books-browser__content-{{ ai_gen_id }}">
+                <h3 class="ai-used-books-browser__book-title-{{ ai_gen_id }}">{{ product.title }}</h3>
+                
+                {% if block.settings.show_vendor and product.vendor != blank %}
+                  <p class="ai-used-books-browser__book-vendor-{{ ai_gen_id }}">{{ product.vendor }}</p>
+                {% endif %}
+
+                <div class="ai-used-books-browser__price-wrapper-{{ ai_gen_id }}">
+                  <span class="ai-used-books-browser__price-{{ ai_gen_id }}">{{ product.price | money }}</span>
+                  {% if product.compare_at_price > product.price %}
+                    <span class="ai-used-books-browser__compare-price-{{ ai_gen_id }}">{{ product.compare_at_price | money }}</span>
+                  {% endif %}
+                </div>
+
+                {% if block.settings.show_button %}
+                  <button class="ai-used-books-browser__button-{{ ai_gen_id }}" type="button">
+                    {{ block.settings.button_text }}
+                  </button>
+                {% endif %}
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if block.settings.collection.products.size > block.settings.products_to_show %}
+        <div class="ai-used-books-browser__load-more-{{ ai_gen_id }}">
+          <a href="{{ block.settings.collection.url }}" class="ai-used-books-browser__load-more-button-{{ ai_gen_id }}">
+            {{ block.settings.view_all_text }}
+          </a>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="ai-used-books-browser__empty-state-{{ ai_gen_id }}">
+        {{ 'collection-1' | placeholder_svg_tag }}
+        <p>اختر مجموعة الكتب المستعملة لعرضها هنا</p>
+      </div>
+    {% endif %}
+  </div>
+</used-books-browser-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class UsedBooksBrowser{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.cards = [];
+        this.observerOptions = {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        };
+      }
+
+      connectedCallback() {
+        this.cards = this.querySelectorAll('.ai-used-books-browser__card-{{ ai_gen_id }}');
+        this.setupIntersectionObserver();
+        this.staggerCards();
+      }
+
+      setupIntersectionObserver() {
+        if ('IntersectionObserver' in window) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('ai-visible-{{ ai_gen_id }}');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, this.observerOptions);
+
+          this.cards.forEach(card => {
+            observer.observe(card);
+          });
+        } else {
+          this.cards.forEach(card => {
+            card.classList.add('ai-visible-{{ ai_gen_id }}');
+          });
+        }
+      }
+
+      staggerCards() {
+        this.cards.forEach((card, index) => {
+          card.style.transitionDelay = `${index * 0.1}s`;
+        });
+      }
+    }
+
+    customElements.define('used-books-browser-{{ ai_gen_id }}', UsedBooksBrowser{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "تصفح الكتب المستعملة",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "العنوان",
+      "default": "الكتب المستعملة"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "الوصف",
+      "default": "<p>اكتشف مجموعتنا من الكتب المستعملة بأسعار مميزة</p>"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "المجموعة"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "label": "عدد المنتجات",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "إعدادات العرض"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "إظهار اسم البائع",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "إظهار شارة الحالة",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "إظهار زر الإضافة",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "نص الزر",
+      "default": "عرض التفاصيل"
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "نص زر عرض الكل",
+      "default": "عرض جميع الكتب"
+    },
+    {
+      "type": "text",
+      "id": "sale_text",
+      "label": "نص التخفيض",
+      "default": "تخفيض"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_text",
+      "label": "نص نفذت الكمية",
+      "default": "نفذت الكمية"
+    },
+    {
+      "type": "header",
+      "content": "الألوان"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "لون الوصف",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "خلفية البطاقة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "لون نص البطاقة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "vendor_color",
+      "label": "لون اسم البائع",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "لون السعر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "خلفية الشارة",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "لون نص الشارة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "خلفية الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "خلفية الزر عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "لون نص الزر",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "التنسيق"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض سطح المكتب",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "المسافة الداخلية",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم العنوان",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم الوصف",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة زوايا البطاقة",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة زوايا الزر",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "تصفح الكتب المستعملة"
+    }
+  ]
+}
+{% endschema %}

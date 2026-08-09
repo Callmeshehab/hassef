@@ -1,0 +1,604 @@
+{% doc %}
+  @prompt
+    بدي عمل مكان أحط فيه بانر ثابت مع خيار بالإعدادات للتقليب لبقية الصور تلقائيه أو باللمس وخيارات للتحكم في طول وعرض البانر واجعل هناك نظام حمايه يمنع حفظ البانر عند الضغط عليه 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-banner-slider-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  .ai-banner-slider-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.banner_height }}px;
+    overflow: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    background-color: #f4f4f4;
+  }
+
+  .ai-banner-slider-track-{{ ai_gen_id }} {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .ai-banner-slider-slide-{{ ai_gen_id }} {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+    pointer-events: none;
+  }
+
+  .ai-banner-slider-slide-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+
+  .ai-banner-slider-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+    position: relative;
+  }
+
+  .ai-banner-slider-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .ai-banner-slider-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-banner-slider-dots-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+  }
+
+  .ai-banner-slider-dot-{{ ai_gen_id }} {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: {{ block.settings.dot_color }};
+    opacity: 0.5;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-banner-slider-dot-{{ ai_gen_id }}.active {
+    opacity: 1;
+  }
+
+  .ai-banner-slider-arrow-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: {{ block.settings.arrow_color }};
+    color: {{ block.settings.arrow_icon_color }};
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-banner-slider-arrow-{{ ai_gen_id }}:hover {
+    opacity: 1;
+  }
+
+  .ai-banner-slider-arrow-{{ ai_gen_id }}.left {
+    left: 20px;
+  }
+
+  .ai-banner-slider-arrow-{{ ai_gen_id }}.right {
+    right: 20px;
+  }
+
+  .ai-banner-slider-arrow-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ai-banner-slider-protection-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: transparent;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-banner-slider-container-{{ ai_gen_id }} {
+      height: {{ block.settings.mobile_banner_height }}px;
+    }
+
+    .ai-banner-slider-arrow-{{ ai_gen_id }} {
+      width: 32px;
+      height: 32px;
+    }
+
+    .ai-banner-slider-arrow-{{ ai_gen_id }}.left {
+      left: 10px;
+    }
+
+    .ai-banner-slider-arrow-{{ ai_gen_id }}.right {
+      right: 10px;
+    }
+  }
+{% endstyle %}
+
+<banner-slider-{{ ai_gen_id }}
+  class="ai-banner-slider-{{ ai_gen_id }}"
+  data-autoplay="{{ block.settings.autoplay }}"
+  data-autoplay-speed="{{ block.settings.autoplay_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-banner-slider-container-{{ ai_gen_id }}">
+    <div class="ai-banner-slider-track-{{ ai_gen_id }}">
+      {% if block.settings.image_1 %}
+        <div class="ai-banner-slider-slide-{{ ai_gen_id }}">
+          <img
+            src="{{ block.settings.image_1 | image_url: width: 2000 }}"
+            alt="{{ block.settings.image_1.alt | escape }}"
+            loading="lazy"
+            width="{{ block.settings.image_1.width }}"
+            height="{{ block.settings.image_1.height }}"
+          >
+        </div>
+      {% else %}
+        <div class="ai-banner-slider-slide-{{ ai_gen_id }}">
+          <div class="ai-banner-slider-placeholder-{{ ai_gen_id }}">
+            {{ 'hero-apparel-1' | placeholder_svg_tag }}
+            <div class="ai-banner-slider-empty-state-{{ ai_gen_id }}">
+              أضف الصورة الأولى
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if block.settings.image_2 %}
+        <div class="ai-banner-slider-slide-{{ ai_gen_id }}">
+          <img
+            src="{{ block.settings.image_2 | image_url: width: 2000 }}"
+            alt="{{ block.settings.image_2.alt | escape }}"
+            loading="lazy"
+            width="{{ block.settings.image_2.width }}"
+            height="{{ block.settings.image_2.height }}"
+          >
+        </div>
+      {% endif %}
+
+      {% if block.settings.image_3 %}
+        <div class="ai-banner-slider-slide-{{ ai_gen_id }}">
+          <img
+            src="{{ block.settings.image_3 | image_url: width: 2000 }}"
+            alt="{{ block.settings.image_3.alt | escape }}"
+            loading="lazy"
+            width="{{ block.settings.image_3.width }}"
+            height="{{ block.settings.image_3.height }}"
+          >
+        </div>
+      {% endif %}
+
+      {% if block.settings.image_4 %}
+        <div class="ai-banner-slider-slide-{{ ai_gen_id }}">
+          <img
+            src="{{ block.settings.image_4 | image_url: width: 2000 }}"
+            alt="{{ block.settings.image_4.alt | escape }}"
+            loading="lazy"
+            width="{{ block.settings.image_4.width }}"
+            height="{{ block.settings.image_4.height }}"
+          >
+        </div>
+      {% endif %}
+
+      {% if block.settings.image_5 %}
+        <div class="ai-banner-slider-slide-{{ ai_gen_id }}">
+          <img
+            src="{{ block.settings.image_5 | image_url: width: 2000 }}"
+            alt="{{ block.settings.image_5.alt | escape }}"
+            loading="lazy"
+            width="{{ block.settings.image_5.width }}"
+            height="{{ block.settings.image_5.height }}"
+          >
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-banner-slider-protection-{{ ai_gen_id }}"></div>
+
+    {% assign total_images = 0 %}
+    {% if block.settings.image_1 %}{% assign total_images = total_images | plus: 1 %}{% endif %}
+    {% if block.settings.image_2 %}{% assign total_images = total_images | plus: 1 %}{% endif %}
+    {% if block.settings.image_3 %}{% assign total_images = total_images | plus: 1 %}{% endif %}
+    {% if block.settings.image_4 %}{% assign total_images = total_images | plus: 1 %}{% endif %}
+    {% if block.settings.image_5 %}{% assign total_images = total_images | plus: 1 %}{% endif %}
+
+    {% if total_images > 1 %}
+      {% if block.settings.show_arrows %}
+        <button
+          class="ai-banner-slider-arrow-{{ ai_gen_id }} left"
+          aria-label="الصورة السابقة"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button
+          class="ai-banner-slider-arrow-{{ ai_gen_id }} right"
+          aria-label="الصورة التالية"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      {% endif %}
+
+      {% if block.settings.show_dots %}
+        <div class="ai-banner-slider-dots-{{ ai_gen_id }}">
+          {% for i in (1..total_images) %}
+            <button
+              class="ai-banner-slider-dot-{{ ai_gen_id }} {% if i == 1 %}active{% endif %}"
+              aria-label="انتقل إلى الصورة {{ i }}"
+              data-index="{{ i | minus: 1 }}"
+            ></button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</banner-slider-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class BannerSlider{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.autoplayInterval = null;
+        this.touchStartX = 0;
+        this.touchEndX = 0;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-banner-slider-track-{{ ai_gen_id }}');
+        this.slides = this.querySelectorAll('.ai-banner-slider-slide-{{ ai_gen_id }}');
+        this.dots = this.querySelectorAll('.ai-banner-slider-dot-{{ ai_gen_id }}');
+        this.leftArrow = this.querySelector('.ai-banner-slider-arrow-{{ ai_gen_id }}.left');
+        this.rightArrow = this.querySelector('.ai-banner-slider-arrow-{{ ai_gen_id }}.right');
+        this.container = this.querySelector('.ai-banner-slider-container-{{ ai_gen_id }}');
+
+        if (this.slides.length <= 1) return;
+
+        this.setupEventListeners();
+        this.preventImageSaving();
+
+        if (this.dataset.autoplay === 'true') {
+          this.startAutoplay();
+        }
+      }
+
+      setupEventListeners() {
+        if (this.leftArrow) {
+          this.leftArrow.addEventListener('click', () => this.prevSlide());
+        }
+
+        if (this.rightArrow) {
+          this.rightArrow.addEventListener('click', () => this.nextSlide());
+        }
+
+        this.dots.forEach((dot) => {
+          dot.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            this.goToSlide(index);
+          });
+        });
+
+        this.container.addEventListener('touchstart', (e) => {
+          this.touchStartX = e.changedTouches[0].screenX;
+        });
+
+        this.container.addEventListener('touchend', (e) => {
+          this.touchEndX = e.changedTouches[0].screenX;
+          this.handleSwipe();
+        });
+
+        this.addEventListener('mouseenter', () => {
+          if (this.dataset.autoplay === 'true') {
+            this.stopAutoplay();
+          }
+        });
+
+        this.addEventListener('mouseleave', () => {
+          if (this.dataset.autoplay === 'true') {
+            this.startAutoplay();
+          }
+        });
+      }
+
+      preventImageSaving() {
+        const images = this.querySelectorAll('img');
+        images.forEach((img) => {
+          img.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+          });
+
+          img.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            return false;
+          });
+        });
+
+        this.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          return false;
+        });
+      }
+
+      handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = this.touchStartX - this.touchEndX;
+
+        if (Math.abs(diff) > swipeThreshold) {
+          if (diff > 0) {
+            this.nextSlide();
+          } else {
+            this.prevSlide();
+          }
+        }
+      }
+
+      nextSlide() {
+        this.currentIndex = (this.currentIndex + 1) % this.slides.length;
+        this.updateSlider();
+      }
+
+      prevSlide() {
+        this.currentIndex = (this.currentIndex - 1 + this.slides.length) % this.slides.length;
+        this.updateSlider();
+      }
+
+      goToSlide(index) {
+        this.currentIndex = index;
+        this.updateSlider();
+      }
+
+      updateSlider() {
+        const offset = -this.currentIndex * 100;
+        this.track.style.transform = `translateX(${offset}%)`;
+
+        this.dots.forEach((dot, index) => {
+          if (index === this.currentIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      startAutoplay() {
+        const speed = parseInt(this.dataset.autoplaySpeed) * 1000;
+        this.autoplayInterval = setInterval(() => {
+          this.nextSlide();
+        }, speed);
+      }
+
+      stopAutoplay() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+          this.autoplayInterval = null;
+        }
+      }
+
+      disconnectedCallback() {
+        this.stopAutoplay();
+      }
+    }
+
+    customElements.define('banner-slider-{{ ai_gen_id }}', BannerSlider{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "بانر متحرك محمي",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "الصور"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "الصورة 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "الصورة 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "الصورة 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "الصورة 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_5",
+      "label": "الصورة 5"
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد"
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "label": "ارتفاع البانر على الكمبيوتر",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "mobile_banner_height",
+      "label": "ارتفاع البانر على الموبايل",
+      "min": 150,
+      "max": 600,
+      "step": 50,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض البانر على الكمبيوتر",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الحواف",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "التحكم في الحركة"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تشغيل تلقائي",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "سرعة التشغيل التلقائي",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "ث",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "إظهار الأسهم",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "إظهار النقاط",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "الألوان"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "لون خلفية الأسهم",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_icon_color",
+      "label": "لون أيقونة الأسهم",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "لون النقاط",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "بانر متحرك محمي"
+    }
+  ]
+}
+{% endschema %}

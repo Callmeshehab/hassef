@@ -1,0 +1,951 @@
+{% doc %}
+  @prompt
+    بدي تعمل مشغل موسيقى يعمل عند الضغط عليه نسميه إذاعه الحصيف يكون شكله على طول الهيدر في كل الصفحات ثابت ويكون يأخذ طابع انيق وغير مزدحم متكون من زر إيقاف وزر تنقل وعند التنقل يخرج صوت تشويش زي الراديو هيك , بدي الصوتيات ارفعها من الجهاز, بدي يكون جانبي افضل ولكن كزر عائر به شعار الراديو وعند الضغط عليه يظهر هذي الخيارات وكمان بدي الأغاني ارفعها من جهازي يعني اعملها بالود 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-radio-fab-{{ ai_gen_id }} {
+    display: block;
+  }
+
+  .ai-radio-fab-button-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: {{ block.settings.bottom_position }}px;
+    {% if block.settings.position == 'left' %}
+      left: {{ block.settings.side_position }}px;
+    {% else %}
+      right: {{ block.settings.side_position }}px;
+    {% endif %}
+    z-index: 9999;
+    width: {{ block.settings.fab_size }}px;
+    height: {{ block.settings.fab_size }}px;
+    border-radius: 50%;
+    background: {{ block.settings.fab_background }};
+    border: {{ block.settings.fab_border_thickness }}px solid {{ block.settings.fab_border_color }};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .ai-radio-fab-button-{{ ai_gen_id }}:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .ai-radio-fab-button-{{ ai_gen_id }}.playing {
+    animation: ai-radio-pulse-{{ ai_gen_id }} 2s infinite;
+  }
+
+  @keyframes ai-radio-pulse-{{ ai_gen_id }} {
+    0%, 100% {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+      box-shadow: 0 4px 20px {{ block.settings.fab_background }};
+    }
+  }
+
+  .ai-radio-fab-icon-{{ ai_gen_id }} {
+    width: calc({{ block.settings.fab_size }}px * 0.6);
+    height: calc({{ block.settings.fab_size }}px * 0.6);
+    color: {{ block.settings.fab_icon_color }};
+  }
+
+  .ai-radio-panel-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: calc({{ block.settings.bottom_position }}px + {{ block.settings.fab_size }}px + 15px);
+    {% if block.settings.position == 'left' %}
+      left: {{ block.settings.side_position }}px;
+    {% else %}
+      right: {{ block.settings.side_position }}px;
+    {% endif %}
+    z-index: 9998;
+    background: {{ block.settings.panel_background }};
+    border: {{ block.settings.panel_border_thickness }}px solid {{ block.settings.panel_border_color }};
+    border-radius: {{ block.settings.panel_radius }}px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: {{ block.settings.panel_padding }}px;
+    width: {{ block.settings.panel_width }}px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+  }
+
+  .ai-radio-panel-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .ai-radio-panel-header-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid {{ block.settings.panel_border_color }};
+  }
+
+  .ai-radio-panel-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 600;
+    color: {{ block.settings.panel_text_color }};
+    margin: 0;
+  }
+
+  .ai-radio-panel-close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: {{ block.settings.panel_text_color }};
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .ai-radio-panel-close-{{ ai_gen_id }}:hover {
+    opacity: 1;
+  }
+
+  .ai-radio-panel-close-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ai-radio-station-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: {{ block.settings.station_background }};
+    border: 1px solid {{ block.settings.station_border_color }};
+    border-radius: {{ block.settings.station_radius }}px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ai-radio-station-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.station_hover_background }};
+    transform: translateX({% if block.settings.position == 'left' %}5{% else %}-5{% endif %}px);
+  }
+
+  .ai-radio-station-{{ ai_gen_id }}.active {
+    background: {{ block.settings.station_active_background }};
+    border-color: {{ block.settings.fab_background }};
+  }
+
+  .ai-radio-station-info-{{ ai_gen_id }} {
+    flex-grow: 1;
+  }
+
+  .ai-radio-station-name-{{ ai_gen_id }} {
+    font-size: {{ block.settings.station_name_size }}px;
+    font-weight: 500;
+    color: {{ block.settings.panel_text_color }};
+    margin: 0;
+  }
+
+  .ai-radio-station-{{ ai_gen_id }}.active .ai-radio-station-name-{{ ai_gen_id }} {
+    color: {{ block.settings.fab_background }};
+  }
+
+  .ai-radio-station-icon-{{ ai_gen_id }} {
+    width: 20px;
+    height: 20px;
+    color: {{ block.settings.panel_text_color }};
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .ai-radio-station-{{ ai_gen_id }}.active .ai-radio-station-icon-{{ ai_gen_id }} {
+    opacity: 1;
+    color: {{ block.settings.fab_background }};
+  }
+
+  .ai-radio-controls-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid {{ block.settings.panel_border_color }};
+  }
+
+  .ai-radio-control-button-{{ ai_gen_id }} {
+    background: {{ block.settings.control_button_background }};
+    border: 1px solid {{ block.settings.control_button_border }};
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    color: {{ block.settings.control_button_icon_color }};
+  }
+
+  .ai-radio-control-button-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.control_button_hover_background }};
+    transform: scale(1.1);
+  }
+
+  .ai-radio-control-button-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ai-radio-control-button-{{ ai_gen_id }}.play-button {
+    width: 50px;
+    height: 50px;
+    background: {{ block.settings.fab_background }};
+    border-color: {{ block.settings.fab_background }};
+  }
+
+  .ai-radio-control-button-{{ ai_gen_id }}.play-button svg {
+    width: 24px;
+    height: 24px;
+    color: {{ block.settings.fab_icon_color }};
+  }
+
+  .ai-radio-status-{{ ai_gen_id }} {
+    text-align: center;
+    font-size: 12px;
+    color: {{ block.settings.panel_text_color }};
+    opacity: 0.7;
+    margin-top: 12px;
+  }
+
+  .ai-radio-empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 20px;
+    color: {{ block.settings.panel_text_color }};
+    opacity: 0.6;
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-radio-fab-button-{{ ai_gen_id }} {
+      width: {{ block.settings.fab_size | times: 0.85 }}px;
+      height: {{ block.settings.fab_size | times: 0.85 }}px;
+      bottom: {{ block.settings.bottom_position | times: 0.7 }}px;
+      {% if block.settings.position == 'left' %}
+        left: {{ block.settings.side_position | times: 0.7 }}px;
+      {% else %}
+        right: {{ block.settings.side_position | times: 0.7 }}px;
+      {% endif %}
+    }
+
+    .ai-radio-panel-{{ ai_gen_id }} {
+      width: calc(100vw - 40px);
+      max-width: {{ block.settings.panel_width }}px;
+      bottom: calc({{ block.settings.bottom_position | times: 0.7 }}px + {{ block.settings.fab_size | times: 0.85 }}px + 15px);
+      {% if block.settings.position == 'left' %}
+        left: 20px;
+      {% else %}
+        right: 20px;
+      {% endif %}
+    }
+  }
+{% endstyle %}
+
+<radio-fab-{{ ai_gen_id }} class="ai-radio-fab-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <button class="ai-radio-fab-button-{{ ai_gen_id }}" data-fab-button aria-label="فتح مشغل الراديو">
+    <svg class="ai-radio-fab-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14M12 12h.01"></path>
+    </svg>
+  </button>
+
+  <div class="ai-radio-panel-{{ ai_gen_id }}" data-panel>
+    <div class="ai-radio-panel-header-{{ ai_gen_id }}">
+      <h3 class="ai-radio-panel-title-{{ ai_gen_id }}">{{ block.settings.radio_name }}</h3>
+      <button class="ai-radio-panel-close-{{ ai_gen_id }}" data-close-button aria-label="إغلاق">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div data-stations-container>
+      {% assign has_stations = false %}
+      {% for i in (1..5) %}
+        {% assign file_key = 'station_' | append: i | append: '_file' %}
+        {% assign name_key = 'station_' | append: i | append: '_name' %}
+        {% if block.settings[file_key] != blank %}
+          {% assign has_stations = true %}
+          <div class="ai-radio-station-{{ ai_gen_id }}" data-station data-index="{{ forloop.index0 }}" data-name="{{ block.settings[name_key] }}" data-url="{{ block.settings[file_key] }}">
+            <div class="ai-radio-station-info-{{ ai_gen_id }}">
+              <p class="ai-radio-station-name-{{ ai_gen_id }}">{{ block.settings[name_key] }}</p>
+            </div>
+            <svg class="ai-radio-station-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M10 8l6 4-6 4V8z" fill="white"></path>
+            </svg>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {% unless has_stations %}
+        <div class="ai-radio-empty-state-{{ ai_gen_id }}">
+          لا توجد محطات متاحة. يرجى إضافة ملفات صوتية من إعدادات البلوك.
+        </div>
+      {% endunless %}
+    </div>
+
+    {% if has_stations %}
+      <div class="ai-radio-controls-{{ ai_gen_id }}">
+        <button class="ai-radio-control-button-{{ ai_gen_id }}" data-prev-button aria-label="السابق">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="19 20 9 12 19 4 19 20"></polygon>
+            <line x1="5" y1="19" x2="5" y2="5"></line>
+          </svg>
+        </button>
+
+        <button class="ai-radio-control-button-{{ ai_gen_id }} play-button" data-play-button aria-label="تشغيل">
+          <svg data-play-icon xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg data-pause-icon style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+
+        <button class="ai-radio-control-button-{{ ai_gen_id }}" data-next-button aria-label="التالي">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+            <line x1="19" y1="5" x2="19" y2="19"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="ai-radio-status-{{ ai_gen_id }}" data-status>{{ block.settings.stopped_text }}</div>
+    {% endif %}
+  </div>
+</radio-fab-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class RadioFab{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentStationIndex = 0;
+        this.isPlaying = false;
+        this.audio = null;
+        this.staticAudio = null;
+        this.isPanelOpen = false;
+      }
+
+      connectedCallback() {
+        this.fabButton = this.querySelector('[data-fab-button]');
+        this.panel = this.querySelector('[data-panel]');
+        this.closeButton = this.querySelector('[data-close-button]');
+        this.playButton = this.querySelector('[data-play-button]');
+        this.prevButton = this.querySelector('[data-prev-button]');
+        this.nextButton = this.querySelector('[data-next-button]');
+        this.statusElement = this.querySelector('[data-status]');
+        this.playIcon = this.querySelector('[data-play-icon]');
+        this.pauseIcon = this.querySelector('[data-pause-icon]');
+        this.stationElements = this.querySelectorAll('[data-station]');
+
+        this.stations = Array.from(this.stationElements).map(el => ({
+          name: el.dataset.name,
+          url: el.dataset.url,
+          element: el
+        }));
+
+        this.createStaticSound();
+        this.setupEventListeners();
+        
+        if (this.stations.length > 0) {
+          this.updateActiveStation();
+        }
+      }
+
+      createStaticSound() {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const bufferSize = audioContext.sampleRate * 0.3;
+        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        this.staticBuffer = buffer;
+        this.audioContext = audioContext;
+      }
+
+      playStatic() {
+        if (this.staticSource) {
+          this.staticSource.stop();
+        }
+        
+        this.staticSource = this.audioContext.createBufferSource();
+        this.staticSource.buffer = this.staticBuffer;
+        
+        const gainNode = this.audioContext.createGain();
+        gainNode.gain.value = {{ block.settings.static_volume | divided_by: 100.0 }};
+        
+        this.staticSource.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        this.staticSource.start();
+      }
+
+      setupEventListeners() {
+        this.fabButton.addEventListener('click', () => this.togglePanel());
+        this.closeButton.addEventListener('click', () => this.closePanel());
+        
+        if (this.playButton) {
+          this.playButton.addEventListener('click', () => this.togglePlay());
+        }
+        
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.changeStation(-1));
+        }
+        
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.changeStation(1));
+        }
+
+        this.stationElements.forEach((el, index) => {
+          el.addEventListener('click', () => {
+            this.currentStationIndex = index;
+            this.updateActiveStation();
+            if (this.isPlaying) {
+              this.play();
+            }
+          });
+        });
+
+        document.addEventListener('click', (e) => {
+          if (this.isPanelOpen && !this.panel.contains(e.target) && !this.fabButton.contains(e.target)) {
+            this.closePanel();
+          }
+        });
+      }
+
+      togglePanel() {
+        if (this.isPanelOpen) {
+          this.closePanel();
+        } else {
+          this.openPanel();
+        }
+      }
+
+      openPanel() {
+        this.panel.classList.add('active');
+        this.isPanelOpen = true;
+        this.fabButton.setAttribute('aria-expanded', 'true');
+      }
+
+      closePanel() {
+        this.panel.classList.remove('active');
+        this.isPanelOpen = false;
+        this.fabButton.setAttribute('aria-expanded', 'false');
+      }
+
+      togglePlay() {
+        if (this.stations.length === 0) return;
+
+        if (this.isPlaying) {
+          this.stop();
+        } else {
+          this.play();
+        }
+      }
+
+      play() {
+        if (this.stations.length === 0) return;
+
+        const station = this.stations[this.currentStationIndex];
+        
+        if (this.audio) {
+          this.audio.pause();
+        }
+
+        this.audio = new Audio(station.url);
+        this.audio.volume = {{ block.settings.volume | divided_by: 100.0 }};
+        
+        this.audio.addEventListener('loadstart', () => {
+          this.updateStatus('{{ block.settings.loading_text }}');
+        });
+
+        this.audio.addEventListener('canplay', () => {
+          this.updateStatus('{{ block.settings.playing_text }}: ' + station.name);
+        });
+
+        this.audio.addEventListener('error', () => {
+          this.updateStatus('{{ block.settings.error_text }}');
+        });
+
+        this.audio.play().then(() => {
+          this.isPlaying = true;
+          this.updatePlayButton();
+          this.fabButton.classList.add('playing');
+        }).catch(() => {
+          this.updateStatus('{{ block.settings.error_text }}');
+        });
+      }
+
+      stop() {
+        if (this.audio) {
+          this.audio.pause();
+          this.audio = null;
+        }
+        this.isPlaying = false;
+        this.updatePlayButton();
+        this.fabButton.classList.remove('playing');
+        this.updateStatus('{{ block.settings.stopped_text }}');
+      }
+
+      changeStation(direction) {
+        if (this.stations.length === 0) return;
+
+        this.playStatic();
+        this.updateStatus('{{ block.settings.tuning_text }}');
+
+        if (this.audio) {
+          this.audio.pause();
+        }
+
+        setTimeout(() => {
+          this.currentStationIndex = (this.currentStationIndex + direction + this.stations.length) % this.stations.length;
+          this.updateActiveStation();
+          
+          if (this.isPlaying) {
+            this.play();
+          } else {
+            const station = this.stations[this.currentStationIndex];
+            this.updateStatus(station.name);
+          }
+        }, 300);
+      }
+
+      updateActiveStation() {
+        this.stationElements.forEach((el, index) => {
+          if (index === this.currentStationIndex) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        });
+      }
+
+      updatePlayButton() {
+        if (this.isPlaying) {
+          this.playIcon.style.display = 'none';
+          this.pauseIcon.style.display = 'block';
+          this.playButton.setAttribute('aria-label', 'إيقاف');
+        } else {
+          this.playIcon.style.display = 'block';
+          this.pauseIcon.style.display = 'none';
+          this.playButton.setAttribute('aria-label', 'تشغيل');
+        }
+      }
+
+      updateStatus(text) {
+        if (this.statusElement) {
+          this.statusElement.textContent = text;
+        }
+      }
+
+      disconnectedCallback() {
+        if (this.audio) {
+          this.audio.pause();
+        }
+        if (this.staticSource) {
+          this.staticSource.stop();
+        }
+        if (this.audioContext) {
+          this.audioContext.close();
+        }
+      }
+    }
+
+    customElements.define('radio-fab-{{ ai_gen_id }}', RadioFab{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "إذاعة الحصيف",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "إعدادات الإذاعة"
+    },
+    {
+      "type": "text",
+      "id": "radio_name",
+      "label": "اسم الإذاعة",
+      "default": "إذاعة الحصيف"
+    },
+    {
+      "type": "range",
+      "id": "volume",
+      "label": "مستوى الصوت",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "static_volume",
+      "label": "مستوى صوت التشويش",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "المحطات"
+    },
+    {
+      "type": "paragraph",
+      "content": "ارفع الملفات الصوتية من جهازك عبر: الإعدادات > الملفات > رفع ملف، ثم الصق الرابط هنا"
+    },
+    {
+      "type": "text",
+      "id": "station_1_name",
+      "label": "اسم المحطة 1",
+      "default": "المحطة الأولى"
+    },
+    {
+      "type": "url",
+      "id": "station_1_file",
+      "label": "رابط الملف الصوتي 1"
+    },
+    {
+      "type": "text",
+      "id": "station_2_name",
+      "label": "اسم المحطة 2",
+      "default": "المحطة الثانية"
+    },
+    {
+      "type": "url",
+      "id": "station_2_file",
+      "label": "رابط الملف الصوتي 2"
+    },
+    {
+      "type": "text",
+      "id": "station_3_name",
+      "label": "اسم المحطة 3",
+      "default": "المحطة الثالثة"
+    },
+    {
+      "type": "url",
+      "id": "station_3_file",
+      "label": "رابط الملف الصوتي 3"
+    },
+    {
+      "type": "text",
+      "id": "station_4_name",
+      "label": "اسم المحطة 4"
+    },
+    {
+      "type": "url",
+      "id": "station_4_file",
+      "label": "رابط الملف الصوتي 4"
+    },
+    {
+      "type": "text",
+      "id": "station_5_name",
+      "label": "اسم المحطة 5"
+    },
+    {
+      "type": "url",
+      "id": "station_5_file",
+      "label": "رابط الملف الصوتي 5"
+    },
+    {
+      "type": "header",
+      "content": "الموضع"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "الموضع الجانبي",
+      "options": [
+        {
+          "value": "left",
+          "label": "يسار"
+        },
+        {
+          "value": "right",
+          "label": "يمين"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "bottom_position",
+      "label": "المسافة من الأسفل",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "side_position",
+      "label": "المسافة من الجانب",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "الزر العائم"
+    },
+    {
+      "type": "range",
+      "id": "fab_size",
+      "label": "حجم الزر",
+      "min": 50,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "fab_background",
+      "label": "لون الخلفية",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "fab_icon_color",
+      "label": "لون الأيقونة",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "fab_border_color",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "fab_border_thickness",
+      "label": "سمك الحدود",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "اللوحة"
+    },
+    {
+      "type": "range",
+      "id": "panel_width",
+      "label": "عرض اللوحة",
+      "min": 250,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 320
+    },
+    {
+      "type": "color",
+      "id": "panel_background",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "panel_text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "panel_border_color",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "panel_border_thickness",
+      "label": "سمك الحدود",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "panel_radius",
+      "label": "استدارة الزوايا",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "panel_padding",
+      "label": "التباعد الداخلي",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "المحطات"
+    },
+    {
+      "type": "color",
+      "id": "station_background",
+      "label": "لون خلفية المحطة",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "station_hover_background",
+      "label": "لون الخلفية عند التمرير",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "station_active_background",
+      "label": "لون خلفية المحطة النشطة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "station_border_color",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "station_radius",
+      "label": "استدارة الزوايا",
+      "min": 0,
+      "max": 16,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "أزرار التحكم"
+    },
+    {
+      "type": "color",
+      "id": "control_button_background",
+      "label": "لون الخلفية",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "control_button_hover_background",
+      "label": "لون الخلفية عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "control_button_icon_color",
+      "label": "لون الأيقونة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "control_button_border",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "الأحجام"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان",
+      "min": 14,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "station_name_size",
+      "label": "حجم اسم المحطة",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "النصوص"
+    },
+    {
+      "type": "text",
+      "id": "stopped_text",
+      "label": "نص الإيقاف",
+      "default": "متوقف"
+    },
+    {
+      "type": "text",
+      "id": "playing_text",
+      "label": "نص التشغيل",
+      "default": "يتم التشغيل"
+    },
+    {
+      "type": "text",
+      "id": "loading_text",
+      "label": "نص التحميل",
+      "default": "جاري التحميل..."
+    },
+    {
+      "type": "text",
+      "id": "tuning_text",
+      "label": "نص التنقل",
+      "default": "جاري التنقل..."
+    },
+    {
+      "type": "text",
+      "id": "error_text",
+      "label": "نص الخطأ",
+      "default": "خطأ في التشغيل"
+    }
+  ],
+  "presets": [
+    {
+      "name": "إذاعة الحصيف"
+    }
+  ]
+}
+{% endschema %}

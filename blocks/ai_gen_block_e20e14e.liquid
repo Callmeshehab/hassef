@@ -1,0 +1,1822 @@
+{% doc %}
+  @prompt
+    قسم تصفح الكاسيتات حسب المطرب — model-viewer 3D حقيقي مع هوية التطريز الفلسطيني
+    يدعم ملفات GLB مع تحكم كامل بالدوران والأبعاد والنصوص الجانبية
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{%- comment -%}
+╔══════════════════════════════════════════════════════════════════╗
+║  تعليمات الإضافة                                                ║
+║  ─────────────────────────────────────────────────────────────  ║
+║  1. ارفع ملفات .glb عبر:                                        ║
+║     Shopify Admin → Content → Files → Upload files              ║
+║     ثم انسخ الرابط المباشر للملف                               ║
+║                                                                  ║
+║  2. في إعدادات كل فنان، الصق رابط .glb في حقل "رابط ملف GLB"  ║
+║                                                                  ║
+║  3. مكتبة model-viewer تُحمَّل تلقائياً من CDN                  ║
+║     لا حاجة لتثبيت أي شيء                                      ║
+╚══════════════════════════════════════════════════════════════════╝
+{%- endcomment -%}
+
+{%- comment -%} model-viewer script — يُحمَّل مرة واحدة فقط {%- endcomment -%}
+<script>
+  if (!customElements.get('model-viewer')) {
+    var s = document.createElement('script');
+    s.type = 'module';
+    s.src = 'https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js';
+    document.head.appendChild(s);
+  }
+</script>
+
+{% style %}
+
+/* ══════════════════════════════════════
+   SECTION
+══════════════════════════════════════ */
+.ai-ar-{{ ai_gen_id }} {
+  display: block;
+  width: 100%;
+  min-height: {{ block.settings.section_min_h }}px;
+  padding: {{ block.settings.pad_top }}px {{ block.settings.pad_h }}px {{ block.settings.pad_bottom }}px;
+  background: {{ block.settings.bg_color }};
+  position: relative;
+  overflow: hidden;
+}
+
+/* شريط التطريز أعلى وأسفل */
+.ai-ar-{{ ai_gen_id }}::before,
+.ai-ar-{{ ai_gen_id }}::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: {{ block.settings.pattern_h }}px;
+  background: repeating-linear-gradient(
+    90deg,
+    {{ block.settings.p1 }} 0px, {{ block.settings.p1 }} {{ block.settings.p_stripe }}px,
+    {{ block.settings.p2 }} {{ block.settings.p_stripe }}px, {{ block.settings.p2 }} {{ block.settings.p_stripe | times: 2 }}px,
+    {{ block.settings.p3 }} {{ block.settings.p_stripe | times: 2 }}px, {{ block.settings.p3 }} {{ block.settings.p_stripe | times: 3 }}px
+  );
+  z-index: 10;
+  pointer-events: none;
+}
+.ai-ar-{{ ai_gen_id }}::before { top: 0; }
+.ai-ar-{{ ai_gen_id }}::after  { bottom: 0; }
+
+/* ambient glow */
+.ai-ar-glow-{{ ai_gen_id }} {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 50%, {{ block.settings.accent }}1a 0%, transparent 70%),
+    radial-gradient(ellipse 28% 35% at 15% 85%, {{ block.settings.p1 }}0f 0%, transparent 60%),
+    radial-gradient(ellipse 28% 35% at 85% 15%, {{ block.settings.p3 }}0f 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ai-ar-container-{{ ai_gen_id }} {
+  max-width: {{ block.settings.container_w }}px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+.ai-ar-header-{{ ai_gen_id }} {
+  text-align: center;
+  margin-bottom: {{ block.settings.header_mb }}px;
+}
+
+.ai-ar-title-{{ ai_gen_id }} {
+  font-size: {{ block.settings.title_size }}px;
+  color: {{ block.settings.title_color }};
+  font-weight: 700;
+  margin: 0 0 10px;
+  position: relative;
+  display: inline-block;
+}
+
+.ai-ar-title-{{ ai_gen_id }}::before,
+.ai-ar-title-{{ ai_gen_id }}::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: {{ block.settings.deco_w }}px;
+  height: {{ block.settings.deco_h }}px;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(90deg, {{ block.settings.accent }} 0px, {{ block.settings.accent }} 8px, transparent 8px, transparent 12px);
+}
+.ai-ar-title-{{ ai_gen_id }}::before { right: calc(100% + {{ block.settings.deco_gap }}px); }
+.ai-ar-title-{{ ai_gen_id }}::after  { left:  calc(100% + {{ block.settings.deco_gap }}px); }
+
+.ai-ar-subtitle-{{ ai_gen_id }} {
+  font-size: {{ block.settings.subtitle_size }}px;
+  color: {{ block.settings.accent }};
+  margin: 0;
+}
+
+/* ══════════════════════════════════════
+   THREE-COLUMN STAGE
+══════════════════════════════════════ */
+.ai-ar-stage-{{ ai_gen_id }} {
+  display: grid;
+  grid-template-columns: {{ block.settings.side_w }}px 1fr {{ block.settings.side_w }}px;
+  gap: {{ block.settings.stage_gap }}px;
+  align-items: center;
+  min-height: {{ block.settings.stage_h }}px;
+}
+
+/* ── عمود جانبي ── */
+.ai-ar-side-{{ ai_gen_id }} {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 100%;
+}
+
+.ai-ar-side-line-{{ ai_gen_id }} {
+  width: {{ block.settings.deco_h }}px;
+  flex: 1;
+  max-height: 100px;
+  background: repeating-linear-gradient(
+    180deg,
+    {{ block.settings.accent }} 0px, {{ block.settings.accent }} 5px,
+    transparent 5px, transparent 9px
+  );
+  opacity: 0.35;
+}
+
+.ai-ar-side-text-{{ ai_gen_id }} {
+  writing-mode: vertical-rl;
+  font-size: {{ block.settings.side_font }}px;
+  font-weight: 800;
+  letter-spacing: {{ block.settings.side_spacing }}px;
+  color: {{ block.settings.title_color }};
+  opacity: 0.3;
+  text-transform: uppercase;
+  transition: opacity 0.4s;
+  white-space: nowrap;
+}
+
+.ai-ar-side-{{ ai_gen_id }}[data-side="right"] .ai-ar-side-text-{{ ai_gen_id }} {
+  transform: rotate(180deg);
+}
+
+/* نصوص إضافية يمين ويسار */
+.ai-ar-side-extra-{{ ai_gen_id }} {
+  font-size: {{ block.settings.side_extra_font }}px;
+  color: {{ block.settings.accent }};
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.5;
+  opacity: 0.85;
+  padding: 0 4px;
+  writing-mode: vertical-rl;
+}
+
+.ai-ar-side-{{ ai_gen_id }}[data-side="right"] .ai-ar-side-extra-{{ ai_gen_id }} {
+  transform: rotate(180deg);
+}
+
+/* ══════════════════════════════════════
+   CENTER COLUMN
+══════════════════════════════════════ */
+.ai-ar-center-{{ ai_gen_id }} {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* اسم الفنان */
+.ai-ar-name-{{ ai_gen_id }} {
+  font-size: {{ block.settings.name_size }}px;
+  font-weight: 900;
+  color: {{ block.settings.title_color }};
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: {{ block.settings.name_mb }}px;
+  min-height: 1.3em;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  position: relative;
+}
+
+.ai-ar-name-{{ ai_gen_id }}.is-switching {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.ai-ar-name-{{ ai_gen_id }}::after {
+  content: '';
+  display: block;
+  width: 55%;
+  margin: 8px auto 0;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, {{ block.settings.accent }} 0px, {{ block.settings.accent }} 4px, transparent 4px, transparent 8px);
+}
+
+/* وصف الفنان */
+.ai-ar-sub-{{ ai_gen_id }} {
+  font-size: {{ block.settings.sub_size }}px;
+  color: {{ block.settings.accent }};
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: {{ block.settings.sub_mb }}px;
+  min-height: 1.2em;
+  transition: opacity 0.35s ease;
+}
+
+.ai-ar-sub-{{ ai_gen_id }}.is-switching { opacity: 0; }
+
+/* ══════════════════════════════════════
+   MODEL VIEWER WRAPPER
+══════════════════════════════════════ */
+.ai-ar-model-wrap-{{ ai_gen_id }} {
+  position: relative;
+  width: {{ block.settings.model_w }}px;
+  height: {{ block.settings.model_h }}px;
+  {% unless block.settings.show_frame %}
+  background: transparent;
+  {% else %}
+  background: {{ block.settings.card_bg }};
+  border: {{ block.settings.frame_border_w }}px solid {{ block.settings.frame_border_color }};
+  border-radius: {{ block.settings.frame_radius }}px;
+  box-shadow: {{ block.settings.frame_shadow_x }}px {{ block.settings.frame_shadow_y }}px {{ block.settings.frame_shadow_blur }}px {{ block.settings.frame_shadow_color }};
+  overflow: hidden;
+  {% endunless %}
+  transition: box-shadow 0.5s ease;
+}
+
+/* شريط التطريز أعلى الإطار */
+{% if block.settings.show_frame %}
+.ai-ar-model-wrap-{{ ai_gen_id }}::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: {{ block.settings.pattern_h }}px;
+  background: repeating-linear-gradient(
+    90deg,
+    {{ block.settings.p1 }} 0px, {{ block.settings.p1 }} {{ block.settings.p_stripe }}px,
+    {{ block.settings.p2 }} {{ block.settings.p_stripe }}px, {{ block.settings.p2 }} {{ block.settings.p_stripe | times: 2 }}px,
+    {{ block.settings.p3 }} {{ block.settings.p_stripe | times: 2 }}px, {{ block.settings.p3 }} {{ block.settings.p_stripe | times: 3 }}px
+  );
+  z-index: 5;
+  pointer-events: none;
+}
+{% endif %}
+
+/* حلقة التوهج */
+.ai-ar-ring-{{ ai_gen_id }} {
+  position: absolute;
+  bottom: {{ block.settings.ring_offset | times: -1 }}px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: {{ block.settings.model_w | times: 0.65 | round }}px;
+  height: {{ block.settings.ring_h }}px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, {{ block.settings.accent }}55 0%, transparent 70%);
+  filter: blur({{ block.settings.ring_blur }}px);
+  pointer-events: none;
+  z-index: -1;
+  animation: ai-ar-pulse-{{ ai_gen_id }} 3s ease-in-out infinite;
+}
+
+@keyframes ai-ar-pulse-{{ ai_gen_id }} {
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+  50%       { opacity: 1;   transform: translateX(-50%) scaleX(1.15); }
+}
+
+/* model-viewer نفسه */
+.ai-ar-viewer-{{ ai_gen_id }} {
+  width: 100%;
+  height: 100%;
+  --progress-bar-color: {{ block.settings.accent }};
+  --progress-mask: transparent;
+  background: transparent;
+}
+
+/* placeholder عند عدم وجود GLB */
+.ai-ar-placeholder-{{ ai_gen_id }} {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: {{ block.settings.placeholder_bg }};
+  border-radius: inherit;
+}
+
+.ai-ar-placeholder-{{ ai_gen_id }} svg { opacity: 0.2; }
+
+.ai-ar-placeholder-{{ ai_gen_id }} p {
+  font-size: 12px;
+  color: {{ block.settings.accent }};
+  font-weight: 700;
+  opacity: 0.5;
+  margin: 0;
+  text-align: center;
+  padding: 0 16px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════
+   NAV CONTROLS
+══════════════════════════════════════ */
+.ai-ar-nav-{{ ai_gen_id }} {
+  display: flex;
+  align-items: center;
+  gap: {{ block.settings.nav_gap }}px;
+  margin-top: {{ block.settings.nav_mt }}px;
+}
+
+.ai-ar-nav-btn-{{ ai_gen_id }} {
+  width: {{ block.settings.nav_btn_w }}px;
+  height: {{ block.settings.nav_btn_w }}px;
+  border-radius: {{ block.settings.nav_btn_r }}px;
+  background: {{ block.settings.card_bg }};
+  border: {{ block.settings.frame_border_w }}px solid {{ block.settings.frame_border_color }};
+  color: {{ block.settings.title_color }};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  box-shadow: 3px 3px 0 {{ block.settings.frame_border_color }};
+  flex-shrink: 0;
+}
+
+.ai-ar-nav-btn-{{ ai_gen_id }}:hover {
+  background: {{ block.settings.accent }};
+  color: {{ block.settings.bg_color }};
+  border-color: {{ block.settings.accent }};
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 {{ block.settings.frame_border_color }};
+}
+
+.ai-ar-nav-btn-{{ ai_gen_id }}:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.ai-ar-dots-{{ ai_gen_id }} {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.ai-ar-dot-{{ ai_gen_id }} {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: {{ block.settings.frame_border_color }};
+  opacity: 0.25;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  transition: opacity 0.3s, width 0.3s, background 0.3s;
+}
+
+.ai-ar-dot-{{ ai_gen_id }}.active {
+  opacity: 1;
+  width: 22px;
+  background: {{ block.settings.accent }};
+}
+
+/* ══════════════════════════════════════
+   CTA BUTTON
+══════════════════════════════════════ */
+.ai-ar-cta-wrap-{{ ai_gen_id }} {
+  margin-top: {{ block.settings.cta_mt }}px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-ar-cta-{{ ai_gen_id }} {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: {{ block.settings.cta_font }}px;
+  font-weight: {{ block.settings.cta_weight }};
+  color: {{ block.settings.cta_color }};
+  background: {{ block.settings.cta_bg }};
+  padding: {{ block.settings.cta_pv }}px {{ block.settings.cta_ph }}px;
+  border-radius: {{ block.settings.cta_r }}px;
+  text-decoration: none;
+  border: {{ block.settings.frame_border_w }}px solid {{ block.settings.frame_border_color }};
+  box-shadow: {{ block.settings.cta_sx }}px {{ block.settings.cta_sy }}px 0 {{ block.settings.frame_border_color }};
+  transition: all 0.3s ease;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.ai-ar-cta-{{ ai_gen_id }}:hover {
+  background: {{ block.settings.cta_hover_bg }};
+  color: {{ block.settings.cta_hover_color }};
+  transform: translate({{ block.settings.cta_sx | divided_by: 2 }}px, {{ block.settings.cta_sy | divided_by: 2 }}px);
+  box-shadow: {{ block.settings.cta_sx | divided_by: 2 }}px {{ block.settings.cta_sy | divided_by: 2 }}px 0 {{ block.settings.frame_border_color }};
+}
+
+.ai-ar-cta-hint-{{ ai_gen_id }} {
+  font-size: 12px;
+  color: {{ block.settings.accent }};
+  opacity: 0.65;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════
+   THUMBNAILS
+══════════════════════════════════════ */
+.ai-ar-thumbs-{{ ai_gen_id }} {
+  display: flex;
+  gap: {{ block.settings.thumb_gap }}px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: {{ block.settings.thumbs_mt }}px;
+}
+
+.ai-ar-thumb-{{ ai_gen_id }} {
+  width: {{ block.settings.thumb_w }}px;
+  height: {{ block.settings.thumb_w }}px;
+  border-radius: {{ block.settings.thumb_r }}px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  background: {{ block.settings.placeholder_bg }};
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-ar-thumb-{{ ai_gen_id }}:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px {{ block.settings.frame_shadow_color }};
+}
+
+.ai-ar-thumb-{{ ai_gen_id }}.active {
+  border-color: {{ block.settings.accent }};
+  box-shadow: 0 0 0 2px {{ block.settings.accent }}44;
+}
+
+.ai-ar-thumb-img-{{ ai_gen_id }} {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.5);
+  transition: filter 0.3s;
+}
+
+.ai-ar-thumb-{{ ai_gen_id }}.active .ai-ar-thumb-img-{{ ai_gen_id }},
+.ai-ar-thumb-{{ ai_gen_id }}:hover .ai-ar-thumb-img-{{ ai_gen_id }} { filter: grayscale(0); }
+
+.ai-ar-thumb-label-{{ ai_gen_id }} {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: {{ block.settings.frame_border_color }}cc;
+  color: {{ block.settings.bg_color }};
+  font-size: 9px;
+  font-weight: 800;
+  text-align: center;
+  padding: 2px 0;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+}
+
+/* ══════════════════════════════════════
+   MOBILE
+══════════════════════════════════════ */
+@media screen and (max-width: 749px) {
+  .ai-ar-{{ ai_gen_id }} {
+    padding: {{ block.settings.pad_top | divided_by: 2 }}px {{ block.settings.pad_h | divided_by: 2 | round }}px {{ block.settings.pad_bottom | divided_by: 2 }}px;
+  }
+  .ai-ar-stage-{{ ai_gen_id }} {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .ai-ar-side-{{ ai_gen_id }} { display: none; }
+  .ai-ar-title-{{ ai_gen_id }}::before,
+  .ai-ar-title-{{ ai_gen_id }}::after { display: none; }
+  .ai-ar-model-wrap-{{ ai_gen_id }} {
+    width: {{ block.settings.model_w_mobile }}px;
+    height: {{ block.settings.model_h_mobile }}px;
+  }
+}
+
+{% endstyle %}
+
+{%- comment -%} بناء مصفوفة الفنانين {%- endcomment -%}
+{% assign artist_list = '' %}
+{% for i in (1..10) %}
+  {%- assign nk = 'a' | append: i | append: '_name' -%}
+  {%- if block.settings[nk] != blank -%}
+    {%- assign artist_list = artist_list | append: i | append: ',' -%}
+  {%- endif -%}
+{% endfor %}
+{% assign artist_ids = artist_list | split: ',' | compact %}
+
+<div class="ai-ar-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-ar-glow-{{ ai_gen_id }}"></div>
+
+  <div class="ai-ar-container-{{ ai_gen_id }}">
+
+    {%- if block.settings.show_header -%}
+      <div class="ai-ar-header-{{ ai_gen_id }}">
+        {%- if block.settings.section_title != blank -%}
+          <h2 class="ai-ar-title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+        {%- endif -%}
+        {%- if block.settings.section_subtitle != blank -%}
+          <p class="ai-ar-subtitle-{{ ai_gen_id }}">{{ block.settings.section_subtitle }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="ai-ar-stage-{{ ai_gen_id }}">
+
+      {%- comment -%} عمود يسار {%- endcomment -%}
+      <div class="ai-ar-side-{{ ai_gen_id }}" data-side="left">
+        <div class="ai-ar-side-line-{{ ai_gen_id }}"></div>
+        {%- if block.settings.left_label != blank -%}
+          <span class="ai-ar-side-text-{{ ai_gen_id }}">{{ block.settings.left_label }}</span>
+        {%- endif -%}
+        {%- if block.settings.left_extra != blank -%}
+          <span class="ai-ar-side-extra-{{ ai_gen_id }}">{{ block.settings.left_extra }}</span>
+        {%- endif -%}
+        <div class="ai-ar-side-line-{{ ai_gen_id }}"></div>
+      </div>
+
+      {%- comment -%} المنتصف {%- endcomment -%}
+      <div class="ai-ar-center-{{ ai_gen_id }}">
+
+        <div class="ai-ar-name-{{ ai_gen_id }}" id="ar-name-{{ ai_gen_id }}">
+          {{ block.settings.a1_name | default: '...' }}
+        </div>
+        <div class="ai-ar-sub-{{ ai_gen_id }}" id="ar-sub-{{ ai_gen_id }}">
+          {{ block.settings.a1_sub }}
+        </div>
+
+        <div class="ai-ar-model-wrap-{{ ai_gen_id }}" id="ar-wrap-{{ ai_gen_id }}">
+
+          {%- comment -%} عرض الفنانين الـ 10 كـ model-viewer مخفية ← يظهر النشط فقط {%- endcomment -%}
+          {% for i in (1..10) %}
+            {%- assign nk  = 'a' | append: i | append: '_name' -%}
+            {%- assign glk = 'a' | append: i | append: '_glb' -%}
+            {%- assign imk = 'a' | append: i | append: '_thumb' -%}
+            {%- assign n_val  = block.settings[nk] -%}
+            {%- assign gl_val = block.settings[glk] -%}
+            {%- assign im_val = block.settings[imk] -%}
+            {%- if n_val != blank -%}
+              <div
+                class="ai-ar-viewer-slot-{{ ai_gen_id }}"
+                data-slot="{{ i | minus: 1 }}"
+                style="position:absolute;inset:0;transition:opacity 0.5s ease,transform 0.5s cubic-bezier(0.23,1,0.32,1);{% if i != 1 %}opacity:0;pointer-events:none;transform:scale(0.92) translateY(12px);{% endif %}"
+              >
+                {%- if gl_val != blank -%}
+                  <model-viewer
+                    class="ai-ar-viewer-{{ ai_gen_id }}"
+                    src="{{ gl_val }}"
+                    {% if im_val %}poster="{{ im_val | image_url: width: 600 }}"{% endif %}
+                    {% if block.settings.auto_rotate %}auto-rotate{% endif %}
+                    auto-rotate-delay="{{ block.settings.rotate_delay }}"
+                    rotation-per-second="{{ block.settings.rotate_speed }}deg"
+                    camera-controls
+                    touch-action="pan-y"
+                    interaction-prompt="none"
+                    shadow-intensity="{{ block.settings.shadow_intensity }}"
+                    shadow-softness="{{ block.settings.shadow_softness }}"
+                    exposure="{{ block.settings.exposure }}"
+                    environment-image="{{ block.settings.env_image }}"
+                    min-camera-orbit="{{ block.settings.orbit_min }}"
+                    max-camera-orbit="{{ block.settings.orbit_max }}"
+                    min-field-of-view="{{ block.settings.fov_min }}deg"
+                    max-field-of-view="{{ block.settings.fov_max }}deg"
+                    camera-orbit="{{ block.settings.cam_theta }}deg {{ block.settings.cam_phi }}deg {{ block.settings.cam_radius }}%"
+                    style="background:transparent;width:100%;height:100%;"
+                    loading="lazy"
+                    reveal="auto"
+                  >
+                    <div slot="progress-bar" style="display:none"></div>
+                  </model-viewer>
+                {%- else -%}
+                  <div class="ai-ar-placeholder-{{ ai_gen_id }}">
+                    <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="50%">
+                      <circle cx="60" cy="44" r="28" stroke="{{ block.settings.accent }}" stroke-width="3.5" fill="none"/>
+                      <path d="M10 155C10 110 110 110 110 155" stroke="{{ block.settings.accent }}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                      <path d="M45 44 L55 54 L75 34" stroke="{{ block.settings.accent }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.4"/>
+                    </svg>
+                    <p>أضف رابط ملف .glb<br>في إعدادات الفنان {{ i }}</p>
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {% endfor %}
+
+          <div class="ai-ar-ring-{{ ai_gen_id }}"></div>
+        </div>
+
+        {%- comment -%} أزرار التنقل {%- endcomment -%}
+        <div class="ai-ar-nav-{{ ai_gen_id }}">
+          <button class="ai-ar-nav-btn-{{ ai_gen_id }}" id="ar-prev-{{ ai_gen_id }}" aria-label="السابق">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M13 5L8 10L13 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/></svg>
+          </button>
+
+          <div class="ai-ar-dots-{{ ai_gen_id }}" id="ar-dots-{{ ai_gen_id }}">
+            {% for i in (1..10) %}
+              {%- assign nk = 'a' | append: i | append: '_name' -%}
+              {%- if block.settings[nk] != blank -%}
+                <button class="ai-ar-dot-{{ ai_gen_id }}{% if i == 1 %} active{% endif %}" data-index="{{ i | minus: 1 }}" aria-label="فنان {{ i }}"></button>
+              {%- endif -%}
+            {% endfor %}
+          </div>
+
+          <button class="ai-ar-nav-btn-{{ ai_gen_id }}" id="ar-next-{{ ai_gen_id }}" aria-label="التالي">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/></svg>
+          </button>
+        </div>
+
+        {%- comment -%} زر التأكيد {%- endcomment -%}
+        <div class="ai-ar-cta-wrap-{{ ai_gen_id }}">
+          <a href="#" class="ai-ar-cta-{{ ai_gen_id }}" id="ar-cta-{{ ai_gen_id }}">
+            {{ block.settings.cta_text }}
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M7 15L12 10L7 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/></svg>
+          </a>
+          {%- if block.settings.cta_hint != blank -%}
+            <span class="ai-ar-cta-hint-{{ ai_gen_id }}">{{ block.settings.cta_hint }}</span>
+          {%- endif -%}
+        </div>
+
+      </div>{%- comment -%} /center {%- endcomment -%}
+
+      {%- comment -%} عمود يمين {%- endcomment -%}
+      <div class="ai-ar-side-{{ ai_gen_id }}" data-side="right">
+        <div class="ai-ar-side-line-{{ ai_gen_id }}"></div>
+        {%- if block.settings.right_label != blank -%}
+          <span class="ai-ar-side-text-{{ ai_gen_id }}">{{ block.settings.right_label }}</span>
+        {%- endif -%}
+        {%- if block.settings.right_extra != blank -%}
+          <span class="ai-ar-side-extra-{{ ai_gen_id }}">{{ block.settings.right_extra }}</span>
+        {%- endif -%}
+        <div class="ai-ar-side-line-{{ ai_gen_id }}"></div>
+      </div>
+
+    </div>{%- comment -%} /stage {%- endcomment -%}
+
+    {%- comment -%} شريط الصور المصغّرة {%- endcomment -%}
+    {%- if block.settings.show_thumbs -%}
+      <div class="ai-ar-thumbs-{{ ai_gen_id }}" id="ar-thumbs-{{ ai_gen_id }}">
+        {% for i in (1..10) %}
+          {%- assign nk  = 'a' | append: i | append: '_name' -%}
+          {%- assign imk = 'a' | append: i | append: '_thumb' -%}
+          {%- assign n_val = block.settings[nk] -%}
+          {%- if n_val != blank -%}
+            {%- assign im_val = block.settings[imk] -%}
+            <div class="ai-ar-thumb-{{ ai_gen_id }}{% if i == 1 %} active{% endif %}" data-index="{{ i | minus: 1 }}" title="{{ n_val | escape }}">
+              {%- if im_val -%}
+                <img src="{{ im_val | image_url: width: 200 }}" alt="{{ n_val | escape }}" class="ai-ar-thumb-img-{{ ai_gen_id }}" loading="lazy">
+              {%- else -%}
+                <svg viewBox="0 0 60 80" fill="none" width="60%" style="opacity:.2">
+                  <circle cx="30" cy="22" r="14" stroke="{{ block.settings.accent }}" stroke-width="3" fill="none"/>
+                  <path d="M5 78C5 55 55 55 55 78" stroke="{{ block.settings.accent }}" stroke-width="3" fill="none" stroke-linecap="round"/>
+                </svg>
+              {%- endif -%}
+              <span class="ai-ar-thumb-label-{{ ai_gen_id }}">{{ n_val | truncate: 8, '' }}</span>
+            </div>
+          {%- endif -%}
+        {% endfor %}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  var GEN   = '{{ ai_gen_id }}';
+  var SPEED = {{ block.settings.transition_speed }};
+  var AUTO  = {{ block.settings.auto_advance }};
+  var AUTO_DELAY = {{ block.settings.auto_delay }};
+
+  /* بيانات الفنانين */
+  var ARTISTS = [];
+  {% for i in (1..10) %}
+    {%- assign nk  = 'a' | append: i | append: '_name' -%}
+    {%- assign sk  = 'a' | append: i | append: '_sub' -%}
+    {%- assign uk  = 'a' | append: i | append: '_url' -%}
+    {%- if block.settings[nk] != blank -%}
+  ARTISTS.push({
+    index: {{ i | minus: 1 }},
+    name:  {{ block.settings[nk] | json }},
+    sub:   {{ block.settings[sk] | default: '' | json }},
+    url:   {{ block.settings[uk] | default: '#' | json }}
+  });
+    {%- endif -%}
+  {% endfor %}
+
+  if (!ARTISTS.length) return;
+
+  var total   = ARTISTS.length;
+  var current = 0;
+  var isAnim  = false;
+  var timer   = null;
+
+  var nameEl  = document.getElementById('ar-name-'  + GEN);
+  var subEl   = document.getElementById('ar-sub-'   + GEN);
+  var ctaEl   = document.getElementById('ar-cta-'   + GEN);
+  var prevBtn = document.getElementById('ar-prev-'  + GEN);
+  var nextBtn = document.getElementById('ar-next-'  + GEN);
+  var dotsEl  = document.getElementById('ar-dots-'  + GEN);
+  var thumbsEl= document.getElementById('ar-thumbs-'+ GEN);
+  var wrap    = document.getElementById('ar-wrap-'  + GEN);
+
+  var slots  = wrap  ? wrap.querySelectorAll('.ai-ar-viewer-slot-'  + GEN) : [];
+  var dots   = dotsEl   ? dotsEl.querySelectorAll('.ai-ar-dot-'   + GEN) : [];
+  var thumbs = thumbsEl ? thumbsEl.querySelectorAll('.ai-ar-thumb-' + GEN) : [];
+
+  /* ── الانتقال إلى فنان ── */
+  function goTo(idx) {
+    if (isAnim || idx === current) return;
+    isAnim = true;
+
+    var prev = current;
+    current  = ((idx % total) + total) % total;
+
+    /* الـ slot السابق: اخفِ */
+    if (slots[prev]) {
+      slots[prev].style.opacity        = '0';
+      slots[prev].style.transform      = 'scale(0.92) translateY(12px)';
+      slots[prev].style.pointerEvents  = 'none';
+    }
+
+    /* الـ slot الجديد: أظهر بعد تأخير بسيط */
+    setTimeout(function() {
+      if (slots[current]) {
+        slots[current].style.opacity       = '1';
+        slots[current].style.transform     = 'scale(1) translateY(0)';
+        slots[current].style.pointerEvents = 'auto';
+      }
+    }, SPEED * 0.3);
+
+    /* تبديل النص */
+    if (nameEl) {
+      nameEl.classList.add('is-switching');
+      setTimeout(function() {
+        nameEl.textContent = ARTISTS[current].name;
+        nameEl.classList.remove('is-switching');
+      }, 200);
+    }
+    if (subEl) {
+      subEl.classList.add('is-switching');
+      setTimeout(function() {
+        subEl.textContent = ARTISTS[current].sub;
+        subEl.classList.remove('is-switching');
+      }, 220);
+    }
+    if (ctaEl) ctaEl.href = ARTISTS[current].url || '#';
+
+    /* نقاط + صور مصغّرة */
+    dots.forEach(function(d,i)   { d.classList.toggle('active', i === current); });
+    thumbs.forEach(function(t,i) { t.classList.toggle('active', i === current); });
+
+    setTimeout(function() { isAnim = false; }, SPEED);
+  }
+
+  /* ── تشغيل تلقائي ── */
+  function startAuto() {
+    if (!AUTO) return;
+    timer = setInterval(function() { goTo((current + 1) % total); }, AUTO_DELAY);
+  }
+  function stopAuto() { clearInterval(timer); }
+
+  /* ── أحداث ── */
+  if (prevBtn) prevBtn.addEventListener('click', function() { stopAuto(); goTo((current - 1 + total) % total); startAuto(); });
+  if (nextBtn) nextBtn.addEventListener('click', function() { stopAuto(); goTo((current + 1) % total); startAuto(); });
+
+  dots.forEach(function(dot) {
+    dot.addEventListener('click', function() { stopAuto(); goTo(parseInt(dot.dataset.index)); startAuto(); });
+  });
+
+  thumbs.forEach(function(t) {
+    t.addEventListener('click', function() { stopAuto(); goTo(parseInt(t.dataset.index)); startAuto(); });
+  });
+
+  /* swipe */
+  var sx = 0;
+  if (wrap) {
+    wrap.addEventListener('touchstart', function(e) { sx = e.touches[0].clientX; }, { passive: true });
+    wrap.addEventListener('touchend',   function(e) {
+      var diff = sx - e.changedTouches[0].clientX;
+      if (false) { stopAuto(); goTo(diff > 0 ? (current+1)%total : (current-1+total)%total); startAuto(); }
+    }, { passive: true });
+    /* pause auto on hover */
+    wrap.addEventListener('mouseenter', stopAuto);
+    wrap.addEventListener('mouseleave', startAuto);
+  }
+
+  /* keyboard */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft')  { stopAuto(); goTo((current-1+total)%total); startAuto(); }
+    if (e.key === 'ArrowRight') { stopAuto(); goTo((current+1)%total);       startAuto(); }
+  });
+
+  startAuto();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "تصفح حسب الفنان 3D",
+  "settings": [
+    {
+      "type": "header",
+      "content": "═══ تعليمات رفع ملفات GLB ═══"
+    },
+    {
+      "type": "paragraph",
+      "content": "① ارفع ملفات .glb عبر: Shopify Admin → Content → Files → Upload files ② انسخ الرابط المباشر للملف ③ الصقه في حقل 'رابط ملف GLB' لكل فنان ④ يمكن إضافة صورة مصغّرة (تُعرض أثناء التحميل)"
+    },
+    {
+      "type": "header",
+      "content": "العنوان والنصوص"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "إظهار العنوان",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "عنوان القسم",
+      "default": "تصفح حسب الفنان"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "العنوان الفرعي",
+      "default": "اختر فنانك المفضل واكتشف كاسيتاته"
+    },
+    {
+      "type": "text",
+      "id": "left_label",
+      "label": "النص الرأسي الأيسر",
+      "default": "تصفح عبر"
+    },
+    {
+      "type": "text",
+      "id": "left_extra",
+      "label": "نص إضافي أيسر (اختياري)",
+    },
+    {
+      "type": "text",
+      "id": "right_label",
+      "label": "النص الرأسي الأيمن",
+      "default": "مطربك"
+    },
+    {
+      "type": "text",
+      "id": "right_extra",
+      "label": "نص إضافي أيمن (اختياري)",
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "نص زر التأكيد",
+      "default": "اكتشف كاسيتاته"
+    },
+    {
+      "type": "text",
+      "id": "cta_hint",
+      "label": "تلميح تحت الزر",
+      "default": "اضغط لعرض مجموعة الفنان"
+    },
+    {
+      "type": "header",
+      "content": "═══ الفنان #1 ═══"
+    },
+    {
+      "type": "text",
+      "id": "a1_name",
+      "label": "اسم الفنان",
+      "default": "فيروز"
+    },
+    {
+      "type": "text",
+      "id": "a1_sub",
+      "label": "وصف قصير",
+      "default": "أيقونة الغناء العربي"
+    },
+    {
+      "type": "text",
+      "id": "a1_glb",
+      "label": "رابط ملف GLB",
+      "info": "ارفع الملف عبر Content → Files ثم انسخ الرابط هنا"
+    },
+    {
+      "type": "image_picker",
+      "id": "a1_thumb",
+      "label": "صورة مصغّرة (تُعرض أثناء تحميل الـ 3D)"
+    },
+    {
+      "type": "url",
+      "id": "a1_url",
+      "label": "رابط مجموعة الفنان"
+    },
+    {
+      "type": "header",
+      "content": "═══ الفنان #2 ═══"
+    },
+    { "type": "text",         "id": "a2_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a2_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a2_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a2_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a2_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #3 ═══"
+    },
+    { "type": "text",         "id": "a3_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a3_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a3_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a3_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a3_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #4 ═══"
+    },
+    { "type": "text",         "id": "a4_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a4_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a4_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a4_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a4_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #5 ═══"
+    },
+    { "type": "text",         "id": "a5_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a5_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a5_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a5_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a5_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #6 ═══"
+    },
+    { "type": "text",         "id": "a6_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a6_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a6_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a6_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a6_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #7 ═══"
+    },
+    { "type": "text",         "id": "a7_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a7_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a7_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a7_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a7_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #8 ═══"
+    },
+    { "type": "text",         "id": "a8_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a8_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a8_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a8_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a8_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #9 ═══"
+    },
+    { "type": "text",         "id": "a9_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a9_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a9_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a9_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a9_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "═══ الفنان #10 ═══"
+    },
+    { "type": "text",         "id": "a10_name",  "label": "اسم الفنان" },
+    { "type": "text",         "id": "a10_sub",   "label": "وصف قصير" },
+    { "type": "text",         "id": "a10_glb",   "label": "رابط ملف GLB" },
+    { "type": "image_picker", "id": "a10_thumb", "label": "صورة مصغّرة" },
+    { "type": "url",          "id": "a10_url",   "label": "رابط المجموعة" },
+    {
+      "type": "header",
+      "content": "إعدادات الموديل 3D"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "دوران تلقائي للموديل",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "rotate_delay",
+      "min": 0,
+      "max": 5000,
+      "step": 500,
+      "unit": "ms",
+      "label": "تأخير بدء الدوران",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "rotate_speed",
+      "min": 5,
+      "max": 60,
+      "step": 5,
+      "label": "سرعة الدوران (درجة/ثانية)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "shadow_intensity",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "label": "شدة الظل",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "shadow_softness",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "label": "نعومة الظل",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "exposure",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "label": "الإضاءة (×0.1)",
+      "default": 10,
+      "info": "القيمة 10 = إضاءة طبيعية (1.0)"
+    },
+    {
+      "type": "select",
+      "id": "env_image",
+      "label": "بيئة الإضاءة",
+      "options": [
+        { "value": "neutral",    "label": "محايدة" },
+        { "value": "legacy",     "label": "كلاسيكية" },
+        { "value": "commerce",   "label": "تجارية" }
+      ],
+      "default": "neutral"
+    },
+    {
+      "type": "text",
+      "id": "orbit_min",
+      "label": "حد الكاميرا الأدنى",
+      "default": "auto auto auto",
+      "info": "مثال: -180deg 0deg auto"
+    },
+    {
+      "type": "text",
+      "id": "orbit_max",
+      "label": "حد الكاميرا الأقصى",
+      "default": "auto auto auto",
+      "info": "مثال: 180deg 90deg auto"
+    },
+    {
+      "type": "range",
+      "id": "fov_min",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "label": "أضيق زاوية عرض",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "fov_max",
+      "min": 30,
+      "max": 120,
+      "step": 5,
+      "label": "أوسع زاوية عرض",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "cam_theta",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "label": "زاوية الكاميرا الأفقية (θ)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "cam_phi",
+      "min": 0,
+      "max": 180,
+      "step": 5,
+      "label": "زاوية الكاميرا العمودية (φ)",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "cam_radius",
+      "min": 50,
+      "max": 200,
+      "step": 10,
+      "label": "بُعد الكاميرا (%)",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "التقليب التلقائي بين الفنانين"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_advance",
+      "label": "تقليب تلقائي بين الفنانين",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "auto_delay",
+      "min": 2000,
+      "max": 7000,
+      "step": 500,
+      "unit": "ms",
+      "label": "مدة كل فنان",
+      "default": 4000
+    },
+    {
+      "type": "range",
+      "id": "transition_speed",
+      "min": 200,
+      "max": 1200,
+      "step": 100,
+      "unit": "ms",
+      "label": "سرعة تأثير الانتقال",
+      "default": 600
+    },
+    {
+      "type": "header",
+      "content": "الإطار حول الموديل"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_frame",
+      "label": "إظهار الإطار",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "frame_radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "استدارة الإطار",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "frame_border_w",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك حدود الإطار",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "frame_shadow_x",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل الإطار أفقي",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "frame_shadow_y",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل الإطار عمودي",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "frame_shadow_blur",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "تمويه الظل",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "أبعاد الموديل"
+    },
+    {
+      "type": "range",
+      "id": "model_w",
+      "min": 200,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض الموديل",
+      "default": 380
+    },
+    {
+      "type": "range",
+      "id": "model_h",
+      "min": 300,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "label": "ارتفاع الموديل",
+      "default": 480
+    },
+    {
+      "type": "range",
+      "id": "model_w_mobile",
+      "min": 160,
+      "max": 380,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض الموديل (موبايل)",
+      "default": 280
+    },
+    {
+      "type": "range",
+      "id": "model_h_mobile",
+      "min": 240,
+      "max": 560,
+      "step": 10,
+      "unit": "px",
+      "label": "ارتفاع الموديل (موبايل)",
+      "default": 380
+    },
+    {
+      "type": "header",
+      "content": "حلقة التوهج"
+    },
+    {
+      "type": "range",
+      "id": "ring_offset",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "موضع الحلقة أسفل الإطار",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "ring_h",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "ارتفاع الحلقة",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "ring_blur",
+      "min": 5,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "تمويه الحلقة",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "أبعاد القسم"
+    },
+    {
+      "type": "range",
+      "id": "container_w",
+      "min": 800,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "label": "عرض الحاوية",
+      "default": 1100
+    },
+    {
+      "type": "range",
+      "id": "section_min_h",
+      "min": 400,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "label": "الحد الأدنى لارتفاع القسم",
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "pad_top",
+      "min": 40,
+      "max": 160,
+      "step": 10,
+      "unit": "px",
+      "label": "مسافة علوية",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "pad_bottom",
+      "min": 40,
+      "max": 160,
+      "step": 10,
+      "unit": "px",
+      "label": "مسافة سفلية",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "pad_h",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة جانبية",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "stage_gap",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة بين الأعمدة",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "side_w",
+      "min": 40,
+      "max": 160,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض العمود الجانبي",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "النصوص"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم العنوان",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم العنوان الفرعي",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "header_mb",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت العنوان",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "name_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم اسم الفنان",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "name_mb",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت الاسم",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "sub_size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم الوصف القصير",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "sub_mb",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت الوصف",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "side_font",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم النص الجانبي الرئيسي",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "side_spacing",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "label": "تباعد حروف النص الجانبي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "side_extra_font",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم النص الإضافي الجانبي",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "أزرار التنقل"
+    },
+    {
+      "type": "range",
+      "id": "nav_btn_w",
+      "min": 32,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "label": "حجم زر التنقل",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "nav_btn_r",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "label": "استدارة زر التنقل",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "nav_gap",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة بين عناصر التنقل",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "nav_mt",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة فوق التنقل",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "زر التأكيد"
+    },
+    {
+      "type": "range",
+      "id": "cta_font",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم النص",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "cta_weight",
+      "min": 400,
+      "max": 900,
+      "step": 100,
+      "label": "سمك الخط",
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "cta_pv",
+      "min": 8,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "label": "مسافة داخلية عمودية",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "cta_ph",
+      "min": 20,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "مسافة داخلية أفقية",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "cta_r",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "label": "استدارة الزوايا",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "cta_sx",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "label": "ظل الزر أفقي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cta_sy",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "label": "ظل الزر عمودي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "cta_mt",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "مسافة فوق الزر",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "الصور المصغّرة"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbs",
+      "label": "إظهار الصور المصغّرة",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "thumb_w",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "حجم الصورة المصغّرة",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "thumb_r",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "استدارة الصورة المصغّرة",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "thumb_gap",
+      "min": 6,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "مسافة بين الصور",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "thumbs_mt",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة فوق شريط الصور",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "نمط التطريز"
+    },
+    {
+      "type": "range",
+      "id": "pattern_h",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ارتفاع النمط",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "p_stripe",
+      "min": 6,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "عرض الخط",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "زخرفة العنوان"
+    },
+    {
+      "type": "range",
+      "id": "deco_w",
+      "min": 30,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض الزخرفة",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "deco_h",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الزخرفة",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "deco_gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة الزخرفة",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "الألوان"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "خلفية القسم",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "accent",
+      "label": "اللون المميز",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العناوين",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "خلفية الإطار والأزرار",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "frame_border_color",
+      "label": "لون حدود الإطار",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "frame_shadow_color",
+      "label": "لون ظل الإطار",
+      "default": "#3d081b33"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_bg",
+      "label": "خلفية الصورة البديلة",
+      "default": "#e8e5d3"
+    },
+    {
+      "type": "color",
+      "id": "p1",
+      "label": "لون التطريز 1",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "p2",
+      "label": "لون التطريز 2",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "p3",
+      "label": "لون التطريز 3",
+      "default": "#f9e547"
+    },
+    {
+      "type": "color",
+      "id": "cta_bg",
+      "label": "خلفية زر التأكيد",
+      "default": "#f9e547"
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "لون نص الزر",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "cta_hover_bg",
+      "label": "خلفية الزر عند التمرير",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "cta_hover_color",
+      "label": "نص الزر عند التمرير",
+      "default": "#f2efdd"
+    }
+  ],
+  "presets": [
+    {
+      "name": "تصفح حسب الفنان 3D"
+    }
+  ]
+}
+{% endschema %}

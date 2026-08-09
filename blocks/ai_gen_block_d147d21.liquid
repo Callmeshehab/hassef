@@ -1,0 +1,2604 @@
+{% comment %}
+╔══════════════════════════════════════════════════════════════╗
+║         ركن أصدقاء الحصيف — النسخة الاحترافية v2           ║
+║                                                              ║
+║  دليل الإعداد (مرة واحدة فقط):                              ║
+║                                                              ║
+║  ١. Supabase                                                 ║
+║     - أنشئ حساباً على https://supabase.com                  ║
+║     - أنشئ مشروعاً جديداً                                   ║
+║     - افتح SQL Editor وشغّل هذا الكود:                      ║
+║                                                              ║
+║  create table posts (                                        ║
+║    id uuid default gen_random_uuid() primary key,           ║
+║    type text not null,                                       ║
+║    author text not null,                                     ║
+║    content text,                                             ║
+║    image_url text,                                           ║
+║    book_name text,                                           ║
+║    book_author text,                                         ║
+║    comment_title text,                                       ║
+║    approved boolean default false,                           ║
+║    likes_count integer default 0,                            ║
+║    created_at timestamptz default now()                      ║
+║  );                                                          ║
+║                                                              ║
+║  alter table posts enable row level security;                ║
+║                                                              ║
+║  create policy "Anyone can read approved posts"              ║
+║    on posts for select                                       ║
+║    using (approved = true);                                  ║
+║                                                              ║
+║  create policy "Anyone can insert posts"                     ║
+║    on posts for insert                                       ║
+║    with check (true);                                        ║
+║                                                              ║
+║  create policy "Service role can update"                     ║
+║    on posts for update                                       ║
+║    using (true);                                             ║
+║                                                              ║
+║     - اذهب إلى Settings > API                               ║
+║     - انسخ: Project URL و anon public key                   ║
+║     - ضعهما في إعدادات البلوك في Shopify                    ║
+║                                                              ║
+║  ٢. ImgBB                                                    ║
+║     - أنشئ حساباً على https://imgbb.com                     ║
+║     - اذهب إلى API > Get API Key                            ║
+║     - انسخ الـ Key وضعه في إعدادات البلوك                  ║
+║                                                              ║
+║  ٣. Moderation                                               ║
+║     - لمراجعة المشاركات: اذهب إلى Supabase > Table Editor  ║
+║     - غيّر approved من false إلى true للمشاركات التي تريدها║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+{% endcomment %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ch-{{ ai_gen_id }} {
+    background: {{ block.settings.background_color }};
+    padding: 40px 20px;
+    font-family: {{ block.settings.body_font.family }}, {{ block.settings.body_font.fallback_families }};
+    direction: rtl;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ch-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  /* ─── HEADER ─── */
+  .ch-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .ch-title-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+  }
+
+  .ch-subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+  }
+
+  /* Palestinian embroidery pixel divider */
+  .ch-divider-{{ ai_gen_id }} {
+    width: 100%;
+    height: 16px;
+    margin: 24px 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.accent_color_1 }} 0px, {{ block.settings.accent_color_1 }} 4px,
+      transparent 4px, transparent 8px,
+      {{ block.settings.accent_color_2 }} 8px, {{ block.settings.accent_color_2 }} 12px,
+      transparent 12px, transparent 16px,
+      {{ block.settings.accent_color_3 }} 16px, {{ block.settings.accent_color_3 }} 20px,
+      transparent 20px, transparent 24px,
+      {{ block.settings.accent_color_1 }} 24px, {{ block.settings.accent_color_1 }} 28px,
+      transparent 28px, transparent 32px
+    );
+    opacity: 0.8;
+  }
+
+  /* ─── LOGIN NOTICE ─── */
+  .ch-login-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.card_radius }}px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 40px;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ch-login-{{ ai_gen_id }} h3 {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px;
+    font-size: 22px;
+  }
+
+  .ch-btn-{{ ai_gen_id }} {
+    display: inline-block;
+    background: {{ block.settings.button_bg }};
+    color: {{ block.settings.button_text }} !important;
+    padding: 12px 32px;
+    border-radius: {{ block.settings.button_radius }}px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    transition: transform 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .ch-btn-{{ ai_gen_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: {{ block.settings.shadow_x | plus: 2 }}px {{ block.settings.shadow_y | plus: 2 }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ch-btn-outline-{{ ai_gen_id }} {
+    background: transparent;
+    color: {{ block.settings.title_color }} !important;
+  }
+
+  /* ─── TITLE CENTERING ─── */
+  .ch-section-title-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    text-align: center !important;
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: 28px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 32px;
+    font-weight: 700;
+  }
+
+  /* ─── CHIPS FILTERS (Formerly Tabs) ─── */
+  .ch-share-actions-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .ch-action-btn-{{ ai_gen_id }} {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    color: {{ block.settings.title_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 16px;
+  }
+  .ch-action-btn-{{ ai_gen_id }}:hover {
+    background: rgba(0,0,0,0.05);
+  }
+  .ch-export-logo-{{ ai_gen_id }} {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    display: none;
+    z-index: 99;
+  }
+
+  .ch-tabs-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .ch-tabs-{{ ai_gen_id }}::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .ch-tab-{{ ai_gen_id }} {
+    background: transparent;
+    color: {{ block.settings.meta_color }};
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 8px 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: inherit;
+    font-size: 13.5px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .ch-tab-{{ ai_gen_id }}:hover {
+    background: rgba(0,0,0,0.03);
+  }
+
+  .ch-tab-{{ ai_gen_id }}.active {
+    background: {{ block.settings.button_bg }};
+    color: {{ block.settings.button_text }};
+    border-color: {{ block.settings.button_bg }};
+    box-shadow: 0 4px 12px rgba(145, 15, 63, 0.2);
+  }
+
+  .ch-tab-panel-{{ ai_gen_id }} { display: none; }
+  .ch-tab-panel-{{ ai_gen_id }}.active { display: block; }
+
+  /* ─── CATEGORY SQUARES ─── */
+  .ch-categories-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .ch-category-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 80px;
+    max-width: 140px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  }
+
+  .ch-category-{{ ai_gen_id }}:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  }
+
+  .ch-category-{{ ai_gen_id }}.active {
+    border: 2px solid {{ block.settings.button_bg }};
+    padding: 15px 7px; /* compensate for border */
+  }
+
+  .ch-cat-img-{{ ai_gen_id }} {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .ch-cat-icon-{{ ai_gen_id }} {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .ch-cat-text-{{ ai_gen_id }} {
+    font-size: 13px;
+    font-weight: 700;
+    color: {{ block.settings.title_color }};
+    text-align: center;
+    font-family: inherit;
+  }
+
+  /* ─── FAB (Floating Action Button) ─── */
+  .ch-fab-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: {{ block.settings.button_bg }};
+    color: {{ block.settings.button_text }};
+    border: none;
+    box-shadow: 0 8px 24px rgba(145, 15, 63, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+  }
+
+  .ch-fab-{{ ai_gen_id }}:hover {
+    transform: translateX(-50%) scale(1.08);
+    box-shadow: 0 12px 28px rgba(145, 15, 63, 0.45);
+  }
+  
+  .ch-fab-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* ─── BOTTOM SHEET / MODAL ─── */
+  .ch-modal-overlay-{{ ai_gen_id }} {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 9999999 !important;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .ch-modal-overlay-{{ ai_gen_id }}.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ch-modal-content-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    width: 100%;
+    max-width: 600px;
+    border-radius: 24px 24px 0 0;
+    padding: 32px 24px 40px;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+  }
+
+  @media (min-width: 640px) {
+    .ch-modal-overlay-{{ ai_gen_id }} {
+      align-items: center;
+    }
+    .ch-modal-content-{{ ai_gen_id }} {
+      border-radius: 20px;
+      transform: translateY(20px) scale(0.95);
+    }
+    .ch-modal-overlay-{{ ai_gen_id }}.open .ch-modal-content-{{ ai_gen_id }} {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .ch-modal-overlay-{{ ai_gen_id }}.open .ch-modal-content-{{ ai_gen_id }} {
+    transform: translateY(0);
+  }
+
+  .ch-modal-close-{{ ai_gen_id }} {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.05);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: {{ block.settings.title_color }};
+    transition: background 0.2s;
+  }
+
+  .ch-modal-close-{{ ai_gen_id }}:hover {
+    background: rgba(0,0,0,0.1);
+  }
+
+  .ch-modal-header-drag-{{ ai_gen_id }} {
+    width: 40px;
+    height: 4px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+    margin: -16px auto 24px;
+  }
+
+  /* ─── FORM CARD ─── */
+  .ch-form-card-{{ ai_gen_id }} {
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+  }
+
+  .ch-form-card-{{ ai_gen_id }} h3 {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    color: {{ block.settings.title_color }};
+    margin: 0 0 24px;
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .ch-field-{{ ai_gen_id }} { margin-bottom: 18px; }
+
+  .ch-field-{{ ai_gen_id }} label {
+    display: block;
+    color: {{ block.settings.text_color }};
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .ch-input-{{ ai_gen_id }},
+  .ch-textarea-{{ ai_gen_id }},
+  .ch-select-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 10px 14px;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.input_radius }}px;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fff;
+    color: #333;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,0.08);
+    box-sizing: border-box;
+    direction: rtl;
+    transition: border-color 0.2s;
+  }
+
+  .ch-input-{{ ai_gen_id }}:focus,
+  .ch-textarea-{{ ai_gen_id }}:focus {
+    outline: none;
+    border-color: {{ block.settings.button_bg }};
+  }
+
+  .ch-textarea-{{ ai_gen_id }} {
+    min-height: 96px;
+    resize: vertical;
+  }
+
+  /* Image upload area */
+  .ch-upload-area-{{ ai_gen_id }} {
+    border: 2px dashed {{ block.settings.border_color }};
+    border-radius: {{ block.settings.input_radius }}px;
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    transition: background 0.2s;
+    position: relative;
+  }
+
+  .ch-upload-area-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.background_color }};
+  }
+
+  .ch-upload-area-{{ ai_gen_id }} input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ch-upload-icon-{{ ai_gen_id }} {
+    font-size: 36px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .ch-upload-preview-{{ ai_gen_id }} {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: {{ block.settings.input_radius }}px;
+    margin-top: 12px;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    display: none;
+  }
+
+  .ch-upload-progress-{{ ai_gen_id }} {
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    margin-top: 10px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .ch-upload-progress-bar-{{ ai_gen_id }} {
+    height: 100%;
+    background: {{ block.settings.button_bg }};
+    width: 0;
+    transition: width 0.3s;
+    border-radius: 3px;
+  }
+
+  .ch-hint-{{ ai_gen_id }} {
+    font-size: 12px;
+    color: {{ block.settings.meta_color }};
+    margin-top: 4px;
+  }
+
+  .ch-submit-{{ ai_gen_id }} {
+    background: {{ block.settings.button_bg }};
+    color: {{ block.settings.button_text }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    padding: 13px 32px;
+    border-radius: {{ block.settings.button_radius }}px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    font-family: inherit;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    transition: transform 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+
+  .ch-submit-{{ ai_gen_id }}:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: {{ block.settings.shadow_x | plus: 2 }}px {{ block.settings.shadow_y | plus: 2 }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ch-submit-{{ ai_gen_id }}:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .ch-success-{{ ai_gen_id }} {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    color: #155724;
+    padding: 14px;
+    border-radius: {{ block.settings.input_radius }}px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .ch-error-{{ ai_gen_id }} {
+    background: #f8d7da;
+    border: 2px solid #dc3545;
+    color: #721c24;
+    padding: 14px;
+    border-radius: {{ block.settings.input_radius }}px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* ─── SEARCH BAR ─── */
+  .ch-search-wrap-{{ ai_gen_id }} {
+    position: relative;
+    margin-bottom: 24px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ch-search-{{ ai_gen_id }} {
+    width: 100%;
+    padding: 12px 44px 12px 16px;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: 50px;
+    font-family: inherit;
+    font-size: 14px;
+    background: {{ block.settings.card_bg }};
+    box-sizing: border-box;
+    direction: rtl;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ch-search-{{ ai_gen_id }}:focus {
+    outline: none;
+    border-color: {{ block.settings.button_bg }};
+  }
+
+  .ch-search-icon-{{ ai_gen_id }} {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: {{ block.settings.meta_color }};
+    pointer-events: none;
+  }
+
+  /* ─── VERTICAL FEED ─── */
+  .ch-masonry-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 640px;
+    margin: 20px auto 0;
+  }
+
+  .ch-card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border-radius: 16px;
+    padding: 24px 20px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    margin-bottom: 0;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s;
+    opacity: 0;
+    transform: translateY(20px);
+    cursor: pointer;
+  }
+
+  .ch-card-{{ ai_gen_id }}.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .ch-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+  }
+
+  /* Embroidery top stripe - SLIM */
+  .ch-card-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.accent_color_1 }} 0 4px,
+      {{ block.settings.accent_color_2 }} 4px 8px,
+      {{ block.settings.accent_color_3 }} 8px 12px
+    );
+  }
+
+  .ch-card-img-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    display: block;
+    cursor: pointer;
+  }
+
+  .ch-card-type-badge-{{ ai_gen_id }} {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    background: rgba(0,0,0,0.05);
+    color: {{ block.settings.meta_color }};
+    letter-spacing: 0.5px;
+  }
+
+  .ch-card-quote-{{ ai_gen_id }} {
+    font-size: 20px;
+    color: {{ block.settings.title_color }};
+    font-style: italic;
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .ch-card-book-{{ ai_gen_id }} {
+    font-size: 13.5px;
+    color: {{ block.settings.meta_color }};
+    margin-bottom: 16px;
+  }
+
+  .ch-card-text-{{ ai_gen_id }} {
+    font-size: 15.5px;
+    color: {{ block.settings.text_color }};
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .ch-card-title-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: 19px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 12px;
+    font-weight: 700;
+  }
+
+  .ch-card-footer-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    margin-top: 16px;
+    font-size: 12px;
+    color: {{ block.settings.meta_color }};
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ch-card-author-{{ ai_gen_id }} {
+    font-weight: 700;
+    color: {{ block.settings.title_color }};
+  }
+
+  /* ─── VOTE SYSTEM ─── */
+  .ch-vote-system-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0,0,0,0.03);
+    border-radius: 30px;
+    padding: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    font-family: inherit;
+    color: {{ block.settings.title_color }};
+  }
+
+  .ch-vote-btn-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: {{ block.settings.meta_color }};
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s, color 0.2s;
+    position: relative;
+  }
+
+  .ch-vote-btn-{{ ai_gen_id }}:hover {
+    background: rgba(0,0,0,0.06);
+  }
+
+  .ch-vote-btn-up-{{ ai_gen_id }}.active {
+    color: {{ block.settings.accent_color_1 }};
+    background: rgba(145, 15, 63, 0.1);
+    transform: scale(1.1);
+  }
+
+  .ch-vote-btn-down-{{ ai_gen_id }}.active {
+    color: #4a4a4a;
+    background: rgba(0,0,0,0.1);
+    transform: scale(1.1);
+  }
+
+  .ch-vote-score-{{ ai_gen_id }} {
+    min-width: 28px;
+    text-align: center;
+    margin: 0 4px;
+    transition: transform 0.2s;
+  }
+  
+  .ch-vote-score-{{ ai_gen_id }}.bounce {
+    animation: ch-score-bounce-{{ ai_gen_id }} 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes ch-score-bounce-{{ ai_gen_id }} {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+    100% { transform: translateY(0); }
+  }
+
+  /* Particle container for upvote */
+  .ch-particle-wrap-{{ ai_gen_id }} {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+  
+  .ch-particle-{{ ai_gen_id }} {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  /* ─── LOAD MORE ─── */
+  .ch-load-more-{{ ai_gen_id }} {
+    text-align: center;
+    margin-top: 28px;
+  }
+
+  /* ─── EMPTY STATE ─── */
+  .ch-empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 56px 20px;
+    color: {{ block.settings.meta_color }};
+    font-style: italic;
+    font-size: 15px;
+  }
+
+  /* ─── LOADING SPINNER ─── */
+  .ch-spinner-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .ch-spinner-{{ ai_gen_id }}::after {
+    content: '';
+    width: 36px;
+    height: 36px;
+    border: 3px solid {{ block.settings.border_color }};
+    border-top-color: {{ block.settings.button_bg }};
+    border-radius: 50%;
+    animation: ch-spin-{{ ai_gen_id }} 0.7s linear infinite;
+  }
+
+  @keyframes ch-spin-{{ ai_gen_id }} {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ─── SECTION TITLE ─── */
+  .ch-section-title-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: 28px;
+    color: {{ block.settings.title_color }};
+    text-align: right;
+    margin: 0 0 24px;
+    font-weight: 700;
+  }
+
+  /* ─── HIGHLIGHT POST (نبض الحصيف) ─── */
+  .ch-card-{{ ai_gen_id }}.is-highlight {
+    background: #fffdf5; /* slight warmth */
+    border: 1px solid {{ block.settings.accent_color_3 }};
+    box-shadow: 0 4px 20px rgba(224, 186, 68, 0.15);
+  }
+
+  .ch-card-{{ ai_gen_id }}.is-highlight::before {
+    height: 4px;
+    background: linear-gradient(90deg, {{ block.settings.accent_color_1 }}, {{ block.settings.accent_color_3 }});
+  }
+
+  .ch-highlight-badge-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: {{ block.settings.accent_color_1 }};
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(0,0,0,0.08);
+    width: 100%;
+  }
+
+  /* ─── SKELETON LOADER ─── */
+  .ch-skeleton-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border-radius: 16px;
+    padding: 24px 20px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    margin-bottom: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .ch-skeleton-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: #eee;
+  }
+
+  .ch-skeleton-box-{{ ai_gen_id }} {
+    background: #e8e8e8;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ch-skeleton-box-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.4) 20%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0)
+    );
+    animation: ch-shimmer-{{ ai_gen_id }} 1.5s infinite;
+  }
+
+  @keyframes ch-shimmer-{{ ai_gen_id }} {
+    100% { transform: translateX(100%); }
+  }
+
+  .ch-skel-title-{{ ai_gen_id }} { width: 40%; height: 20px; margin-bottom: 16px; }
+  .ch-skel-text-{{ ai_gen_id }} { width: 100%; height: 14px; margin-bottom: 8px; }
+  .ch-skel-text-2-{{ ai_gen_id }} { width: 80%; height: 14px; margin-bottom: 24px; }
+  .ch-skel-footer-{{ ai_gen_id }} { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,0,0,0.04); padding-top: 16px; }
+  .ch-skel-avatar-{{ ai_gen_id }} { width: 80px; height: 14px; }
+  .ch-skel-vote-{{ ai_gen_id }} { width: 60px; height: 28px; border-radius: 20px; }
+
+  /* ─── BLOG SECTION ─── */
+  .ch-blog-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .ch-blog-card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_bg }};
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.card_radius }}px;
+    overflow: hidden;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px 0 {{ block.settings.shadow_color }};
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+
+  .ch-blog-card-{{ ai_gen_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: {{ block.settings.shadow_x | plus: 2 }}px {{ block.settings.shadow_y | plus: 2 }}px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ch-blog-img-{{ ai_gen_id }} {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ch-blog-body-{{ ai_gen_id }} { padding: 18px; }
+
+  .ch-blog-title-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-size: 18px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 10px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .ch-blog-excerpt-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 10px;
+  }
+
+  .ch-blog-date-{{ ai_gen_id }} {
+    font-size: 11px;
+    color: {{ block.settings.meta_color }};
+  }
+
+  /* ─── CONFIG MISSING WARNING ─── */
+  .ch-config-warn-{{ ai_gen_id }} {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    color: #856404;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .ch-title-{{ ai_gen_id }} { font-size: {{ block.settings.title_size | times: 0.75 | round }}px; }
+    .ch-section-title-{{ ai_gen_id }} { font-size: 22px; }
+    .ch-tabs-{{ ai_gen_id }} { flex-direction: column; }
+    .ch-tab-{{ ai_gen_id }} { width: 100%; text-align: center; }
+  }
+{% endstyle %}
+
+{% assign supabase_ok = false %}
+{% if block.settings.supabase_url != blank and block.settings.supabase_key != blank %}
+  {% assign supabase_ok = true %}
+{% endif %}
+
+<div class="ch-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ch-container-{{ ai_gen_id }}">
+
+    <!-- HEADER -->
+    <div class="ch-header-{{ ai_gen_id }}">
+      <h2 class="ch-title-{{ ai_gen_id }}">{{ block.settings.main_title }}</h2>
+      <p class="ch-subtitle-{{ ai_gen_id }}">{{ block.settings.main_subtitle }}</p>
+    </div>
+    <div class="ch-divider-{{ ai_gen_id }}"></div>
+
+    {% unless supabase_ok %}
+      <div class="ch-config-warn-{{ ai_gen_id }}">
+        ⚠️ يرجى إدخال Supabase URL و API Key في إعدادات البلوك لتفعيل الفيد التلقائي. راجع التعليقات في أعلى الملف.
+      </div>
+    {% endunless %}
+
+    <!-- FAB BUTTON -->
+    <button type="button" class="ch-fab-{{ ai_gen_id }}" id="ch-fab-{{ ai_gen_id }}" aria-label="أنشئ مشاركة" title="أنشئ مشاركة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+
+    <!-- CREATE POST MODAL -->
+    <div class="ch-modal-overlay-{{ ai_gen_id }}" id="ch-create-modal-{{ ai_gen_id }}">
+      <div class="ch-modal-content-{{ ai_gen_id }}">
+        <div class="ch-modal-header-drag-{{ ai_gen_id }}"></div>
+        <button type="button" class="ch-modal-close-{{ ai_gen_id }}" id="ch-modal-close-{{ ai_gen_id }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+
+        {% if customer or block.settings.allow_guest_posts %}
+          <div id="ch-submit-section-{{ ai_gen_id }}">
+            {% unless customer %}
+              <!-- Guest name input -->
+              <div class="ch-form-card-{{ ai_gen_id }}" style="margin-bottom:16px;">
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-guest-name-{{ ai_gen_id }}">اسمك المستعار *</label>
+                  <input type="text" id="ch-guest-name-{{ ai_gen_id }}"
+                         class="ch-input-{{ ai_gen_id }}"
+                         placeholder="كيف تريد أن تُعرَّف في المجتمع؟"
+                         maxlength="40" required>
+                </div>
+              </div>
+            {% endunless %}
+
+            <!-- TABS -->
+            <div class="ch-tabs-{{ ai_gen_id }}" role="tablist" data-ch-tabs="submit-{{ ai_gen_id }}">
+              <button class="ch-tab-{{ ai_gen_id }} active"
+                      data-ch-tab="photos-submit"
+                      data-ch-tabs="submit-{{ ai_gen_id }}"
+                      role="tab">{{ block.settings.tab_photos_title }}</button>
+              <button class="ch-tab-{{ ai_gen_id }}"
+                      data-ch-tab="quotes-submit"
+                      data-ch-tabs="submit-{{ ai_gen_id }}"
+                      role="tab">{{ block.settings.tab_quotes_title }}</button>
+              <button class="ch-tab-{{ ai_gen_id }}"
+                      data-ch-tab="comments-submit"
+                      data-ch-tabs="submit-{{ ai_gen_id }}"
+                      role="tab">{{ block.settings.tab_comments_title }}</button>
+            </div>
+
+            <!-- PHOTO FORM -->
+            <div class="ch-tab-panel-{{ ai_gen_id }} active"
+                 data-ch-panel="photos-submit"
+                 data-ch-tabs="submit-{{ ai_gen_id }}">
+              <div class="ch-form-card-{{ ai_gen_id }}">
+                <h3>{{ block.settings.form_photos_title }}</h3>
+                <div id="ch-photo-msg-{{ ai_gen_id }}"></div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label>الصورة *</label>
+                  <div class="ch-upload-area-{{ ai_gen_id }}" id="ch-photo-drop-{{ ai_gen_id }}">
+                    <input type="file" id="ch-photo-file-{{ ai_gen_id }}"
+                           accept="image/jpeg,image/png,image/gif,image/webp">
+                    <span class="ch-upload-icon-{{ ai_gen_id }}">📷</span>
+                    <div style="font-size:14px;color:{{ block.settings.meta_color }};">
+                      اضغط أو اسحب صورة هنا
+                    </div>
+                    <div class="ch-upload-progress-{{ ai_gen_id }}" id="ch-photo-prog-{{ ai_gen_id }}">
+                      <div class="ch-upload-progress-bar-{{ ai_gen_id }}"
+                           id="ch-photo-prog-bar-{{ ai_gen_id }}"></div>
+                    </div>
+                    <img class="ch-upload-preview-{{ ai_gen_id }}"
+                         id="ch-photo-preview-{{ ai_gen_id }}" alt="preview">
+                  </div>
+                </div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-photo-title-{{ ai_gen_id }}">عنوان الصورة *</label>
+                  <input type="text" id="ch-photo-title-{{ ai_gen_id }}"
+                         class="ch-input-{{ ai_gen_id }}" maxlength="120" required>
+                </div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-photo-desc-{{ ai_gen_id }}">وصف قصير (اختياري)</label>
+                  <textarea id="ch-photo-desc-{{ ai_gen_id }}"
+                            class="ch-textarea-{{ ai_gen_id }}" rows="3"
+                            maxlength="400"></textarea>
+                </div>
+                <button type="button" class="ch-submit-{{ ai_gen_id }}"
+                        id="ch-photo-submit-{{ ai_gen_id }}"
+                        data-type="photo">مشاركة الالتقاط</button>
+              </div>
+            </div>
+
+            <!-- QUOTE FORM -->
+            <div class="ch-tab-panel-{{ ai_gen_id }}"
+                 data-ch-panel="quotes-submit"
+                 data-ch-tabs="submit-{{ ai_gen_id }}">
+              <div class="ch-form-card-{{ ai_gen_id }}">
+                <h3>{{ block.settings.form_quotes_title }}</h3>
+                <div id="ch-quote-msg-{{ ai_gen_id }}"></div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-quote-text-{{ ai_gen_id }}">الاقتباس *</label>
+                  <textarea id="ch-quote-text-{{ ai_gen_id }}"
+                            class="ch-textarea-{{ ai_gen_id }}" rows="4"
+                            maxlength="600" required></textarea>
+                </div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-quote-book-{{ ai_gen_id }}">اسم الكتاب *</label>
+                  <input type="text" id="ch-quote-book-{{ ai_gen_id }}"
+                         class="ch-input-{{ ai_gen_id }}" maxlength="120" required>
+                </div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-quote-author-{{ ai_gen_id }}">اسم المؤلف *</label>
+                  <input type="text" id="ch-quote-author-{{ ai_gen_id }}"
+                         class="ch-input-{{ ai_gen_id }}" maxlength="100" required>
+                </div>
+                <button type="button" class="ch-submit-{{ ai_gen_id }}"
+                        id="ch-quote-submit-{{ ai_gen_id }}"
+                        data-type="quote">مشاركة الاقتباس</button>
+              </div>
+            </div>
+
+            <!-- COMMENT FORM -->
+            <div class="ch-tab-panel-{{ ai_gen_id }}"
+                 data-ch-panel="comments-submit"
+                 data-ch-tabs="submit-{{ ai_gen_id }}">
+              <div class="ch-form-card-{{ ai_gen_id }}">
+                <h3>{{ block.settings.form_comments_title }}</h3>
+                <div id="ch-comment-msg-{{ ai_gen_id }}"></div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-comment-title-{{ ai_gen_id }}">عنوان التعليق *</label>
+                  <input type="text" id="ch-comment-title-{{ ai_gen_id }}"
+                         class="ch-input-{{ ai_gen_id }}" maxlength="120" required>
+                </div>
+                <div class="ch-field-{{ ai_gen_id }}">
+                  <label for="ch-comment-text-{{ ai_gen_id }}">التعليق *</label>
+                  <textarea id="ch-comment-text-{{ ai_gen_id }}"
+                            class="ch-textarea-{{ ai_gen_id }}" rows="5"
+                            maxlength="800" required></textarea>
+                </div>
+                <button type="button" class="ch-submit-{{ ai_gen_id }}"
+                        id="ch-comment-submit-{{ ai_gen_id }}"
+                        data-type="comment">مشاركة التعليق</button>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <!-- NOT LOGGED IN + GUESTS NOT ALLOWED -->
+          <div class="ch-login-{{ ai_gen_id }}" style="box-shadow:none; border:none; padding-bottom:0;">
+            <h3>{{ block.settings.login_title }}</h3>
+            <p style="color:{{ block.settings.text_color }};margin:0 0 20px;">
+              {{ block.settings.login_message }}
+            </p>
+            <a href="/account/login" class="ch-btn-{{ ai_gen_id }}">
+              {{ block.settings.login_button_text }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- PUBLIC FEED SECTION -->
+    {% if block.settings.show_public_posts %}
+      <div id="ch-feed-{{ ai_gen_id }}">
+        <h2 class="ch-section-title-{{ ai_gen_id }}">{{ block.settings.public_section_title }}</h2>
+
+        <!-- Search -->
+        <div class="ch-search-wrap-{{ ai_gen_id }}">
+          <svg class="ch-search-icon-{{ ai_gen_id }}" width="16" height="16"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="search" id="ch-search-{{ ai_gen_id }}"
+                 class="ch-search-{{ ai_gen_id }}"
+                 placeholder="ابحث في المشاركات...">
+        </div>
+
+        <!-- Categories Squares -->
+        <div class="ch-categories-{{ ai_gen_id }}">
+          <button class="ch-category-{{ ai_gen_id }} active" data-ch-feed-filter="all">
+            <span class="ch-cat-icon-{{ ai_gen_id }}">الكل</span>
+            <span class="ch-cat-text-{{ ai_gen_id }}">الكل</span>
+          </button>
+          <button class="ch-category-{{ ai_gen_id }}" data-ch-feed-filter="photo">
+            {% if block.settings.icon_photo %}
+              <img src="{{ block.settings.icon_photo | image_url: width: 80 }}" class="ch-cat-img-{{ ai_gen_id }}" loading="lazy">
+            {% else %}
+              <span class="ch-cat-icon-{{ ai_gen_id }}">📷</span>
+            {% endif %}
+            <span class="ch-cat-text-{{ ai_gen_id }}">{{ block.settings.public_tab_photos | default: 'التقاطات القراء' }}</span>
+          </button>
+          <button class="ch-category-{{ ai_gen_id }}" data-ch-feed-filter="quote">
+            {% if block.settings.icon_quote %}
+              <img src="{{ block.settings.icon_quote | image_url: width: 80 }}" class="ch-cat-img-{{ ai_gen_id }}" loading="lazy">
+            {% else %}
+              <span class="ch-cat-icon-{{ ai_gen_id }}">📚</span>
+            {% endif %}
+            <span class="ch-cat-text-{{ ai_gen_id }}">{{ block.settings.public_tab_quotes | default: 'اقتباسات القراء' }}</span>
+          </button>
+          <button class="ch-category-{{ ai_gen_id }}" data-ch-feed-filter="comment">
+            {% if block.settings.icon_comment %}
+              <img src="{{ block.settings.icon_comment | image_url: width: 80 }}" class="ch-cat-img-{{ ai_gen_id }}" loading="lazy">
+            {% else %}
+              <span class="ch-cat-icon-{{ ai_gen_id }}">💬</span>
+            {% endif %}
+            <span class="ch-cat-text-{{ ai_gen_id }}">{{ block.settings.public_tab_comments | default: 'تعليقات القراء' }}</span>
+          </button>
+        </div>
+
+        <!-- Sort Chips -->
+        <div class="ch-tabs-{{ ai_gen_id }}" data-ch-tabs="feed-{{ ai_gen_id }}">
+          <button class="ch-tab-{{ ai_gen_id }} active"
+                  data-ch-tab="newest" data-ch-feed-sort="newest">{{ block.settings.sort_newest_text | default: '🕒 الأحدث' }}</button>
+          <button class="ch-tab-{{ ai_gen_id }}"
+                  data-ch-tab="popular" data-ch-feed-sort="popular">{{ block.settings.sort_popular_text | default: '🔥 الأكثر تفاعلاً' }}</button>
+        </div>
+
+        <!-- Masonry Grid -->
+        <div class="ch-masonry-{{ ai_gen_id }}" id="ch-masonry-{{ ai_gen_id }}">
+          <div class="ch-spinner-{{ ai_gen_id }}" id="ch-spinner-{{ ai_gen_id }}"></div>
+        </div>
+
+        <!-- Load More -->
+        <div class="ch-load-more-{{ ai_gen_id }}" id="ch-load-more-wrap-{{ ai_gen_id }}"
+             style="display:none;">
+          <button class="ch-btn-{{ ai_gen_id }} ch-btn-outline-{{ ai_gen_id }}"
+                  id="ch-load-more-{{ ai_gen_id }}">
+            تحميل المزيد
+          </button>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- BLOG SECTION -->
+    {% if block.settings.show_blog_section and block.settings.blog != blank %}
+      <div class="ch-divider-{{ ai_gen_id }}" style="margin:80px auto 60px; width: 120px; height: 8px; border-radius: 4px; opacity: 0.5;"></div>
+      <div>
+        <h2 class="ch-section-title-{{ ai_gen_id }}">{{ block.settings.blog_section_title }}</h2>
+        <div class="ch-blog-grid-{{ ai_gen_id }}">
+          {% for article in block.settings.blog.articles limit: block.settings.blog_posts_count %}
+            <a href="{{ article.url }}" class="ch-blog-card-{{ ai_gen_id }}">
+              {% if article.image %}
+                <img src="{{ article.image | image_url: width: 600 }}"
+                     alt="{{ article.title | escape }}"
+                     class="ch-blog-img-{{ ai_gen_id }}"
+                     loading="lazy" width="600" height="360">
+              {% else %}
+                <div style="width:100%;height:180px;background:{{ block.settings.border_color }};
+                     display:flex;align-items:center;justify-content:center;font-size:40px;">
+                  📖
+                </div>
+              {% endif %}
+              <div class="ch-blog-body-{{ ai_gen_id }}">
+                <h3 class="ch-blog-title-{{ ai_gen_id }}">{{ article.title }}</h3>
+                {% if article.excerpt != blank %}
+                  <p class="ch-blog-excerpt-{{ ai_gen_id }}">
+                    {{ article.excerpt | strip_html | truncate: 110 }}
+                  </p>
+                {% endif %}
+                {% assign syrian_months = "كانون الثاني,شباط,آذار,نيسان,أيار,حزيران,تموز,آب,أيلول,تشرين الأول,تشرين الثاني,كانون الأول" | split: "," %}
+                {% assign m_index = article.published_at | date: "%-m" | minus: 1 %}
+                <p class="ch-blog-date-{{ ai_gen_id }}">
+                  {{ article.published_at | date: "%-d" }} {{ syrian_months[m_index] }} {{ article.published_at | date: "%Y" }}
+                </p>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- POST MODAL -->
+    <div class="ch-modal-overlay-{{ ai_gen_id }}" id="ch-post-modal-{{ ai_gen_id }}" style="align-items: center; padding: 16px;">
+      <div id="ch-post-modal-content-{{ ai_gen_id }}" style="width: 100%; max-width: 600px; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto; background: {{ block.settings.card_bg }}; box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin: auto;">
+        <!-- Card cloned here -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG (injected from Shopify settings) ── */
+  const CFG = {
+    genId:         '{{ ai_gen_id }}',
+    supabaseUrl:   '{{ block.settings.supabase_url | strip }}',
+    supabaseKey:   '{{ block.settings.supabase_key | strip }}',
+    imgbbKey:      '{{ block.settings.imgbb_key | strip }}',
+    moderation:    {{ block.settings.enable_moderation | json }},
+    guestPosts:    {{ block.settings.allow_guest_posts | json }},
+    pageSize:      {{ block.settings.posts_per_page }},
+    customerName:  '{{ customer.name | default: "" | escape }}',
+    customerEmail: '{{ customer.email | default: "" | escape }}',
+    isLoggedIn:    {{ customer | json | default: 'null' }} !== null,
+    showHighlight: {{ block.settings.show_highlight_post | json }},
+    voteUpAnim:    '{% if block.settings.vote_up_anim %}{{ block.settings.vote_up_anim | image_url: width: 200 }}{% endif %}',
+    voteDownAnim:  '{% if block.settings.vote_down_anim %}{{ block.settings.vote_down_anim | image_url: width: 200 }}{% endif %}',
+    exportLogo:    '{% if block.settings.export_logo %}{{ block.settings.export_logo | image_url: width: 250 }}{% endif %}',
+    showLoadAnim:  {{ block.settings.show_loading_anim | json }},
+    loadAnimImg:   '{% if block.settings.loading_anim_img %}{{ block.settings.loading_anim_img | image_url: width: 300 }}{% endif %}'
+  };
+
+  const g  = id => document.getElementById(id);
+  const qs = (sel, ctx) => (ctx || document).querySelector(sel);
+  const E  = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const LIKED_KEY = 'ch_likes_v1';
+
+  /* ── SUPABASE HELPERS ── */
+  const SB = {
+    ready: CFG.supabaseUrl && CFG.supabaseKey,
+
+    headers() {
+      return {
+        'Content-Type':  'application/json',
+        'apikey':        CFG.supabaseKey,
+        'Authorization': 'Bearer ' + CFG.supabaseKey,
+        'Prefer':        'return=representation',
+      };
+    },
+
+    async insert(row) {
+      const r = await fetch(CFG.supabaseUrl + '/rest/v1/posts', {
+        method:  'POST',
+        headers: this.headers(),
+        body:    JSON.stringify(row),
+      });
+      if (!r.ok) throw new Error(await r.text());
+      return r.json();
+    },
+
+    async fetch({ type, search, from, to, sort = 'popular' }) {
+      let order = sort === 'popular' ? 'likes_count.desc' : 'created_at.desc';
+      let url = CFG.supabaseUrl + `/rest/v1/posts?approved=eq.true&order=${order}`;
+      if (type && type !== 'all') url += '&type=eq.' + type;
+      if (search) url += '&or=(content.ilike.*' + encodeURIComponent(search) + '*,author.ilike.*' + encodeURIComponent(search) + '*,book_name.ilike.*' + encodeURIComponent(search) + '*)';
+      url += '&limit=' + (to - from + 1) + '&offset=' + from;
+      const r = await fetch(url, {
+        headers: { 'apikey': CFG.supabaseKey, 'Authorization': 'Bearer ' + CFG.supabaseKey },
+      });
+      if (!r.ok) throw new Error(await r.text());
+      return r.json();
+    },
+
+    async incrementLike(id) {
+      const r = await fetch(CFG.supabaseUrl + '/rest/v1/rpc/increment_likes', {
+        method:  'POST',
+        headers: this.headers(),
+        body:    JSON.stringify({ post_id: id }),
+      });
+      return r.ok;
+    },
+  };
+
+  /* ── IMGBB UPLOAD ── */
+  async function uploadImage(file, onProgress) {
+    if (!CFG.imgbbKey) throw new Error('ImgBB key missing');
+    return new Promise((resolve, reject) => {
+      const fd = new FormData();
+      fd.append('image', file);
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.imgbb.com/1/upload?key=' + CFG.imgbbKey);
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) onProgress(Math.round(e.loaded / e.total * 90));
+      };
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const d = JSON.parse(xhr.responseText);
+          onProgress(100);
+          resolve(d.data.url);
+        } else {
+          reject(new Error('Upload failed'));
+        }
+      };
+      xhr.onerror = () => reject(new Error('Network error'));
+      xhr.send(fd);
+    });
+  }
+
+  /* ── TAB SWITCHER ── */
+  function initTabs(scopeEl, groupKey) {
+    const tabs   = scopeEl.querySelectorAll(`.ch-tab-${CFG.genId}[data-ch-tabs="${groupKey}"]`);
+    const panels = scopeEl.querySelectorAll(`.ch-tab-panel-${CFG.genId}[data-ch-tabs="${groupKey}"]`);
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.getAttribute('data-ch-tab');
+        scopeEl.querySelectorAll(`.ch-tab-panel-${CFG.genId}[data-ch-panel="${target}"]`)
+               .forEach(p => p.classList.add('active'));
+      });
+    });
+  }
+
+  /* ── VOTES ── */
+  const VOTES_KEY = 'ch_votes_v2';
+  function getVoted() {
+    try { return JSON.parse(localStorage.getItem(VOTES_KEY)) || {}; } catch { return {}; }
+  }
+
+  function setVoted(id, dir) {
+    const v = getVoted();
+    if (dir === null) delete v[id];
+    else v[id] = dir;
+    try { localStorage.setItem(VOTES_KEY, JSON.stringify(v)); } catch {}
+  }
+
+  function timeAgo(dateString) {
+    const d = new Date(dateString);
+    const diff = Math.floor((new Date() - d) / 1000);
+    if (diff < 60) return 'منذ لحظات';
+    if (diff < 3600) return `منذ ${Math.floor(diff / 60)} دقيقة`;
+    if (diff < 86400) return `منذ ${Math.floor(diff / 3600)} ساعة`;
+    if (diff < 2592000) return `منذ ${Math.floor(diff / 86400)} يوم`;
+    const syrianMonths = ['كانون الثاني', 'شباط', 'آذار', 'نيسان', 'أيار', 'حزيران', 'تموز', 'آب', 'أيلول', 'تشرين الأول', 'تشرين الثاني', 'كانون الأول'];
+    return `${d.getDate()} ${syrianMonths[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  /* ── SKELETON ── */
+  function renderSkeleton() {
+    const div = document.createElement('div');
+    div.className = `ch-skeleton-${CFG.genId}`;
+    div.innerHTML = `
+      <div class="ch-skeleton-box-${CFG.genId} ch-skel-title-${CFG.genId}"></div>
+      <div class="ch-skeleton-box-${CFG.genId} ch-skel-text-${CFG.genId}"></div>
+      <div class="ch-skeleton-box-${CFG.genId} ch-skel-text-2-${CFG.genId}"></div>
+      <div class="ch-skel-footer-${CFG.genId}">
+        <div class="ch-skeleton-box-${CFG.genId} ch-skel-avatar-${CFG.genId}"></div>
+        <div class="ch-skeleton-box-${CFG.genId} ch-skel-vote-${CFG.genId}"></div>
+      </div>
+    `;
+    return div;
+  }
+
+  /* ── RENDER CARD ── */
+  function renderCard(post, isHighlight = false) {
+    const voteState = getVoted()[post.id] || null;
+    const dateStr   = timeAgo(post.created_at);
+
+    const badges = { photo: '📷 التقاط', quote: '📚 اقتباس', comment: '💬 تعليق' };
+    const badge  = badges[post.type] || post.type;
+
+    let inner = '';
+    if (isHighlight) {
+      inner += `
+        <div class="ch-highlight-badge-${CFG.genId}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          نبض الحصيف اليوم
+        </div>`;
+    }
+    
+    inner += `<span class="ch-card-type-badge-${CFG.genId}">${E(badge)}</span>`;
+
+    if (post.type === 'photo') {
+      if (post.image_url) {
+        inner += `<img src="${E(post.image_url)}" alt="${E(post.content)}"
+                       class="ch-card-img-${CFG.genId}" loading="lazy">`;
+      }
+      if (post.content) inner += `<p class="ch-card-text-${CFG.genId}">${E(post.content)}</p>`;
+    } else if (post.type === 'quote') {
+      inner += `<p class="ch-card-quote-${CFG.genId}">"${E(post.content)}"</p>`;
+      if (post.book_name) {
+        inner += `<p class="ch-card-book-${CFG.genId}">
+          <strong>${E(post.book_name)}</strong>${post.book_author ? ' — ' + E(post.book_author) : ''}
+        </p>`;
+      }
+    } else {
+      if (post.comment_title) {
+        inner += `<h4 class="ch-card-title-${CFG.genId}">${E(post.comment_title)}</h4>`;
+      }
+      inner += `<p class="ch-card-text-${CFG.genId}">${E(post.content)}</p>`;
+    }
+
+    if (CFG.exportLogo) {
+       inner += `<img src="${CFG.exportLogo}" class="ch-export-logo-${CFG.genId}" crossorigin="anonymous">`;
+    }
+
+    inner += `
+      <div class="ch-card-footer-${CFG.genId}">
+        <div>
+          <span class="ch-card-author-${CFG.genId}">✍ ${E(post.author)}</span>
+          <span style="opacity:0.7; margin-right:8px; font-size:11px;">${dateStr}</span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <div class="ch-share-actions-${CFG.genId}">
+            <button class="ch-action-btn-${CFG.genId} ch-share-btn-${CFG.genId}" title="مشاركة البطاقة">🔗</button>
+            <button class="ch-action-btn-${CFG.genId} ch-download-btn-${CFG.genId}" title="حفظ كصورة">⬇️</button>
+          </div>
+          <div class="ch-vote-system-${CFG.genId}" data-post-id="${post.id}">
+            <button class="ch-vote-btn-${CFG.genId} ch-vote-btn-up-${CFG.genId} ${voteState === 'up' ? 'active' : ''}" data-dir="up">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-8 8h6v8h4v-8h6z"/></svg>
+              <div class="ch-particle-wrap-${CFG.genId}"></div>
+            </button>
+            <span class="ch-vote-score-${CFG.genId}" data-score="${post.likes_count || 0}">${post.likes_count || 0}</span>
+            <button class="ch-vote-btn-${CFG.genId} ch-vote-btn-down-${CFG.genId} ${voteState === 'down' ? 'active' : ''}" data-dir="down">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l8-8h-6v-8h-4v8H4z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>`;
+
+    const div = document.createElement('div');
+    div.className = `ch-card-${CFG.genId}`;
+    if (isHighlight) div.classList.add('is-highlight');
+    div.dataset.postId   = post.id;
+    div.dataset.postType = post.type;
+    div.dataset.search   = [post.author, post.content, post.book_name, post.book_author, post.comment_title]
+                             .filter(Boolean).join(' ').toLowerCase();
+    div.innerHTML = inner;
+    return div;
+  }
+
+  /* ── FEED MANAGER ── */
+  const Feed = {
+    offset:      0,
+    activeSort:  'newest',
+    activeType:  'all',
+    searchQuery: '',
+    loading:     false,
+    exhausted:   false,
+    highlight:   null,
+
+    async fetchHighlight() {
+      if (!SB.ready || !CFG.showHighlight) return;
+      try {
+        const url = CFG.supabaseUrl + '/rest/v1/posts?approved=eq.true&order=likes_count.desc&limit=1';
+        const r = await fetch(url, { headers: { 'apikey': CFG.supabaseKey, 'Authorization': 'Bearer ' + CFG.supabaseKey } });
+        if (r.ok) {
+          const rows = await r.json();
+          if (rows && rows.length > 0) this.highlight = rows[0];
+        }
+      } catch(e) {}
+    },
+
+    async load(reset) {
+      if (!SB.ready) return;
+      if (this.loading) return;
+      if (!reset && this.exhausted) return;
+
+      this.loading = true;
+      const masonry = g('ch-masonry-' + CFG.genId);
+      const lmWrap  = g('ch-load-more-wrap-' + CFG.genId);
+
+      const artificialDelay = CFG.showLoadAnim ? new Promise(r => setTimeout(r, 800)) : Promise.resolve();
+
+      // Loaders
+      const loaders = [];
+      if (reset) {
+        this.offset = 0;
+        this.exhausted = false;
+        masonry.innerHTML = '';
+        if (lmWrap) lmWrap.style.display = 'none';
+      }
+
+      if (CFG.showLoadAnim && (reset || !reset)) {
+        const loaderDiv = document.createElement('div');
+        loaderDiv.style.cssText = 'width: 100%; display: flex; justify-content: center; padding: 40px 0;';
+        if (CFG.loadAnimImg) loaderDiv.innerHTML = `<img src="${CFG.loadAnimImg}" style="max-height: 80px; object-fit: contain;">`;
+        else loaderDiv.innerHTML = `<div class="ch-spinner-${CFG.genId}"></div>`;
+        loaders.push(loaderDiv);
+        masonry.appendChild(loaderDiv);
+      } else {
+        for(let i=0; i < (reset ? CFG.pageSize : 3); i++) {
+          const sk = renderSkeleton();
+          loaders.push(sk);
+          masonry.appendChild(sk);
+        }
+      }
+
+      try {
+        const [rows] = await Promise.all([
+          SB.fetch({
+            type:   this.activeType,
+            sort:   this.activeSort,
+            search: this.searchQuery,
+            from:   this.offset,
+            to:     this.offset + CFG.pageSize - 1,
+          }),
+          artificialDelay
+        ]);
+
+        // Remove loaders
+        loaders.forEach(l => l.remove());
+
+        if (rows.length === 0 && this.offset === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'ch-empty-' + CFG.genId;
+          empty.innerHTML = `
+            <div>لا يوجد مشاركات بعد… كن أول من يشارك</div>
+            <button class="ch-btn-${CFG.genId}" style="margin-top:16px;" onclick="document.getElementById('ch-fab-${CFG.genId}').click()">
+              ➕ شارك أول فكرة
+            </button>`;
+          masonry.appendChild(empty);
+        } else {
+          // If reset and we have a highlight, AND no search filtering, inject highlight at top
+          if (reset && CFG.showHighlight && this.highlight && !this.searchQuery && this.activeType === 'all') {
+            // Remove highlight from rows to prevent duplicate
+            const filteredRows = rows.filter(r => r.id !== this.highlight.id);
+            const el = renderCard(this.highlight, true);
+            masonry.appendChild(el);
+            if (window.IntersectionObserver) cardObserver.observe(el);
+            else el.classList.add('revealed');
+            
+            filteredRows.forEach(post => {
+              const e = renderCard(post);
+              masonry.appendChild(e);
+              if (window.IntersectionObserver) cardObserver.observe(e);
+              else e.classList.add('revealed');
+            });
+          } else {
+            rows.forEach(post => {
+              const el = renderCard(post);
+              masonry.appendChild(el);
+              if (window.IntersectionObserver) cardObserver.observe(el);
+              else el.classList.add('revealed');
+            });
+          }
+          this.offset += rows.length;
+          if (lmWrap) lmWrap.style.display = rows.length < CFG.pageSize ? 'none' : 'block';
+          if (rows.length < CFG.pageSize) this.exhausted = true;
+        }
+      } catch (err) {
+        loaders.forEach(l => l.remove());
+        const errDiv = document.createElement('div');
+        errDiv.className = 'ch-error-' + CFG.genId;
+        errDiv.textContent = 'تعذّر تحميل المشاركات. يرجى المحاولة لاحقاً.';
+        masonry.appendChild(errDiv);
+      }
+
+      this.loading = false;
+    },
+  };
+
+  /* ── SHOW MESSAGE ── */
+  function showMsg(el, type, text) {
+    el.className = type === 'success' ? 'ch-success-' + CFG.genId : 'ch-error-' + CFG.genId;
+    el.textContent = text;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  /* ── SUBMIT POST ── */
+  async function submitPost(type) {
+    if (!SB.ready) {
+      const msgEl = g('ch-' + (type === 'photo' ? 'photo' : type === 'quote' ? 'quote' : 'comment') + '-msg-' + CFG.genId);
+      showMsg(msgEl, 'error', 'لم يتم إعداد قاعدة البيانات بعد. يرجى مراجعة الإعدادات.');
+      return;
+    }
+
+    let author = CFG.isLoggedIn ? CFG.customerName : '';
+    if (!CFG.isLoggedIn) {
+      const guestEl = g('ch-guest-name-' + CFG.genId);
+      author = guestEl ? guestEl.value.trim() : '';
+      if (!author) { guestEl.focus(); return; }
+    }
+
+    const btn   = g('ch-' + type + '-submit-' + CFG.genId);
+    const msgEl = g('ch-' + type + '-msg-' + CFG.genId);
+    msgEl.textContent = '';
+
+    const row = {
+      type,
+      author,
+      approved: !CFG.moderation,
+    };
+
+    // Gather fields
+    if (type === 'photo') {
+      const fileEl = g('ch-photo-file-' + CFG.genId);
+      const titleEl = g('ch-photo-title-' + CFG.genId);
+      const descEl  = g('ch-photo-desc-' + CFG.genId);
+      if (!fileEl.files[0] && !titleEl.value.trim()) {
+        showMsg(msgEl, 'error', 'يرجى اختيار صورة وكتابة عنوان.'); return;
+      }
+      row.comment_title = titleEl.value.trim();
+      row.content       = descEl.value.trim();
+      if (fileEl.files[0]) {
+        btn.disabled    = true;
+        btn.textContent = 'جارٍ الرفع...';
+        const prog    = g('ch-photo-prog-' + CFG.genId);
+        const progBar = g('ch-photo-prog-bar-' + CFG.genId);
+        prog.style.display = 'block';
+        try {
+          row.image_url = await uploadImage(fileEl.files[0], pct => {
+            progBar.style.width = pct + '%';
+          });
+        } catch {
+          showMsg(msgEl, 'error', 'فشل رفع الصورة. يرجى التحقق من ImgBB API Key.');
+          btn.disabled    = false;
+          btn.textContent = 'مشاركة الالتقاط';
+          prog.style.display = 'none';
+          return;
+        }
+      }
+
+    } else if (type === 'quote') {
+      const qt = g('ch-quote-text-' + CFG.genId).value.trim();
+      const bk = g('ch-quote-book-' + CFG.genId).value.trim();
+      const ba = g('ch-quote-author-' + CFG.genId).value.trim();
+      if (!qt || !bk || !ba) { showMsg(msgEl, 'error', 'يرجى ملء جميع الحقول.'); return; }
+      row.content     = qt;
+      row.book_name   = bk;
+      row.book_author = ba;
+
+    } else if (type === 'comment') {
+      const ct = g('ch-comment-title-' + CFG.genId).value.trim();
+      const cx = g('ch-comment-text-' + CFG.genId).value.trim();
+      if (!ct || !cx) { showMsg(msgEl, 'error', 'يرجى ملء جميع الحقول.'); return; }
+      row.comment_title = ct;
+      row.content       = cx;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'جارٍ الإرسال...';
+
+    try {
+      await SB.insert(row);
+      const pending = CFG.moderation
+        ? 'شكراً! سيتم مراجعة مشاركتك ونشرها قريباً. ✨'
+        : 'تمت مشاركتك بنجاح! 🎉';
+      showMsg(msgEl, 'success', pending);
+
+      // Close modal gracefully after success
+      setTimeout(() => {
+        const createModal = g('ch-create-modal-' + CFG.genId);
+        if (createModal) createModal.classList.remove('open');
+      }, 1500);
+
+      // Reset form
+      if (type === 'photo') {
+        g('ch-photo-file-' + CFG.genId).value  = '';
+        g('ch-photo-title-' + CFG.genId).value = '';
+        g('ch-photo-desc-' + CFG.genId).value  = '';
+        const prev = g('ch-photo-preview-' + CFG.genId);
+        prev.src = ''; prev.style.display = 'none';
+        const prog = g('ch-photo-prog-' + CFG.genId);
+        prog.style.display = 'none';
+        g('ch-photo-prog-bar-' + CFG.genId).style.width = '0';
+      } else if (type === 'quote') {
+        ['ch-quote-text-','ch-quote-book-','ch-quote-author-'].forEach(p =>
+          { const el = g(p + CFG.genId); if (el) el.value = ''; });
+      } else {
+        ['ch-comment-title-','ch-comment-text-'].forEach(p =>
+          { const el = g(p + CFG.genId); if (el) el.value = ''; });
+      }
+
+      // Refresh feed if not under moderation
+      if (!CFG.moderation) Feed.load(true);
+
+    } catch (err) {
+      showMsg(msgEl, 'error', 'حدث خطأ. يرجى المحاولة مرة أخرى.');
+    } finally {
+      btn.disabled    = false;
+      const labels = { photo:'مشاركة الالتقاط', quote:'مشاركة الاقتباس', comment:'مشاركة التعليق' };
+      btn.textContent = labels[type];
+    }
+  }
+
+  /* ── INIT ── */
+  let cardObserver;
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector('.ch-' + CFG.genId);
+    if (!root) return;
+
+    /* Initialize Observer for Cards */
+    if (window.IntersectionObserver) {
+      cardObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    }
+
+    /* Modal Toggle Logic */
+    const fab = g('ch-fab-' + CFG.genId);
+    const createModal = g('ch-create-modal-' + CFG.genId);
+    const postModal = g('ch-post-modal-' + CFG.genId);
+    const closeModalBtn = g('ch-modal-close-' + CFG.genId);
+    if (fab && createModal) {
+      fab.addEventListener('click', () => createModal.classList.add('open'));
+    }
+    if (closeModalBtn && createModal) {
+      closeModalBtn.addEventListener('click', () => createModal.classList.remove('open'));
+    }
+    if (createModal) {
+      createModal.addEventListener('click', (e) => {
+        if(e.target === createModal) createModal.classList.remove('open');
+      });
+    }
+    if (postModal) {
+      postModal.addEventListener('click', (e) => {
+        if(e.target === postModal) postModal.classList.remove('open');
+      });
+    }
+
+    /* Tabs for submit section */
+    initTabs(root, 'submit-' + CFG.genId);
+
+    /* Category filter squares */
+    root.querySelectorAll('.ch-category-' + CFG.genId).forEach(tab => {
+      tab.addEventListener('click', () => {
+        root.querySelectorAll('.ch-category-' + CFG.genId).forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        Feed.activeType = tab.dataset.chFeedFilter;
+        Feed.load(true);
+      });
+    });
+
+    /* Sort tabs */
+    root.querySelectorAll('[data-ch-feed-sort]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        root.querySelectorAll('[data-ch-feed-sort]').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        Feed.activeSort = tab.dataset.chFeedSort;
+        Feed.load(true);
+      });
+    });
+
+    /* Search */
+    const searchEl = g('ch-search-' + CFG.genId);
+    if (searchEl) {
+      let timer;
+      searchEl.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          Feed.searchQuery = searchEl.value.trim();
+          Feed.load(true);
+        }, 350);
+      });
+    }
+
+    /* Submit buttons */
+    ['photo','quote','comment'].forEach(type => {
+      const btn = g('ch-' + type + '-submit-' + CFG.genId);
+      if (btn) btn.addEventListener('click', () => submitPost(type));
+    });
+
+    /* Image preview */
+    const fileEl = g('ch-photo-file-' + CFG.genId);
+    const preview = g('ch-photo-preview-' + CFG.genId);
+    if (fileEl && preview) {
+      fileEl.addEventListener('change', () => {
+        const file = fileEl.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            preview.src          = e.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    /* Card interactions (Voting, Expansion, Share, Download) */
+    const wrapper = document.querySelector('.ch-' + CFG.genId);
+    if (wrapper) {
+      wrapper.addEventListener('click', async e => {
+        // Download Image
+        const dlBtn = e.target.closest('.ch-download-btn-' + CFG.genId);
+        if (dlBtn) {
+          e.stopPropagation();
+          const card = dlBtn.closest('.ch-card-' + CFG.genId);
+          if (card && window.html2canvas) {
+             const oldHTML = dlBtn.innerHTML;
+             dlBtn.innerHTML = '⏳';
+             const exportLogo = card.querySelector('.ch-export-logo-' + CFG.genId);
+             if (exportLogo) exportLogo.style.display = 'block';
+             
+             html2canvas(card, { scale: 2, backgroundColor: '{{ block.settings.card_bg }}', useCORS: true }).then(canvas => {
+                if (exportLogo) exportLogo.style.display = 'none';
+                dlBtn.innerHTML = oldHTML;
+                const link = document.createElement('a');
+                link.download = 'Hassif_Post_' + card.dataset.postId + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+             }).catch(() => {
+                if (exportLogo) exportLogo.style.display = 'none';
+                dlBtn.innerHTML = '❌';
+                setTimeout(() => dlBtn.innerHTML = oldHTML, 2000);
+             });
+          } else if (!window.html2canvas) {
+             alert('جاري تحميل مكتبة الصور، حاول مرة أخرى.');
+          }
+          return;
+        }
+
+        // Share Link
+        const shareBtn = e.target.closest('.ch-share-btn-' + CFG.genId);
+        if (shareBtn) {
+          e.stopPropagation();
+          const card = shareBtn.closest('.ch-card-' + CFG.genId);
+          if (card) {
+            const url = window.location.origin + window.location.pathname + '?post_id=' + card.dataset.postId;
+            navigator.clipboard.writeText(url).then(() => {
+               const oldHTML = shareBtn.innerHTML;
+               shareBtn.innerHTML = '✅';
+               setTimeout(() => shareBtn.innerHTML = oldHTML, 2000);
+            });
+          }
+          return;
+        }
+        // Vote system
+        const btn = e.target.closest('.ch-vote-btn-' + CFG.genId);
+        if (btn) {
+          const sys = btn.closest('.ch-vote-system-' + CFG.genId);
+          const id = sys.dataset.postId;
+          const dir = btn.dataset.dir;
+
+          const upBtn = sys.querySelector('.ch-vote-btn-up-' + CFG.genId);
+          const dnBtn = sys.querySelector('.ch-vote-btn-down-' + CFG.genId);
+          const scoreEl = sys.querySelector('.ch-vote-score-' + CFG.genId);
+          
+          let currentScore = parseInt(scoreEl.dataset.score || 0);
+          const currentVote = getVoted()[id] || null;
+
+          if (currentVote === dir) {
+             // Undo vote
+             if(dir === 'up') currentScore--;
+             if(dir === 'down') currentScore++;
+             setVoted(id, null);
+             upBtn.classList.remove('active');
+             dnBtn.classList.remove('active');
+          } else {
+             // New vote
+             if (dir === 'up') {
+                currentScore += (currentVote === 'down' ? 2 : 1);
+                upBtn.classList.add('active');
+                dnBtn.classList.remove('active');
+                
+                if (CFG.voteUpAnim) {
+                   const anim = document.createElement('img');
+                   anim.src = CFG.voteUpAnim;
+                   anim.style.cssText = 'position:absolute; width:48px; height:48px; z-index:10; pointer-events:none; left:50%; top:50%; transform:translate(-50%, -50%);';
+                   upBtn.appendChild(anim);
+                   const svg = upBtn.querySelector('svg');
+                   if(svg) svg.style.opacity = '0';
+                   setTimeout(() => {
+                      anim.style.opacity = '0';
+                      anim.style.transition = 'opacity 0.3s';
+                      setTimeout(() => anim.remove(), 300);
+                      if(svg) svg.style.opacity = '1';
+                   }, 1500);
+                } else {
+                   // Burst effect
+                   const wrap = upBtn.querySelector('.ch-particle-wrap-' + CFG.genId);
+                   for(let i=0; i<8; i++) {
+                      const p = document.createElement('div');
+                      p.className = 'ch-particle-' + CFG.genId;
+                      p.style.background = Math.random() > 0.5 ? '#910F3F' : '#E0BA44';
+                      p.style.left = '50%'; p.style.top = '50%';
+                      wrap.appendChild(p);
+                      const ang = Math.random() * Math.PI * 2;
+                      const dist = 15 + Math.random() * 20;
+                      p.animate([
+                        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                        { transform: `translate(calc(-50% + ${Math.cos(ang)*dist}px), calc(-50% + ${Math.sin(ang)*dist - 15}px)) scale(0)`, opacity: 0 }
+                      ], { duration: 450 + Math.random()*200, easing: 'ease-out' });
+                      setTimeout(()=>p.remove(), 700);
+                   }
+                }
+             } else {
+                currentScore -= (currentVote === 'up' ? 2 : 1);
+                dnBtn.classList.add('active');
+                upBtn.classList.remove('active');
+                if (CFG.voteDownAnim) {
+                   const anim = document.createElement('img');
+                   anim.src = CFG.voteDownAnim;
+                   anim.style.cssText = 'position:absolute; width:48px; height:48px; z-index:10; pointer-events:none; left:50%; top:50%; transform:translate(-50%, -50%);';
+                   dnBtn.appendChild(anim);
+                   const svg = dnBtn.querySelector('svg');
+                   if(svg) svg.style.opacity = '0';
+                   setTimeout(() => {
+                      anim.style.opacity = '0';
+                      anim.style.transition = 'opacity 0.3s';
+                      setTimeout(() => anim.remove(), 300);
+                      if(svg) svg.style.opacity = '1';
+                   }, 1500);
+                }
+             }
+             setVoted(id, dir);
+          }
+
+          scoreEl.dataset.score = currentScore;
+          scoreEl.textContent = currentScore;
+          scoreEl.classList.remove('bounce');
+          void scoreEl.offsetWidth; // trigger reflow
+          scoreEl.classList.add('bounce');
+          
+          if(dir === 'up' && currentVote !== 'up') {
+            await SB.incrementLike(id).catch(()=>{});
+          } else if(dir === 'down' && currentVote !== 'down') {
+            // Note: Since decrementLike RPC might not exist, this acts optimistically on client.
+          }
+          return;
+        }
+
+        // Post Expansion Modal
+        const card = e.target.closest('.ch-card-' + CFG.genId);
+        if (card) {
+          const img = e.target.closest('.ch-card-img-' + CFG.genId);
+          if (img) return; // Let image zoom handler handle this
+
+          const postModal = document.getElementById('ch-post-modal-' + CFG.genId);
+          const modalContent = document.getElementById('ch-post-modal-content-' + CFG.genId);
+          if (postModal && modalContent) {
+             modalContent.innerHTML = '';
+             const clone = card.cloneNode(true);
+             clone.style.transform = 'none';
+             clone.style.opacity = '1';
+             clone.style.margin = '0';
+             clone.style.cursor = 'default';
+             clone.style.boxShadow = 'none';
+             
+             // Dynamic image styling to keep it comfortable in modal
+             const imgInClone = clone.querySelector('.ch-card-img-' + CFG.genId);
+             if (imgInClone) {
+                imgInClone.style.objectFit = 'contain';
+                imgInClone.style.maxHeight = '50vh';
+                imgInClone.style.background = 'rgba(0,0,0,0.03)';
+             }
+             
+             modalContent.appendChild(clone);
+             postModal.classList.add('open');
+          }
+        }
+      });
+    }
+
+    /* Load more */
+    const lmBtn = g('ch-load-more-' + CFG.genId);
+    if (lmBtn) lmBtn.addEventListener('click', () => Feed.load(false));
+
+    /* Initial feed load */
+    if (SB.ready) {
+      const params = new URLSearchParams(window.location.search);
+      const deepLinkPostId = params.get('post_id');
+      if (deepLinkPostId) {
+         fetch(CFG.supabaseUrl + '/rest/v1/posts?id=eq.' + deepLinkPostId, { headers: { 'apikey': CFG.supabaseKey, 'Authorization': 'Bearer ' + CFG.supabaseKey } })
+         .then(r => r.json())
+         .then(rows => {
+            if(rows && rows.length > 0) {
+              const clone = renderCard(rows[0]);
+              const postModal = document.getElementById('ch-post-modal-' + CFG.genId);
+              const modalContent = document.getElementById('ch-post-modal-content-' + CFG.genId);
+              if (postModal && modalContent) {
+                 modalContent.innerHTML = '';
+                 clone.style.transform = 'none';
+                 clone.style.opacity = '1';
+                 clone.style.margin = '0';
+                 clone.style.cursor = 'default';
+                 clone.style.boxShadow = 'none';
+                 const imgInClone = clone.querySelector('.ch-card-img-' + CFG.genId);
+                 if (imgInClone) {
+                    imgInClone.style.objectFit = 'contain';
+                    imgInClone.style.maxHeight = '50vh';
+                    imgInClone.style.background = 'rgba(0,0,0,0.03)';
+                 }
+                 modalContent.appendChild(clone);
+                 postModal.classList.add('open');
+                 setTimeout(() => postModal.scrollIntoView(), 300);
+              }
+            }
+         }).catch(()=>{});
+      }
+
+      Feed.fetchHighlight().then(() => {
+        Feed.load(true);
+      });
+    }
+  });
+
+
+// image zoom
+document.addEventListener('click', function(e) {
+  const img = e.target.closest('.ch-card-img-{{ ai_gen_id }}');
+  if (!img) return;
+
+  const modal = document.getElementById('ch-image-modal-{{ ai_gen_id }}');
+  const modalImg = document.getElementById('ch-image-modal-img-{{ ai_gen_id }}');
+
+  modal.style.display = 'flex';
+  modalImg.src = img.src;
+});
+
+document.getElementById('ch-image-modal-{{ ai_gen_id }}')
+?.addEventListener('click', function() {
+  this.style.display = 'none';
+});
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "ركن المجتمع v2",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🔗 إعدادات Supabase"
+    },
+    {
+      "type": "text",
+      "id": "supabase_url",
+      "label": "Supabase Project URL",
+      "placeholder": "https://xxxx.supabase.co",
+      "info": "Settings > API > Project URL"
+    },
+    {
+      "type": "text",
+      "id": "supabase_key",
+      "label": "Supabase Anon Key",
+      "info": "Settings > API > anon public"
+    },
+    {
+      "type": "header",
+      "content": "🖼 إعدادات ImgBB (رفع الصور)"
+    },
+    {
+      "type": "text",
+      "id": "imgbb_key",
+      "label": "ImgBB API Key",
+      "info": "أنشئ حساباً على imgbb.com ثم اذهب إلى API للحصول على المفتاح"
+    },
+    {
+      "type": "header",
+      "content": "⚙️ إعدادات المجتمع"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_highlight_post",
+      "label": "إظهار قسم 'نبض الحصيف اليوم'",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_guest_posts",
+      "label": "السماح بالنشر بدون تسجيل دخول",
+      "default": false,
+      "info": "سيُطلب من الزائر كتابة اسم مستعار فقط"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_moderation",
+      "label": "تفعيل المراجعة قبل النشر",
+      "default": true,
+      "info": "المشاركات لن تظهر للعامة إلا بعد الموافقة من Supabase > Table Editor"
+    },
+    {
+      "type": "range",
+      "id": "posts_per_page",
+      "label": "عدد المشاركات في كل تحميل",
+      "min": 6,
+      "max": 24,
+      "step": 3,
+      "default": 9
+    },
+    {
+      "type": "header",
+      "content": "📝 النصوص"
+    },
+    {
+      "type": "text",
+      "id": "main_title",
+      "label": "العنوان الرئيسي",
+      "default": "ركن أصدقاء الحصيف"
+    },
+    {
+      "type": "text",
+      "id": "main_subtitle",
+      "label": "العنوان الفرعي",
+      "default": "شارك التقاطاتك واقتباساتك وتعليقاتك مع المجتمع"
+    },
+    {
+      "type": "text",
+      "id": "login_title",
+      "label": "عنوان إشعار الدخول",
+      "default": "سجل دخولك للمشاركة"
+    },
+    {
+      "type": "textarea",
+      "id": "login_message",
+      "label": "رسالة إشعار الدخول",
+      "default": "انضم إلى مجتمع أصدقاء الحصيف وشارك التقاطاتك واقتباساتك المفضلة"
+    },
+    {
+      "type": "text",
+      "id": "login_button_text",
+      "label": "نص زر الدخول",
+      "default": "تسجيل الدخول"
+    },
+    {
+      "type": "text",
+      "id": "tab_photos_title",
+      "label": "تبويب الالتقاطات",
+      "default": "التقاطات أصدقاء الحصيف"
+    },
+    {
+      "type": "text",
+      "id": "tab_quotes_title",
+      "label": "تبويب الاقتباسات",
+      "default": "اقتباسات أصدقاء الحصيف"
+    },
+    {
+      "type": "text",
+      "id": "tab_comments_title",
+      "label": "تبويب التعليقات",
+      "default": "تعليقات أصدقاء الحصيف"
+    },
+    {
+      "type": "header",
+      "content": "🖼️ أيقونات الفئات"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_photo",
+      "label": "أيقونة الالتقاطات"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_quote",
+      "label": "أيقونة الاقتباسات"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_comment",
+      "label": "أيقونة التعليقات"
+    },
+    {
+      "type": "header",
+      "content": "✨ تأثيرات الأنيميشن"
+    },
+    {
+      "type": "image_picker",
+      "id": "vote_up_anim",
+      "label": "أنيميشن رفع الصوت (Upvote GIF)"
+    },
+    {
+      "type": "image_picker",
+      "id": "vote_down_anim",
+      "label": "أنيميشن خفض الصوت (Downvote GIF)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_loading_anim",
+      "label": "تفعيل شريط التحميل بين الأقسام",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "loading_anim_img",
+      "label": "أنيميشن أو صورة التحميل (وسط الشاشة)"
+    },
+    {
+      "type": "image_picker",
+      "id": "export_logo",
+      "label": "شعار التصدير (يظهر عند التصدير كصورة فقط)"
+    },
+    {
+      "type": "text",
+      "id": "form_photos_title",
+      "label": "عنوان نموذج الالتقاطات",
+      "default": "شارك التقاطك المفضل"
+    },
+    {
+      "type": "text",
+      "id": "form_quotes_title",
+      "label": "عنوان نموذج الاقتباسات",
+      "default": "شارك اقتباسك المفضل"
+    },
+    {
+      "type": "text",
+      "id": "form_comments_title",
+      "label": "عنوان نموذج التعليقات",
+      "default": "شارك تعليقك"
+    },
+    {
+      "type": "header",
+      "content": "📰 القسم العام"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_public_posts",
+      "label": "عرض الفيد العام",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "public_section_title",
+      "label": "عنوان القسم العام",
+      "default": "مشاركات القراء"
+    },
+    {
+      "type": "text",
+      "id": "public_tab_photos",
+      "label": "تبويب التقاطات القراء",
+      "default": "التقاطات القراء"
+    },
+    {
+      "type": "text",
+      "id": "sort_newest_text",
+      "label": "نص زر الترتيب (الأحدث)",
+      "default": "🕒 الأحدث"
+    },
+    {
+      "type": "text",
+      "id": "sort_popular_text",
+      "label": "نص زر الترتيب (الأكثر تفاعلاً)",
+      "default": "🔥 الأكثر تفاعلاً"
+    },
+    {
+      "type": "text",
+      "id": "public_tab_quotes",
+      "label": "تبويب اقتباسات القراء",
+      "default": "اقتباسات القراء"
+    },
+    {
+      "type": "text",
+      "id": "public_tab_comments",
+      "label": "تبويب تعليقات القراء",
+      "default": "تعليقات القراء"
+    },
+    {
+      "type": "header",
+      "content": "📖 قسم المقالات"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_blog_section",
+      "label": "عرض قسم المقالات",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "blog_section_title",
+      "label": "عنوان قسم المقالات",
+      "default": "أحدث المقالات"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "المدونة"
+    },
+    {
+      "type": "range",
+      "id": "blog_posts_count",
+      "label": "عدد المقالات",
+      "min": 3,
+      "max": 12,
+      "step": 3,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "🎨 الألوان"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "لون البطاقات",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العناوين",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "meta_color",
+      "label": "لون النص الثانوي",
+      "default": "#888888"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "لون الظل",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "لون الأزرار",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "لون نص الأزرار",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "tab_text",
+      "label": "لون نص التبويبات",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_bg",
+      "label": "لون التبويب النشط",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_text",
+      "label": "لون نص التبويب النشط",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "🪡 ألوان التطريز الفلسطيني"
+    },
+    {
+      "type": "color",
+      "id": "accent_color_1",
+      "label": "لون التطريز 1",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "accent_color_2",
+      "label": "لون التطريز 2",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "accent_color_3",
+      "label": "لون التطريز 3",
+      "default": "#f9e547"
+    },
+    {
+      "type": "header",
+      "content": "📐 الأحجام"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "العرض الأقصى",
+      "min": 800,
+      "max": 1400,
+      "step": 100,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم العنوان الفرعي",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "label": "سمك الحدود",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "انحناء البطاقات",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "انحناء الأزرار",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "input_radius",
+      "label": "انحناء الحقول",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "shadow_x",
+      "label": "الظل أفقياً",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "shadow_y",
+      "label": "الظل عمودياً",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "🔤 الخطوط"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "خط العناوين",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "خط النص",
+      "default": "assistant_n4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "ركن المجتمع v2"
+    }
+  ]
+}
+{% endschema %}

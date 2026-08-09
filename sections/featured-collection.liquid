@@ -1,0 +1,1117 @@
+{% comment %}
+╔══════════════════════════════════════════════════════════════╗
+║  CASSETTE COLLECTION ARC — عرض منتجات الكولكشن              ║
+║  Arc انسيابي • بطاقات كاسيت • صور بالطول • تحكم كامل        ║
+╚══════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+#cas-arc {
+  /* Colors */
+  --bg:       {{ section.settings.color_bg }};
+  --primary:  {{ section.settings.color_primary }};
+  --accent:   {{ section.settings.color_accent }};
+  --text:     {{ section.settings.color_text }};
+  --card-bg:  {{ section.settings.color_card_bg }};
+  --card-bdr: {{ section.settings.color_card_border }};
+  --muted:    color-mix(in srgb, var(--text) 42%, transparent);
+
+  /* Pattern */
+  --pat-h:    {{ section.settings.pattern_h }}px;
+  --pat-s:    {{ section.settings.pattern_stripe }}px;
+  --p1:       {{ section.settings.color_p1 }};
+  --p2:       {{ section.settings.color_p2 }};
+  --p3:       {{ section.settings.color_p3 }};
+
+  /* Arc */
+  --card-w:   {{ section.settings.card_w }}px;
+  --card-h:   {{ section.settings.card_h }}px;
+  --arc-drop: {{ section.settings.arc_drop }}px;
+  --step:     {{ section.settings.card_step }}px;
+  --stage-h:  {{ section.settings.stage_h }}px;
+
+  /* Card style */
+  --radius:   {{ section.settings.card_radius }}px;
+  --bdr-w:    {{ section.settings.card_border_w }}px;
+  --sh-x:     {{ section.settings.shadow_x }}px;
+  --sh-y:     {{ section.settings.shadow_y }}px;
+  --sh-c:     {{ section.settings.shadow_color }};
+
+  /* Button */
+  --btn-bg:   {{ section.settings.btn_bg }};
+  --btn-txt:  {{ section.settings.btn_text_color }};
+  --btn-bdr:  {{ section.settings.btn_border }};
+  --btn-sh:   {{ section.settings.btn_shadow }};
+  --btn-hbg:  {{ section.settings.btn_hover_bg }};
+  --btn-htxt: {{ section.settings.btn_hover_text }};
+  --btn-r:    {{ section.settings.btn_radius }}px;
+  --btn-bw:   {{ section.settings.btn_border_w }}px;
+  --btn-sx:   {{ section.settings.btn_sh_x }}px;
+  --btn-sy:   {{ section.settings.btn_sh_y }}px;
+
+  /* Typography */
+  --f:        'Cairo', sans-serif;
+
+  /* Spacing */
+  --sec-pt:   {{ section.settings.sec_pt }}px;
+  --sec-pb:   {{ section.settings.sec_pb }}px;
+  --sec-ph:   {{ section.settings.sec_ph }}px;
+  --max-w:    {{ section.settings.max_w }}px;
+}
+
+/* ══════════════════════════════════════════════
+   RESET + ROOT
+══════════════════════════════════════════════ */
+#cas-arc *, #cas-arc *::before, #cas-arc *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+}
+
+#cas-arc {
+  background: var(--bg);
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  direction: rtl;
+  font-family: var(--f);
+  padding: var(--sec-pt) var(--sec-ph) var(--sec-pb);
+}
+
+/* Grain */
+{% unless section.settings.no_grain %}
+#cas-arc::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.032'/%3E%3C/svg%3E");
+}
+{% endunless %}
+
+/* Ambient */
+.cas-ambient {
+  position: absolute;
+  top: -80px; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    color-mix(in srgb, var(--primary) 7%, transparent) 0%,
+    transparent 70%);
+  pointer-events: none; z-index: 0;
+  transition: background 1.2s ease;
+}
+
+/* ══════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════ */
+.cas-header {
+  text-align: center;
+  position: relative; z-index: 2;
+  margin-bottom: {{ section.settings.header_mb }}px;
+  max-width: var(--max-w);
+  margin-left: auto; margin-right: auto;
+}
+
+.cas-eyebrow {
+  font-size: {{ section.settings.sz_eyebrow }}px;
+  font-weight: 300;
+  color: var(--primary);
+  opacity: .7;
+  margin-bottom: 6px;
+}
+
+.cas-title {
+  font-size: {{ section.settings.sz_title }}px;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.15;
+  display: inline-block;
+  position: relative;
+}
+.cas-title em { color: var(--primary); font-style: normal; }
+
+/* Dashes */
+{% if section.settings.show_title_deco %}
+.cas-title::before, .cas-title::after {
+  content: '';
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  height: {{ section.settings.deco_h }}px;
+  width: {{ section.settings.deco_w }}px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--primary) 0, var(--primary) var(--pat-s),
+    transparent var(--pat-s), transparent calc(var(--pat-s) * 2)
+  );
+  opacity: .38;
+}
+.cas-title::before { right: calc(100% + {{ section.settings.deco_gap }}px); }
+.cas-title::after  { left:  calc(100% + {{ section.settings.deco_gap }}px); }
+{% endif %}
+
+.cas-subtitle {
+  font-size: {{ section.settings.sz_subtitle }}px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════
+   ARC STAGE
+══════════════════════════════════════════════ */
+.cas-stage {
+  position: relative;
+  width: 100%;
+  height: var(--stage-h);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: visible;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+  z-index: 2;
+  margin-bottom: {{ section.settings.stage_mb }}px;
+}
+.cas-stage:active { cursor: grabbing; }
+.cas-stage.is-dragging { cursor: grabbing; }
+
+.cas-track {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* ══════════════════════════════════════════════
+   PRODUCT CARD — Cassette Style
+══════════════════════════════════════════════ */
+.cas-card {
+  position: absolute;
+  bottom: 0;
+  width: var(--card-w);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--card-bg);
+  border: var(--bdr-w) solid var(--card-bdr);
+  box-shadow: var(--sh-x) var(--sh-y) 0 var(--sh-c);
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform, opacity;
+  transform-origin: center bottom;
+  text-decoration: none;
+  transition:
+    border-color .35s ease,
+    box-shadow .35s ease;
+}
+
+/* Active card highlight */
+.cas-card.is-active {
+  border-color: var(--primary);
+  box-shadow:
+    var(--sh-x) var(--sh-y) 0 var(--sh-c),
+    0 0 0 2px color-mix(in srgb, var(--primary) 22%, transparent),
+    0 14px 44px color-mix(in srgb, var(--primary) 18%, transparent);
+  animation: casCardPulse 4.2s ease-in-out infinite;
+}
+@keyframes casCardPulse {
+  0%,100% { box-shadow: var(--sh-x) var(--sh-y) 0 var(--sh-c), 0 0 0 2px color-mix(in srgb,var(--primary) 18%,transparent), 0 10px 36px color-mix(in srgb,var(--primary) 14%,transparent); }
+  50%     { box-shadow: var(--sh-x) var(--sh-y) 0 var(--sh-c), 0 0 0 5px color-mix(in srgb,var(--primary) 26%,transparent), 0 20px 56px color-mix(in srgb,var(--primary) 22%,transparent); }
+}
+
+/* Cassette stripe top */
+.cas-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--pat-h);
+  z-index: 4;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--p1) 0, var(--p1) var(--pat-s),
+    var(--p2) var(--pat-s), var(--p2) calc(var(--pat-s) * 2),
+    var(--p3) calc(var(--pat-s) * 2), var(--p3) calc(var(--pat-s) * 3)
+  );
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* ── Image (tall portrait) ── */
+.cas-card-img-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: var(--pat-h);
+  flex-shrink: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+.cas-card-img {
+  display: block;
+  width: 100%;
+  height: var(--card-h);
+  object-fit: {{ section.settings.img_fit }};
+  transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+}
+.cas-card:hover .cas-card-img,
+.cas-card.is-active .cas-card-img {
+  transform: scale({{ section.settings.img_hover_scale | divided_by: 100.0 }});
+}
+
+/* Gradient overlay on image */
+.cas-card-img-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 45%;
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--card-bg) 70%, transparent) 0%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+/* Cassette placeholder SVG */
+.cas-card-placeholder {
+  width: 100%;
+  height: var(--card-h);
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+/* ── Card Body ── */
+.cas-card-body {
+  padding: {{ section.settings.body_pt }}px {{ section.settings.body_ph }}px {{ section.settings.body_pb }}px;
+  display: flex;
+  flex-direction: column;
+  gap: {{ section.settings.body_gap }}px;
+  flex: 1;
+  position: relative;
+}
+
+/* Dotted divider line */
+.cas-card-body::before {
+  content: '';
+  position: absolute;
+  top: 0; left: {{ section.settings.body_ph }}px; right: {{ section.settings.body_ph }}px;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--primary) 0, var(--primary) 4px,
+    transparent 4px, transparent 8px
+  );
+  opacity: .28;
+}
+
+/* Badge (rank / number) */
+.cas-card-rank {
+  font-size: {{ section.settings.sz_rank }}px;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: 0;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.cas-card-title {
+  font-size: {{ section.settings.sz_card_title }}px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: {{ section.settings.title_lines }};
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cas-card-price {
+  font-size: {{ section.settings.sz_price }}px;
+  font-weight: 900;
+  color: var(--primary);
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.cas-card-link {
+  font-size: {{ section.settings.sz_card_link }}px;
+  font-weight: 800;
+  color: var(--primary);
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0;
+  transition: color .2s;
+}
+.cas-card-link::after {
+  content: '';
+  position: absolute; bottom: -2px; left: 0;
+  width: 0; height: 2px;
+  background: var(--primary);
+  transition: width .3s ease;
+}
+.cas-card-link:hover { color: var(--text); }
+.cas-card-link:hover::after { width: 100%; }
+
+/* Side-card name overlay (visible on non-active) */
+.cas-card-side-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 8px {{ section.settings.body_ph }}px;
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--card-bg) 90%, transparent),
+    transparent);
+  font-size: {{ section.settings.sz_side_label }}px;
+  font-weight: 700;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.cas-card.is-near .cas-card-side-label { opacity: .7; }
+
+/* ══════════════════════════════════════════════
+   NAVIGATION DOTS
+══════════════════════════════════════════════ */
+.cas-dots {
+  display: flex;
+  justify-content: center;
+  gap: {{ section.settings.dot_gap }}px;
+  margin-bottom: {{ section.settings.dots_mb }}px;
+  position: relative; z-index: 2;
+}
+.cas-dot {
+  height: {{ section.settings.dot_h }}px;
+  border-radius: {{ section.settings.dot_r }}px;
+  background: var(--card-bdr);
+  opacity: .25;
+  cursor: pointer;
+  border: none; padding: 0;
+  transition: opacity .3s, width .35s cubic-bezier(.34,1.3,.64,1), background .3s;
+  width: {{ section.settings.dot_w }}px;
+}
+.cas-dot.active {
+  opacity: 1;
+  width: {{ section.settings.dot_w_active }}px;
+  background: var(--primary);
+}
+
+/* ══════════════════════════════════════════════
+   DRAG HINT
+══════════════════════════════════════════════ */
+.cas-drag-hint {
+  position: absolute;
+  bottom: -{{ section.settings.hint_bottom }}px;
+  left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none; z-index: 3;
+  white-space: nowrap;
+}
+.cas-drag-hint.show { opacity: .55; }
+.cas-drag-hint svg { width: 16px; height: 16px; }
+
+/* ══════════════════════════════════════════════
+   CTA SECTION
+══════════════════════════════════════════════ */
+.cas-cta-wrap {
+  display: flex; justify-content: center;
+  position: relative; z-index: 2;
+  padding: {{ section.settings.cta_pt }}px var(--sec-ph) {{ section.settings.cta_pb }}px;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .5s ease .2s, transform .5s ease .2s;
+}
+.cas-cta-wrap.on { opacity: 1; transform: translateY(0); }
+
+.cas-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--f);
+  font-size: {{ section.settings.sz_cta }}px;
+  font-weight: 700;
+  color: var(--btn-txt);
+  background: var(--btn-bg);
+  border: var(--btn-bw) solid var(--btn-bdr);
+  border-radius: var(--btn-r);
+  padding: {{ section.settings.btn_pv }}px {{ section.settings.btn_ph }}px;
+  text-decoration: none; cursor: pointer;
+  position: relative; overflow: hidden;
+  letter-spacing: 0;
+  box-shadow: var(--btn-sx) var(--btn-sy) 0 var(--btn-sh);
+  transition: color .22s, background .22s, border-color .22s,
+              transform .2s, box-shadow .2s;
+}
+.cas-cta::before {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,.13), transparent);
+  transition: left .5s ease;
+}
+.cas-cta:hover::before { left: 140%; }
+.cas-cta:hover {
+  background: var(--btn-hbg);
+  color: var(--btn-htxt);
+  border-color: var(--btn-hbg);
+  transform: translate(calc(var(--btn-sx) * .5), calc(var(--btn-sy) * .5));
+  box-shadow: calc(var(--btn-sx) * .5) calc(var(--btn-sy) * .5) 0 var(--btn-sh);
+}
+.cas-cta svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #cas-arc {
+    --card-w:   min({{ section.settings.card_w }}px, {{ section.settings.card_w_mob_pct }}vw);
+    --card-h:   min({{ section.settings.card_h }}px, 50vw);
+    --step:     min({{ section.settings.card_step }}px, {{ section.settings.step_mob_pct }}vw);
+    --stage-h:  min({{ section.settings.stage_h }}px, 70vw);
+    --arc-drop: min({{ section.settings.arc_drop }}px, 10vw);
+    --sec-ph:   {{ section.settings.sec_ph_mob }}px;
+  }
+}
+</style>
+
+<!-- ══════════════════════════════════════
+     HTML
+══════════════════════════════════════ -->
+<section id="cas-arc">
+  <div class="cas-ambient" id="cas-ambient"></div>
+
+  <!-- Header -->
+  {% if section.settings.show_header %}
+  <header class="cas-header">
+    {% if section.settings.eyebrow != blank %}
+    <p class="cas-eyebrow">{{ section.settings.eyebrow }}</p>
+    {% endif %}
+    <h2 class="cas-title">
+      {{ section.settings.title_before }}
+      {% if section.settings.title_hl != blank %}<em>{{ section.settings.title_hl }}</em>{% endif %}
+      {{ section.settings.title_after }}
+    </h2>
+    {% if section.settings.subtitle != blank %}
+    <p class="cas-subtitle">{{ section.settings.subtitle }}</p>
+    {% endif %}
+  </header>
+  {% endif %}
+
+  <!-- Arc Stage -->
+  <div class="cas-stage" id="cas-stage">
+    <div class="cas-track" id="cas-track"></div>
+    <div class="cas-drag-hint" id="cas-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+      اسحب للتصفح
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:scaleX(-1)">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Navigation Dots -->
+  {% if section.settings.show_dots %}
+  <div class="cas-dots" id="cas-dots"></div>
+  {% endif %}
+
+  <!-- CTA -->
+  {% if section.settings.show_cta and section.settings.collection != blank %}
+  <div class="cas-cta-wrap" id="cas-cta-wrap">
+    <a class="cas-cta"
+       href="{{ section.settings.collection.url }}{% if section.settings.cta_url != blank %}{{ section.settings.cta_url }}{% endif %}">
+      <svg viewBox="0 0 20 20">
+        <path d="M7 15L12 10L7 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none"/>
+      </svg>
+      {{ section.settings.cta_text }}
+    </a>
+  </div>
+  {% endif %}
+
+</section>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+(function(){
+"use strict";
+
+/* ── CONFIG FROM SCHEMA ── */
+const CFG = {
+  CARD_W:   {{ section.settings.card_w }},
+  CARD_H:   {{ section.settings.card_h }},
+  DROP:     {{ section.settings.arc_drop }},
+  STEP:     {{ section.settings.card_step }},
+  SNAP_MS:  {{ section.settings.snap_ms }},
+  FRICT:    {{ section.settings.friction }} / 100,
+  DRAG_S:   {{ section.settings.drag_speed }} / 100,
+  SIDE_OP:  {{ section.settings.side_opacity }} / 100,
+  SIDE_SC:  {{ section.settings.side_scale }} / 100,
+  MAX_VIS:  {{ section.settings.max_visible }},
+  SHOW_CTA: {{ section.settings.show_cta | json }},
+  LOOP:     {{ section.settings.enable_loop | json }},
+  AUTO_ON:  {{ section.settings.auto_scroll | json }},
+  AUTO_MS:  {{ section.settings.auto_ms }},
+  BLUR_ON:  {{ section.settings.side_blur | json }},
+  BLUR_MAX: {{ section.settings.blur_max }},
+  RANK_PRE: {{ section.settings.rank_prefix | json }},
+  SHOW_RNK: {{ section.settings.show_rank | json }},
+  SHOW_PRC: {{ section.settings.show_price | json }},
+  SHOW_LNK: {{ section.settings.show_link | json }},
+  LINK_TXT: {{ section.settings.card_link_text | json }},
+};
+
+/* ── PRODUCTS ── */
+{%- if section.settings.collection != blank -%}
+{%- assign prods = section.settings.collection.products -%}
+{%- assign limit = section.settings.products_limit -%}
+const PRODUCTS = [
+  {%- for p in prods limit: limit -%}
+  {
+    title: {{ p.title | json }},
+    price: {{ p.price | money | json }},
+    img:   {{ p.featured_image | img_url: '600x900', crop: 'center' | json }},
+    url:   {{ p.url | json }},
+  },
+  {%- endfor -%}
+];
+{%- else -%}
+const PRODUCTS = [];
+{%- endif -%}
+
+if (!PRODUCTS.length) return;
+const N = PRODUCTS.length;
+
+/* ── STATE ── */
+let offset    = 0;
+let velocity  = 0;
+let activeIdx = 0;
+let dragging  = false;
+let lastX     = null;
+let lastT     = 0;
+let didDrag   = false;
+let snapRaf   = null;
+let inRaf     = null;
+let autoTimer = null;
+
+/* ── DOM ── */
+const root    = document.getElementById('cas-arc');
+const stage   = document.getElementById('cas-stage');
+const track   = document.getElementById('cas-track');
+const dotsEl  = document.getElementById('cas-dots');
+const ctaW    = document.getElementById('cas-cta-wrap');
+const hint    = document.getElementById('cas-hint');
+const ambient = document.getElementById('cas-ambient');
+let   cardEls = [];
+let   dotEls  = [];
+
+/* ── READ CSS VARS (responsive) ── */
+function readVars(){
+  const cs = getComputedStyle(root);
+  CFG.CARD_W = parseFloat(cs.getPropertyValue('--card-w')) || CFG.CARD_W;
+  CFG.CARD_H = parseFloat(cs.getPropertyValue('--card-h')) || CFG.CARD_H;
+  CFG.STEP   = parseFloat(cs.getPropertyValue('--step'))   || CFG.STEP;
+  CFG.DROP   = parseFloat(cs.getPropertyValue('--arc-drop'))|| CFG.DROP;
+}
+
+/* ── BUILD CARDS ── */
+function buildCards(){
+  track.innerHTML = '';
+  cardEls = [];
+
+  PRODUCTS.forEach((p, i) => {
+    const a = document.createElement('a');
+    a.className = 'cas-card';
+    a.href      = p.url || '#';
+    a.dataset.i = i;
+
+    const imgHtml = p.img
+      ? `<img class="cas-card-img" src="${p.img}" alt="${p.title||''}" loading="${i===0?'eager':'lazy'}" decoding="async">
+         <div class="cas-card-img-overlay"></div>`
+      : `<div class="cas-card-placeholder">
+           <svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="55%" style="opacity:.2">
+             <rect x="4" y="4" width="72" height="112" rx="6" stroke="currentColor" stroke-width="3"/>
+             <circle cx="40" cy="55" r="18" stroke="currentColor" stroke-width="2.5"/>
+             <circle cx="40" cy="55" r="6" fill="currentColor" opacity=".4"/>
+             <path d="M28 28 Q40 22 52 28" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+             <rect x="20" y="90" width="40" height="4" rx="2" fill="currentColor" opacity=".25"/>
+             <rect x="28" y="100" width="24" height="3" rx="1.5" fill="currentColor" opacity=".18"/>
+           </svg>
+         </div>`;
+
+    const rankHtml = CFG.SHOW_RNK
+      ? `<div class="cas-card-rank">${CFG.RANK_PRE}${i+1}</div>` : '';
+
+    const priceHtml = CFG.SHOW_PRC && p.price
+      ? `<div class="cas-card-price">${p.price}</div>` : '';
+
+    const linkHtml = CFG.SHOW_LNK
+      ? `<span class="cas-card-link">${CFG.LINK_TXT}</span>` : '';
+
+    a.innerHTML = `
+      <div class="cas-card-img-wrap">${imgHtml}</div>
+      <div class="cas-card-body">
+        ${rankHtml}
+        <div class="cas-card-title">${p.title || ''}</div>
+        ${priceHtml}
+        ${linkHtml}
+      </div>
+      <div class="cas-card-side-label">${p.title || ''}</div>`;
+
+    track.appendChild(a);
+    cardEls.push(a);
+
+    a.addEventListener('click', e => {
+      if (didDrag){ e.preventDefault(); return; }
+      if (i !== activeIdx){ e.preventDefault(); snapToReal(i); }
+    });
+  });
+
+  /* Build dots */
+  if (dotsEl){
+    dotsEl.innerHTML = '';
+    dotEls = [];
+    PRODUCTS.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'cas-dot' + (i===0?' active':'');
+      d.setAttribute('aria-label', `منتج ${i+1}`);
+      d.addEventListener('click', () => { stopAuto(); snapToReal(i); });
+      dotsEl.appendChild(d);
+      dotEls.push(d);
+    });
+  }
+}
+
+/* ── LAYOUT (arc parabola) ── */
+function layout(){
+  const sideRatio = CFG.SIDE_SC;
+
+  cardEls.forEach((el, i) => {
+    let rel = i - offset;
+
+    // Infinite loop wrapping
+    if (CFG.LOOP){
+      rel = rel - Math.round(rel / N) * N;
+    }
+
+    const absRel = Math.abs(rel);
+
+    if (absRel > CFG.MAX_VIS + 0.9){
+      el.style.visibility = 'hidden';
+      return;
+    }
+    el.style.visibility = 'visible';
+
+    /* Position on arc */
+    const x    = rel * CFG.STEP;
+    const yDrop= (rel * rel / (CFG.MAX_VIS * CFG.MAX_VIS)) * CFG.DROP;
+
+    /* Scale: center=1, sides=sideRatio */
+    const t     = Math.max(0, 1 - absRel);
+    const scale = sideRatio + (1 - sideRatio) * Math.max(0, 1 - absRel * .95);
+
+    /* Opacity */
+    const opacity = CFG.SIDE_OP + (1 - CFG.SIDE_OP) * Math.max(0, 1 - absRel * .8);
+
+    /* Blur (optional) */
+    const blurPx = CFG.BLUR_ON ? (1 - Math.max(0, 1 - absRel)) * CFG.BLUR_MAX : 0;
+
+    /* Apply — transform only (GPU compositing) */
+    el.style.transform = `translateX(${x}px) translateY(${-yDrop}px) scale(${scale})`;
+    el.style.opacity   = opacity;
+    el.style.filter    = blurPx > 0.4 ? `blur(${blurPx.toFixed(1)}px)` : '';
+    el.style.zIndex    = Math.round(20 - absRel * 3);
+
+    /* Classes */
+    el.classList.toggle('is-active', absRel < 0.38);
+    el.classList.toggle('is-near',   absRel >= 0.38 && absRel < 1.45);
+  });
+}
+
+/* ── SNAP ── */
+function snapToReal(idx){
+  if (snapRaf){ cancelAnimationFrame(snapRaf); snapRaf = null; }
+  if (inRaf)  { cancelAnimationFrame(inRaf);   inRaf   = null; }
+  velocity = 0;
+
+  // Find nearest copy in offset-space
+  const cur = Math.round(offset);
+  let target = idx;
+  if (CFG.LOOP){
+    while (target < cur - N/2) target += N;
+    while (target > cur + N/2) target -= N;
+  } else {
+    target = Math.max(0, Math.min(N-1, idx));
+  }
+
+  const start = offset;
+  const end   = target;
+  const t0    = performance.now();
+  const dur   = CFG.SNAP_MS;
+
+  function frame(now){
+    const p = Math.min((now - t0) / dur, 1);
+    // ease-out-cubic
+    const e = 1 - Math.pow(1 - p, 3);
+    offset = start + (end - start) * e;
+    layout();
+    if (p < 1){
+      snapRaf = requestAnimationFrame(frame);
+    } else {
+      offset    = end;
+      activeIdx = ((Math.round(end) % N) + N) % N;
+      layout();
+      onSnapped(activeIdx);
+    }
+  }
+  snapRaf = requestAnimationFrame(frame);
+}
+
+function nearestReal(){
+  const r = Math.round(offset);
+  return ((r % N) + N) % N;
+}
+
+function onSnapped(idx){
+  /* Update dots */
+  dotEls.forEach((d, i) => d.classList.toggle('active', i === idx));
+
+  /* Update theme color */
+  updateTheme();
+
+  /* Show CTA */
+  if (ctaW) ctaW.classList.add('on');
+
+  /* Hide hint */
+  hintHide();
+}
+
+/* ── THEME (ambient glow) ── */
+function updateTheme(){
+  if (!ambient) return;
+  const col = getComputedStyle(root).getPropertyValue('--primary').trim();
+  ambient.style.background =
+    `radial-gradient(ellipse at center, color-mix(in srgb,${col} 8%,transparent) 0%, transparent 68%)`;
+}
+
+/* ── DRAG ── */
+function getX(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
+
+function inStageZone(e){
+  const r = stage.getBoundingClientRect();
+  const x = getX(e);
+  const y = e.touches ? e.touches[0].clientY : e.clientY;
+  return x >= r.left && x <= r.right && y >= r.top - 30 && y <= r.bottom + 60;
+}
+
+function onDown(e){
+  if (!inStageZone(e)) return;
+  dragging = true; didDrag = false;
+  velocity = 0;
+  lastX = getX(e); lastT = performance.now();
+  if (snapRaf){ cancelAnimationFrame(snapRaf); snapRaf = null; }
+  if (inRaf)  { cancelAnimationFrame(inRaf);   inRaf   = null; }
+  stage.classList.add('is-dragging');
+  stopAuto();
+  hintHide();
+  if (e.cancelable) e.preventDefault();
+}
+
+function onMove(e){
+  if (!dragging) return;
+  if (e.cancelable) e.preventDefault();
+
+  const x   = getX(e);
+  const now = performance.now();
+  const dt  = Math.max(now - lastT, 1);
+  const dx  = (lastX - x) * CFG.DRAG_S;
+
+  if (Math.abs(dx) > 1.5) didDrag = true;
+
+  velocity = (dx / CFG.STEP) / dt * 16;
+  offset  += dx / CFG.STEP;
+
+  // Soft clamp at edges (non-loop mode)
+  if (!CFG.LOOP){
+    if (offset < -0.4)     offset = -0.4   + (offset + 0.4) * 0.25;
+    if (offset > N - 0.6)  offset = N-0.6  + (offset-(N-0.6)) * 0.25;
+  }
+
+  lastX = x; lastT = now;
+  layout();
+
+  const ni = nearestReal();
+  if (ni !== activeIdx){
+    activeIdx = ni;
+    dotEls.forEach((d, i) => d.classList.toggle('active', i === ni));
+    updateTheme();
+  }
+}
+
+function onUp(){
+  if (!dragging) return;
+  dragging = false;
+  stage.classList.remove('is-dragging');
+  runInertia();
+}
+
+function runInertia(){
+  if (inRaf){ cancelAnimationFrame(inRaf); inRaf = null; }
+  function frame(){
+    velocity *= CFG.FRICT;
+    offset   += velocity;
+
+    if (!CFG.LOOP){
+      if (offset < -0.4)    { offset = -0.4;   velocity *= -0.3; }
+      if (offset > N - 0.6) { offset = N-0.6;  velocity *= -0.3; }
+    }
+
+    layout();
+    const ni = nearestReal();
+    if (ni !== activeIdx){
+      activeIdx = ni;
+      dotEls.forEach((d, i) => d.classList.toggle('active', i === ni));
+      updateTheme();
+    }
+
+    if (Math.abs(velocity) < .005){
+      velocity = 0;
+      snapToReal(nearestReal());
+    } else {
+      inRaf = requestAnimationFrame(frame);
+    }
+  }
+  inRaf = requestAnimationFrame(frame);
+}
+
+/* ── AUTO SCROLL ── */
+function startAuto(){
+  if (!CFG.AUTO_ON) return;
+  stopAuto();
+  autoTimer = setInterval(() => {
+    if (!dragging){
+      const next = (activeIdx + 1) % N;
+      snapToReal(next);
+    }
+  }, CFG.AUTO_MS);
+}
+function stopAuto(){
+  if (autoTimer){ clearInterval(autoTimer); autoTimer = null; }
+}
+
+/* ── DRAG HINT ── */
+let hintTimer = null;
+function hintShow(){
+  if (!hint) return;
+  clearTimeout(hintTimer);
+  hint.classList.add('show');
+}
+function hintHide(){
+  if (!hint) return;
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => hint.classList.remove('show'), 1800);
+}
+
+/* ── EVENTS ── */
+stage.addEventListener('mousedown',  onDown);
+window.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup',   onUp);
+stage.addEventListener('touchstart', onDown, { passive: false });
+window.addEventListener('touchmove', onMove, { passive: false });
+window.addEventListener('touchend',  onUp);
+
+/* Keyboard */
+document.addEventListener('keydown', e => {
+  if (!['ArrowLeft','ArrowRight'].includes(e.key)) return;
+  stopAuto();
+  const dir = e.key === 'ArrowLeft' ? -1 : 1;
+  snapToReal(((activeIdx + dir) % N + N) % N);
+});
+
+/* Pause auto on hover */
+stage.addEventListener('mouseenter', () => stopAuto());
+stage.addEventListener('mouseleave', () => { if (!dragging) startAuto(); });
+
+/* Resize */
+let rzT = null;
+window.addEventListener('resize', () => {
+  clearTimeout(rzT);
+  rzT = setTimeout(() => { readVars(); layout(); }, 180);
+});
+
+/* Intersection observer */
+new IntersectionObserver(e => {
+  if (!e[0].isIntersecting) stopAuto();
+  else startAuto();
+}, { threshold: .2 }).observe(root);
+
+/* ── INIT ── */
+readVars();
+buildCards();
+layout();
+setTimeout(() => { onSnapped(0); startAuto(); }, 200);
+setTimeout(() => hintShow(), 900);
+setTimeout(() => hintHide(), 4000);
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🎵 كولكشن Arc",
+  "tag": "section",
+  "class": "cas-arc-section",
+  "settings": [
+
+    {"type":"header","content":"🛍️ المنتجات"},
+    {"type":"collection","id":"collection","label":"الكولكشن"},
+    {"type":"range","id":"products_limit","label":"عدد المنتجات المعروضة","min":2,"max":20,"step":1,"default":8},
+
+    {"type":"header","content":"📝 النصوص"},
+    {"type":"checkbox","id":"show_header","label":"إظهار العنوان","default":true},
+    {"type":"text","id":"eyebrow","label":"النص الصغير","default":"مجموعة حصرية"},
+    {"type":"text","id":"title_before","label":"العنوان — قبل","default":"تصفح"},
+    {"type":"text","id":"title_hl","label":"العنوان — مضيء","default":"كوليكشن الكاسيت"},
+    {"type":"text","id":"title_after","label":"العنوان — بعد","default":"rr"},
+    {"type":"text","id":"subtitle","label":"وصف القسم","default":"rr"},
+    {"type":"text","id":"cta_text","label":"نص زر المزيد","default":"تصفح المجموعة كاملة"},
+    {"type":"url","id":"cta_url","label":"رابط مخصص للزر (اختياري)","info":"اتركه فارغاً لاستخدام رابط الكولكشن"},
+
+    {"type":"header","content":"🎨 الألوان"},
+    {"type":"color","id":"color_bg","label":"خلفية القسم","default":"#F2EFDD"},
+    {"type":"color","id":"color_primary","label":"اللون الرئيسي","default":"#910F3F"},
+    {"type":"color","id":"color_accent","label":"اللون المميز","default":"#3D081B"},
+    {"type":"color","id":"color_text","label":"لون النص","default":"#3D081B"},
+    {"type":"color","id":"color_card_bg","label":"خلفية البطاقة","default":"#FAF9E1"},
+    {"type":"color","id":"color_card_border","label":"حدود البطاقة","default":"#3D081B"},
+
+    {"type":"header","content":"🎨 شرائط الكاسيت"},
+    {"type":"color","id":"color_p1","label":"شريط 1","default":"#910F3F"},
+    {"type":"color","id":"color_p2","label":"شريط 2","default":"#3D081B"},
+    {"type":"color","id":"color_p3","label":"شريط 3","default":"#F9E547"},
+    {"type":"range","id":"pattern_h","label":"ارتفاع الشريط (px)","min":3,"max":16,"step":1,"default":7},
+    {"type":"range","id":"pattern_stripe","label":"عرض كل لون (px)","min":4,"max":20,"step":2,"default":10},
+
+    {"type":"header","content":"🖼️ الصور"},
+    {"type":"select","id":"img_fit","label":"طريقة عرض الصورة","options":[
+      {"value":"cover","label":"Cover (تعبئة)"},
+      {"value":"contain","label":"Contain (كاملة)"},
+      {"value":"fill","label":"Fill (تمدد)"}
+    ],"default":"cover"},
+    {"type":"range","id":"img_hover_scale","label":"تكبير الصورة عند التمرير (%)","min":100,"max":118,"step":1,"default":106},
+
+    {"type":"header","content":"⚙️ أبعاد البطاقة"},
+    {"type":"range","id":"card_w","label":"عرض البطاقة (px)","min":120,"max":320,"step":5,"default":200},
+    {"type":"range","id":"card_h","label":"ارتفاع الصورة (px)","min":160,"max":500,"step":5,"default":280},
+    {"type":"range","id":"card_radius","label":"استدارة الزوايا (px)","min":0,"max":24,"step":1,"default":10},
+    {"type":"range","id":"card_border_w","label":"سُمك الإطار (px)","min":0,"max":5,"step":1,"default":2},
+    {"type":"range","id":"shadow_x","label":"ظل أفقي (px)","min":0,"max":10,"step":1,"default":4},
+    {"type":"range","id":"shadow_y","label":"ظل عمودي (px)","min":0,"max":10,"step":1,"default":4},
+    {"type":"color","id":"shadow_color","label":"لون الظل","default":"#3D081B66"},
+
+    {"type":"header","content":"🌊 Arc — القوس"},
+    {"type":"range","id":"arc_drop","label":"عمق القوس (px) — كلما زاد، زاد الانحناء","min":0,"max":200,"step":5,"default":70},
+    {"type":"range","id":"card_step","label":"المسافة الأفقية بين البطاقات (px)","min":80,"max":280,"step":5,"default":160},
+    {"type":"range","id":"stage_h","label":"ارتفاع منطقة Arc (px)","min":200,"max":600,"step":10,"default":380},
+    {"type":"range","id":"max_visible","label":"عدد البطاقات المرئية على كل جانب","min":1,"max":5,"step":1,"default":3},
+    {"type":"range","id":"side_scale","label":"حجم البطاقات الجانبية (% من المركزية)","min":30,"max":95,"step":5,"default":55},
+    {"type":"range","id":"side_opacity","label":"شفافية البطاقات الجانبية (%)","min":20,"max":90,"step":5,"default":55},
+    {"type":"checkbox","id":"side_blur","label":"ضبابية للبطاقات الجانبية","default":false},
+    {"type":"range","id":"blur_max","label":"أقصى ضبابية (px)","min":0,"max":6,"step":0.5,"default":1.5},
+    {"type":"checkbox","id":"enable_loop","label":"تصفح لا نهائي (Loop)","default":true},
+
+    {"type":"header","content":"📱 موبايل"},
+    {"type":"range","id":"card_w_mob_pct","label":"عرض البطاقة موبايل (% من الشاشة)","min":30,"max":70,"step":5,"default":45},
+    {"type":"range","id":"step_mob_pct","label":"خطوة البطاقة موبايل (% من الشاشة)","min":30,"max":70,"step":5,"default":55},
+
+    {"type":"header","content":"🎮 الحركة"},
+    {"type":"range","id":"drag_speed","label":"حساسية السحب (%)","min":40,"max":200,"step":10,"default":100},
+    {"type":"range","id":"friction","label":"الاحتكاك — Inertia (%)","min":85,"max":98,"step":1,"default":93},
+    {"type":"range","id":"snap_ms","label":"سرعة التثبيت (ms)","min":150,"max":700,"step":25,"default":325},
+    {"type":"checkbox","id":"auto_scroll","label":"تمرير تلقائي","default":false},
+    {"type":"range","id":"auto_ms","label":"مدة التمرير التلقائي (ms)","min":1500,"max":8000,"step":500,"default":3500},
+
+    {"type":"header","content":"🔢 نقاط التنقل"},
+    {"type":"checkbox","id":"show_dots","label":"إظهار النقاط","default":true},
+    {"type":"range","id":"dot_h","label":"ارتفاع النقطة (px)","min":4,"max":12,"step":1,"default":7},
+    {"type":"range","id":"dot_w","label":"عرض النقطة (px)","min":6,"max":16,"step":1,"default":8},
+    {"type":"range","id":"dot_w_active","label":"عرض النقطة النشطة (px)","min":16,"max":48,"step":2,"default":26},
+    {"type":"range","id":"dot_r","label":"استدارة النقطة (px)","min":0,"max":8,"step":1,"default":4},
+    {"type":"range","id":"dot_gap","label":"المسافة بين النقاط (px)","min":4,"max":16,"step":1,"default":7},
+    {"type":"range","id":"dots_mb","label":"مسافة أسفل النقاط (px)","min":0,"max":40,"step":4,"default":12},
+
+    {"type":"header","content":"📋 محتوى البطاقة"},
+    {"type":"checkbox","id":"show_rank","label":"إظهار رقم الترتيب","default":true},
+    {"type":"text","id":"rank_prefix","label":"نص قبل الرقم","default":"# "},
+    {"type":"checkbox","id":"show_price","label":"إظهار السعر","default":true},
+    {"type":"checkbox","id":"show_link","label":"إظهار رابط المنتج","default":true},
+    {"type":"text","id":"card_link_text","label":"نص رابط المنتج","default":"▶ استمع الآن"},
+
+    {"type":"header","content":"🔤 أحجام الخطوط"},
+    {"type":"range","id":"sz_eyebrow","label":"النص الصغير (px)","min":10,"max":18,"step":1,"default":12},
+    {"type":"range","id":"sz_title","label":"العنوان (px)","min":22,"max":60,"step":1,"default":36},
+    {"type":"range","id":"sz_subtitle","label":"الوصف (px)","min":11,"max":17,"step":1,"default":13},
+    {"type":"range","id":"sz_rank","label":"رقم الترتيب (px)","min":10,"max":18,"step":1,"default":12},
+    {"type":"range","id":"sz_card_title","label":"عنوان البطاقة (px)","min":11,"max":18,"step":1,"default":13},
+    {"type":"range","id":"title_lines","label":"أسطر عنوان البطاقة","min":1,"max":4,"step":1,"default":2},
+    {"type":"range","id":"sz_price","label":"السعر (px)","min":12,"max":20,"step":1,"default":15},
+    {"type":"range","id":"sz_card_link","label":"رابط المنتج (px)","min":11,"max":17,"step":1,"default":13},
+    {"type":"range","id":"sz_side_label","label":"اسم البطاقة الجانبية (px)","min":9,"max":14,"step":1,"default":11},
+    {"type":"range","id":"sz_cta","label":"زر المزيد (px)","min":12,"max":20,"step":1,"default":14},
+
+    {"type":"header","content":"📐 المسافات — القسم"},
+    {"type":"range","id":"sec_pt","label":"حشوة من الأعلى (px)","min":20,"max":100,"step":4,"default":44},
+    {"type":"range","id":"sec_pb","label":"حشوة من الأسفل (px)","min":20,"max":100,"step":4,"default":48},
+    {"type":"range","id":"sec_ph","label":"حشوة أفقية (px)","min":0,"max":60,"step":4,"default":16},
+{"type":"range","id":"sec_ph_mob","label":"حشوة أفقية موبايل (px)","min":2,"max":30,"step":4,"default":10},    {"type":"range","id":"max_w","label":"أقصى عرض للمحتوى (px)","min":320,"max":1200,"step":20,"default":800},
+{"type":"range","id":"header_mb","label":"مسافة العنوان من Arc (px)","min":10,"max":60,"step":2,"default":24},    {"type":"range","id":"hint_bottom","label":"موضع تلميح السحب (px)","min":0,"max":40,"step":2,"default":8},
+
+    {"type":"header","content":"📐 داخل البطاقة"},
+    {"type":"range","id":"body_pt","label":"حشوة المحتوى من الأعلى (px)","min":8,"max":24,"step":1,"default":14},
+    {"type":"range","id":"body_pb","label":"حشوة المحتوى من الأسفل (px)","min":8,"max":24,"step":1,"default":14},
+    {"type":"range","id":"body_ph","label":"حشوة المحتوى الأفقية (px)","min":8,"max":24,"step":1,"default":12},
+    {"type":"range","id":"body_gap","label":"مسافة بين عناصر المحتوى (px)","min":4,"max":14,"step":1,"default":7},
+
+    {"type":"header","content":"📌 زخرفة العنوان"},
+    {"type":"checkbox","id":"show_title_deco","label":"إظهار الزخرفة","default":true},
+    {"type":"range","id":"deco_w","label":"عرض الزخرفة (px)","min":0,"max":100,"step":5,"default":50},
+    {"type":"range","id":"deco_h","label":"سُمك الزخرفة (px)","min":1,"max":5,"step":1,"default":2},
+    {"type":"range","id":"deco_gap","label":"مسافة الزخرفة (px)","min":8,"max":40,"step":2,"default":16},
+
+    {"type":"header","content":"🎨 زر تصفح المزيد"},
+    {"type":"checkbox","id":"show_cta","label":"إظهار الزر","default":true},
+    {"type":"color","id":"btn_bg","label":"خلفية","default":"#F9E547"},
+    {"type":"color","id":"btn_text_color","label":"لون النص","default":"#3D081B"},
+    {"type":"color","id":"btn_border","label":"لون الحدود","default":"#3D081B"},
+    {"type":"color","id":"btn_shadow","label":"لون الظل","default":"#3D081B"},
+    {"type":"color","id":"btn_hover_bg","label":"خلفية عند التمرير","default":"#910F3F"},
+    {"type":"color","id":"btn_hover_text","label":"نص عند التمرير","default":"#F2EFDD"},
+    {"type":"range","id":"btn_radius","label":"استدارة الزر (px)","min":0,"max":30,"step":2,"default":6},
+    {"type":"range","id":"btn_border_w","label":"سُمك حدود الزر (px)","min":1,"max":5,"step":1,"default":2},
+    {"type":"range","id":"btn_sh_x","label":"ظل الزر أفقي (px)","min":0,"max":10,"step":1,"default":4},
+    {"type":"range","id":"btn_sh_y","label":"ظل الزر عمودي (px)","min":0,"max":10,"step":1,"default":4},
+    {"type":"range","id":"btn_pv","label":"حشوة عمودية (px)","min":8,"max":22,"step":1,"default":14},
+    {"type":"range","id":"btn_ph","label":"حشوة أفقية (px)","min":16,"max":56,"step":2,"default":36},
+    {"type":"range","id":"cta_pt","label":"مسافة الزر من الأعلى (px)","min":0,"max":32,"step":4,"default":8},
+    {"type":"range","id":"cta_pb","label":"مسافة الزر من الأسفل (px)","min":0,"max":32,"step":4,"default":8},
+
+    {"type":"header","content":"✨ تأثيرات"},
+    {"type":"checkbox","id":"no_grain","label":"إيقاف تأثير الحبوب","default":false}
+  ],
+
+  "presets": [{
+    "name": "🎵 كولكشن Arc"
+  }]
+}
+{% endschema %}

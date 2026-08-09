@@ -1,0 +1,579 @@
+{% doc %}
+  @prompt
+    stack"}
+    اء سكشن في Shopify لعرض مجموعة صور (حوالي 10 صور) بأسلوب تفاعلي مبتكر يعتمد على السكرول.
+    
+    الفكرةأريد إن
+    ش:
+    
+    - الصور تكون مكدسة فوق بعضها (stacked).
+    - مع نزول المستخدم، كل صورة تتحرك للأعلى وتكشف الصورة التي تحتها.
+    مستخدم يشعر أنه يكتشف محتوى تدريجيًا.
+    - الإحساس العام يشب- الانتقال يكون ناعم مع تأثير zoom خفيف أو parallax بسيط.
+    - كل صورة تمثل مشهد أو فصل من القصة.
+    
+    التجربة:
+    
+    - ا
+    له فتح صندوق واكتشاف ما بداخله.
+    
+    النهاية (مهم جدًا):
+    
+    - بعد آخر صورة، يحدث reveal كامل.
+    - تظهر مجموعة المنتجات (كاسيت، كتب، تحف) بشكل واضح.
+    - يظهر زر Call To Action مثل:
+    اظ على أسلوب بصري نظيف وحديث.
+    
+    من ناحية ا  "اكتشف التحف الآن" أو "تسوّق المجموعة".
+    
+    من ناحية التصميم:
+    
+    - كل صورة تأخذ كامل الشاشة (full screen).
+    - استخدام position: sticky للحفاظ على الثبات أثناء التمرير.
+    - الح
+    فلأداء:
+    
+    - تحميل الصور بشكل تدريجي (lazy loading).
+    - الحفاظ على سرعة الموقع.
+    
+    الهدف:
+    
+    - تحويل عرض الصور إلى تجربة تفاعلية تحكي قصة.
+    - جذب المستخدم حتى النهاية ثم توجي
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-story-stack-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-story-stack-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-story-stack-item-{{ ai_gen_id }} {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .ai-story-stack-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
+  }
+
+  .ai-story-stack-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-story-stack-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: {{ block.settings.placeholder_bg_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-story-stack-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+    opacity: 0.3;
+  }
+
+  .ai-story-stack-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 16px 24px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-story-stack-reveal-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background-color: {{ block.settings.reveal_bg_color }};
+    text-align: center;
+  }
+
+  .ai-story-stack-reveal-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.reveal_title_size }}px;
+    color: {{ block.settings.reveal_text_color }};
+    margin: 0 0 20px;
+    max-width: 800px;
+  }
+
+  .ai-story-stack-reveal-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.reveal_description_size }}px;
+    color: {{ block.settings.reveal_text_color }};
+    margin: 0 0 40px;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .ai-story-stack-products-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 40px;
+  }
+
+  .ai-story-stack-product-card-{{ ai_gen_id }} {
+    background-color: {{ block.settings.card_bg_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-story-stack-product-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-8px);
+  }
+
+  .ai-story-stack-product-image-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .ai-story-stack-product-info-{{ ai_gen_id }} {
+    padding: 20px;
+  }
+
+  .ai-story-stack-product-title-{{ ai_gen_id }} {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: {{ block.settings.reveal_text_color }};
+  }
+
+  .ai-story-stack-product-price-{{ ai_gen_id }} {
+    font-size: 16px;
+    color: {{ block.settings.reveal_text_color }};
+    opacity: 0.8;
+  }
+
+  .ai-story-stack-cta-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 16px 40px;
+    background-color: {{ block.settings.cta_bg_color }};
+    color: {{ block.settings.cta_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.cta_border_radius }}px;
+    font-size: {{ block.settings.cta_font_size }}px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-story-stack-cta-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.cta_hover_bg_color }};
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-story-stack-reveal-title-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.reveal_title_size }}px * 0.7);
+    }
+
+    .ai-story-stack-reveal-description-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.reveal_description_size }}px * 0.9);
+    }
+
+    .ai-story-stack-products-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+{% endstyle %}
+
+<story-stack-{{ ai_gen_id }} class="ai-story-stack-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-story-stack-container-{{ ai_gen_id }}">
+    {% for i in (1..10) %}
+      {% liquid
+        assign image_key = 'image_' | append: i
+        assign image = block.settings[image_key]
+      %}
+
+      <div class="ai-story-stack-item-{{ ai_gen_id }}" data-index="{{ i }}">
+        <div class="ai-story-stack-image-wrapper-{{ ai_gen_id }}">
+          {% if image %}
+            <img
+              src="{{ image | image_url: width: 2000 }}"
+              alt="{{ image.alt | escape }}"
+              loading="lazy"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+              class="ai-story-stack-image-{{ ai_gen_id }}"
+            >
+          {% else %}
+            <div class="ai-story-stack-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+              <div class="ai-story-stack-empty-state-{{ ai_gen_id }}">
+                أضف الصورة {{ i }} لبناء القصة
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="ai-story-stack-reveal-{{ ai_gen_id }}">
+      {% if block.settings.reveal_title != blank %}
+        <h2 class="ai-story-stack-reveal-title-{{ ai_gen_id }}">
+          {{ block.settings.reveal_title }}
+        </h2>
+      {% endif %}
+
+      {% if block.settings.reveal_description != blank %}
+        <div class="ai-story-stack-reveal-description-{{ ai_gen_id }}">
+          {{ block.settings.reveal_description }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.featured_collection != blank %}
+        <div class="ai-story-stack-products-{{ ai_gen_id }}">
+          {% for product in block.settings.featured_collection.products limit: block.settings.products_limit %}
+            <a href="{{ product.url }}" class="ai-story-stack-product-card-{{ ai_gen_id }}">
+              {% if product.featured_image %}
+                <img
+                  src="{{ product.featured_image | image_url: width: 500 }}"
+                  alt="{{ product.featured_image.alt | escape }}"
+                  loading="lazy"
+                  class="ai-story-stack-product-image-{{ ai_gen_id }}"
+                >
+              {% endif %}
+              <div class="ai-story-stack-product-info-{{ ai_gen_id }}">
+                <h3 class="ai-story-stack-product-title-{{ ai_gen_id }}">{{ product.title }}</h3>
+                <div class="ai-story-stack-product-price-{{ ai_gen_id }}">{{ product.price | money }}</div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if block.settings.cta_text != blank and block.settings.cta_link != blank %}
+        <a href="{{ block.settings.cta_link }}" class="ai-story-stack-cta-{{ ai_gen_id }}">
+          {{ block.settings.cta_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</story-stack-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class StoryStack{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.items = [];
+        this.currentIndex = 0;
+      }
+
+      connectedCallback() {
+        this.items = Array.from(this.querySelectorAll('.ai-story-stack-item-{{ ai_gen_id }}'));
+        this.setupScrollAnimation();
+      }
+
+      setupScrollAnimation() {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                this.handleScroll();
+              }
+            });
+          },
+          {
+            threshold: [0, 0.25, 0.5, 0.75, 1],
+            rootMargin: '0px'
+          }
+        );
+
+        this.items.forEach((item) => observer.observe(item));
+
+        window.addEventListener('scroll', () => this.handleScroll());
+      }
+
+      handleScroll() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const containerTop = this.offsetTop;
+
+        this.items.forEach((item, index) => {
+          const wrapper = item.querySelector('.ai-story-stack-image-wrapper-{{ ai_gen_id }}');
+          const itemTop = containerTop + (index * window.innerHeight);
+          const progress = Math.max(0, Math.min(1, (scrollTop - itemTop) / window.innerHeight));
+
+          if (progress > 0 && progress < 1) {
+            const scale = 1 - (progress * {{ block.settings.zoom_intensity }});
+            const translateY = progress * -100;
+            const opacity = 1 - (progress * 0.5);
+
+            wrapper.style.transform = `scale(${scale}) translateY(${translateY}px)`;
+            wrapper.style.opacity = opacity;
+          } else if (progress >= 1) {
+            wrapper.style.transform = 'scale(0.8) translateY(-100px)';
+            wrapper.style.opacity = '0.5';
+          } else {
+            wrapper.style.transform = 'scale(1) translateY(0)';
+            wrapper.style.opacity = '1';
+          }
+        });
+      }
+    }
+
+    customElements.define('story-stack-{{ ai_gen_id }}', StoryStack{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "قصة مكدسة",
+  "settings": [
+    {
+      "type": "header",
+      "content": "الصور"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "الصورة 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "الصورة 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "الصورة 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "الصورة 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_5",
+      "label": "الصورة 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_6",
+      "label": "الصورة 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_7",
+      "label": "الصورة 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_8",
+      "label": "الصورة 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_9",
+      "label": "الصورة 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_10",
+      "label": "الصورة 10"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_bg_color",
+      "label": "لون خلفية العنصر النائب",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "تأثيرات الحركة"
+    },
+    {
+      "type": "range",
+      "id": "zoom_intensity",
+      "label": "شدة التكبير",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "default": 0.2
+    },
+    {
+      "type": "header",
+      "content": "قسم الكشف النهائي"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "reveal_title",
+      "label": "العنوان",
+      "default": "اكتشف مجموعتنا الفريدة"
+    },
+    {
+      "type": "richtext",
+      "id": "reveal_description",
+      "label": "الوصف",
+      "default": "<p>تحف وكتب وكاسيتات نادرة تحكي قصصًا لا تُنسى</p>"
+    },
+    {
+      "type": "range",
+      "id": "reveal_title_size",
+      "label": "حجم العنوان",
+      "min": 24,
+      "max": 72,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "reveal_description_size",
+      "label": "حجم الوصف",
+      "min": 14,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "reveal_bg_color",
+      "label": "لون الخلفية",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "reveal_text_color",
+      "label": "لون النص",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "المنتجات المميزة"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "المجموعة"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "عدد المنتجات",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "لون خلفية البطاقة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "استدارة حواف البطاقة",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "زر الدعوة لاتخاذ إجراء"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "نص الزر",
+      "default": "تسوّق المجموعة"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "رابط الزر"
+    },
+    {
+      "type": "range",
+      "id": "cta_font_size",
+      "label": "حجم خط الزر",
+      "min": 14,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "cta_bg_color",
+      "label": "لون خلفية الزر",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "cta_hover_bg_color",
+      "label": "لون خلفية الزر عند التمرير",
+      "default": "#6b0b2f"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "لون نص الزر",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "cta_border_radius",
+      "label": "استدارة حواف الزر",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "قصة مكدسة"
+    }
+  ]
+}
+{% endschema %}

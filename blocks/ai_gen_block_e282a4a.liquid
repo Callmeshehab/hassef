@@ -1,0 +1,942 @@
+{% doc %}
+  @prompt
+    بدي أشياء في سكشن يستعرض مميزات متجر الحصيف وهو متجر بيع منتجات ريترو وكتب أصيله  استخدم تصاميم للتعبير عن هوية الموقع ويكون انيق بسيط وادخل أسلوب التطريز الفلسطيني على الموقع وصور لكل ميزه هيك مع امكانيه تغييرها من خلال رفع غيرها من الجهاز , بدي إطار الميزات يأخذ طابع أسلوب التطريز الفلسطيني بالبيكسل وكمان بدي تكون المميزات في مربعات اصغر لكي تكون واضحه بصريا ومريحه وكمان تتحرك بطريقه تفاعليه عن النزول لاسفل مانها تترتب لتظهر
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-features-section-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.section_padding_top }}px 20px {{ block.settings.section_padding_bottom }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-features-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.container_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-features-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: {{ block.settings.header_spacing }}px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .ai-features-header-{{ ai_gen_id }}.ai-visible-{{ ai_gen_id }} {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .ai-features-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 16px;
+    font-weight: 600;
+  }
+
+  .ai-features-subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .ai-features-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat({{ block.settings.columns_desktop }}, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+    margin-top: {{ block.settings.grid_spacing }}px;
+  }
+
+  .ai-feature-card-{{ ai_gen_id }} {
+    background-color: {{ block.settings.card_background }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    padding: {{ block.settings.card_padding }}px;
+    text-align: {{ block.settings.text_alignment }};
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(61, 8, 27, 0.1);
+  }
+
+  .ai-feature-card-{{ ai_gen_id }}.ai-visible-{{ ai_gen_id }} {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .ai-feature-card-{{ ai_gen_id }}:hover {
+    box-shadow: 0 8px 20px rgba(61, 8, 27, 0.15);
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .ai-pixel-border-{{ ai_gen_id }} {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .ai-pixel-border-top-{{ ai_gen_id }} {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: {{ block.settings.pixel_border_size }}px;
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.embroidery_color_1 }} 0px,
+      {{ block.settings.embroidery_color_1 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_2 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_2 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_3 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_3 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_1 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_1 }} calc({{ block.settings.pixel_size }}px * 4)
+    );
+  }
+
+  .ai-pixel-border-bottom-{{ ai_gen_id }} {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: {{ block.settings.pixel_border_size }}px;
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.embroidery_color_3 }} 0px,
+      {{ block.settings.embroidery_color_3 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_2 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_2 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_1 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_1 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_3 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_3 }} calc({{ block.settings.pixel_size }}px * 4)
+    );
+  }
+
+  .ai-pixel-border-left-{{ ai_gen_id }} {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: {{ block.settings.pixel_border_size }}px;
+    background: repeating-linear-gradient(
+      180deg,
+      {{ block.settings.embroidery_color_2 }} 0px,
+      {{ block.settings.embroidery_color_2 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_1 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_1 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_3 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_3 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_2 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_2 }} calc({{ block.settings.pixel_size }}px * 4)
+    );
+  }
+
+  .ai-pixel-border-right-{{ ai_gen_id }} {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: {{ block.settings.pixel_border_size }}px;
+    background: repeating-linear-gradient(
+      180deg,
+      {{ block.settings.embroidery_color_1 }} 0px,
+      {{ block.settings.embroidery_color_1 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_3 }} {{ block.settings.pixel_size }}px,
+      {{ block.settings.embroidery_color_3 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_2 }} calc({{ block.settings.pixel_size }}px * 2),
+      {{ block.settings.embroidery_color_2 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_1 }} calc({{ block.settings.pixel_size }}px * 3),
+      {{ block.settings.embroidery_color_1 }} calc({{ block.settings.pixel_size }}px * 4)
+    );
+  }
+
+  .ai-pixel-corner-{{ ai_gen_id }} {
+    position: absolute;
+    width: calc({{ block.settings.pixel_size }}px * 2);
+    height: calc({{ block.settings.pixel_size }}px * 2);
+    background: {{ block.settings.embroidery_color_3 }};
+  }
+
+  .ai-pixel-corner-tl-{{ ai_gen_id }} {
+    top: 0;
+    left: 0;
+  }
+
+  .ai-pixel-corner-tr-{{ ai_gen_id }} {
+    top: 0;
+    right: 0;
+  }
+
+  .ai-pixel-corner-bl-{{ ai_gen_id }} {
+    bottom: 0;
+    left: 0;
+  }
+
+  .ai-pixel-corner-br-{{ ai_gen_id }} {
+    bottom: 0;
+    right: 0;
+  }
+
+  .ai-feature-image-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    margin-bottom: {{ block.settings.image_spacing }}px;
+    margin-top: {{ block.settings.pixel_border_size | plus: 8 }}px;
+  }
+
+  .ai-feature-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.image_height }}px;
+    object-fit: cover;
+    border-radius: {{ block.settings.image_border_radius }}px;
+  }
+
+  .ai-feature-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.image_height }}px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    position: relative;
+  }
+
+  .ai-feature-image-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-feature-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: #999;
+    text-align: center;
+    padding: 6px 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+  }
+
+  .ai-feature-content-{{ ai_gen_id }} {
+    padding: {{ block.settings.content_padding }}px {{ block.settings.pixel_border_size }}px {{ block.settings.pixel_border_size }}px;
+  }
+
+  .ai-feature-icon-{{ ai_gen_id }} {
+    font-size: {{ block.settings.icon_size }}px;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+
+  .ai-feature-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.feature_title_size }}px;
+    color: {{ block.settings.feature_title_color }};
+    margin: 0 0 10px;
+    font-weight: 600;
+  }
+
+  .ai-feature-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.feature_description_size }}px;
+    color: {{ block.settings.feature_description_color }};
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-features-grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ block.settings.columns_mobile }}, 1fr);
+    }
+
+    .ai-features-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;
+    }
+
+    .ai-features-subtitle-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subtitle_size | times: 0.9 }}px;
+    }
+
+    .ai-feature-card-{{ ai_gen_id }} {
+      padding: {{ block.settings.card_padding | times: 0.75 }}px;
+    }
+
+    .ai-feature-image-{{ ai_gen_id }},
+    .ai-feature-image-placeholder-{{ ai_gen_id }} {
+      height: {{ block.settings.image_height | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<features-section-{{ ai_gen_id }} class="ai-features-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-features-container-{{ ai_gen_id }}">
+    {% if block.settings.section_title != blank or block.settings.section_subtitle != blank %}
+      <div class="ai-features-header-{{ ai_gen_id }}" data-animate="header">
+        {% if block.settings.section_title != blank %}
+          <h2 class="ai-features-title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+        {% endif %}
+        {% if block.settings.section_subtitle != blank %}
+          <div class="ai-features-subtitle-{{ ai_gen_id }}">{{ block.settings.section_subtitle }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="ai-features-grid-{{ ai_gen_id }}">
+      {% for i in (1..6) %}
+        {% liquid
+          assign feature_enabled_key = 'feature_' | append: i | append: '_enabled'
+          assign feature_image_key = 'feature_' | append: i | append: '_image'
+          assign feature_icon_key = 'feature_' | append: i | append: '_icon'
+          assign feature_title_key = 'feature_' | append: i | append: '_title'
+          assign feature_description_key = 'feature_' | append: i | append: '_description'
+
+          assign feature_enabled = block.settings[feature_enabled_key]
+          assign feature_image = block.settings[feature_image_key]
+          assign feature_icon = block.settings[feature_icon_key]
+          assign feature_title = block.settings[feature_title_key]
+          assign feature_description = block.settings[feature_description_key]
+        %}
+
+        {% if feature_enabled %}
+          <div class="ai-feature-card-{{ ai_gen_id }}" data-animate="card" data-index="{{ forloop.index }}">
+            <div class="ai-pixel-border-{{ ai_gen_id }} ai-pixel-border-top-{{ ai_gen_id }}"></div>
+            <div class="ai-pixel-border-{{ ai_gen_id }} ai-pixel-border-bottom-{{ ai_gen_id }}"></div>
+            <div class="ai-pixel-border-{{ ai_gen_id }} ai-pixel-border-left-{{ ai_gen_id }}"></div>
+            <div class="ai-pixel-border-{{ ai_gen_id }} ai-pixel-border-right-{{ ai_gen_id }}"></div>
+            
+            <div class="ai-pixel-corner-{{ ai_gen_id }} ai-pixel-corner-tl-{{ ai_gen_id }}"></div>
+            <div class="ai-pixel-corner-{{ ai_gen_id }} ai-pixel-corner-tr-{{ ai_gen_id }}"></div>
+            <div class="ai-pixel-corner-{{ ai_gen_id }} ai-pixel-corner-bl-{{ ai_gen_id }}"></div>
+            <div class="ai-pixel-corner-{{ ai_gen_id }} ai-pixel-corner-br-{{ ai_gen_id }}"></div>
+
+            <div class="ai-feature-image-wrapper-{{ ai_gen_id }}">
+              {% if feature_image %}
+                <img
+                  src="{{ feature_image | image_url: width: 500 }}"
+                  alt="{{ feature_image.alt | escape }}"
+                  loading="lazy"
+                  width="500"
+                  height="{{ block.settings.image_height }}"
+                  class="ai-feature-image-{{ ai_gen_id }}"
+                >
+              {% else %}
+                <div class="ai-feature-image-placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                  <div class="ai-feature-empty-state-{{ ai_gen_id }}">
+                    أضف صورة للميزة
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="ai-feature-content-{{ ai_gen_id }}">
+              {% if feature_icon != blank %}
+                <div class="ai-feature-icon-{{ ai_gen_id }}">{{ feature_icon }}</div>
+              {% endif %}
+
+              {% if feature_title != blank %}
+                <h3 class="ai-feature-title-{{ ai_gen_id }}">{{ feature_title }}</h3>
+              {% endif %}
+
+              {% if feature_description != blank %}
+                <div class="ai-feature-description-{{ ai_gen_id }}">{{ feature_description }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</features-section-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class FeaturesSection{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.animatedElements = new Set();
+      }
+
+      connectedCallback() {
+        this.setupIntersectionObserver();
+      }
+
+      setupIntersectionObserver() {
+        const options = {
+          root: null,
+          rootMargin: '0px 0px -100px 0px',
+          threshold: 0.1
+        };
+
+        this.observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !this.animatedElements.has(entry.target)) {
+              this.animatedElements.add(entry.target);
+              
+              if (entry.target.dataset.animate === 'header') {
+                entry.target.classList.add('ai-visible-{{ ai_gen_id }}');
+              } else if (entry.target.dataset.animate === 'card') {
+                const index = parseInt(entry.target.dataset.index) || 0;
+                const delay = index * 100;
+                
+                setTimeout(() => {
+                  entry.target.classList.add('ai-visible-{{ ai_gen_id }}');
+                }, delay);
+              }
+            }
+          });
+        }, options);
+
+        const header = this.querySelector('[data-animate="header"]');
+        if (header) {
+          this.observer.observe(header);
+        }
+
+        const cards = this.querySelectorAll('[data-animate="card"]');
+        cards.forEach((card) => {
+          this.observer.observe(card);
+        });
+      }
+
+      disconnectedCallback() {
+        if (this.observer) {
+          this.observer.disconnect();
+        }
+      }
+    }
+
+    customElements.define('features-section-{{ ai_gen_id }}', FeaturesSection{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "مميزات المتجر",
+  "settings": [
+    {
+      "type": "header",
+      "content": "العنوان الرئيسي"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "section_title",
+      "label": "عنوان القسم",
+      "default": "لماذا الحصيف؟"
+    },
+    {
+      "type": "richtext",
+      "id": "section_subtitle",
+      "label": "وصف القسم",
+      "default": "<p>نقدم لك تجربة فريدة في عالم المنتجات الريترو والكتب الأصيلة</p>"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم الوصف",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "header_spacing",
+      "label": "المسافة بعد العنوان",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "تخطيط الشبكة"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "عرض الحاوية",
+      "min": 800,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "الأعمدة على الكمبيوتر",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "الأعمدة على الموبايل",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "المسافة بين البطاقات",
+      "min": 12,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "grid_spacing",
+      "label": "المسافة قبل الشبكة",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "تصميم البطاقة"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "خلفية البطاقة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "استدارة الزوايا",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "المسافة الداخلية",
+      "min": 12,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "محاذاة النص",
+      "options": [
+        { "value": "right", "label": "يمين" },
+        { "value": "center", "label": "وسط" },
+        { "value": "left", "label": "يسار" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "التطريز البيكسل الفلسطيني"
+    },
+    {
+      "type": "range",
+      "id": "pixel_border_size",
+      "label": "سمك الإطار",
+      "min": 4,
+      "max": 12,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "pixel_size",
+      "label": "حجم البيكسل",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "embroidery_color_1",
+      "label": "لون التطريز 1",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "embroidery_color_2",
+      "label": "لون التطريز 2",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "embroidery_color_3",
+      "label": "لون التطريز 3",
+      "default": "#f9e547"
+    },
+    {
+      "type": "header",
+      "content": "الصورة"
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "ارتفاع الصورة",
+      "min": 100,
+      "max": 300,
+      "step": 20,
+      "unit": "px",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "استدارة زوايا الصورة",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "image_spacing",
+      "label": "المسافة بعد الصورة",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "label": "المسافة قبل المحتوى",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "حجم الأيقونة",
+      "min": 20,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "feature_title_size",
+      "label": "حجم عنوان الميزة",
+      "min": 14,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "feature_description_size",
+      "label": "حجم وصف الميزة",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "الألوان"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "خلفية القسم",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "لون الوصف",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "feature_title_color",
+      "label": "لون عنوان الميزة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "feature_description_color",
+      "label": "لون وصف الميزة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "المسافات"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "المسافة العلوية",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "المسافة السفلية",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "الميزة 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_1_enabled",
+      "label": "تفعيل الميزة 1",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_1_image",
+      "label": "صورة الميزة"
+    },
+    {
+      "type": "text",
+      "id": "feature_1_icon",
+      "label": "أيقونة (إيموجي)",
+      "default": "📚"
+    },
+    {
+      "type": "text",
+      "id": "feature_1_title",
+      "label": "عنوان الميزة",
+      "default": "كتب أصيلة"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_1_description",
+      "label": "وصف الميزة",
+      "default": "مجموعة مختارة من الكتب النادرة والأصيلة"
+    },
+    {
+      "type": "header",
+      "content": "الميزة 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_2_enabled",
+      "label": "تفعيل الميزة 2",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_2_image",
+      "label": "صورة الميزة"
+    },
+    {
+      "type": "text",
+      "id": "feature_2_icon",
+      "label": "أيقونة (إيموجي)",
+      "default": "🎨"
+    },
+    {
+      "type": "text",
+      "id": "feature_2_title",
+      "label": "عنوان الميزة",
+      "default": "منتجات ريترو"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_2_description",
+      "label": "وصف الميزة",
+      "default": "قطع فنية فريدة تعيدك إلى الزمن الجميل"
+    },
+    {
+      "type": "header",
+      "content": "الميزة 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_3_enabled",
+      "label": "تفعيل الميزة 3",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_3_image",
+      "label": "صورة الميزة"
+    },
+    {
+      "type": "text",
+      "id": "feature_3_icon",
+      "label": "أيقونة (إيموجي)",
+      "default": "✨"
+    },
+    {
+      "type": "text",
+      "id": "feature_3_title",
+      "label": "عنوان الميزة",
+      "default": "جودة عالية"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_3_description",
+      "label": "وصف الميزة",
+      "default": "نختار كل قطعة بعناية لضمان أفضل جودة"
+    },
+    {
+      "type": "header",
+      "content": "الميزة 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_4_enabled",
+      "label": "تفعيل الميزة 4",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_4_image",
+      "label": "صورة الميزة"
+    },
+    {
+      "type": "text",
+      "id": "feature_4_icon",
+      "label": "أيقونة (إيموجي)",
+      "default": "🚚"
+    },
+    {
+      "type": "text",
+      "id": "feature_4_title",
+      "label": "عنوان الميزة",
+      "default": "شحن سريع"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_4_description",
+      "label": "وصف الميزة",
+      "default": "توصيل آمن وسريع لجميع المناطق"
+    },
+    {
+      "type": "header",
+      "content": "الميزة 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_5_enabled",
+      "label": "تفعيل الميزة 5",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_5_image",
+      "label": "صورة الميزة"
+    },
+    {
+      "type": "text",
+      "id": "feature_5_icon",
+      "label": "أيقونة (إيموجي)",
+      "default": "💎"
+    },
+    {
+      "type": "text",
+      "id": "feature_5_title",
+      "label": "عنوان الميزة",
+      "default": "قطع نادرة"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_5_description",
+      "label": "وصف الميزة",
+      "default": "منتجات حصرية يصعب إيجادها في مكان آخر"
+    },
+    {
+      "type": "header",
+      "content": "الميزة 6"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_6_enabled",
+      "label": "تفعيل الميزة 6",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_6_image",
+      "label": "صورة الميزة"
+    },
+    {
+      "type": "text",
+      "id": "feature_6_icon",
+      "label": "أيقونة (إيموجي)",
+      "default": "🤝"
+    },
+    {
+      "type": "text",
+      "id": "feature_6_title",
+      "label": "عنوان الميزة",
+      "default": "خدمة عملاء ممتازة"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_6_description",
+      "label": "وصف الميزة",
+      "default": "فريقنا جاهز لمساعدتك في أي وقت"
+    }
+  ],
+  "presets": [
+    {
+      "name": "مميزات المتجر"
+    }
+  ]
+}
+{% endschema %}

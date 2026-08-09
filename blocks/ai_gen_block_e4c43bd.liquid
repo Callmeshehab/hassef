@@ -1,0 +1,732 @@
+{% doc %}
+  @prompt
+    شركاء الحصيف , بدي شعارات الشركاء تتحرك كانها استعراض 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-partners-carousel-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    padding: {{ block.settings.section_padding }}px 20px;
+    background-color: {{ block.settings.background_color }};
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .ai-partners-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 {{ block.settings.spacing_below_heading }}px;
+    font-weight: 600;
+  }
+
+  .ai-partners-subheading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subheading_size }}px;
+    color: {{ block.settings.subheading_color }};
+    margin: 0 0 {{ block.settings.spacing_below_subheading }}px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ai-carousel-container-{{ ai_gen_id }} {
+    position: relative;
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-carousel-track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.grid_gap }}px;
+    width: max-content;
+  }
+
+  @keyframes ai-scroll-ltr-{{ ai_gen_id }} {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - {{ block.settings.grid_gap | divided_by: 2 }}px)); }
+  }
+
+  @keyframes ai-scroll-rtl-{{ ai_gen_id }} {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(calc(50% + {{ block.settings.grid_gap | divided_by: 2 }}px)); }
+  }
+
+  .ai-carousel-track-{{ ai_gen_id }}.ai-scroll-ltr-{{ ai_gen_id }} {
+    animation: ai-scroll-ltr-{{ ai_gen_id }} {{ block.settings.scroll_speed }}s linear infinite;
+  }
+
+  .ai-carousel-track-{{ ai_gen_id }}.ai-scroll-rtl-{{ ai_gen_id }} {
+    animation: ai-scroll-rtl-{{ ai_gen_id }} {{ block.settings.scroll_speed }}s linear infinite;
+  }
+
+  .ai-carousel-track-{{ ai_gen_id }}.ai-paused-{{ ai_gen_id }} {
+    animation-play-state: paused;
+  }
+
+  .ai-partner-item-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: {{ block.settings.item_padding }}px;
+    background-color: {{ block.settings.item_background_color }};
+    border-radius: {{ block.settings.item_border_radius }}px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
+    width: {{ block.settings.item_width }}px;
+  }
+
+  .ai-partner-item-{{ ai_gen_id }}:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-partner-logo-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.logo_height }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: {{ block.settings.spacing_below_logo }}px;
+  }
+
+  .ai-partner-logo-{{ ai_gen_id }} {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: grayscale({{ block.settings.logo_grayscale }}%);
+    opacity: {{ block.settings.logo_opacity }};
+    transition: filter 0.3s ease, opacity 0.3s ease;
+  }
+
+  .ai-partner-item-{{ ai_gen_id }}:hover .ai-partner-logo-{{ ai_gen_id }} {
+    filter: grayscale(0%);
+    opacity: 1;
+  }
+
+  .ai-partner-logo-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  .ai-partner-logo-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-partner-name-{{ ai_gen_id }} {
+    font-size: {{ block.settings.partner_name_size }}px;
+    color: {{ block.settings.partner_name_color }};
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+
+  .ai-partner-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.partner_description_size }}px;
+    color: {{ block.settings.partner_description_color }};
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-partners-heading-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.heading_size }}px * 0.8);
+    }
+
+    .ai-partners-subheading-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.subheading_size }}px * 0.9);
+    }
+
+    .ai-partner-item-{{ ai_gen_id }} {
+      width: {{ block.settings.item_width | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<partners-carousel-{{ ai_gen_id }} class="ai-partners-carousel-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.heading != blank %}
+    <h2 class="ai-partners-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+  {% endif %}
+
+  {% if block.settings.subheading != blank %}
+    <div class="ai-partners-subheading-{{ ai_gen_id }}">{{ block.settings.subheading }}</div>
+  {% endif %}
+
+  <div class="ai-carousel-container-{{ ai_gen_id }}">
+    <div class="ai-carousel-track-{{ ai_gen_id }}">
+      {% for i in (1..6) %}
+        {% liquid
+          assign logo_key = 'partner_' | append: i | append: '_logo'
+          assign name_key = 'partner_' | append: i | append: '_name'
+          assign description_key = 'partner_' | append: i | append: '_description'
+          assign url_key = 'partner_' | append: i | append: '_url'
+
+          assign partner_logo = block.settings[logo_key]
+          assign partner_name = block.settings[name_key]
+          assign partner_description = block.settings[description_key]
+          assign partner_url = block.settings[url_key]
+        %}
+
+        {% if partner_logo != blank or partner_name != blank %}
+          <div class="ai-partner-item-{{ ai_gen_id }}">
+            {% if partner_url != blank %}
+              <a href="{{ partner_url }}" style="text-decoration: none; color: inherit; width: 100%;">
+            {% endif %}
+
+            <div class="ai-partner-logo-wrapper-{{ ai_gen_id }}">
+              {% if partner_logo %}
+                <img
+                  src="{{ partner_logo | image_url: width: 400 }}"
+                  alt="{{ partner_name | escape }}"
+                  class="ai-partner-logo-{{ ai_gen_id }}"
+                  loading="lazy"
+                  width="400"
+                  height="{{ block.settings.logo_height }}"
+                >
+              {% else %}
+                <div class="ai-partner-logo-placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+            </div>
+
+            {% if partner_name != blank %}
+              <h3 class="ai-partner-name-{{ ai_gen_id }}">{{ partner_name }}</h3>
+            {% endif %}
+
+            {% if partner_description != blank %}
+              <p class="ai-partner-description-{{ ai_gen_id }}">{{ partner_description }}</p>
+            {% endif %}
+
+            {% if partner_url != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {% for i in (1..6) %}
+        {% liquid
+          assign logo_key = 'partner_' | append: i | append: '_logo'
+          assign name_key = 'partner_' | append: i | append: '_name'
+          assign description_key = 'partner_' | append: i | append: '_description'
+          assign url_key = 'partner_' | append: i | append: '_url'
+
+          assign partner_logo = block.settings[logo_key]
+          assign partner_name = block.settings[name_key]
+          assign partner_description = block.settings[description_key]
+          assign partner_url = block.settings[url_key]
+        %}
+
+        {% if partner_logo != blank or partner_name != blank %}
+          <div class="ai-partner-item-{{ ai_gen_id }}" aria-hidden="true">
+            {% if partner_url != blank %}
+              <a href="{{ partner_url }}" style="text-decoration: none; color: inherit; width: 100%;" tabindex="-1">
+            {% endif %}
+
+            <div class="ai-partner-logo-wrapper-{{ ai_gen_id }}">
+              {% if partner_logo %}
+                <img
+                  src="{{ partner_logo | image_url: width: 400 }}"
+                  alt="{{ partner_name | escape }}"
+                  class="ai-partner-logo-{{ ai_gen_id }}"
+                  loading="lazy"
+                  width="400"
+                  height="{{ block.settings.logo_height }}"
+                >
+              {% else %}
+                <div class="ai-partner-logo-placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+            </div>
+
+            {% if partner_name != blank %}
+              <h3 class="ai-partner-name-{{ ai_gen_id }}">{{ partner_name }}</h3>
+            {% endif %}
+
+            {% if partner_description != blank %}
+              <p class="ai-partner-description-{{ ai_gen_id }}">{{ partner_description }}</p>
+            {% endif %}
+
+            {% if partner_url != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</partners-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class PartnersCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.track = null;
+        this.pauseOnHover = {{ block.settings.pause_on_hover }};
+        this.autoScroll = {{ block.settings.auto_scroll }};
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-carousel-track-{{ ai_gen_id }}');
+        if (!this.track) return;
+
+        if (this.autoScroll) {
+          const isRTL = document.documentElement.dir === 'rtl'
+                     || getComputedStyle(document.documentElement).direction === 'rtl';
+
+          if (isRTL) {
+            this.track.classList.add('ai-scroll-rtl-{{ ai_gen_id }}');
+          } else {
+            this.track.classList.add('ai-scroll-ltr-{{ ai_gen_id }}');
+          }
+        }
+
+        if (this.pauseOnHover) {
+          this.track.addEventListener('mouseenter', () => {
+            this.track.classList.add('ai-paused-{{ ai_gen_id }}');
+          });
+          this.track.addEventListener('mouseleave', () => {
+            this.track.classList.remove('ai-paused-{{ ai_gen_id }}');
+          });
+        }
+      }
+    }
+
+    customElements.define('partners-carousel-{{ ai_gen_id }}', PartnersCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "شركاء الحصيف",
+  "settings": [
+    {
+      "type": "header",
+      "content": "العنوان"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "العنوان الرئيسي",
+      "default": "شركاؤنا"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "حجم العنوان",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "spacing_below_heading",
+      "label": "المسافة أسفل العنوان",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "العنوان الفرعي"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "العنوان الفرعي",
+      "default": "<p>نفخر بالعمل مع أفضل الشركاء في المجال</p>"
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "حجم العنوان الفرعي",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "لون العنوان الفرعي",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "spacing_below_subheading",
+      "label": "المسافة أسفل العنوان الفرعي",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "التخطيط"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض سطح المكتب",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "الحد الأقصى للعرض",
+      "min": 800,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "حشوة القسم",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "المسافة بين العناصر",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "إعدادات الاستعراض"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_scroll",
+      "label": "تفعيل التمرير التلقائي",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "سرعة التمرير",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "إيقاف مؤقت عند التمرير",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "نمط العنصر"
+    },
+    {
+      "type": "range",
+      "id": "item_width",
+      "label": "عرض العنصر",
+      "min": 150,
+      "max": 350,
+      "step": 10,
+      "unit": "px",
+      "default": 250
+    },
+    {
+      "type": "color",
+      "id": "item_background_color",
+      "label": "لون خلفية العنصر",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "item_padding",
+      "label": "حشوة العنصر",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "item_border_radius",
+      "label": "استدارة حواف العنصر",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "الشعار"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "ارتفاع الشعار",
+      "min": 40,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "spacing_below_logo",
+      "label": "المسافة أسفل الشعار",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "logo_grayscale",
+      "label": "تدرج الرمادي للشعار",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "logo_opacity",
+      "label": "شفافية الشعار",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.7
+    },
+    {
+      "type": "header",
+      "content": "نص الشريك"
+    },
+    {
+      "type": "range",
+      "id": "partner_name_size",
+      "label": "حجم اسم الشريك",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "partner_name_color",
+      "label": "لون اسم الشريك",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "partner_description_size",
+      "label": "حجم وصف الشريك",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "partner_description_color",
+      "label": "لون وصف الشريك",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "الشريك 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "partner_1_logo",
+      "label": "شعار الشريك"
+    },
+    {
+      "type": "text",
+      "id": "partner_1_name",
+      "label": "اسم الشريك"
+    },
+    {
+      "type": "textarea",
+      "id": "partner_1_description",
+      "label": "وصف الشريك"
+    },
+    {
+      "type": "url",
+      "id": "partner_1_url",
+      "label": "رابط الشريك"
+    },
+    {
+      "type": "header",
+      "content": "الشريك 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "partner_2_logo",
+      "label": "شعار الشريك"
+    },
+    {
+      "type": "text",
+      "id": "partner_2_name",
+      "label": "اسم الشريك"
+    },
+    {
+      "type": "textarea",
+      "id": "partner_2_description",
+      "label": "وصف الشريك"
+    },
+    {
+      "type": "url",
+      "id": "partner_2_url",
+      "label": "رابط الشريك"
+    },
+    {
+      "type": "header",
+      "content": "الشريك 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "partner_3_logo",
+      "label": "شعار الشريك"
+    },
+    {
+      "type": "text",
+      "id": "partner_3_name",
+      "label": "اسم الشريك"
+    },
+    {
+      "type": "textarea",
+      "id": "partner_3_description",
+      "label": "وصف الشريك"
+    },
+    {
+      "type": "url",
+      "id": "partner_3_url",
+      "label": "رابط الشريك"
+    },
+    {
+      "type": "header",
+      "content": "الشريك 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "partner_4_logo",
+      "label": "شعار الشريك"
+    },
+    {
+      "type": "text",
+      "id": "partner_4_name",
+      "label": "اسم الشريك"
+    },
+    {
+      "type": "textarea",
+      "id": "partner_4_description",
+      "label": "وصف الشريك"
+    },
+    {
+      "type": "url",
+      "id": "partner_4_url",
+      "label": "رابط الشريك"
+    },
+    {
+      "type": "header",
+      "content": "الشريك 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "partner_5_logo",
+      "label": "شعار الشريك"
+    },
+    {
+      "type": "text",
+      "id": "partner_5_name",
+      "label": "اسم الشريك"
+    },
+    {
+      "type": "textarea",
+      "id": "partner_5_description",
+      "label": "وصف الشريك"
+    },
+    {
+      "type": "url",
+      "id": "partner_5_url",
+      "label": "رابط الشريك"
+    },
+    {
+      "type": "header",
+      "content": "الشريك 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "partner_6_logo",
+      "label": "شعار الشريك"
+    },
+    {
+      "type": "text",
+      "id": "partner_6_name",
+      "label": "اسم الشريك"
+    },
+    {
+      "type": "textarea",
+      "id": "partner_6_description",
+      "label": "وصف الشريك"
+    },
+    {
+      "type": "url",
+      "id": "partner_6_url",
+      "label": "رابط الشريك"
+    }
+  ],
+  "presets": [
+    {
+      "name": "شركاء الحصيف"
+    }
+  ]
+}
+{% endschema %}

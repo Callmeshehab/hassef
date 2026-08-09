@@ -1,0 +1,13 @@
+<div class="hf-header"><div class="hf-header__top"><div class="hf-header__right"><a href="" class="hf-logo">//hassef.myshopify.com/cdn/shop/files/IMG_2335_a9216d96-ac28-480f-bc30-afedf08c9731.png?v=1775861876&width=300
+</a><button class="hf-search-btn" onclick="document.querySelector('details[id*=Search]')?.setAttribute('open','')">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      </button>
+
+    </div><div class="hf-header__left"><a href="" class="hf-btn-subscribe">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        السلة</a>
+
+    </div>
+  </div><nav class="hf-header__nav"></nav>
+
+</div>

@@ -1,0 +1,790 @@
+{% comment %}
+  ╔══════════════════════════════════════════════════════════════╗
+  ║   SECTION 1: Scroll-Driven Frame Animation                   ║
+  ║   متجر الريترو - أنيميشن السكرول بالفريمات                   ║
+  ╚══════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+<style>
+  /* ─── Fonts ─── */
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Bebas+Neue&display=swap');
+
+  :root {
+    --retro-cream:   #F5EDD6;
+    --retro-dark:    #1A1208;
+    --retro-burgundy:#7B1C2E;
+    --retro-gold:    #C9A84C;
+    --retro-brown:   #5C3A1E;
+    --retro-tape:    #2B4A6F;
+  }
+
+  /* ─── Wrapper ─── */
+  #sfa-{{ section.id }} {
+    position: relative;
+    background: var(--retro-dark);
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  /* ─── Sticky canvas ─── */
+  .sfa-sticky {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ─── Canvas image ─── */
+  .sfa-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .sfa-canvas img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.04s linear;
+  }
+  .sfa-canvas img.sfa-active { opacity: 1; }
+
+  /* ─── Grain overlay ─── */
+  .sfa-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.18;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    mix-blend-mode: overlay;
+  }
+
+  /* ─── Vignette ─── */
+  .sfa-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(10,5,0,0.75) 100%);
+  }
+
+  /* ─── Scroll height spacer ─── */
+  .sfa-scroll-space {
+    /* height set by JS */
+  }
+
+  /* ─── Progress bar ─── */
+  .sfa-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--retro-gold), var(--retro-burgundy));
+    z-index: 10;
+    transition: width 0.1s linear;
+  }
+
+  /* ─── Overlay text items ─── */
+  .sfa-text-item {
+    position: absolute;
+    z-index: 8;
+    pointer-events: none;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  .sfa-text-item.sfa-visible { pointer-events: auto; }
+
+  /* text animation styles */
+  .sfa-text-item[data-anim="fadeUp"]    { transform: translateY(30px); }
+  .sfa-text-item[data-anim="fadeDown"]  { transform: translateY(-30px); }
+  .sfa-text-item[data-anim="fadeLeft"]  { transform: translateX(30px); }
+  .sfa-text-item[data-anim="fadeRight"] { transform: translateX(-30px); }
+  .sfa-text-item[data-anim="zoom"]      { transform: scale(0.7); }
+  .sfa-text-item[data-anim="rotate"]    { transform: rotate(-10deg) scale(0.8); }
+
+  .sfa-text-item.sfa-visible {
+    opacity: 1;
+    transform: none !important;
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1);
+  }
+  .sfa-text-item.sfa-hidden-out {
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  /* rainbow letter effect */
+  .sfa-rainbow span {
+    display: inline-block;
+    transition: color 0.3s;
+  }
+
+  /* ─── CTA Buttons container ─── */
+  .sfa-buttons-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  .sfa-buttons-layer.sfa-visible { opacity: 1; pointer-events: auto; }
+
+  .sfa-btn-wrapper {
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+
+  .sfa-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: 2px solid var(--retro-gold);
+    background: rgba(26,18,8,0.75);
+    backdrop-filter: blur(8px);
+    color: var(--retro-gold);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    position: relative;
+    overflow: hidden;
+  }
+  .sfa-cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--retro-gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+    z-index: -1;
+  }
+  .sfa-cta-btn:hover { color: var(--retro-dark); border-color: var(--retro-gold); }
+  .sfa-cta-btn:hover::before { transform: scaleX(1); }
+
+  .sfa-cta-btn .sfa-btn-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  /* pulse ring on button */
+  .sfa-cta-btn::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--retro-gold);
+    border-radius: 6px;
+    opacity: 0;
+    animation: sfaPulse 2.5s ease infinite;
+  }
+  @keyframes sfaPulse {
+    0%   { opacity: 0; transform: scale(1); }
+    50%  { opacity: 0.4; }
+    100% { opacity: 0; transform: scale(1.1); }
+  }
+
+  /* ─── Scroll hint ─── */
+  .sfa-scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--retro-cream);
+    font-size: 12px;
+    font-family: 'Tajawal', sans-serif;
+    letter-spacing: 0.15em;
+    opacity: 1;
+    transition: opacity 0.5s;
+  }
+  .sfa-scroll-hint.sfa-gone { opacity: 0; pointer-events: none; }
+  .sfa-scroll-mouse {
+    width: 22px; height: 36px;
+    border: 2px solid var(--retro-gold);
+    border-radius: 12px;
+    display: flex; justify-content: center; padding-top: 5px;
+  }
+  .sfa-scroll-dot {
+    width: 4px; height: 8px;
+    background: var(--retro-gold);
+    border-radius: 2px;
+    animation: sfaScrollDot 1.6s ease infinite;
+  }
+  @keyframes sfaScrollDot {
+    0%   { transform: translateY(0); opacity: 1; }
+    80%  { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+  }
+
+  /* ─── Loading overlay ─── */
+  .sfa-loader {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: var(--retro-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.6s ease;
+  }
+  .sfa-loader.sfa-done { opacity: 0; pointer-events: none; }
+  .sfa-loader-tape {
+    font-size: 56px;
+    animation: sfaTapeSpin 1s linear infinite;
+  }
+  @keyframes sfaTapeSpin { to { transform: rotate(360deg); } }
+  .sfa-loader-bar {
+    width: 200px; height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .sfa-loader-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--retro-gold), var(--retro-burgundy));
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+  }
+  .sfa-loader-text {
+    color: var(--retro-cream);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+
+  /* ─── Frame counter ─── */
+  .sfa-frame-counter {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    z-index: 10;
+    color: rgba(245,237,214,0.4);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    direction: ltr;
+  }
+
+  @media (max-width: 768px) {
+    .sfa-cta-btn { font-size: 13px; padding: 10px 18px; }
+  }
+</style>
+
+<div id="sfa-{{ section.id }}">
+  <!-- Scroll spacer — height controls animation duration -->
+  <div class="sfa-scroll-space" id="sfaSpace-{{ section.id }}" style="height: {{ section.settings.scroll_height }}vh"></div>
+
+  <!-- Sticky scene -->
+  <div class="sfa-sticky" id="sfaSticky-{{ section.id }}">
+
+    <!-- Loading screen -->
+    <div class="sfa-loader" id="sfaLoader-{{ section.id }}">
+      <div class="sfa-loader-tape">📼</div>
+      <div class="sfa-loader-bar"><div class="sfa-loader-fill" id="sfaLoaderFill-{{ section.id }}"></div></div>
+      <div class="sfa-loader-text">جاري تحميل المشهد…</div>
+    </div>
+
+    <!-- Frame counter -->
+    <div class="sfa-frame-counter" id="sfaCounter-{{ section.id }}">01 / {{ section.blocks | where: 'type', 'frame' | size }}</div>
+
+    <!-- Canvas -->
+    <div class="sfa-canvas" id="sfaCanvas-{{ section.id }}">
+      {%- assign frame_blocks = section.blocks | where: 'type', 'frame' -%}
+      {%- for block in frame_blocks -%}
+        {%- if block.settings.image != blank -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 1920 }}"
+            alt="Frame {{ forloop.index }}"
+            {% if forloop.first %}class="sfa-active"{% endif %}
+            loading="{% if forloop.index <= 5 %}eager{% else %}lazy{% endif %}"
+            decoding="async"
+            data-frame="{{ forloop.index0 }}"
+          >
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <!-- Grain + Vignette -->
+    <div class="sfa-grain"></div>
+    <div class="sfa-vignette"></div>
+
+    <!-- Text overlay items -->
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'text_overlay' -%}
+        {%- assign color_mode = block.settings.color_mode -%}
+        <div
+          class="sfa-text-item{% if color_mode == 'rainbow' %} sfa-rainbow{% endif %}"
+          id="sfaText-{{ block.id }}"
+          data-anim="{{ block.settings.animation_style }}"
+          style="
+            top: {{ block.settings.pos_y }}%;
+            {% if block.settings.align == 'right' %}right: {{ block.settings.pos_x }}%; text-align: right;
+            {% elsif block.settings.align == 'center' %}left: 50%; transform: translateX(-50%); text-align: center;
+            {% else %}left: {{ block.settings.pos_x }}%;{% endif %}
+            font-size: clamp(20px, {{ block.settings.font_size }}vw, 120px);
+            font-weight: {{ block.settings.font_weight }};
+            color: {{ block.settings.text_color }};
+            text-shadow: 2px 4px 20px rgba(0,0,0,0.8);
+            max-width: {{ block.settings.max_width }}%;
+            line-height: 1.2;
+            direction: rtl;
+          "
+          data-show-frame="{{ block.settings.show_at_frame }}"
+          data-hide-frame="{{ block.settings.hide_at_frame }}"
+        >
+          {%- assign text_content = block.settings.text -%}
+          {%- if color_mode == 'rainbow' -%}
+            {%- assign rainbow_colors = '#C9A84C,#7B1C2E,#F5EDD6,#2B4A6F,#C9A84C,#5C3A1E' | split: ',' -%}
+            {%- assign chars = text_content | split: '' -%}
+            {%- for char in chars -%}
+              {%- assign ci = forloop.index0 | modulo: rainbow_colors.size -%}
+              <span style="color: {{ rainbow_colors[ci] }}; transition-delay: {{ forloop.index0 | times: 0.04 }}s">{{ char }}</span>
+            {%- endfor -%}
+          {%- elsif color_mode == 'gradient' -%}
+            <span style="background: linear-gradient(135deg, {{ block.settings.gradient_from }}, {{ block.settings.gradient_to }}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ text_content }}</span>
+          {%- else -%}
+            {{ text_content }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+
+    <!-- CTA Buttons layer (shows at last frames) -->
+    <div class="sfa-buttons-layer" id="sfaBtns-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'cta_button' -%}
+          <div class="sfa-btn-wrapper" style="top: {{ block.settings.pos_y }}%; left: {{ block.settings.pos_x }}%;">
+            <a href="{{ block.settings.link }}" class="sfa-cta-btn">
+              <span class="sfa-btn-icon">{{ block.settings.icon }}</span>
+              {{ block.settings.label }}
+            </a>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="sfa-scroll-hint" id="sfaHint-{{ section.id }}">
+      <div class="sfa-scroll-mouse"><div class="sfa-scroll-dot"></div></div>
+      <span>مرر للأسفل</span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="sfa-progress" id="sfaProgress-{{ section.id }}"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const SEC_ID   = '{{ section.id }}';
+  const wrapper  = document.getElementById('sfa-' + SEC_ID);
+  const sticky   = document.getElementById('sfaSticky-' + SEC_ID);
+  const space    = document.getElementById('sfaSpace-' + SEC_ID);
+  const canvas   = document.getElementById('sfaCanvas-' + SEC_ID);
+  const progress = document.getElementById('sfaProgress-' + SEC_ID);
+  const hint     = document.getElementById('sfaHint-' + SEC_ID);
+  const loader   = document.getElementById('sfaLoader-' + SEC_ID);
+  const loaderFill = document.getElementById('sfaLoaderFill-' + SEC_ID);
+  const counter  = document.getElementById('sfaCounter-' + SEC_ID);
+  const btnsLayer = document.getElementById('sfaBtns-' + SEC_ID);
+
+  if (!wrapper || !canvas) return;
+
+  const images = Array.from(canvas.querySelectorAll('img'));
+  const TOTAL  = images.length;
+  if (!TOTAL) return;
+
+  const BUF = {{ section.settings.preload_count | default: 8 }};
+  const BTN_FRAME = Math.max(0, TOTAL - {{ section.settings.buttons_appear_frame | default: 3 }});
+
+  /* ── Text overlays ── */
+  const textItems = Array.from(wrapper.querySelectorAll('.sfa-text-item')).map(el => ({
+    el,
+    showAt: parseInt(el.dataset.showFrame) || 0,
+    hideAt: parseInt(el.dataset.hideFrame) || TOTAL + 1,
+  }));
+
+  /* ── Preload first N ── */
+  let loaded = 0;
+  function onLoad() {
+    loaded++;
+    const pct = Math.round((loaded / Math.min(BUF, TOTAL)) * 100);
+    if (loaderFill) loaderFill.style.width = pct + '%';
+    if (loaded >= Math.min(BUF, TOTAL)) {
+      setTimeout(() => { if (loader) loader.classList.add('sfa-done'); }, 400);
+    }
+  }
+  images.slice(0, BUF).forEach(img => {
+    if (img.complete) onLoad();
+    else img.addEventListener('load', onLoad, { once: true });
+  });
+
+  /* ── State ── */
+  let currentFrame = 0;
+  let rafId = null;
+
+  function setFrame(idx) {
+    const next = Math.max(0, Math.min(TOTAL - 1, Math.round(idx)));
+    if (next === currentFrame && images[next].classList.contains('sfa-active')) return;
+    images[currentFrame].classList.remove('sfa-active');
+    currentFrame = next;
+    images[currentFrame].classList.add('sfa-active');
+
+    /* counter */
+    if (counter) {
+      const disp = String(next + 1).padStart(2, '0');
+      const tot  = String(TOTAL).padStart(2, '0');
+      counter.textContent = disp + ' / ' + tot;
+    }
+
+    /* text overlays */
+    textItems.forEach(({ el, showAt, hideAt }) => {
+      const visible = next >= showAt && next < hideAt;
+      if (visible) {
+        el.classList.add('sfa-visible');
+        el.classList.remove('sfa-hidden-out');
+      } else if (el.classList.contains('sfa-visible')) {
+        el.classList.remove('sfa-visible');
+        el.classList.add('sfa-hidden-out');
+      }
+    });
+
+    /* CTA buttons */
+    if (btnsLayer) {
+      if (next >= BTN_FRAME) btnsLayer.classList.add('sfa-visible');
+      else btnsLayer.classList.remove('sfa-visible');
+    }
+
+    /* scroll hint */
+    if (next > 2 && hint) hint.classList.add('sfa-gone');
+    else if (next <= 2 && hint) hint.classList.remove('sfa-gone');
+  }
+
+  /* ── Smooth interpolation ── */
+  let targetFrame = 0;
+  let displayFrame = 0;
+  const EASE = 0.12;
+
+  function tick() {
+    const diff = targetFrame - displayFrame;
+    if (Math.abs(diff) > 0.05) {
+      displayFrame += diff * EASE;
+      setFrame(displayFrame);
+      rafId = requestAnimationFrame(tick);
+    } else {
+      displayFrame = targetFrame;
+      setFrame(displayFrame);
+      rafId = null;
+    }
+  }
+
+  /* ── Scroll handler ── */
+  function onScroll() {
+    const rect = wrapper.getBoundingClientRect();
+    const total = wrapper.offsetHeight - window.innerHeight;
+    if (total <= 0) return;
+
+    const scrolled = -rect.top;
+    const pct = Math.max(0, Math.min(1, scrolled / total));
+
+    progress.style.width = (pct * 100) + '%';
+
+    targetFrame = pct * (TOTAL - 1);
+    if (!rafId) rafId = requestAnimationFrame(tick);
+
+    /* lazy load ahead */
+    const ahead = Math.min(TOTAL - 1, Math.round(targetFrame) + 5);
+    images.slice(0, ahead + 1).forEach(img => {
+      if (img.loading === 'lazy') img.loading = 'eager';
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🎬 Scroll Frames Animation",
+  "tag": "section",
+  "class": "retro-scroll-frames",
+  "settings": [
+    {
+      "type": "range",
+      "id": "scroll_height",
+      "label": "ارتفاع منطقة السكرول (vh)",
+      "min": 200,
+      "max": 1000,
+      "step": 50,
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "preload_count",
+      "label": "عدد الفريمات المحملة مسبقاً",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "buttons_appear_frame",
+      "label": "تظهر الأزرار قبل كم فريم من النهاية",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "blocks": [
+    {
+      "type": "frame",
+      "name": "🖼 فريم صورة",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "الصورة (يفضل WebP)"
+        }
+      ]
+    },
+    {
+      "type": "text_overlay",
+      "name": "✍️ نص متحرك",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "النص",
+          "default": "أغراض تحكي قصة"
+        },
+        {
+          "type": "select",
+          "id": "color_mode",
+          "label": "أسلوب اللون",
+          "options": [
+            { "value": "solid",    "label": "لون ثابت" },
+            { "value": "rainbow",  "label": "قوس قزح (حرف بحرف)" },
+            { "value": "gradient", "label": "تدرج" }
+          ],
+          "default": "solid"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "اللون الأساسي",
+          "default": "#F5EDD6"
+        },
+        {
+          "type": "color",
+          "id": "gradient_from",
+          "label": "بداية التدرج",
+          "default": "#C9A84C"
+        },
+        {
+          "type": "color",
+          "id": "gradient_to",
+          "label": "نهاية التدرج",
+          "default": "#7B1C2E"
+        },
+        {
+          "type": "select",
+          "id": "animation_style",
+          "label": "أسلوب الظهور",
+          "options": [
+            { "value": "fadeUp",    "label": "ارتفاع من الأسفل" },
+            { "value": "fadeDown",  "label": "نزول من الأعلى" },
+            { "value": "fadeLeft",  "label": "من اليمين" },
+            { "value": "fadeRight", "label": "من اليسار" },
+            { "value": "zoom",      "label": "تكبير" },
+            { "value": "rotate",    "label": "دوران" }
+          ],
+          "default": "fadeUp"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "حجم الخط (vw)",
+          "min": 1,
+          "max": 12,
+          "step": 0.5,
+          "default": 4
+        },
+        {
+          "type": "select",
+          "id": "font_weight",
+          "label": "سماكة الخط",
+          "options": [
+            { "value": "300", "label": "رفيع" },
+            { "value": "400", "label": "عادي" },
+            { "value": "700", "label": "غامق" },
+            { "value": "900", "label": "أغمق" }
+          ],
+          "default": "700"
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "محاذاة النص",
+          "options": [
+            { "value": "right",  "label": "يمين" },
+            { "value": "center", "label": "وسط" },
+            { "value": "left",   "label": "يسار" }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "pos_x",
+          "label": "الموضع الأفقي (%)",
+          "min": 0,
+          "max": 90,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "pos_y",
+          "label": "الموضع الرأسي (%)",
+          "min": 0,
+          "max": 90,
+          "step": 1,
+          "default": 15
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "label": "الحد الأقصى للعرض (%)",
+          "min": 20,
+          "max": 100,
+          "step": 5,
+          "default": 80
+        },
+        {
+          "type": "range",
+          "id": "show_at_frame",
+          "label": "يظهر عند الفريم رقم",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "hide_at_frame",
+          "label": "يختفي عند الفريم رقم",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "cta_button",
+      "name": "🛍 زر CTA",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "نص الزر",
+          "default": "تسوّق الكاسيتات"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "أيقونة (إيموجي)",
+          "default": "📼"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "الرابط"
+        },
+        {
+          "type": "range",
+          "id": "pos_x",
+          "label": "الموضع الأفقي (%)",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "pos_y",
+          "label": "الموضع الرأسي (%)",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "default": 75
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "🎬 Scroll Frames Animation",
+      "blocks": [
+        { "type": "frame" },
+        { "type": "frame" },
+        { "type": "frame" },
+        {
+          "type": "text_overlay",
+          "settings": {
+            "text": "أغراض تحكي قصة",
+            "color_mode": "rainbow",
+            "animation_style": "fadeUp",
+            "show_at_frame": 2,
+            "hide_at_frame": 15
+          }
+        },
+        {
+          "type": "cta_button",
+          "settings": {
+            "label": "تسوّق الكاسيتات",
+            "icon": "📼",
+            "pos_x": 30,
+            "pos_y": 70
+          }
+        },
+        {
+          "type": "cta_button",
+          "settings": {
+            "label": "تسوّق الكتب",
+            "icon": "📚",
+            "pos_x": 70,
+            "pos_y": 70
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

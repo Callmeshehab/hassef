@@ -1,0 +1,389 @@
+/* ============================================================
+   AL-HASEEF — Header Override CSS
+   Drop this into: Shopify Admin → Themes → Edit Code →
+   Assets → custom-header.css  (then link it in theme.liquid)
+   OR paste inside the <style> tag in header.liquid
+   ============================================================ */
+
+/* ── GOOGLE FONTS (paste in <head> of theme.liquid) ──────────
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+─────────────────────────────────────────────────────────── */
+
+/* ══════════════════════════════════════════════════════════
+   1. CSS VARIABLES — tweak these only
+   ══════════════════════════════════════════════════════════ */
+:root {
+  /* Colors */
+  --hf-navy:        #2c4a6e;
+  --hf-navy-hover:  #3a5f8a;
+  --hf-cream:       #f0ece3;
+  --hf-cream-dark:  #e5e0d5;
+  --hf-border:      rgba(44, 74, 110, 0.14);
+  --hf-text:        #1a2e42;
+  --hf-muted:       #7a8a96;
+
+  /* ── LOGO DIMENSIONS — change freely ── */
+  --hf-logo-width-desktop:  160px;   /* try: 120px / 160px / 200px */
+  --hf-logo-width-mobile:   110px;   /* try: 90px / 110px / 130px  */
+  --hf-logo-height-desktop: auto;    /* 'auto' = keep ratio, or set px */
+
+  /* ── HEADER HEIGHT ── */
+  --hf-header-h-desktop: 72px;       /* try: 64px / 72px / 88px */
+  --hf-header-h-mobile:  60px;
+
+  /* ── BUTTON STYLE — see Section 4 for options ── */
+  --hf-btn-radius: 10px;             /* 0 = square, 50px = pill */
+  --hf-btn-font-size: 13.5px;
+  --hf-btn-padding: 9px 20px;
+
+  /* ── ICON BUTTON ── */
+  --hf-icon-size: 40px;
+  --hf-icon-radius: 50%;             /* 50% = circle, 10px = rounded square */
+
+  /* ── ANIMATION ── */
+  --hf-logo-zoom: 1.06;              /* scale on hover: 1.04 subtle / 1.1 bold */
+  --hf-logo-duration: 0.32s;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   2. BASE HEADER SHELL
+   ══════════════════════════════════════════════════════════ */
+.header-wrapper {
+  background: var(--hf-cream) !important;
+  border-bottom: 1px solid var(--hf-border) !important;
+  transition: box-shadow 0.3s ease;
+}
+
+.section-header.shopify-section-header-sticky {
+  box-shadow: 0 2px 20px rgba(44, 74, 110, 0.09);
+}
+
+.header {
+  display: flex !important;
+  align-items: center !important;
+  min-height: var(--hf-header-h-desktop) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-family: 'Cairo', sans-serif !important;
+  direction: rtl;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   3. LOGO — multiple layout options
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 3A. Default logo sizing ── */
+.header__heading-logo-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.header__heading-logo {
+  width: var(--hf-logo-width-desktop) !important;
+  height: var(--hf-logo-height-desktop) !important;
+  max-width: none !important;
+  object-fit: contain;
+
+  /* ── ZOOM ANIMATION ── */
+  transition:
+    transform var(--hf-logo-duration) cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter     var(--hf-logo-duration) ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.header__heading-link:hover .header__heading-logo,
+.header__heading-link:focus .header__heading-logo {
+  transform: scale(var(--hf-logo-zoom));
+  filter: drop-shadow(0 4px 12px rgba(44, 74, 110, 0.22));
+}
+
+/* ── 3B. Shop name fallback (when no image logo) ── */
+.header__heading-link .h2 {
+  font-family: 'Cairo', sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: var(--hf-navy) !important;
+  letter-spacing: -0.01em;
+  transition: transform var(--hf-logo-duration) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.header__heading-link:hover .h2 {
+  transform: scale(var(--hf-logo-zoom));
+}
+
+/* ── 3C. LOGO POSITION HELPERS (add class to header in Shopify) ──
+
+   Option A: logo-left  → add  header--logo-left   to .header
+   Option B: logo-center → default Dawn behavior (middle-center)
+   Option C: logo-top   → stacked layout
+*/
+
+/* logo centered vertically + horizontally (Dawn middle-center already handles this) */
+.header--middle-center .header__heading {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   4. ICON BUTTONS (search, account, cart)
+   ══════════════════════════════════════════════════════════ */
+.header__icon {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: var(--hf-icon-size) !important;
+  height: var(--hf-icon-size) !important;
+  border-radius: var(--hf-icon-radius) !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--hf-navy) !important;
+  transition: background 0.2s ease, transform 0.18s ease !important;
+  text-decoration: none;
+}
+.header__icon:hover {
+  background: rgba(44, 74, 110, 0.09) !important;
+  transform: translateY(-1px);
+}
+.header__icon svg {
+  width: 19px !important;
+  height: 19px !important;
+  stroke: var(--hf-navy);
+  fill: none;
+  stroke-width: 1.6;
+}
+
+/* Cart bubble badge */
+.cart-count-bubble {
+  position: absolute !important;
+  top: 4px !important;
+  left: 4px !important;          /* RTL: badge on left */
+  min-width: 17px !important;
+  height: 17px !important;
+  background: var(--hf-navy) !important;
+  color: var(--hf-cream) !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1.5px solid var(--hf-cream) !important;
+  font-family: 'Cairo', sans-serif;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   4B. BUTTON STYLE OPTIONS
+   Pick ONE of the following blocks and keep the rest commented out
+   ══════════════════════════════════════════════════════════ */
+
+/* ── OPTION 1: Filled Navy (default) ── */
+.hf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--hf-navy);
+  color: var(--hf-cream);
+  border: none;
+  border-radius: var(--hf-btn-radius);
+  padding: var(--hf-btn-padding);
+  font-family: 'Cairo', sans-serif;
+  font-size: var(--hf-btn-font-size);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.hf-btn:hover {
+  background: var(--hf-navy-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(44, 74, 110, 0.22);
+}
+
+/* ── OPTION 2: Outline ── (replace .hf-btn above with this)
+.hf-btn {
+  background: transparent;
+  color: var(--hf-navy);
+  border: 1.5px solid var(--hf-navy);
+  border-radius: var(--hf-btn-radius);
+  padding: var(--hf-btn-padding);
+  font-family: 'Cairo', sans-serif;
+  font-size: var(--hf-btn-font-size);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.hf-btn:hover { background: var(--hf-navy); color: var(--hf-cream); }
+*/
+
+/* ── OPTION 3: Ghost with underline ──
+.hf-btn {
+  background: transparent;
+  color: var(--hf-navy);
+  border: none;
+  border-bottom: 1.5px solid var(--hf-navy);
+  border-radius: 0;
+  padding: 6px 2px;
+  font-family: 'Cairo', sans-serif;
+  font-size: var(--hf-btn-font-size);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 7px;
+  transition: opacity 0.2s;
+}
+.hf-btn:hover { opacity: 0.65; }
+*/
+
+/* ── OPTION 4: Cream/Retro stamp ──
+.hf-btn {
+  background: var(--hf-cream-dark);
+  color: var(--hf-navy);
+  border: 1.5px solid var(--hf-navy);
+  border-radius: 6px;
+  padding: var(--hf-btn-padding);
+  font-family: 'Cairo', sans-serif;
+  font-size: var(--hf-btn-font-size);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 7px;
+  box-shadow: 2px 2px 0 var(--hf-navy);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.hf-btn:hover { box-shadow: 0 0 0 var(--hf-navy); transform: translate(2px, 2px); }
+*/
+
+
+/* ══════════════════════════════════════════════════════════
+   5. NAV LINKS
+   ══════════════════════════════════════════════════════════ */
+.list-menu__item--link,
+.header__menu-item {
+  font-family: 'Cairo', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--hf-text) !important;
+  text-decoration: none !important;
+  position: relative;
+  padding: 8px 12px !important;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s !important;
+}
+.list-menu__item--link::after,
+.header__menu-item::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  right: 12px; left: 12px;   /* RTL-aware */
+  height: 1.5px;
+  background: var(--hf-navy);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s ease;
+  border-radius: 2px;
+}
+.list-menu__item--link:hover,
+.header__menu-item:hover {
+  color: var(--hf-navy) !important;
+}
+.list-menu__item--link:hover::after,
+.header__menu-item:hover::after {
+  transform: scaleX(1);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   6. MOBILE RESPONSIVE
+   ══════════════════════════════════════════════════════════ */
+@media screen and (max-width: 749px) {
+  .header {
+    min-height: var(--hf-header-h-mobile) !important;
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+  }
+
+  .header__heading-logo {
+    width: var(--hf-logo-width-mobile) !important;
+  }
+
+  /* Stack icons tighter on mobile */
+  .header__icons {
+    gap: 2px !important;
+  }
+  .header__icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .header__icon svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
+
+/* ── MOBILE SIZE PRESETS — pick one by changing --hf-logo-width-mobile above:
+   Compact  → 90px
+   Default  → 110px
+   Large    → 140px
+   Full-width banner → 100% (set --hf-logo-height-desktop: 56px too)
+── */
+
+
+/* ══════════════════════════════════════════════════════════
+   7. RETRO VIBES — optional texture overlay on header
+   ══════════════════════════════════════════════════════════ */
+.header-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 180px;
+  opacity: 0.55;
+  z-index: 0;
+}
+.header-wrapper > * { position: relative; z-index: 1; }
+
+
+/* ══════════════════════════════════════════════════════════
+   8. LOGO POSITION DIMENSION QUICK-REFERENCE
+   ══════════════════════════════════════════════════════════
+   Desktop presets:
+     Small logo    → --hf-logo-width-desktop: 100px
+     Medium logo   → --hf-logo-width-desktop: 160px  ← default
+     Large logo    → --hf-logo-width-desktop: 220px
+     XL / Banner   → --hf-logo-width-desktop: 300px
+
+   Header height:
+     Compact       → --hf-header-h-desktop: 56px
+     Normal        → --hf-header-h-desktop: 72px      ← default
+     Spacious      → --hf-header-h-desktop: 88px
+     Tall          → --hf-header-h-desktop: 100px
+
+   Logo zoom on hover:
+     Subtle        → --hf-logo-zoom: 1.03
+     Normal        → --hf-logo-zoom: 1.06             ← default
+     Bold          → --hf-logo-zoom: 1.12
+
+   Icon shape:
+     Circle        → --hf-icon-radius: 50%            ← default
+     Rounded square→ --hf-icon-radius: 10px
+     Square        → --hf-icon-radius: 0
+
+   Button shape:
+     Pill          → --hf-btn-radius: 50px
+     Rounded       → --hf-btn-radius: 10px            ← default
+     Square        → --hf-btn-radius: 0
+   ══════════════════════════════════════════════════════════ */

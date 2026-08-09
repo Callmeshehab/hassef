@@ -1,0 +1,681 @@
+{% doc %}
+  @prompt
+    أريد إنشاء قسم بانر في الصفحة الرئيسية لمتجر Shopify.
+    المواصفات المطلوبة:
+    
+    - يكون القسم عبارة عن صورة بانر بعرض الصفحة بالكامل (Full Width).
+    ة انحناء ناعم وحديث (Curved Bottom Edge) بدلاً من خط مستقيم.
+    - - الصورة تحتوي على كتب موضوعة على رف، مع كتاب مفتوح في المنتصف.
+    - يجب أن يظهر أسفل الصو
+    رالانحناء يكون كبير وناعم ليعطي مظهراً عصرياً وحديثاً للموقع.
+    - يجب أن يكون الانحناء في أسفل الصورة فقط، بينما تبقى الحواف الأخرى مستقيمة.
+    - القسم يجب أن يكون متجاوباً مع الهاتف والكمبيوتر (Responsive).
+    الهدف من هذا القسم هو إعطاء الصفحة الرئيسية مظهراً حديثاً وأنيقاً يشبه- الانحناء يتم تنفيذه باستخدام CSS أو SVG wave ليكون سلساً وليس حاداً.
+    - يجب أن يكون التصميم نظيفاً مع خلفية بيضاء أسفل الانحناء ليظهر التأثير بوضوح.
+    - الصورة تبقى واضحة ولا يتم قص العناصر المهمة منها.
+    
+     تصميمات المواقع ا, خيار لإضافة نص بخط عربي جميل قديم فوق الصوره والتحكم في حجمها والابعاد, بدي الانحناء فيه ظل ايضا ويكون اسفل البانر وليس فوقه يعني كانه إطار سفلي وكمان امكانيه إضافه صوره او نص فوق البانر وليس نص فقط
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-curved-banner-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ai-curved-banner-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-curved-banner-image-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.banner_height_desktop }}px;
+    overflow: hidden;
+  }
+
+  .ai-curved-banner-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-curved-banner-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-curved-banner-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    max-height: 400px;
+  }
+
+  .ai-curved-banner-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-curved-banner-content-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: {{ block.settings.content_position_vertical }}%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    text-align: center;
+    width: 90%;
+    max-width: {{ block.settings.content_max_width }}px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: {{ block.settings.content_spacing }}px;
+  }
+
+  .ai-curved-banner-overlay-image-{{ ai_gen_id }} {
+    width: {{ block.settings.overlay_image_width }}px;
+    height: auto;
+    border-radius: {{ block.settings.overlay_image_radius }}px;
+    box-shadow: 0 {{ block.settings.overlay_image_shadow_y }}px {{ block.settings.overlay_image_shadow_blur }}px {{ block.settings.overlay_image_shadow_color }};
+  }
+
+  .ai-curved-banner-overlay-image-placeholder-{{ ai_gen_id }} {
+    width: {{ block.settings.overlay_image_width }}px;
+    height: {{ block.settings.overlay_image_width }}px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: {{ block.settings.overlay_image_radius }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+  }
+
+  .ai-curved-banner-overlay-image-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.5;
+  }
+
+  .ai-curved-banner-heading-{{ ai_gen_id }} {
+    font-family: {{ block.settings.text_font.family }}, {{ block.settings.text_font.fallback_families }};
+    font-weight: {{ block.settings.text_font.weight }};
+    font-style: {{ block.settings.text_font.style }};
+    font-size: {{ block.settings.text_size_desktop }}px;
+    line-height: {{ block.settings.text_line_height }};
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    padding: {{ block.settings.text_padding_vertical }}px {{ block.settings.text_padding_horizontal }}px;
+    background-color: {{ block.settings.text_background_color }};
+    border-radius: {{ block.settings.text_border_radius }}px;
+    text-shadow: {{ block.settings.text_shadow_horizontal }}px {{ block.settings.text_shadow_vertical }}px {{ block.settings.text_shadow_blur }}px {{ block.settings.text_shadow_color }};
+    letter-spacing: {{ block.settings.text_letter_spacing }}px;
+  }
+
+  .ai-curved-banner-bottom-frame-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    margin-top: -1px;
+  }
+
+  .ai-curved-banner-curve-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.curve_height }}px;
+    overflow: hidden;
+    line-height: 0;
+    background-color: {{ block.settings.curve_color }};
+    filter: drop-shadow(0 {{ block.settings.curve_shadow_y }}px {{ block.settings.curve_shadow_blur }}px {{ block.settings.curve_shadow_color }});
+  }
+
+  .ai-curved-banner-curve-{{ ai_gen_id }} svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: {{ block.settings.curve_height }}px;
+    transform: rotate(180deg);
+  }
+
+  .ai-curved-banner-curve-{{ ai_gen_id }} .ai-curved-banner-shape-fill-{{ ai_gen_id }} {
+    fill: {{ block.settings.banner_background_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-curved-banner-image-container-{{ ai_gen_id }} {
+      height: {{ block.settings.banner_height_mobile }}px;
+    }
+
+    .ai-curved-banner-overlay-image-{{ ai_gen_id }} {
+      width: {{ block.settings.overlay_image_width | times: 0.7 }}px;
+    }
+
+    .ai-curved-banner-overlay-image-placeholder-{{ ai_gen_id }} {
+      width: {{ block.settings.overlay_image_width | times: 0.7 }}px;
+      height: {{ block.settings.overlay_image_width | times: 0.7 }}px;
+    }
+
+    .ai-curved-banner-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size_mobile }}px;
+      padding: {{ block.settings.text_padding_vertical | times: 0.7 }}px {{ block.settings.text_padding_horizontal | times: 0.7 }}px;
+    }
+
+    .ai-curved-banner-curve-{{ ai_gen_id }} {
+      height: {{ block.settings.curve_height_mobile }}px;
+    }
+
+    .ai-curved-banner-curve-{{ ai_gen_id }} svg {
+      height: {{ block.settings.curve_height_mobile }}px;
+    }
+
+    .ai-curved-banner-content-overlay-{{ ai_gen_id }} {
+      gap: {{ block.settings.content_spacing | times: 0.7 }}px;
+    }
+  }
+{% endstyle %}
+
+<curved-banner-{{ ai_gen_id }} class="ai-curved-banner-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-curved-banner-wrapper-{{ ai_gen_id }}">
+    <div class="ai-curved-banner-image-container-{{ ai_gen_id }}">
+      {% if block.settings.banner_image %}
+        <img
+          src="{{ block.settings.banner_image | image_url: width: 2400 }}"
+          alt="{{ block.settings.banner_image.alt | escape }}"
+          loading="lazy"
+          width="{{ block.settings.banner_image.width }}"
+          height="{{ block.settings.banner_image.height }}"
+          class="ai-curved-banner-image-{{ ai_gen_id }}"
+        >
+      {% else %}
+        <div class="ai-curved-banner-placeholder-{{ ai_gen_id }}">
+          {{ 'hero-apparel-1' | placeholder_svg_tag }}
+          <div class="ai-curved-banner-empty-state-{{ ai_gen_id }}">
+            أضف صورة البانر من الإعدادات
+          </div>
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_overlay_image or block.settings.show_text %}
+        <div class="ai-curved-banner-content-overlay-{{ ai_gen_id }}">
+          {% if block.settings.show_overlay_image %}
+            {% if block.settings.overlay_image %}
+              <img
+                src="{{ block.settings.overlay_image | image_url: width: 800 }}"
+                alt="{{ block.settings.overlay_image.alt | escape }}"
+                loading="lazy"
+                class="ai-curved-banner-overlay-image-{{ ai_gen_id }}"
+              >
+            {% else %}
+              <div class="ai-curved-banner-overlay-image-placeholder-{{ ai_gen_id }}">
+                {{ 'image' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+          {% endif %}
+
+          {% if block.settings.show_text and block.settings.banner_text != blank %}
+            <h2 class="ai-curved-banner-heading-{{ ai_gen_id }}">
+              {{ block.settings.banner_text }}
+            </h2>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-curved-banner-bottom-frame-{{ ai_gen_id }}">
+      <div class="ai-curved-banner-curve-{{ ai_gen_id }}">
+        <svg
+          data-name="Layer 1"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+        >
+          {% if block.settings.curve_style == 'smooth' %}
+            <path
+              d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"
+              opacity=".25"
+              class="ai-curved-banner-shape-fill-{{ ai_gen_id }}"
+            ></path>
+            <path
+              d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z"
+              opacity=".5"
+              class="ai-curved-banner-shape-fill-{{ ai_gen_id }}"
+            ></path>
+            <path
+              d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"
+              class="ai-curved-banner-shape-fill-{{ ai_gen_id }}"
+            ></path>
+          {% elsif block.settings.curve_style == 'wave' %}
+            <path
+              d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+              class="ai-curved-banner-shape-fill-{{ ai_gen_id }}"
+            ></path>
+          {% elsif block.settings.curve_style == 'simple' %}
+            <path
+              d="M0,0V7.23C0,65.52,268.63,112.77,600,112.77S1200,65.52,1200,7.23V0Z"
+              class="ai-curved-banner-shape-fill-{{ ai_gen_id }}"
+            ></path>
+          {% else %}
+            <path
+              d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z"
+              class="ai-curved-banner-shape-fill-{{ ai_gen_id }}"
+            ></path>
+          {% endif %}
+        </svg>
+      </div>
+    </div>
+  </div>
+</curved-banner-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CurvedBanner{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.init();
+      }
+
+      init() {
+        const curve = this.querySelector('.ai-curved-banner-curve-{{ ai_gen_id }}');
+        if (curve) {
+          curve.style.position = 'relative';
+        }
+      }
+    }
+
+    customElements.define('curved-banner-{{ ai_gen_id }}', CurvedBanner{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "بانر منحني",
+  "settings": [
+    {
+      "type": "header",
+      "content": "الصورة الخلفية"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "صورة البانر"
+    },
+    {
+      "type": "color",
+      "id": "banner_background_color",
+      "label": "لون خلفية البانر",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "range",
+      "id": "banner_height_desktop",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "ارتفاع البانر (كمبيوتر)",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "banner_height_mobile",
+      "min": 200,
+      "max": 600,
+      "step": 50,
+      "unit": "px",
+      "label": "ارتفاع البانر (موبايل)",
+      "default": 350
+    },
+    {
+      "type": "header",
+      "content": "المحتوى فوق البانر"
+    },
+    {
+      "type": "range",
+      "id": "content_position_vertical",
+      "min": 10,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "الموضع العمودي",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 300,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "أقصى عرض للمحتوى",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "content_spacing",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "المسافة بين الصورة والنص",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "الصورة فوق البانر"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay_image",
+      "label": "إظهار صورة فوق البانر",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "overlay_image",
+      "label": "الصورة (مثل شعار أو أيقونة)"
+    },
+    {
+      "type": "range",
+      "id": "overlay_image_width",
+      "min": 50,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض الصورة",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "overlay_image_radius",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "انحناء حواف الصورة",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "overlay_image_shadow_y",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل الصورة عمودياً",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "overlay_image_shadow_blur",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "ضبابية ظل الصورة",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "overlay_image_shadow_color",
+      "label": "لون ظل الصورة",
+      "default": "rgba(0,0,0,0.3)"
+    },
+    {
+      "type": "header",
+      "content": "النص فوق البانر"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_text",
+      "label": "إظهار النص",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "banner_text",
+      "label": "نص البانر",
+      "default": "مكتبة الحصيف"
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "خط النص",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size_desktop",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "label": "حجم النص (كمبيوتر)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "min": 16,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "حجم النص (موبايل)",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "text_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "text_letter_spacing",
+      "min": -5,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "المسافة بين الحروف",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "خلفية النص"
+    },
+    {
+      "type": "color",
+      "id": "text_background_color",
+      "label": "لون الخلفية",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "range",
+      "id": "text_padding_vertical",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "المسافة الداخلية عمودياً",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "text_padding_horizontal",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "المسافة الداخلية أفقياً",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "text_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "انحناء الحواف",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "ظل النص"
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_horizontal",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "الظل الأفقي",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_vertical",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "الظل العمودي",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_blur",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ضبابية الظل",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "text_shadow_color",
+      "label": "لون الظل",
+      "default": "rgba(0,0,0,0.3)"
+    },
+    {
+      "type": "header",
+      "content": "الإطار السفلي المنحني"
+    },
+    {
+      "type": "select",
+      "id": "curve_style",
+      "label": "نمط الانحناء",
+      "options": [
+        {
+          "value": "smooth",
+          "label": "ناعم ومتعدد الطبقات"
+        },
+        {
+          "value": "wave",
+          "label": "موجة بسيطة"
+        },
+        {
+          "value": "simple",
+          "label": "قوس بسيط"
+        },
+        {
+          "value": "elegant",
+          "label": "أنيق ومنحني"
+        }
+      ],
+      "default": "smooth"
+    },
+    {
+      "type": "range",
+      "id": "curve_height",
+      "min": 50,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "ارتفاع الانحناء (كمبيوتر)",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "curve_height_mobile",
+      "min": 30,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "ارتفاع الانحناء (موبايل)",
+      "default": 80
+    },
+    {
+      "type": "color",
+      "id": "curve_color",
+      "label": "لون الإطار المنحني",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "ظل الإطار المنحني"
+    },
+    {
+      "type": "range",
+      "id": "curve_shadow_y",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل الإطار عمودياً",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "curve_shadow_blur",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "ضبابية ظل الإطار",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "curve_shadow_color",
+      "label": "لون ظل الإطار",
+      "default": "rgba(0,0,0,0.15)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "بانر منحني"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}

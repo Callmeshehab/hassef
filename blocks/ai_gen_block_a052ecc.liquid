@@ -1,0 +1,566 @@
+{% doc %}
+  @prompt
+    بدي مساحه لاضافا بانر يكون مستطيل أتحكم في أبعاده بدقه وتفاعلي يعني عند الضغط عليه ينتقل لصفحة احددها, بدي أبعاد مخصصه لشاشات العريضة ومخصصه للموبايل للتحكم في الأبعاد, خيارات لتحديد موضع الصوره يعني جوا الأبعاد سواء وسط طرف هيك
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-banner-container-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-banner-link-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.desktop_height }}px;
+    overflow: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 {{ block.settings.shadow_vertical }}px {{ block.settings.shadow_blur }}px rgba(0, 0, 0, {{ block.settings.shadow_opacity }});
+  }
+
+  .ai-banner-link-{{ ai_gen_id }}:hover {
+    transform: translateY(-{{ block.settings.hover_lift }}px);
+    box-shadow: 0 {{ block.settings.shadow_vertical | plus: block.settings.hover_lift }}px {{ block.settings.shadow_blur | plus: 5 }}px rgba(0, 0, 0, {{ block.settings.shadow_opacity | plus: 0.1 }});
+  }
+
+  .ai-banner-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: {{ block.settings.image_fit }};
+    object-position: {{ block.settings.image_position_horizontal }} {{ block.settings.image_position_vertical }};
+    display: block;
+  }
+
+  .ai-banner-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: {{ block.settings.placeholder_bg_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-banner-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 300px;
+  }
+
+  .ai-banner-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-banner-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      {{ block.settings.overlay_direction }},
+      rgba(0, 0, 0, {{ block.settings.overlay_opacity }}) 0%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+
+  .ai-banner-content-{{ ai_gen_id }} {
+    position: absolute;
+    {% if block.settings.text_position_vertical == 'top' %}
+      top: 30px;
+    {% elsif block.settings.text_position_vertical == 'bottom' %}
+      bottom: 30px;
+    {% else %}
+      top: 50%;
+      transform: translateY(-50%);
+    {% endif %}
+    {% if block.settings.text_position_horizontal == 'left' %}
+      left: 30px;
+      text-align: left;
+    {% elsif block.settings.text_position_horizontal == 'right' %}
+      right: 30px;
+      text-align: right;
+    {% else %}
+      left: 50%;
+      transform: translateX(-50%) {% if block.settings.text_position_vertical == 'center' %}translateY(-50%){% endif %};
+      text-align: center;
+    {% endif %}
+    color: {{ block.settings.text_color }};
+    width: 90%;
+    max-width: 600px;
+    pointer-events: none;
+  }
+
+  .ai-banner-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    line-height: 1.2;
+  }
+
+  .ai-banner-subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-banner-container-{{ ai_gen_id }} {
+      width: {{ block.settings.mobile_width_percent }}%;
+    }
+
+    .ai-banner-link-{{ ai_gen_id }} {
+      height: {{ block.settings.mobile_height }}px;
+    }
+
+    .ai-banner-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.mobile_title_size }}px;
+    }
+
+    .ai-banner-subtitle-{{ ai_gen_id }} {
+      font-size: {{ block.settings.mobile_subtitle_size }}px;
+    }
+
+    .ai-banner-content-{{ ai_gen_id }} {
+      {% if block.settings.text_position_vertical == 'top' %}
+        top: 20px;
+      {% elsif block.settings.text_position_vertical == 'bottom' %}
+        bottom: 20px;
+      {% endif %}
+      {% if block.settings.text_position_horizontal == 'left' %}
+        left: 20px;
+      {% elsif block.settings.text_position_horizontal == 'right' %}
+        right: 20px;
+      {% endif %}
+    }
+  }
+{% endstyle %}
+
+<banner-block-{{ ai_gen_id }} class="ai-banner-container-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <a
+    href="{{ block.settings.banner_link }}"
+    class="ai-banner-link-{{ ai_gen_id }}"
+    {% if block.settings.banner_link == blank %}aria-disabled="true"{% endif %}
+  >
+    {% if block.settings.banner_image %}
+      <img
+        src="{{ block.settings.banner_image | image_url: width: 2000 }}"
+        alt="{{ block.settings.banner_image.alt | escape }}"
+        loading="lazy"
+        width="{{ block.settings.banner_image.width }}"
+        height="{{ block.settings.banner_image.height }}"
+        class="ai-banner-image-{{ ai_gen_id }}"
+      >
+    {% else %}
+      <div class="ai-banner-placeholder-{{ ai_gen_id }}">
+        {{ 'image' | placeholder_svg_tag }}
+        <div class="ai-banner-empty-state-{{ ai_gen_id }}">
+          أضف صورة للبانر
+        </div>
+      </div>
+    {% endif %}
+
+    {% if block.settings.show_overlay %}
+      <div class="ai-banner-overlay-{{ ai_gen_id }}"></div>
+    {% endif %}
+
+    {% if block.settings.show_text %}
+      <div class="ai-banner-content-{{ ai_gen_id }}">
+        {% if block.settings.banner_title != blank %}
+          <h2 class="ai-banner-title-{{ ai_gen_id }}">{{ block.settings.banner_title }}</h2>
+        {% endif %}
+        {% if block.settings.banner_subtitle != blank %}
+          <p class="ai-banner-subtitle-{{ ai_gen_id }}">{{ block.settings.banner_subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </a>
+</banner-block-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class BannerBlock{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        const link = this.querySelector('.ai-banner-link-{{ ai_gen_id }}');
+        if (link && link.getAttribute('aria-disabled') === 'true') {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+          });
+          link.style.cursor = 'default';
+        }
+      }
+    }
+
+    customElements.define('banner-block-{{ ai_gen_id }}', BannerBlock{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "بانر مخصص",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "الصورة"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "صورة البانر"
+    },
+    {
+      "type": "url",
+      "id": "banner_link",
+      "label": "رابط البانر"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "طريقة عرض الصورة",
+      "options": [
+        {
+          "value": "cover",
+          "label": "تغطية كاملة"
+        },
+        {
+          "value": "contain",
+          "label": "احتواء كامل"
+        },
+        {
+          "value": "fill",
+          "label": "تمديد"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position_horizontal",
+      "label": "موضع الصورة أفقياً",
+      "options": [
+        {
+          "value": "left",
+          "label": "يسار"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "right",
+          "label": "يمين"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "image_position_vertical",
+      "label": "موضع الصورة عمودياً",
+      "options": [
+        {
+          "value": "top",
+          "label": "أعلى"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "bottom",
+          "label": "أسفل"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "أبعاد الشاشات العريضة"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "العرض",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "الارتفاع",
+      "min": 100,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "header",
+      "content": "أبعاد الموبايل"
+    },
+    {
+      "type": "range",
+      "id": "mobile_width_percent",
+      "label": "العرض",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "الارتفاع",
+      "min": 100,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "التصميم"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الحواف",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "النص"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_text",
+      "label": "إظهار النص",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "banner_title",
+      "label": "العنوان",
+      "default": "عنوان البانر"
+    },
+    {
+      "type": "text",
+      "id": "banner_subtitle",
+      "label": "العنوان الفرعي",
+      "default": "اكتشف المزيد"
+    },
+    {
+      "type": "select",
+      "id": "text_position_horizontal",
+      "label": "موضع النص أفقياً",
+      "options": [
+        {
+          "value": "left",
+          "label": "يسار"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "right",
+          "label": "يمين"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_position_vertical",
+      "label": "موضع النص عمودياً",
+      "options": [
+        {
+          "value": "top",
+          "label": "أعلى"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "bottom",
+          "label": "أسفل"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان - شاشات عريضة",
+      "min": 16,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_title_size",
+      "label": "حجم العنوان - موبايل",
+      "min": 12,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "حجم العنوان الفرعي - شاشات عريضة",
+      "min": 12,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "mobile_subtitle_size",
+      "label": "حجم العنوان الفرعي - موبايل",
+      "min": 10,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "التراكب"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "إظهار التراكب",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "شفافية التراكب",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.3
+    },
+    {
+      "type": "select",
+      "id": "overlay_direction",
+      "label": "اتجاه التراكب",
+      "options": [
+        {
+          "value": "to bottom",
+          "label": "من الأعلى للأسفل"
+        },
+        {
+          "value": "to top",
+          "label": "من الأسفل للأعلى"
+        },
+        {
+          "value": "to right",
+          "label": "من اليسار لليمين"
+        },
+        {
+          "value": "to left",
+          "label": "من اليمين لليسار"
+        }
+      ],
+      "default": "to bottom"
+    },
+    {
+      "type": "header",
+      "content": "التأثيرات"
+    },
+    {
+      "type": "range",
+      "id": "hover_lift",
+      "label": "ارتفاع عند التمرير",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "shadow_vertical",
+      "label": "ظل عمودي",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "label": "ضبابية الظل",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "shadow_opacity",
+      "label": "شفافية الظل",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "default": 0.2
+    },
+    {
+      "type": "color",
+      "id": "placeholder_bg_color",
+      "label": "لون خلفية العنصر النائب",
+      "default": "#f2efdd"
+    }
+  ],
+  "presets": [
+    {
+      "name": "بانر مخصص"
+    }
+  ]
+}
+{% endschema %}

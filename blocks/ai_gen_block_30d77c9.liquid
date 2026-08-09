@@ -1,0 +1,851 @@
+{% doc %}
+  @prompt
+    بار متحرك يأخذ طابع الريترو لتصفح أقسام الكاسيت المختلفه , حلو بس بدي كل بار متحرك اقدر اعدل النص واربط فيه القسم المراد وإمكانيه تغيير الصوره المصغره بجانب النص , بدي تضيف قسم آخر وكمان امكانيه التحكم في سرعتهن , بدي خيارات اكثر للتحكم في النصوص 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-retro-cassette-bar-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: {{ block.settings.background_color }};
+    padding: {{ block.settings.bar_padding }}px 0;
+    overflow: hidden;
+    position: relative;
+    border-top: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-bottom: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+  }
+
+  .ai-retro-cassette-bar__track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.item_spacing }}px;
+    will-change: transform;
+  }
+
+  .ai-retro-cassette-bar__item-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: {{ block.settings.item_background }};
+    border: 2px solid {{ block.settings.item_border_color }};
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 4px 4px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ai-retro-cassette-bar__item-{{ ai_gen_id }}:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 {{ block.settings.shadow_color }};
+  }
+
+  .ai-retro-cassette-bar__icon-{{ ai_gen_id }} {
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+    border: 2px solid {{ block.settings.item_border_color }};
+  }
+
+  .ai-retro-cassette-bar__icon-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-retro-cassette-bar__cassette-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background: {{ block.settings.cassette_body_color }};
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .ai-retro-cassette-bar__cassette-{{ ai_gen_id }}::before,
+  .ai-retro-cassette-bar__cassette-{{ ai_gen_id }}::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: {{ block.settings.cassette_reel_color }};
+    border: 1px solid {{ block.settings.item_border_color }};
+    border-radius: 50%;
+  }
+
+  .ai-retro-cassette-bar__label-{{ ai_gen_id }} {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 8px;
+    background: {{ block.settings.cassette_label_color }};
+    border: 1px solid {{ block.settings.item_border_color }};
+    border-radius: 1px;
+  }
+
+  .ai-retro-cassette-bar__text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-family: {{ block.settings.text_font.family }}, {{ block.settings.text_font.fallback_families }};
+    font-weight: {{ block.settings.text_font.weight }};
+    font-style: {{ block.settings.text_font.style }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: {{ block.settings.text_line_height }};
+    letter-spacing: {{ block.settings.text_letter_spacing }}px;
+    white-space: nowrap;
+    {% if block.settings.text_transform != 'none' %}
+      text-transform: {{ block.settings.text_transform }};
+    {% endif %}
+    {% if block.settings.text_shadow_enabled %}
+      text-shadow: {{ block.settings.text_shadow_x }}px {{ block.settings.text_shadow_y }}px {{ block.settings.text_shadow_blur }}px {{ block.settings.text_shadow_color }};
+    {% endif %}
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-retro-cassette-bar__text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size_mobile }}px;
+    }
+    
+    .ai-retro-cassette-bar__icon-{{ ai_gen_id }} {
+      width: {{ block.settings.icon_size | times: 0.8 }}px;
+      height: {{ block.settings.icon_size | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<retro-cassette-bar-{{ ai_gen_id }}
+  class="ai-retro-cassette-bar-{{ ai_gen_id }}"
+  data-speed="{{ block.settings.scroll_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-retro-cassette-bar__track-{{ ai_gen_id }}">
+    {% for i in (1..10) %}
+      {% liquid
+        assign item_1_text = block.settings.item_1_text
+        assign item_1_url = block.settings.item_1_url
+        assign item_1_image = block.settings.item_1_image
+        
+        assign item_2_text = block.settings.item_2_text
+        assign item_2_url = block.settings.item_2_url
+        assign item_2_image = block.settings.item_2_image
+        
+        assign item_3_text = block.settings.item_3_text
+        assign item_3_url = block.settings.item_3_url
+        assign item_3_image = block.settings.item_3_image
+        
+        assign item_4_text = block.settings.item_4_text
+        assign item_4_url = block.settings.item_4_url
+        assign item_4_image = block.settings.item_4_image
+        
+        assign item_5_text = block.settings.item_5_text
+        assign item_5_url = block.settings.item_5_url
+        assign item_5_image = block.settings.item_5_image
+        
+        assign item_6_text = block.settings.item_6_text
+        assign item_6_url = block.settings.item_6_url
+        assign item_6_image = block.settings.item_6_image
+        
+        assign item_7_text = block.settings.item_7_text
+        assign item_7_url = block.settings.item_7_url
+        assign item_7_image = block.settings.item_7_image
+        
+        assign item_8_text = block.settings.item_8_text
+        assign item_8_url = block.settings.item_8_url
+        assign item_8_image = block.settings.item_8_image
+      %}
+      
+      {% if item_1_text != blank %}
+        <a
+          href="{% if item_1_url != blank %}{{ item_1_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_1_image %}
+              <img
+                src="{{ item_1_image | image_url: width: 100 }}"
+                alt="{{ item_1_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_1_text }}
+          </span>
+        </a>
+      {% endif %}
+      
+      {% if item_2_text != blank %}
+        <a
+          href="{% if item_2_url != blank %}{{ item_2_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_2_image %}
+              <img
+                src="{{ item_2_image | image_url: width: 100 }}"
+                alt="{{ item_2_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_2_text }}
+          </span>
+        </a>
+      {% endif %}
+      
+      {% if item_3_text != blank %}
+        <a
+          href="{% if item_3_url != blank %}{{ item_3_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_3_image %}
+              <img
+                src="{{ item_3_image | image_url: width: 100 }}"
+                alt="{{ item_3_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_3_text }}
+          </span>
+        </a>
+      {% endif %}
+      
+      {% if item_4_text != blank %}
+        <a
+          href="{% if item_4_url != blank %}{{ item_4_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_4_image %}
+              <img
+                src="{{ item_4_image | image_url: width: 100 }}"
+                alt="{{ item_4_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_4_text }}
+          </span>
+        </a>
+      {% endif %}
+      
+      {% if item_5_text != blank %}
+        <a
+          href="{% if item_5_url != blank %}{{ item_5_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_5_image %}
+              <img
+                src="{{ item_5_image | image_url: width: 100 }}"
+                alt="{{ item_5_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_5_text }}
+          </span>
+        </a>
+      {% endif %}
+      
+      {% if item_6_text != blank %}
+        <a
+          href="{% if item_6_url != blank %}{{ item_6_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_6_image %}
+              <img
+                src="{{ item_6_image | image_url: width: 100 }}"
+                alt="{{ item_6_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_6_text }}
+          </span>
+        </a>
+      {% endif %}
+      
+      {% if item_7_text != blank %}
+        <a
+          href="{% if item_7_url != blank %}{{ item_7_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_7_image %}
+              <img
+                src="{{ item_7_image | image_url: width: 100 }}"
+                alt="{{ item_7_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_7_text }}
+          </span>
+        </a>
+      {% endif %}
+      
+      {% if item_8_text != blank %}
+        <a
+          href="{% if item_8_url != blank %}{{ item_8_url }}{% else %}#{% endif %}"
+          class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+        >
+          <div class="ai-retro-cassette-bar__icon-{{ ai_gen_id }}">
+            {% if item_8_image %}
+              <img
+                src="{{ item_8_image | image_url: width: 100 }}"
+                alt="{{ item_8_text }}"
+                loading="lazy"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__cassette-{{ ai_gen_id }}">
+                <span class="ai-retro-cassette-bar__label-{{ ai_gen_id }}"></span>
+              </div>
+            {% endif %}
+          </div>
+          <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">
+            {{ item_8_text }}
+          </span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</retro-cassette-bar-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class RetroCassetteBar{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.track = this.querySelector('.ai-retro-cassette-bar__track-{{ ai_gen_id }}');
+        this.speed = parseFloat(this.dataset.speed) || 1;
+        this.position = 0;
+        this.isPaused = false;
+        this.isRTL = false;
+        this.singleSetWidth = 0;
+      }
+
+      connectedCallback() {
+        // تحديد اتجاه الصفحة
+        this.isRTL = getComputedStyle(document.documentElement).direction === 'rtl'
+                     || document.documentElement.dir === 'rtl';
+
+        // انتظر تحميل الصور قبل حساب العرض
+        requestAnimationFrame(() => {
+          this.calculateWidth();
+          this.startAnimation();
+          this.setupHoverPause();
+        });
+      }
+
+      calculateWidth() {
+        // عدد العناصر الأصلية = scrollWidth / 10 (لأن اللوب كرر 10 مرات)
+        this.singleSetWidth = this.track.scrollWidth / 10;
+      }
+
+      startAnimation() {
+        const animate = () => {
+          if (!this.isPaused) {
+            if (this.isRTL) {
+              // RTL: نتحرك للأيمن (قيمة موجبة)
+              this.position += this.speed;
+              if (this.position >= this.singleSetWidth) {
+                this.position = 0;
+              }
+            } else {
+              // LTR: نتحرك للأيسر (قيمة سالبة)
+              this.position -= this.speed;
+              if (Math.abs(this.position) >= this.singleSetWidth) {
+                this.position = 0;
+              }
+            }
+
+            this.track.style.transform = `translateX(${this.position}px)`;
+          }
+
+          requestAnimationFrame(animate);
+        };
+
+        animate();
+      }
+
+      setupHoverPause() {
+        this.addEventListener('mouseenter', () => { this.isPaused = true; });
+        this.addEventListener('mouseleave', () => { this.isPaused = false; });
+      }
+    }
+
+    customElements.define('retro-cassette-bar-{{ ai_gen_id }}', RetroCassetteBar{{ ai_gen_id }});
+  })();
+</script>
+
+
+{% schema %}
+{
+  "name": "Retro cassette bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Item 1"
+    },
+    {
+      "type": "text",
+      "id": "item_1_text",
+      "label": "Text",
+      "default": "كاسيت الثمانينات"
+    },
+    {
+      "type": "url",
+      "id": "item_1_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Item 2"
+    },
+    {
+      "type": "text",
+      "id": "item_2_text",
+      "label": "Text",
+      "default": "كاسيت الروك"
+    },
+    {
+      "type": "url",
+      "id": "item_2_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Item 3"
+    },
+    {
+      "type": "text",
+      "id": "item_3_text",
+      "label": "Text",
+      "default": "كاسيت البوب"
+    },
+    {
+      "type": "url",
+      "id": "item_3_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Item 4"
+    },
+    {
+      "type": "text",
+      "id": "item_4_text",
+      "label": "Text",
+      "default": "كاسيت الجاز"
+    },
+    {
+      "type": "url",
+      "id": "item_4_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Item 5"
+    },
+    {
+      "type": "text",
+      "id": "item_5_text",
+      "label": "Text",
+      "default": "كاسيت الكلاسيك"
+    },
+    {
+      "type": "url",
+      "id": "item_5_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_5_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Item 6"
+    },
+    {
+      "type": "text",
+      "id": "item_6_text",
+      "label": "Text",
+      "default": "كاسيت الهيب هوب"
+    },
+    {
+      "type": "url",
+      "id": "item_6_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_6_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Item 7"
+    },
+    {
+      "type": "text",
+      "id": "item_7_text",
+      "label": "Text",
+      "default": "كاسيت الديسكو"
+    },
+    {
+      "type": "url",
+      "id": "item_7_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_7_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Item 8"
+    },
+    {
+      "type": "text",
+      "id": "item_8_text",
+      "label": "Text",
+      "default": "كاسيت الفانك"
+    },
+    {
+      "type": "url",
+      "id": "item_8_url",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_8_image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Bar style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f9e547"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "label": "Border thickness",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "bar_padding",
+      "label": "Padding",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Item style"
+    },
+    {
+      "type": "color",
+      "id": "item_background",
+      "label": "Item background",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "item_border_color",
+      "label": "Item border",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Shadow",
+      "default": "#910f3f"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size",
+      "min": 30,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "label": "Item spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Font",
+      "default": "assistant_n7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Size (desktop)",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Size (mobile)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text transform",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        },
+        {
+          "value": "lowercase",
+          "label": "Lowercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "Capitalize"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "text_letter_spacing",
+      "label": "Letter spacing",
+      "min": -2,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "text_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.2
+    },
+    {
+      "type": "header",
+      "content": "Text shadow"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_shadow_enabled",
+      "label": "Enable text shadow",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "text_shadow_color",
+      "label": "Shadow color",
+      "default": "#910f3f"
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_x",
+      "label": "Horizontal offset",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_y",
+      "label": "Vertical offset",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "text_shadow_blur",
+      "label": "Blur",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Default cassette icon"
+    },
+    {
+      "type": "color",
+      "id": "cassette_body_color",
+      "label": "Cassette body",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "cassette_reel_color",
+      "label": "Cassette reel",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "cassette_label_color",
+      "label": "Cassette label",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Scroll speed",
+      "min": 0.5,
+      "max": 5,
+      "step": 0.5,
+      "default": 1.5
+    }
+  ],
+  "presets": [
+    {
+      "name": "Retro cassette bar"
+    }
+  ]
+}
+{% endschema %}

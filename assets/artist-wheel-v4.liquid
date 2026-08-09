@@ -1,0 +1,1237 @@
+{% comment %}
+╔══════════════════════════════════════════════════════════════╗
+║  ARTIST SELECTOR WHEEL v4 — Ultra Premium                   ║
+║  مؤشر صحيح ↓ | نص منحني | صوت تلقائي | توهج نشط           ║
+╚══════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════
+   CSS VARIABLES
+══════════════════════════════ */
+#asw4 {
+  --bg:       {{ section.settings.color_bg }};
+  --primary:  {{ section.settings.color_primary }};
+  --sec:      {{ section.settings.color_secondary }};
+  --text:     {{ section.settings.color_text }};
+  --ws:       {{ section.settings.wheel_size }}px;
+  --hub:      {{ section.settings.hub_size }}px;
+  --av:       {{ section.settings.avatar_size }}px;
+  --ptr-h:    {{ section.settings.pointer_height }}px;
+  --ptr-w:    {{ section.settings.pointer_width }}px;
+  --gap-hw:   {{ section.settings.gap_header_wheel }}px;
+  --gap-wi:   {{ section.settings.gap_wheel_info }}px;
+  --f-ar:     'Cairo', sans-serif;
+  --f-en:     'Orbitron', monospace;
+}
+#asw4 *, #asw4 *::before, #asw4 *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+}
+
+/* ══════════════════════════════
+   SECTION
+══════════════════════════════ */
+#asw4 {
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: {{ section.settings.pad_v }}px {{ section.settings.pad_h }}px;
+  position: relative;
+  overflow: hidden;
+  direction: rtl;
+}
+/* paper grain */
+#asw4::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23g)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════
+   HEADER
+══════════════════════════════ */
+.asw4-header {
+  text-align: center;
+  position: relative; z-index: 2;
+  margin-bottom: var(--gap-hw);
+}
+.asw4-eyebrow {
+  font-family: var(--f-ar);
+  font-size: {{ section.settings.sz_eyebrow }}px;
+  color: var(--sec);
+  opacity: .7;
+  margin-bottom: 6px;
+}
+.asw4-title {
+  font-family: var(--f-ar);
+  font-size: {{ section.settings.sz_title }}px;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1.15;
+}
+.asw4-sub {
+  font-family: var(--f-ar);
+  font-size: {{ section.settings.sz_sub }}px;
+  color: var(--text);
+  opacity: .38;
+  margin-top: 6px;
+}
+
+/* ══════════════════════════════
+   STAGE  — touch only inside circle
+══════════════════════════════ */
+.asw4-stage {
+  position: relative;
+  width: var(--ws); height: var(--ws);
+  flex-shrink: 0;
+  z-index: 2;
+  /* NO touch-action:none here — handled per-event with hit-test */
+}
+
+/* decorative rings */
+.asw4-ring {
+  position: absolute;
+  inset: -{{ section.settings.ring_gap }}px;
+  border-radius: 50%;
+  border: {{ section.settings.ring_thick }}px solid;
+  border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  pointer-events: none;
+}
+.asw4-ring-inner {
+  position: absolute;
+  inset: {{ section.settings.ring_gap }}px;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--sec) 16%, transparent);
+  pointer-events: none;
+}
+
+/* ══════════════════════════════
+   WHEEL
+══════════════════════════════ */
+.asw4-wheel {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  cursor: grab;
+  will-change: transform;
+  user-select: none;
+}
+.asw4-wheel:active { cursor: grabbing; }
+.asw4-wheel svg { width: 100%; height: 100%; overflow: visible; }
+
+/* ══════════════════════════════
+   HUB (clickable center)
+══════════════════════════════ */
+.asw4-hub {
+  position: absolute;
+  width: var(--hub); height: var(--hub);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  background: var(--bg);
+  border: {{ section.settings.hub_border }}px solid
+    color-mix(in srgb, var(--primary) 28%, transparent);
+  box-shadow:
+    0 0 0 {{ section.settings.hub_ring_gap }}px var(--bg),
+    0 0 0 {{ section.settings.hub_ring_gap | plus: 1 }}px
+      color-mix(in srgb, var(--primary) 13%, transparent),
+    0 6px 28px color-mix(in srgb, var(--primary) 16%, transparent);
+  overflow: hidden;
+  z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+  transition: box-shadow .35s ease, transform .2s ease;
+}
+.asw4-hub:hover { transform: translate(-50%,-50%) scale(1.04); }
+.asw4-hub::before {
+  content: '';
+  position: absolute;
+  width: 36%; height: 36%;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  pointer-events: none; z-index: 1;
+}
+
+.asw4-hub-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; border-radius: 50%;
+  opacity: 0; transform: scale(.88);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.34,1.3,.64,1);
+  pointer-events: none;
+}
+.asw4-hub-img.on { opacity: 1; transform: scale(1); }
+
+.asw4-hub-overlay {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg) 82%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 15%, transparent) 55%,
+    transparent 100%
+  );
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding-bottom: 14%; z-index: 2; pointer-events: none;
+}
+.asw4-hub-name {
+  font-family: var(--f-ar);
+  font-size: clamp(9px, calc(var(--hub) * 0.09), 15px);
+  font-weight: 900; color: var(--primary);
+  text-align: center; line-height: 1.2;
+  max-width: 86%; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ══════════════════════════════
+   POINTER — pointing DOWN into wheel
+══════════════════════════════ */
+.asw4-ptr-wrap {
+  position: absolute;
+  bottom: -{{ section.settings.ptr_offset }}px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  z-index: 20; pointer-events: none;
+}
+/* Needle tip pointing DOWN = into the wheel from outside */
+.asw4-ptr-svg {
+  width: var(--ptr-w);
+  height: var(--ptr-h);
+  filter: drop-shadow(0 3px 7px color-mix(in srgb,var(--primary) 55%,transparent));
+  transition: transform .12s ease;
+}
+.asw4-ptr-svg.tick {
+  animation: ptrBeat .22s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes ptrBeat {
+  0%,100% { transform: scale(1) translateY(0); }
+  30%  { transform: scale(1.3) translateY(4px); }
+  65%  { transform: scale(.88) translateY(-2px); }
+}
+.asw4-ptr-stem {
+  width: {{ section.settings.ptr_stem_w }}px;
+  height: {{ section.settings.ptr_stem_h }}px;
+  background: linear-gradient(to top, var(--primary), transparent);
+  opacity: .4; border-radius: 1px;
+}
+
+/* ══════════════════════════════
+   VIBRATE
+══════════════════════════════ */
+.asw4-stage.vibe {
+  animation: stageVibe .18s ease;
+}
+@keyframes stageVibe {
+  0%,100% { transform: translate(0,0); }
+  20%  { transform: translate(-3px, 1px); }
+  40%  { transform: translate(3px, -1px); }
+  60%  { transform: translate(-2px, 1px); }
+  80%  { transform: translate(2px, -1px); }
+}
+
+/* ══════════════════════════════
+   INFO PANEL
+══════════════════════════════ */
+.asw4-info {
+  position: relative; z-index: 2;
+  margin-top: var(--gap-wi);
+  width: 100%; max-width: {{ section.settings.info_max_w }}px;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: {{ section.settings.info_gap }}px;
+  min-height: 180px;
+}
+
+/* cassette tape divider */
+.asw4-tape {
+  width: {{ section.settings.tape_w }}px;
+  height: {{ section.settings.tape_h }}px;
+  background: linear-gradient(
+    to left,
+    transparent,
+    color-mix(in srgb,var(--sec) 45%,transparent),
+    color-mix(in srgb,var(--primary) 65%,transparent),
+    color-mix(in srgb,var(--sec) 45%,transparent),
+    transparent
+  );
+  border-radius: 2px;
+}
+
+.asw4-name {
+  font-family: var(--f-ar);
+  font-size: {{ section.settings.sz_name }}px;
+  font-weight: 900; color: var(--primary);
+  text-align: center;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .4s ease, transform .4s cubic-bezier(.34,1.3,.64,1);
+}
+.asw4-name.on { opacity: 1; transform: translateY(0); }
+
+/* stats */
+.asw4-meta {
+  display: flex; align-items: center;
+  opacity: 0; transition: opacity .4s ease .1s;
+  direction: rtl;
+}
+.asw4-meta.on { opacity: 1; }
+.asw4-mi {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 {{ section.settings.meta_pad }}px; gap: 3px;
+}
+.asw4-mv {
+  font-family: var(--f-ar);
+  font-size: {{ section.settings.sz_meta_v }}px;
+  font-weight: 900; color: var(--primary); line-height: 1;
+}
+.asw4-mk {
+  font-family: var(--f-ar);
+  font-size: {{ section.settings.sz_meta_k }}px;
+  font-weight: 600; color: var(--text); opacity: .42;
+}
+.asw4-sep {
+  width: 1px; height: 28px;
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+/* ══════════════════════════════
+   CTA BUTTON — premium design
+══════════════════════════════ */
+.asw4-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--f-ar);
+  font-size: {{ section.settings.sz_cta }}px;
+  font-weight: 700; color: var(--primary);
+  background: transparent;
+  border: 2px solid color-mix(in srgb, var(--primary) 55%, transparent);
+  padding: {{ section.settings.cta_pv }}px {{ section.settings.cta_ph }}px;
+  border-radius: {{ section.settings.cta_r }}px;
+  text-decoration: none; cursor: pointer;
+  opacity: 0; transform: translateY(8px) scale(.96);
+  transition:
+    opacity .4s ease .2s,
+    transform .4s cubic-bezier(.34,1.3,.64,1) .2s,
+    background .25s, color .25s, border-color .25s, box-shadow .25s;
+  position: relative; overflow: hidden;
+  letter-spacing: 0;
+}
+/* shimmer layer */
+.asw4-cta::before {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(
+    120deg, transparent, rgba(255,255,255,.18), transparent
+  );
+  transition: left .5s ease;
+}
+.asw4-cta:hover::before { left: 130%; }
+.asw4-cta.on {
+  opacity: 1; transform: translateY(0) scale(1);
+}
+.asw4-cta:hover {
+  background: var(--primary);
+  color: var(--bg);
+  border-color: var(--primary);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 38%, transparent);
+  transform: translateY(-2px) scale(1.03) !important;
+}
+.asw4-cta-arrow {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  transition: background .25s, transform .25s;
+  flex-shrink: 0;
+}
+.asw4-cta:hover .asw4-cta-arrow {
+  background: color-mix(in srgb, var(--bg) 20%, transparent);
+  transform: translateX(-3px);
+}
+.asw4-cta-arrow svg {
+  width: 12px; height: 12px; fill: currentColor;
+}
+
+/* audio badge */
+.asw4-audio {
+  position: absolute;
+  top: {{ section.settings.audio_top }}px;
+  {{ section.settings.audio_side }}: {{ section.settings.audio_side_off }}px;
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--f-ar); font-size: 11px;
+  color: var(--primary); opacity: 0;
+  transition: opacity .5s ease; z-index: 5; pointer-events: none;
+}
+.asw4-audio.on { opacity: .75; }
+.asw4-waves { display: flex; gap: 2px; align-items: flex-end; height: 14px; }
+.asw4-bar {
+  width: 3px; background: var(--primary); border-radius: 2px;
+  animation: waveUp .7s ease-in-out infinite alternate;
+}
+.asw4-bar:nth-child(1){height:4px;  animation-delay:0s}
+.asw4-bar:nth-child(2){height:11px; animation-delay:.13s}
+.asw4-bar:nth-child(3){height:7px;  animation-delay:.26s}
+.asw4-bar:nth-child(4){height:13px; animation-delay:.08s}
+.asw4-bar:nth-child(5){height:5px;  animation-delay:.21s}
+@keyframes waveUp {
+  from { transform: scaleY(.3); opacity: .3; }
+  to   { transform: scaleY(1);  opacity: 1; }
+}
+
+/* auto rotate toggle */
+.asw4-auto-btn {
+  position: absolute;
+  {% if section.settings.audio_side == 'right' %}left{% else %}right{% endif %}: {{ section.settings.audio_side_off }}px;
+  top: {{ section.settings.audio_top }}px;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 5;
+  transition: border-color .3s; backdrop-filter: blur(4px);
+}
+.asw4-auto-btn:hover { border-color: var(--primary); }
+.asw4-auto-btn svg { width: 13px; height: 13px; fill: var(--primary); }
+
+/* ══════════════════════════════
+   RESPONSIVE
+══════════════════════════════ */
+@media(max-width:600px){
+  #asw4{
+    --ws: min(90vw,360px);
+    --hub: min(28vw,115px);
+    --av: min(9vw,36px);
+  }
+}
+</style>
+
+<!-- ════════════════════════════════
+     HTML
+════════════════════════════════ -->
+<section id="asw4">
+
+  <header class="asw4-header">
+    <p class="asw4-eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 class="asw4-title">{{ section.settings.title }}</h2>
+    <p class="asw4-sub">{{ section.settings.subtitle }}</p>
+  </header>
+
+  <!-- audio badge -->
+  {% if section.settings.enable_preview %}
+  <div class="asw4-audio" id="asw4-audio">
+    <div class="asw4-waves">
+      <div class="asw4-bar"></div><div class="asw4-bar"></div>
+      <div class="asw4-bar"></div><div class="asw4-bar"></div>
+      <div class="asw4-bar"></div>
+    </div>
+    <span>{{ section.settings.audio_label }}</span>
+  </div>
+  {% endif %}
+
+  <!-- auto-rotate toggle -->
+  {% if section.settings.enable_auto %}
+  <button class="asw4-auto-btn" id="asw4-auto-btn" aria-label="تدوير تلقائي">
+    <svg id="asw4-auto-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
+  </button>
+  {% endif %}
+
+  <!-- Stage -->
+  <div class="asw4-stage" id="asw4-stage">
+    <div class="asw4-ring"></div>
+    <div class="asw4-ring-inner"></div>
+
+    <!-- Wheel -->
+    <div class="asw4-wheel" id="asw4-wheel">
+      <svg id="asw4-svg" viewBox="-300 -300 600 600"
+           xmlns="http://www.w3.org/2000/svg"
+           xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs id="asw4-defs"></defs>
+      </svg>
+    </div>
+
+    <!-- Hub -->
+    <div class="asw4-hub" id="asw4-hub">
+      <img class="asw4-hub-img" id="asw4-hub-img" src="" alt="">
+      <div class="asw4-hub-overlay">
+        <span class="asw4-hub-name" id="asw4-hub-name">—</span>
+      </div>
+    </div>
+
+    <!-- Pointer — tip pointing DOWN into wheel -->
+    <div class="asw4-ptr-wrap" id="asw4-ptr-wrap">
+      <div class="asw4-ptr-stem"></div>
+      <svg class="asw4-ptr-svg" id="asw4-ptr"
+           viewBox="0 0 48 60" xmlns="http://www.w3.org/2000/svg">
+        <!-- body -->
+        <path d="M24 58 C12 58 6 48 6 38 C6 24 16 10 24 4 C32 10 42 24 42 38 C42 48 36 58 24 58Z"
+              fill="{{ section.settings.color_primary }}" opacity=".15"
+              stroke="{{ section.settings.color_primary }}" stroke-width=".5"/>
+        <!-- sharp tip pointing DOWN -->
+        <path d="M24 58 L14 36 L24 42 L34 36 Z"
+              fill="{{ section.settings.color_primary }}"/>
+        <!-- upper oval -->
+        <ellipse cx="24" cy="26" rx="13" ry="18"
+                 fill="{{ section.settings.color_primary }}" opacity=".22"
+                 stroke="{{ section.settings.color_primary }}" stroke-width="1"/>
+        <!-- center dot -->
+        <circle cx="24" cy="26" r="4.5"
+                fill="{{ section.settings.color_primary }}" opacity=".65"/>
+        <!-- highlight -->
+        <path d="M17 12 Q22 7 25 16" stroke="white" stroke-width="1.8"
+              fill="none" stroke-linecap="round" opacity=".35"/>
+      </svg>
+    </div>
+  </div><!-- /stage -->
+
+  <!-- Info panel -->
+  <div class="asw4-info">
+    <div class="asw4-tape"></div>
+    <div class="asw4-name" id="asw4-name">—</div>
+    <div class="asw4-meta" id="asw4-meta">
+      <div class="asw4-mi">
+        <div class="asw4-mv" id="asw4-tracks">—</div>
+        <div class="asw4-mk">{{ section.settings.lbl_tracks }}</div>
+      </div>
+      <div class="asw4-sep"></div>
+      <div class="asw4-mi">
+        <div class="asw4-mv" id="asw4-prods">—</div>
+        <div class="asw4-mk">{{ section.settings.lbl_products }}</div>
+      </div>
+      <div class="asw4-sep"></div>
+      <div class="asw4-mi">
+        <div class="asw4-mv" id="asw4-genre">—</div>
+        <div class="asw4-mk">{{ section.settings.lbl_genre }}</div>
+      </div>
+    </div>
+    <a class="asw4-cta" id="asw4-cta" href="#">
+      <span class="asw4-cta-arrow">
+        <svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+      </span>
+      {{ section.settings.cta_text }}
+    </a>
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════ -->
+<script>
+(function(){
+"use strict";
+
+/* ── ARTISTS DATA ── */
+const ARTISTS = [
+  {% for block in section.blocks %}{% if block.type == 'artist' %}
+  {
+    name:     {{ block.settings.name | json }},
+    image:    {{ block.settings.image | img_url: '600x600', crop: 'center' | json }},
+    url:      {{ block.settings.collection_url | json }},
+    tracks:   {{ block.settings.tracks   | default: 0 }},
+    products: {{ block.settings.products | default: 0 }},
+    genre:    {{ block.settings.genre | json }},
+    color:    {{ block.settings.color | json }},
+    audio:    {{ block.settings.preview_audio | json }},
+  },
+  {% endif %}{% endfor %}
+].filter(a => a.name && a.name.trim());
+
+if (ARTISTS.length < 2) return;
+
+/* ── CONFIG ── */
+const N         = ARTISTS.length;
+const SLICE     = 360 / N;
+const PTR_DEG   = 270;            // bottom = 270° in SVG coords
+const R_OUT     = {{ section.settings.r_out }};
+const R_IN      = {{ section.settings.r_in }};
+const AV_R      = Math.floor({{ section.settings.avatar_size }} / 2);
+const SEC_GAP   = {{ section.settings.sec_gap }};
+const SNAP_MS   = {{ section.settings.snap_ms }};
+const FRICTION  = 1 - {{ section.settings.friction_pct }} / 100;
+const EN_SND    = {{ section.settings.enable_sound   | json }};
+const EN_PRV    = {{ section.settings.enable_preview | json }};
+const PRV_DUR   = {{ section.settings.preview_dur }} * 1000;
+const EN_AUTO   = {{ section.settings.enable_auto    | json }};
+const AUTO_SPD  = {{ section.settings.auto_spd }} / 10;
+const ARC_LBL   = {{ section.settings.label_arc_r }};   // radius for curved label
+const LBL_SIZE  = {{ section.settings.label_size }};     // font size for curved label
+const LBL_OLEN  = {{ section.settings.label_offset }};   // startOffset %
+const PRIMARY   = '{{ section.settings.color_primary }}';
+const BG        = '{{ section.settings.color_bg }}';
+const FADE_IN_S = {{ section.settings.audio_fade_in }};  // seconds
+const FADE_OUT_S= {{ section.settings.audio_fade_out }}; // seconds
+const MAX_VOL   = {{ section.settings.audio_volume }} / 100;
+
+/* ── STATE ── */
+let angle    = 0, velocity = 0;
+let dragging = false, lastMX = null, lastT = 0;
+let activeIdx = -1, prevIdx = -1;
+let rafId = null, autoRafId = null;
+let audioCtx = null, unlocked = false;
+let audioNodes = {};   // idx → { source, gainNode, buffer, playing }
+let curPreview = null; // currently fading audio idx
+let autoOn = EN_AUTO;
+
+/* ── DOM ── */
+const $  = id => document.getElementById(id);
+const stage    = $('asw4-stage');
+const wheelEl  = $('asw4-wheel');
+const svgEl    = $('asw4-svg');
+const defsEl   = $('asw4-defs');
+const hubEl    = $('asw4-hub');
+const hubImg   = $('asw4-hub-img');
+const hubName  = $('asw4-hub-name');
+const ptrEl    = $('asw4-ptr');
+const nameEl   = $('asw4-name');
+const metaEl   = $('asw4-meta');
+const ctaEl    = $('asw4-cta');
+const tracksEl = $('asw4-tracks');
+const prodsEl  = $('asw4-prods');
+const genreEl  = $('asw4-genre');
+const audioBdg = $('asw4-audio');
+const autoBtn  = $('asw4-auto-btn');
+const autoIco  = $('asw4-auto-icon');
+
+/* ── MATH ── */
+const rad = d => d * Math.PI / 180;
+const pt  = (r,d) => ({ x: r*Math.cos(rad(d)), y: r*Math.sin(rad(d)) });
+
+function sectorD(i){
+  const s = i*SLICE + SEC_GAP/2, e = (i+1)*SLICE - SEC_GAP/2;
+  const lg = (e-s)>180?1:0;
+  const o1=pt(R_OUT,s), o2=pt(R_OUT,e), i1=pt(R_IN,e), i2=pt(R_IN,s);
+  return `M${o1.x},${o1.y} A${R_OUT},${R_OUT} 0 ${lg} 1 ${o2.x},${o2.y}
+          L${i1.x},${i1.y} A${R_IN},${R_IN}   0 ${lg} 0 ${i2.x},${i2.y} Z`;
+}
+
+function midPt(i,r){
+  const m = i*SLICE + SLICE/2;
+  return { x:r*Math.cos(rad(m)), y:r*Math.sin(rad(m)), deg:m };
+}
+
+/* ── BUILD WHEEL ── */
+function build(){
+  let defs = `
+    <filter id="f-blur"><feGaussianBlur stdDeviation="2.2"/></filter>
+    <filter id="f-glow">
+      <feGaussianBlur stdDeviation="2.8" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-glow-strong">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feColorMatrix in="b" type="saturate" values="2" result="bs"/>
+      <feMerge><feMergeNode in="bs"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>`;
+
+  ARTISTS.forEach((a,i)=>{
+    const ap = midPt(i,(R_IN+R_OUT)/2);
+    const mid = i*SLICE + SLICE/2;
+
+    // Arc path for curved text — use LABEL_ARC_R
+    const arcR = ARC_LBL;
+    const textArcS = i*SLICE + SLICE/2 - 25;
+    const textArcE = i*SLICE + SLICE/2 + 25;
+    const ta1 = pt(arcR, textArcS), ta2 = pt(arcR, textArcE);
+    const arcId = `arc-${i}`;
+
+    defs += `
+      <pattern id="p${i}" patternUnits="userSpaceOnUse" x="-300" y="-300" width="600" height="600">
+        <image href="${a.image||''}" x="0" y="0" width="600" height="600"
+               preserveAspectRatio="xMidYMid slice"/>
+      </pattern>
+      <clipPath id="sc${i}"><path d="${sectorD(i)}"/></clipPath>
+      <clipPath id="ac${i}"><circle cx="${ap.x}" cy="${ap.y}" r="${AV_R}"/></clipPath>
+      <path id="${arcId}"
+            d="M${ta1.x},${ta1.y} A${arcR},${arcR} 0 0 1 ${ta2.x},${ta2.y}"
+            fill="none"/>`;
+  });
+  defsEl.innerHTML = defs;
+
+  ARTISTS.forEach((a,i)=>{
+    const col = a.color || PRIMARY;
+    const ap  = midPt(i,(R_IN+R_OUT)/2);
+    const avR2 = AV_R+3;
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.dataset.i = i;
+    g.setAttribute('class','asw4-sector');
+
+    // Shorten name for label
+    const shortName = (a.name||'').substring(0,8);
+
+    g.innerHTML = `
+      <path class="sec-base" d="${sectorD(i)}" fill="${col}" opacity=".18"
+            stroke="${col}" stroke-width="1.2" stroke-opacity=".35"/>
+      <path d="${sectorD(i)}" fill="url(#p${i})"
+            opacity=".15" filter="url(#f-blur)" clip-path="url(#sc${i})"/>
+      <path d="${sectorD(i)}" fill="${col}" opacity=".09"/>
+      <path class="sec-border" d="${sectorD(i)}" fill="none"
+            stroke="${col}" stroke-width="1" opacity=".45" filter="url(#f-glow)"/>
+
+      <!-- active glow layer (hidden by default) -->
+      <path class="sec-glow" d="${sectorD(i)}" fill="${col}" opacity="0"
+            filter="url(#f-glow-strong)"
+            style="transition:opacity .4s ease"/>
+
+      <!-- curved text label (engraved) -->
+      <text font-size="${LBL_SIZE}"
+            font-family="'Cairo',sans-serif"
+            font-weight="700"
+            fill="${col}"
+            opacity=".38"
+            style="pointer-events:none">
+        <textPath href="#arc-${i}" startOffset="${LBL_OLEN}%"
+                  text-anchor="middle">${shortName}</textPath>
+      </text>
+
+      <!-- avatar ring -->
+      <circle cx="${ap.x}" cy="${ap.y}" r="${avR2+2}"
+              fill="${col}" opacity=".16"/>
+      <circle cx="${ap.x}" cy="${ap.y}" r="${avR2}"
+              fill="${BG}" opacity=".65"/>
+      <image class="av-img" data-src="${a.image||''}"
+             href="${a.image||''}"
+             x="${ap.x-AV_R}" y="${ap.y-AV_R}"
+             width="${AV_R*2}" height="${AV_R*2}"
+             preserveAspectRatio="xMidYMid slice"
+             clip-path="url(#ac${i})"
+             style="transform-origin:${ap.x}px ${ap.y}px;
+                    transition:transform .35s cubic-bezier(.34,1.3,.64,1)"/>
+      <circle cx="${ap.x}" cy="${ap.y}" r="${AV_R}"
+              fill="none" stroke="${col}" stroke-width="1.6" opacity=".7"/>`;
+
+    svgEl.appendChild(g);
+  });
+}
+
+/* ── ACTIVE IDX ── */
+function activeIdxAt(deg){
+  let best=0, bestD=Infinity;
+  for(let i=0;i<N;i++){
+    let sa = ((i*SLICE + SLICE/2 + deg) % 360 + 360) % 360;
+    let d  = Math.abs(sa - PTR_DEG);
+    if(d>180) d=360-d;
+    if(d<bestD){ bestD=d; best=i; }
+  }
+  return best;
+}
+
+function computeSnap(deg){
+  const idx = activeIdxAt(deg);
+  const center = idx*SLICE + SLICE/2;
+  let diff = ((PTR_DEG - center - deg%360) % 360 + 360) % 360;
+  if(diff>180) diff-=360;
+  return { angle: deg+diff, idx };
+}
+
+/* ── SECTOR VISUAL STATE ── */
+function setSectorState(idx){
+  const sectors = svgEl.querySelectorAll('.asw4-sector');
+  sectors.forEach((g,i)=>{
+    const glow   = g.querySelector('.sec-glow');
+    const avImg  = g.querySelector('.av-img');
+    const active = (i === idx);
+
+    // Glow
+    if(glow) glow.setAttribute('opacity', active ? '0.12' : '0');
+
+    // Avatar zoom
+    const ap = midPt(i,(R_IN+R_OUT)/2);
+    if(avImg){
+      avImg.style.transform = active
+        ? `scale(1.22) translate(0px,0px)`
+        : `scale(1)`;
+    }
+  });
+}
+
+/* ── VIBRATE STAGE ── */
+function vibeStage(){
+  stage.classList.remove('vibe');
+  void stage.offsetWidth;
+  stage.classList.add('vibe');
+  if(navigator.vibrate) navigator.vibrate(18);
+}
+
+/* ── UI UPDATE ── */
+function updateUI(idx){
+  if(idx===activeIdx) return;
+  activeIdx = idx;
+  const a = ARTISTS[idx];
+  if(!a) return;
+
+  setSectorState(idx);
+
+  // Hub
+  hubImg.classList.remove('on');
+  setTimeout(()=>{
+    if(a.image){ hubImg.src=a.image; hubImg.classList.add('on'); }
+    hubName.textContent = a.name;
+  },70);
+
+  // CTA link
+  ctaEl.href = a.url || '#';
+
+  // Info
+  nameEl.classList.remove('on');
+  metaEl.classList.remove('on');
+  ctaEl.classList.remove('on');
+  requestAnimationFrame(()=>{
+    nameEl.textContent   = a.name;
+    tracksEl.textContent = a.tracks  || '—';
+    prodsEl.textContent  = a.products|| '—';
+    genreEl.textContent  = a.genre   || '—';
+    setTimeout(()=> nameEl.classList.add('on'), 25);
+    setTimeout(()=> metaEl.classList.add('on'), 85);
+    setTimeout(()=>  ctaEl.classList.add('on'),145);
+  });
+}
+
+/* ══════════════════════════════════════════
+   AUDIO ENGINE
+   - Web Audio API for tick + static noise
+   - HTML Audio for preview (streaming)
+   - Fade in when entering zone, fade out when leaving
+══════════════════════════════════════════ */
+let previewAudio = null;  // current HTMLAudioElement
+let fadeInterval = null;
+let curAudioIdx  = -1;
+
+function unlockCtx(){
+  if(unlocked) return;
+  try{
+    audioCtx = new(window.AudioContext||window.webkitAudioContext)();
+    unlocked = true;
+  }catch(e){}
+}
+
+/* Tick: soft click/blip */
+function playTick(){
+  if(!EN_SND||!unlocked||!audioCtx) return;
+  try{
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sine';
+    o.frequency.value = 360 + Math.random()*130;
+    g.gain.setValueAtTime(.08, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime+.075);
+    o.start(); o.stop(audioCtx.currentTime+.08);
+  }catch(e){}
+}
+
+/* TV static noise — short burst (transition FX) */
+function playStatic(durationMs){
+  if(!unlocked||!audioCtx) return;
+  try{
+    const bufLen = audioCtx.sampleRate * durationMs/1000;
+    const buf    = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+    const data   = buf.getChannelData(0);
+    for(let i=0;i<bufLen;i++) data[i] = (Math.random()*2-1);
+
+    const src  = audioCtx.createBufferSource();
+    src.buffer = buf;
+    const g    = audioCtx.createGain();
+    src.connect(g); g.connect(audioCtx.destination);
+
+    // Envelope: fade in then fade out
+    g.gain.setValueAtTime(0, audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(.06, audioCtx.currentTime + durationMs/2000);
+    g.gain.linearRampToValueAtTime(0,   audioCtx.currentTime + durationMs/1000);
+    src.start(); src.stop(audioCtx.currentTime + durationMs/1000);
+  }catch(e){}
+}
+
+/* Pointer tick + static burst + visual */
+function onSectorEnter(){
+  ptrEl.classList.remove('tick');
+  void ptrEl.offsetWidth;
+  ptrEl.classList.add('tick');
+  vibeStage();
+  playTick();
+  playStatic({{ section.settings.static_ms }});
+}
+
+/* ── PREVIEW AUDIO ── */
+function clearFade(){
+  if(fadeInterval){ clearInterval(fadeInterval); fadeInterval=null; }
+}
+
+function fadeOutCurrent(cb){
+  if(!previewAudio){ cb&&cb(); return; }
+  const au = previewAudio;
+  clearFade();
+  playStatic({{ section.settings.static_ms }});
+  fadeInterval = setInterval(()=>{
+    au.volume = Math.max(0, au.volume - 1/(FADE_OUT_S*25));
+    if(au.volume<=0.001){
+      au.pause(); au.currentTime=0;
+      clearFade();
+      if(previewAudio===au){ previewAudio=null; curAudioIdx=-1; }
+      if(audioBdg) audioBdg.classList.remove('on');
+      cb&&cb();
+    }
+  }, 40);
+}
+
+function fadeInAudio(au){
+  clearFade();
+  au.volume = 0;
+  playStatic({{ section.settings.static_ms }});
+  fadeInterval = setInterval(()=>{
+    au.volume = Math.min(MAX_VOL, au.volume + MAX_VOL/(FADE_IN_S*25));
+    if(au.volume >= MAX_VOL-0.01){
+      au.volume = MAX_VOL;
+      clearFade();
+    }
+  }, 40);
+  if(audioBdg) audioBdg.classList.add('on');
+}
+
+/* Called when pointer enters a sector zone */
+function startPreview(idx){
+  if(!EN_PRV||!unlocked) return;
+  if(curAudioIdx===idx) return;      // already playing this one
+  const a = ARTISTS[idx];
+  if(!a||!a.audio) return;
+
+  fadeOutCurrent(()=>{
+    const au = new Audio(a.audio);
+    au.crossOrigin = 'anonymous';
+    au.preload     = 'auto';
+    previewAudio   = au;
+    curAudioIdx    = idx;
+    au.play().then(()=>{
+      fadeInAudio(au);
+      // Auto-stop after duration
+      setTimeout(()=>{
+        if(previewAudio===au) fadeOutCurrent();
+      }, PRV_DUR);
+    }).catch(()=>{
+      previewAudio=null; curAudioIdx=-1;
+    });
+  });
+}
+
+/* Called when leaving a sector */
+function stopCurrentPreview(){
+  if(previewAudio) fadeOutCurrent();
+}
+
+/* ── HIT-TEST: is point inside circle? ── */
+function inCircle(cx,cy,px,py,r){
+  const dx=px-cx, dy=py-cy;
+  return dx*dx+dy*dy <= r*r;
+}
+
+/* ── DRAG — only inside wheel circle ── */
+function getXY(e){
+  return e.touches
+    ? {x:e.touches[0].clientX, y:e.touches[0].clientY}
+    : {x:e.clientX, y:e.clientY};
+}
+function stageCenter(){
+  const r=stage.getBoundingClientRect();
+  return {x:r.left+r.width/2, y:r.top+r.height/2, r:r.width/2};
+}
+function mouseAngle(e){
+  const c=stageCenter(), p=getXY(e);
+  return Math.atan2(p.y-c.y,p.x-c.x)*180/Math.PI;
+}
+
+function onDown(e){
+  // Hit-test: only start drag inside wheel circle
+  const c = stageCenter();
+  const p = getXY(e);
+  if(!inCircle(c.x,c.y,p.x,p.y,c.r)) return;
+
+  unlockCtx();
+  dragging = true; velocity=0;
+  lastMX=mouseAngle(e); lastT=performance.now();
+  wheelEl.style.transition='none';
+  stopAutoRotate();
+  if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  // Prevent page scroll only when inside
+  if(e.cancelable) e.preventDefault();
+}
+
+function onMove(e){
+  if(!dragging) return;
+  if(e.cancelable) e.preventDefault();
+  const now = performance.now();
+  const cur = mouseAngle(e);
+  let d = cur-lastMX;
+  if(d>180) d-=360;
+  if(d<-180) d+=360;
+  velocity = d/Math.max(now-lastT,1)*16;
+  angle   += d;
+  lastMX=cur; lastT=now;
+  wheelEl.style.transform=`rotate(${angle}deg)`;
+
+  const idx = activeIdxAt(angle);
+  if(idx!==prevIdx){
+    prevIdx=idx;
+    onSectorEnter();
+    updateUI(idx);
+    startPreview(idx);
+  }
+}
+
+function onUp(){
+  if(!dragging) return;
+  dragging=false;
+  inertia();
+}
+
+/* ── INERTIA + SNAP ── */
+function inertia(){
+  function frame(){
+    if(Math.abs(velocity)<0.07){ doSnap(); return; }
+    velocity *= FRICTION;
+    angle    += velocity;
+    wheelEl.style.transform=`rotate(${angle}deg)`;
+    const idx=activeIdxAt(angle);
+    if(idx!==prevIdx){
+      prevIdx=idx;
+      onSectorEnter();
+      updateUI(idx);
+      startPreview(idx);
+    }
+    rafId=requestAnimationFrame(frame);
+  }
+  rafId=requestAnimationFrame(frame);
+}
+
+function doSnap(){
+  const {angle:snapped,idx}=computeSnap(angle);
+  angle=snapped;
+  wheelEl.style.transition=`transform ${SNAP_MS}ms cubic-bezier(.25,.46,.45,.94)`;
+  wheelEl.style.transform=`rotate(${angle}deg)`;
+  prevIdx=idx; updateUI(idx);
+  setTimeout(()=> onSectorEnter(), SNAP_MS*.75);
+  if(EN_AUTO&&autoOn) setTimeout(startAutoRotate, SNAP_MS+200);
+}
+
+/* ── AUTO-ROTATE ── */
+function startAutoRotate(){
+  if(!autoOn||dragging) return;
+  stopAutoRotate();
+  function frame(){
+    if(dragging){ stopAutoRotate(); return; }
+    angle -= AUTO_SPD;
+    wheelEl.style.transition='none';
+    wheelEl.style.transform=`rotate(${angle}deg)`;
+    const idx=activeIdxAt(angle);
+    if(idx!==prevIdx){
+      prevIdx=idx;
+      onSectorEnter();
+      updateUI(idx);
+      startPreview(idx);
+    }
+    autoRafId=requestAnimationFrame(frame);
+  }
+  autoRafId=requestAnimationFrame(frame);
+}
+function stopAutoRotate(){
+  if(autoRafId){cancelAnimationFrame(autoRafId);autoRafId=null;}
+}
+function toggleAuto(){
+  autoOn=!autoOn;
+  if(autoOn){ startAutoRotate(); }
+  else { stopAutoRotate(); doSnap(); }
+  if(autoIco) autoIco.innerHTML = autoOn
+    ? '<path d="M6 19h4V5H6zm8-14v14h4V5z"/>'
+    : '<path d="M8 5v14l11-7z"/>';
+}
+
+/* ── HUB CLICK ── */
+hubEl.addEventListener('click',()=>{
+  if(activeIdx<0) return;
+  const url=ARTISTS[activeIdx].url;
+  if(url) window.location.href=url;
+});
+
+/* ── CTA CLICK ── */
+ctaEl.addEventListener('click',e=>{
+  if(!ARTISTS[activeIdx]||!ARTISTS[activeIdx].url) e.preventDefault();
+  // audio already playing — no extra action needed
+});
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{
+  const L=['ArrowLeft','ArrowUp'], R=['ArrowRight','ArrowDown'];
+  if(L.includes(e.key)||R.includes(e.key)){
+    unlockCtx();
+    const dir=L.includes(e.key)?1:-1;
+    angle += dir*SLICE;
+    wheelEl.style.transition=`transform ${SNAP_MS}ms cubic-bezier(.25,.46,.45,.94)`;
+    wheelEl.style.transform=`rotate(${angle}deg)`;
+    const idx=activeIdxAt(angle); prevIdx=idx;
+    onSectorEnter(); updateUI(idx); startPreview(idx);
+  }
+  if(e.key==='Enter'&&activeIdx>=0){
+    const url=ARTISTS[activeIdx].url;
+    if(url) window.location.href=url;
+  }
+});
+
+/* ── EVENTS ── */
+// Use document-level listeners but with circle hit-test in onDown
+document.addEventListener('mousedown',  onDown);
+window.addEventListener('mousemove',    onMove);
+window.addEventListener('mouseup',      onUp);
+stage.addEventListener('touchstart',   onDown, {passive:false});
+window.addEventListener('touchmove',   onMove, {passive:false});
+window.addEventListener('touchend',    onUp);
+
+if(autoBtn) autoBtn.addEventListener('click', toggleAuto);
+
+/* ── INIT ── */
+build();
+const init = computeSnap(0);
+angle = init.angle;
+wheelEl.style.transform = `rotate(${angle}deg)`;
+setTimeout(()=>{
+  const idx = activeIdxAt(angle);
+  prevIdx=idx; updateUI(idx);
+  setSectorState(idx);
+  if(EN_AUTO&&autoOn) setTimeout(startAutoRotate,1400);
+}, 120);
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🎵 عجلة الفنانين v4",
+  "tag": "section",
+  "class": "asw4-section",
+  "settings": [
+
+    {"type":"header","content":"📝 النصوص"},
+    {"type":"text","id":"eyebrow","label":"النص الصغير","default":"اختر فنانك المفضل"},
+    {"type":"text","id":"title","label":"العنوان","default":"اختر فنانك"},
+    {"type":"text","id":"subtitle","label":"النص الفرعي","default":"اسحب الدائرة • اختر فنانك"},
+    {"type":"text","id":"cta_text","label":"نص زر التصفح","default":"تصفح منتجات الفنان"},
+    {"type":"text","id":"audio_label","label":"نص مؤشر الصوت","default":"يعزف الآن"},
+
+    {"type":"header","content":"🏷️ تسميات الإحصائيات"},
+    {"type":"text","id":"lbl_tracks","label":"تسمية المقاطع","default":"مقطع"},
+    {"type":"text","id":"lbl_products","label":"تسمية المنتجات","default":"منتج"},
+    {"type":"text","id":"lbl_genre","label":"تسمية النوع","default":"نوع"},
+
+    {"type":"header","content":"🎨 الألوان"},
+    {"type":"color","id":"color_bg","label":"الخلفية","default":"#F5EFE6"},
+    {"type":"color","id":"color_primary","label":"اللون الرئيسي","default":"#7A0C2E"},
+    {"type":"color","id":"color_secondary","label":"اللون الثانوي","default":"#D4AF37"},
+    {"type":"color","id":"color_text","label":"لون النص","default":"#1A1A1A"},
+
+    {"type":"header","content":"🔤 أحجام الخطوط"},
+    {"type":"range","id":"sz_eyebrow","label":"النص الصغير (px)","min":9,"max":18,"step":1,"default":12},
+    {"type":"range","id":"sz_title","label":"العنوان (px)","min":20,"max":60,"step":1,"default":34},
+    {"type":"range","id":"sz_sub","label":"النص الفرعي (px)","min":10,"max":20,"step":1,"default":13},
+    {"type":"range","id":"sz_name","label":"اسم الفنان (px)","min":18,"max":52,"step":1,"default":28},
+    {"type":"range","id":"sz_meta_v","label":"الأرقام (px)","min":14,"max":34,"step":1,"default":22},
+    {"type":"range","id":"sz_meta_k","label":"التسميات (px)","min":9,"max":16,"step":1,"default":11},
+    {"type":"range","id":"sz_cta","label":"زر التصفح (px)","min":11,"max":20,"step":1,"default":14},
+
+    {"type":"header","content":"🔤 النص المنحني على القطاعات"},
+    {"type":"range","id":"label_arc_r","label":"نصف قطر قوس النص (SVG)","min":100,"max":270,"step":5,"default":175},
+    {"type":"range","id":"label_size","label":"حجم خط النص المنحني","min":6,"max":18,"step":1,"default":11},
+    {"type":"range","id":"label_offset","label":"موضع النص على القوس (%)","min":30,"max":70,"step":1,"default":50},
+
+    {"type":"header","content":"⚙️ العجلة"},
+    {"type":"range","id":"wheel_size","label":"قطر العجلة (px)","min":260,"max":650,"step":10,"default":480},
+    {"type":"range","id":"r_out","label":"الشعاع الخارجي (SVG)","min":150,"max":285,"step":5,"default":240},
+    {"type":"range","id":"r_in","label":"الشعاع الداخلي (SVG)","min":50,"max":160,"step":5,"default":85},
+    {"type":"range","id":"sec_gap","label":"الفجوة بين القطاعات (درجة)","min":0,"max":8,"step":0.5,"default":2},
+    {"type":"range","id":"ring_gap","label":"مسافة الحلقة الخارجية (px)","min":4,"max":30,"step":1,"default":10},
+    {"type":"range","id":"ring_thick","label":"سُمك الحلقة (px)","min":1,"max":4,"step":1,"default":1},
+
+    {"type":"header","content":"🔵 المركز"},
+    {"type":"range","id":"hub_size","label":"حجم المركز (px)","min":70,"max":220,"step":5,"default":130},
+    {"type":"range","id":"hub_border","label":"سُمك إطار المركز (px)","min":1,"max":6,"step":1,"default":2},
+    {"type":"range","id":"hub_ring_gap","label":"فجوة المركز (px)","min":2,"max":18,"step":1,"default":5},
+
+    {"type":"header","content":"🟤 الأفاتار"},
+    {"type":"range","id":"avatar_size","label":"قطر الأفاتار (px)","min":20,"max":90,"step":2,"default":46},
+
+    {"type":"header","content":"📍 المؤشر"},
+    {"type":"range","id":"pointer_height","label":"ارتفاع المؤشر (px)","min":20,"max":70,"step":2,"default":44},
+    {"type":"range","id":"pointer_width","label":"عرض المؤشر (px)","min":16,"max":60,"step":2,"default":34},
+    {"type":"range","id":"ptr_offset","label":"بروز المؤشر خارج العجلة (px)","min":0,"max":25,"step":1,"default":6},
+    {"type":"range","id":"ptr_stem_w","label":"عرض ذيل المؤشر (px)","min":1,"max":6,"step":1,"default":2},
+    {"type":"range","id":"ptr_stem_h","label":"طول ذيل المؤشر (px)","min":0,"max":28,"step":1,"default":12},
+
+    {"type":"header","content":"📐 المسافات"},
+    {"type":"range","id":"pad_v","label":"حشوة عمودية (px)","min":20,"max":100,"step":4,"default":48},
+    {"type":"range","id":"pad_h","label":"حشوة أفقية (px)","min":10,"max":60,"step":4,"default":20},
+    {"type":"range","id":"gap_header_wheel","label":"عنوان ← عجلة (px)","min":10,"max":80,"step":4,"default":30},
+    {"type":"range","id":"gap_wheel_info","label":"عجلة ← معلومات (px)","min":10,"max":80,"step":4,"default":28},
+    {"type":"range","id":"info_gap","label":"مسافة عناصر المعلومات (px)","min":6,"max":32,"step":2,"default":14},
+    {"type":"range","id":"meta_pad","label":"حشوة عناصر الإحصائيات (px)","min":8,"max":32,"step":2,"default":18},
+    {"type":"range","id":"info_max_w","label":"أقصى عرض للمعلومات (px)","min":280,"max":600,"step":10,"default":420},
+    {"type":"range","id":"tape_w","label":"عرض خط الشريط (px)","min":60,"max":300,"step":10,"default":190},
+    {"type":"range","id":"tape_h","label":"سُمك خط الشريط (px)","min":1,"max":5,"step":1,"default":2},
+
+    {"type":"header","content":"🎨 زر التصفح"},
+    {"type":"range","id":"cta_pv","label":"حشوة الزر عمودية (px)","min":8,"max":22,"step":1,"default":13},
+    {"type":"range","id":"cta_ph","label":"حشوة الزر أفقية (px)","min":16,"max":60,"step":2,"default":28},
+    {"type":"range","id":"cta_r","label":"استدارة الزر (px)","min":0,"max":40,"step":1,"default":6},
+
+    {"type":"header","content":"🎧 مؤشر الصوت"},
+    {"type":"range","id":"audio_top","label":"موضع من الأعلى (px)","min":10,"max":60,"step":2,"default":20},
+    {"type":"select","id":"audio_side","label":"الجانب","options":[{"value":"right","label":"يمين"},{"value":"left","label":"يسار"}],"default":"right"},
+    {"type":"range","id":"audio_side_off","label":"بُعد عن الجانب (px)","min":10,"max":60,"step":2,"default":16},
+
+    {"type":"header","content":"🎮 الحركة"},
+    {"type":"range","id":"snap_ms","label":"سرعة التثبيت (ms)","min":200,"max":900,"step":50,"default":460},
+    {"type":"range","id":"friction_pct","label":"احتكاك الإنيرشيا (1=ناعم, 12=سريع)","min":1,"max":12,"step":1,"default":7},
+    {"type":"checkbox","id":"enable_auto","label":"تفعيل التدوير التلقائي","default":false},
+    {"type":"range","id":"auto_spd","label":"سرعة التدوير التلقائي","min":1,"max":20,"step":1,"default":5},
+
+    {"type":"header","content":"🔊 الصوت"},
+    {"type":"checkbox","id":"enable_sound","label":"صوت النقر عند التغيير","default":true},
+    {"type":"checkbox","id":"enable_preview","label":"معاينة صوت الفنان تلقائياً","default":true},
+    {"type":"range","id":"preview_dur","label":"مدة المعاينة (ثانية)","min":5,"max":60,"step":5,"default":20},
+    {"type":"range","id":"audio_volume","label":"مستوى الصوت (%)","min":10,"max":100,"step":5,"default":65},
+    {"type":"range","id":"audio_fade_in","label":"مدة التلاشي للداخل (ثانية)","min":0.2,"max":3,"step":0.2,"default":0.8},
+    {"type":"range","id":"audio_fade_out","label":"مدة التلاشي للخارج (ثانية)","min":0.2,"max":3,"step":0.2,"default":0.6},
+    {"type":"range","id":"static_ms","label":"مدة صوت التشويش (ms)","min":100,"max":800,"step":50,"default":300}
+
+  ],
+  "blocks":[
+    {
+      "type":"artist",
+      "name":"🎤 فنان",
+      "limit":10,
+      "settings":[
+        {"type":"text","id":"name","label":"اسم الفنان","default":"الفنان"},
+        {"type":"image_picker","id":"image","label":"صورة الفنان"},
+        {"type":"url","id":"collection_url","label":"رابط الكولكشن"},
+        {"type":"color","id":"color","label":"اللون المميز","default":"#7A0C2E"},
+        {"type":"text","id":"genre","label":"النوع الموسيقي","default":"طرب"},
+        {"type":"number","id":"tracks","label":"عدد المقاطع","default":12},
+        {"type":"number","id":"products","label":"عدد المنتجات","default":20},
+        {"type":"text","id":"preview_audio","label":"رابط ملف الصوت MP3","info":"رابط مباشر لملف صوتي يُشغَّل تلقائياً عند توقف العجلة على الفنان"}
+      ]
+    }
+  ],
+  "presets":[
+    {
+      "name":"🎵 عجلة الفنانين",
+      "blocks":[
+        {"type":"artist","settings":{"name":"محمد عبده","color":"#7A0C2E","genre":"طرب","tracks":24,"products":40}},
+        {"type":"artist","settings":{"name":"فيروز","color":"#1A3A5C","genre":"كلاسيكي","tracks":18,"products":28}},
+        {"type":"artist","settings":{"name":"عمرو دياب","color":"#4A5C1A","genre":"بوب","tracks":20,"products":35}},
+        {"type":"artist","settings":{"name":"أم كلثوم","color":"#5C3A1A","genre":"تراث","tracks":15,"products":22}}
+      ]
+    }
+  ]
+}
+{% endschema %}

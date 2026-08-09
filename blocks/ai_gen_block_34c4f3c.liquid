@@ -1,0 +1,1350 @@
+{% doc %}
+  @prompt
+    قسم لعرض احدث مقالات بطابع ريترو جميل يحاكي التطريز الفلسطيني بأسلوب البيكسل ويكون حديث وأنيق ومتماشي مع ثيم الموقع, بدي تغير زر اقرأ المزيد لخط غليظ فقط مميز بلون مميز قابل للضغط عليه لتشغيل المقال , خيارات للتحكم في أبعاد كل شيء والإفراغات والمسافات , بدي المقالات المعروضه بجوار بعض مش تحت بعض   , اجعل إذا بطاقه واحده فقط تتموضع في المنتصف جيداً 
+{% enddoc %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-palestinian-blog-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.section_padding_top }}px {{ block.settings.section_padding_horizontal }}px {{ block.settings.section_padding_bottom }}px;
+    background: {{ block.settings.background_color }};
+    position: relative;
+  }
+
+  .ai-palestinian-blog-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.container_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-palestinian-blog-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: {{ block.settings.header_margin_bottom }}px;
+    position: relative;
+  }
+
+  .ai-palestinian-blog-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 {{ block.settings.title_margin_bottom }}px;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+  }
+
+  .ai-palestinian-blog-title-{{ ai_gen_id }}::before,
+  .ai-palestinian-blog-title-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: {{ block.settings.title_decoration_width }}px;
+    height: {{ block.settings.title_decoration_height }}px;
+    background: {{ block.settings.accent_color }};
+    transform: translateY(-50%);
+  }
+
+  .ai-palestinian-blog-title-{{ ai_gen_id }}::before {
+    right: calc(100% + {{ block.settings.title_decoration_spacing }}px);
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.accent_color }} 0px,
+      {{ block.settings.accent_color }} 8px,
+      transparent 8px,
+      transparent 12px
+    );
+  }
+
+  .ai-palestinian-blog-title-{{ ai_gen_id }}::after {
+    left: calc(100% + {{ block.settings.title_decoration_spacing }}px);
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.accent_color }} 0px,
+      {{ block.settings.accent_color }} 8px,
+      transparent 8px,
+      transparent 12px
+    );
+  }
+
+  .ai-palestinian-blog-subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+  }
+
+  .ai-palestinian-blog-scroll-wrapper-{{ ai_gen_id }} {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-bottom: {{ block.settings.grid_margin_bottom }}px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: {{ block.settings.accent_color }} transparent;
+  }
+
+  .ai-palestinian-blog-scroll-wrapper-{{ ai_gen_id }}::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .ai-palestinian-blog-scroll-wrapper-{{ ai_gen_id }}::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .ai-palestinian-blog-scroll-wrapper-{{ ai_gen_id }}::-webkit-scrollbar-thumb {
+    background: {{ block.settings.accent_color }};
+    border-radius: 4px;
+  }
+
+  .ai-palestinian-blog-grid-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.grid_gap }}px;
+    min-width: min-content;
+  }
+
+  .ai-palestinian-blog-grid-{{ ai_gen_id }}[data-count="1"] {
+    justify-content: center;
+  }
+
+  .ai-palestinian-blog-card-{{ ai_gen_id }} {
+    background: {{ block.settings.card_background }};
+    border: {{ block.settings.card_border_width }}px solid {{ block.settings.card_border_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: {{ block.settings.card_shadow_x }}px {{ block.settings.card_shadow_y }}px {{ block.settings.card_shadow_blur }}px {{ block.settings.card_shadow_color }};
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex: 0 0 {{ block.settings.card_width }}px;
+    width: {{ block.settings.card_width }}px;
+  }
+
+  .ai-palestinian-blog-card-{{ ai_gen_id }}:hover {
+    transform: translateY({{ block.settings.card_hover_lift }}px);
+    box-shadow: {{ block.settings.card_shadow_x | times: 1.5 }}px {{ block.settings.card_shadow_y | times: 1.5 }}px {{ block.settings.card_shadow_blur | times: 1.5 }}px {{ block.settings.card_shadow_color }};
+  }
+
+  .ai-palestinian-blog-card-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: {{ block.settings.pattern_height }}px;
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.pattern_color_1 }} 0px,
+      {{ block.settings.pattern_color_1 }} {{ block.settings.pattern_stripe_width }}px,
+      {{ block.settings.pattern_color_2 }} {{ block.settings.pattern_stripe_width }}px,
+      {{ block.settings.pattern_color_2 }} {{ block.settings.pattern_stripe_width | times: 2 }}px,
+      {{ block.settings.pattern_color_3 }} {{ block.settings.pattern_stripe_width | times: 2 }}px,
+      {{ block.settings.pattern_color_3 }} {{ block.settings.pattern_stripe_width | times: 3 }}px
+    );
+    z-index: 2;
+  }
+
+  .ai-palestinian-blog-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-top: {{ block.settings.image_aspect_ratio }}%;
+    overflow: hidden;
+    background: {{ block.settings.image_placeholder_bg }};
+  }
+
+  .ai-palestinian-blog-image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: {{ block.settings.pixel_effect }};
+  }
+
+  .ai-palestinian-blog-image-placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: {{ block.settings.image_placeholder_bg }};
+  }
+
+  .ai-palestinian-blog-image-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-palestinian-blog-content-{{ ai_gen_id }} {
+    padding: {{ block.settings.card_padding_top }}px {{ block.settings.card_padding_horizontal }}px {{ block.settings.card_padding_bottom }}px;
+    position: relative;
+  }
+
+  .ai-palestinian-blog-content-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: {{ block.settings.card_padding_horizontal }}px;
+    right: {{ block.settings.card_padding_horizontal }}px;
+    height: {{ block.settings.content_divider_height }}px;
+    background: repeating-linear-gradient(
+      90deg,
+      {{ block.settings.accent_color }} 0px,
+      {{ block.settings.accent_color }} 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+
+  .ai-palestinian-blog-date-{{ ai_gen_id }} {
+    font-size: {{ block.settings.date_size }}px;
+    color: {{ block.settings.date_color }};
+    margin: 0 0 {{ block.settings.date_margin_bottom }}px;
+    font-weight: 600;
+    letter-spacing: {{ block.settings.date_letter_spacing }}px;
+  }
+
+  .ai-palestinian-blog-article-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.article_title_size }}px;
+    color: {{ block.settings.article_title_color }};
+    margin: 0 0 {{ block.settings.article_title_margin_bottom }}px;
+    font-weight: 700;
+    line-height: {{ block.settings.article_title_line_height }};
+    display: -webkit-box;
+    -webkit-line-clamp: {{ block.settings.article_title_lines }};
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ai-palestinian-blog-article-title-{{ ai_gen_id }} a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ai-palestinian-blog-article-title-{{ ai_gen_id }} a:hover {
+    color: {{ block.settings.accent_color }};
+  }
+
+  .ai-palestinian-blog-excerpt-{{ ai_gen_id }} {
+    font-size: {{ block.settings.excerpt_size }}px;
+    color: {{ block.settings.excerpt_color }};
+    margin: 0 0 {{ block.settings.excerpt_margin_bottom }}px;
+    line-height: {{ block.settings.excerpt_line_height }};
+    display: -webkit-box;
+    -webkit-line-clamp: {{ block.settings.excerpt_lines }};
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ai-palestinian-blog-read-more-{{ ai_gen_id }} {
+    display: inline-block;
+    font-size: {{ block.settings.read_more_size }}px;
+    color: {{ block.settings.read_more_color }};
+    text-decoration: none;
+    font-weight: 800;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    position: relative;
+    letter-spacing: {{ block.settings.read_more_letter_spacing }}px;
+  }
+
+  .ai-palestinian-blog-read-more-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.read_more_hover_color }};
+  }
+
+  .ai-palestinian-blog-read-more-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: {{ block.settings.read_more_underline_offset }}px;
+    left: 0;
+    width: 0;
+    height: {{ block.settings.read_more_underline_height }}px;
+    background: {{ block.settings.read_more_hover_color }};
+    transition: width 0.3s ease;
+  }
+
+  .ai-palestinian-blog-read-more-{{ ai_gen_id }}:hover::after {
+    width: 100%;
+  }
+
+  .ai-palestinian-blog-view-all-{{ ai_gen_id }} {
+    text-align: center;
+    margin-top: {{ block.settings.view_all_margin_top }}px;
+  }
+
+  .ai-palestinian-blog-view-all-link-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: {{ block.settings.view_all_icon_gap }}px;
+    font-size: {{ block.settings.view_all_font_size }}px;
+    color: {{ block.settings.view_all_text_color }};
+    background: {{ block.settings.view_all_bg_color }};
+    padding: {{ block.settings.view_all_padding_vertical }}px {{ block.settings.view_all_padding_horizontal }}px;
+    border-radius: {{ block.settings.view_all_border_radius }}px;
+    text-decoration: none;
+    font-weight: {{ block.settings.view_all_font_weight }};
+    border: {{ block.settings.view_all_border_width }}px solid {{ block.settings.view_all_border_color }};
+    transition: all 0.3s ease;
+    box-shadow: {{ block.settings.view_all_shadow_x }}px {{ block.settings.view_all_shadow_y }}px 0 {{ block.settings.view_all_shadow_color }};
+  }
+
+  .ai-palestinian-blog-view-all-link-{{ ai_gen_id }}:hover {
+    transform: translate({{ block.settings.view_all_hover_translate }}px, {{ block.settings.view_all_hover_translate }}px);
+    box-shadow: {{ block.settings.view_all_shadow_x | divided_by: 2 }}px {{ block.settings.view_all_shadow_y | divided_by: 2 }}px 0 {{ block.settings.view_all_shadow_color }};
+    background: {{ block.settings.view_all_hover_bg }};
+    color: {{ block.settings.view_all_hover_text }};
+  }
+
+  .ai-palestinian-blog-empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: {{ block.settings.subtitle_color }};
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-palestinian-blog-{{ ai_gen_id }} {
+      padding: {{ block.settings.section_padding_top_mobile }}px {{ block.settings.section_padding_horizontal_mobile }}px {{ block.settings.section_padding_bottom_mobile }}px;
+    }
+
+    .ai-palestinian-blog-title-{{ ai_gen_id }}::before,
+    .ai-palestinian-blog-title-{{ ai_gen_id }}::after {
+      display: none;
+    }
+
+    .ai-palestinian-blog-grid-{{ ai_gen_id }} {
+      gap: {{ block.settings.grid_gap_mobile }}px;
+    }
+
+    .ai-palestinian-blog-card-{{ ai_gen_id }} {
+      flex: 0 0 {{ block.settings.card_width_mobile }}px;
+      width: {{ block.settings.card_width_mobile }}px;
+    }
+
+    .ai-palestinian-blog-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size_mobile }}px;
+    }
+
+    .ai-palestinian-blog-article-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.article_title_size_mobile }}px;
+    }
+  }
+{% endstyle %}
+
+<palestinian-blog-{{ ai_gen_id }} class="ai-palestinian-blog-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-palestinian-blog-container-{{ ai_gen_id }}">
+    {% if block.settings.show_header %}
+      <div class="ai-palestinian-blog-header-{{ ai_gen_id }}">
+        {% if block.settings.section_title != blank %}
+          <h2 class="ai-palestinian-blog-title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+        {% endif %}
+        {% if block.settings.section_subtitle != blank %}
+          <p class="ai-palestinian-blog-subtitle-{{ ai_gen_id }}">{{ block.settings.section_subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if block.settings.blog != blank %}
+      {% assign articles = block.settings.blog.articles %}
+      {% if articles.size > 0 %}
+        <div class="ai-palestinian-blog-scroll-wrapper-{{ ai_gen_id }}">
+          <div class="ai-palestinian-blog-grid-{{ ai_gen_id }}" data-count="{{ articles.size | min: block.settings.articles_count }}">
+            {% for article in articles limit: block.settings.articles_count %}
+              <article class="ai-palestinian-blog-card-{{ ai_gen_id }}">
+                <div class="ai-palestinian-blog-image-wrapper-{{ ai_gen_id }}">
+                  {% if article.image %}
+                    <img
+                      src="{{ article.image | image_url: width: 600 }}"
+                      alt="{{ article.image.alt | escape }}"
+                      class="ai-palestinian-blog-image-{{ ai_gen_id }}"
+                      loading="lazy"
+                      width="600"
+                      height="400"
+                    >
+                  {% else %}
+                    <div class="ai-palestinian-blog-image-placeholder-{{ ai_gen_id }}">
+                      {{ 'image' | placeholder_svg_tag }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="ai-palestinian-blog-content-{{ ai_gen_id }}">
+                                    {% if block.settings.show_date %}
+                    {% assign month_num = article.published_at | date: '%m' | plus: 0 %}
+                    {% assign syriac_months = 'كانون الثاني,شباط,آذار,نيسان,أيار,حزيران,تموز,آب,أيلول,تشرين الأول,تشرين الثاني,كانون الأول' | split: ',' %}
+                    {% assign month_index = month_num | minus: 1 %}
+                    {% assign month_name = syriac_months[month_index] %}
+
+                    {% assign day = article.published_at | date: '%d' %}
+                    {% assign day_ar = day | replace: '0','٠' | replace: '1','١' | replace: '2','٢' | replace: '3','٣' | replace: '4','٤' | replace: '5','٥' | replace: '6','٦' | replace: '7','٧' | replace: '8','٨' | replace: '9','٩' %}
+
+                    {% assign year = article.published_at | date: '%Y' %}
+                    {% assign year_ar = year | replace: '0','٠' | replace: '1','١' | replace: '2','٢' | replace: '3','٣' | replace: '4','٤' | replace: '5','٥' | replace: '6','٦' | replace: '7','٧' | replace: '8','٨' | replace: '9','٩' %}
+
+                    <time class="ai-palestinian-blog-date-{{ ai_gen_id }}" datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+                      {{ day_ar }} {{ month_name }} {{ year_ar }}
+                    </time>
+                  {% endif %}
+
+                  <h3 class="ai-palestinian-blog-article-title-{{ ai_gen_id }}">
+                    <a href="{{ article.url }}">{{ article.title }}</a>
+                  </h3>
+
+                  {% if block.settings.show_excerpt and article.excerpt != blank %}
+                    <div class="ai-palestinian-blog-excerpt-{{ ai_gen_id }}">
+                      {{ article.excerpt | strip_html | truncate: 120 }}
+                    </div>
+                  {% endif %}
+
+                  {% if block.settings.show_read_more %}
+                    <a href="{{ article.url }}" class="ai-palestinian-blog-read-more-{{ ai_gen_id }}">
+                      {{ block.settings.read_more_text }}
+                    </a>
+                  {% endif %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if block.settings.show_view_all %}
+          <div class="ai-palestinian-blog-view-all-{{ ai_gen_id }}">
+            <a href="{{ block.settings.blog.url }}" class="ai-palestinian-blog-view-all-link-{{ ai_gen_id }}">
+              {{ block.settings.view_all_text }}
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 15L12 10L7 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/>
+              </svg>
+            </a>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="ai-palestinian-blog-empty-{{ ai_gen_id }}">
+          لا توجد مقالات في هذه المدونة حالياً
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="ai-palestinian-blog-empty-{{ ai_gen_id }}">
+        الرجاء اختيار مدونة لعرض المقالات
+      </div>
+    {% endif %}
+  </div>
+</palestinian-blog-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class PalestinianBlog{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        const images = this.querySelectorAll('.ai-palestinian-blog-image-{{ ai_gen_id }}');
+        images.forEach(img => {
+          img.addEventListener('load', function() {
+            this.style.opacity = '1';
+          });
+        });
+      }
+    }
+
+    customElements.define('palestinian-blog-{{ ai_gen_id }}', PalestinianBlog{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "مقالات تطريز فلسطيني",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المحتوى"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "المدونة"
+    },
+    {
+      "type": "range",
+      "id": "articles_count",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "label": "عدد المقالات",
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "إظهار العنوان الرئيسي",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "عنوان القسم",
+      "default": "أحدث المقالات"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "العنوان الفرعي",
+      "default": "اكتشف آخر الأخبار"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "إظهار التاريخ",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "إظهار المقتطف",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_read_more",
+      "label": "إظهار رابط القراءة",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "read_more_text",
+      "label": "نص رابط القراءة",
+      "default": "اقرأ المزيد ←"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "إظهار زر عرض الكل",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "نص زر عرض الكل",
+      "default": "جميع المقالات"
+    },
+    {
+      "type": "header",
+      "content": "المسافات والأبعاد - القسم"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "min": 800,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "label": "عرض الحاوية",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "مسافة علوية",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "label": "مسافة سفلية",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة جانبية",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة علوية (موبايل)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة سفلية (موبايل)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal_mobile",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة جانبية (موبايل)",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "المسافات - العنوان الرئيسي"
+    },
+    {
+      "type": "range",
+      "id": "header_margin_bottom",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت العنوان",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "min": 5,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة بين العنوان والوصف",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "title_decoration_width",
+      "min": 30,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض الزخرفة",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "title_decoration_height",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الزخرفة",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "title_decoration_spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة الزخرفة من العنوان",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "المسافات - الشبكة الأفقية"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "min": 250,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض البطاقة",
+      "default": 350
+    },
+    {
+      "type": "range",
+      "id": "card_width_mobile",
+      "min": 200,
+      "max": 350,
+      "step": 10,
+      "unit": "px",
+      "label": "عرض البطاقة (موبايل)",
+      "default": 280
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "المسافة بين البطاقات",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_mobile",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "المسافة (موبايل)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "grid_margin_bottom",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت الشبكة",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "المسافات - البطاقة"
+    },
+    {
+      "type": "range",
+      "id": "card_padding_top",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية علوية",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "card_padding_bottom",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية سفلية",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "card_padding_horizontal",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية جانبية",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_hover_lift",
+      "min": -20,
+      "max": 0,
+      "step": 1,
+      "unit": "px",
+      "label": "ارتفاع عند التمرير",
+      "default": -5
+    },
+    {
+      "type": "header",
+      "content": "المسافات - المحتوى"
+    },
+    {
+      "type": "range",
+      "id": "date_margin_bottom",
+      "min": 5,
+      "max": 25,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت التاريخ",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "article_title_margin_bottom",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "مسافة تحت عنوان المقال",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "excerpt_margin_bottom",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة تحت المقتطف",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "content_divider_height",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الفاصل العلوي",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد - نمط التطريز"
+    },
+    {
+      "type": "range",
+      "id": "pattern_height",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ارتفاع النمط",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "pattern_stripe_width",
+      "min": 6,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "عرض الخط الواحد",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد - الصورة"
+    },
+    {
+      "type": "range",
+      "id": "image_aspect_ratio",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "نسبة الارتفاع للعرض",
+      "default": 67
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد - زر عرض الكل"
+    },
+    {
+      "type": "range",
+      "id": "view_all_margin_top",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة فوق الزر",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "view_all_padding_vertical",
+      "min": 8,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "مسافة داخلية عمودية",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "view_all_padding_horizontal",
+      "min": 20,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة داخلية أفقية",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "view_all_icon_gap",
+      "min": 5,
+      "max": 20,
+      "step": 5,
+      "unit": "px",
+      "label": "مسافة بين النص والأيقونة",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "view_all_border_width",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الحدود",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "view_all_shadow_x",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "ظل أفقي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "view_all_shadow_y",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "ظل عمودي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "view_all_hover_translate",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "حركة عند التمرير",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "الألوان الرئيسية"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "اللون المميز",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "لون العنوان",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "لون العنوان الفرعي",
+      "default": "#910f3f"
+    },
+    {
+      "type": "header",
+      "content": "ألوان نمط التطريز"
+    },
+    {
+      "type": "color",
+      "id": "pattern_color_1",
+      "label": "لون النمط 1",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "pattern_color_2",
+      "label": "لون النمط 2",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "pattern_color_3",
+      "label": "لون النمط 3",
+      "default": "#f9e547"
+    },
+    {
+      "type": "header",
+      "content": "البطاقات"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "خلفية البطاقة",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "لون حدود البطاقة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "card_border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك حدود البطاقة",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة زوايا البطاقة",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "card_shadow_color",
+      "label": "لون ظل البطاقة",
+      "default": "#3d081b33"
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_x",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل أفقي",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_y",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "ظل عمودي",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_blur",
+      "min": 0,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "تمويه الظل",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "تأثير البيكسل"
+    },
+    {
+      "type": "select",
+      "id": "pixel_effect",
+      "label": "تأثير الصورة",
+      "options": [
+        { "value": "auto", "label": "عادي" },
+        { "value": "pixelated", "label": "بيكسل" },
+        { "value": "crisp-edges", "label": "حواف حادة" }
+      ],
+      "default": "pixelated"
+    },
+    {
+      "type": "color",
+      "id": "image_placeholder_bg",
+      "label": "خلفية الصورة",
+      "default": "#e8e5d3"
+    },
+    {
+      "type": "header",
+      "content": "النصوص - الأحجام"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم العنوان الرئيسي",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "min": 18,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم العنوان (موبايل)",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم العنوان الفرعي",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "article_title_size",
+      "min": 16,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم عنوان المقال",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "article_title_size_mobile",
+      "min": 14,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم عنوان المقال (موبايل)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "excerpt_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم المقتطف",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "date_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم التاريخ",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "النصوص - التنسيق"
+    },
+    {
+      "type": "range",
+      "id": "article_title_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر - عنوان المقال",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "article_title_lines",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "عدد أسطر عنوان المقال",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "excerpt_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "ارتفاع السطر - المقتطف",
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "excerpt_lines",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "عدد أسطر المقتطف",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "date_letter_spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "label": "تباعد الأحرف - التاريخ",
+      "default": 0.5
+    },
+    {
+      "type": "color",
+      "id": "article_title_color",
+      "label": "لون عنوان المقال",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "excerpt_color",
+      "label": "لون المقتطف",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "date_color",
+      "label": "لون التاريخ",
+      "default": "#910f3f"
+    },
+    {
+      "type": "header",
+      "content": "رابط اقرأ المزيد"
+    },
+    {
+      "type": "range",
+      "id": "read_more_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم النص",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "read_more_weight",
+      "min": 400,
+      "max": 900,
+      "step": 100,
+      "label": "سمك الخط",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "read_more_letter_spacing",
+      "min": 0,
+      "max": 2,
+      "step": 0.5,
+      "unit": "px",
+      "label": "تباعد الأحرف",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "read_more_underline_height",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الخط السفلي",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "read_more_underline_offset",
+      "min": -5,
+      "max": 0,
+      "step": 1,
+      "unit": "px",
+      "label": "موضع الخط السفلي",
+      "default": -2
+    },
+    {
+      "type": "color",
+      "id": "read_more_color",
+      "label": "لون النص",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "read_more_hover_color",
+      "label": "لون عند التمرير",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "زر عرض الكل"
+    },
+    {
+      "type": "range",
+      "id": "view_all_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم النص",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "view_all_font_weight",
+      "min": 400,
+      "max": 900,
+      "step": 100,
+      "label": "سمك الخط",
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "view_all_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "استدارة الزوايا",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "view_all_bg_color",
+      "label": "خلفية الزر",
+      "default": "#f9e547"
+    },
+    {
+      "type": "color",
+      "id": "view_all_text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "view_all_border_color",
+      "label": "لون الحدود",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "view_all_shadow_color",
+      "label": "لون الظل",
+      "default": "#3d081b"
+    },
+    {
+      "type": "color",
+      "id": "view_all_hover_bg",
+      "label": "خلفية عند التمرير",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "view_all_hover_text",
+      "label": "نص عند التمرير",
+      "default": "#f2efdd"
+    }
+  ],
+  "presets": [
+    {
+      "name": "مقالات تطريز فلسطيني"
+    }
+  ]
+}
+{% endschema %}

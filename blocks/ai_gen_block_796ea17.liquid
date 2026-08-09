@@ -1,0 +1,499 @@
+{% doc %}
+  @prompt
+    <section class="flipbook-section">
+    
+      <h2 class="title">{{ section.settings.title }}</h2>
+    
+      <div class="viewer">
+        {% if section.blocks.size > 0 %}
+          <img id="page" src="{{ section.blocks.first.settings.image | image_url }}" loading="lazy">
+        {% else %}
+          <p>أضف صور للمجلة</p>
+        {% endif %}
+      </div>
+    
+      <div class="controls">
+        <button onclick="prevPage()">←</button>
+        <button onclick="nextPage()">→</button>
+      </div>
+    
+    </section>
+    
+    <style>
+    .flipbook-section {
+      text-align: center;
+      padding: 50px 20px;
+      background: #f4efe6;
+    }
+    
+    .title {
+      color: #6b1d2a;
+      margin-bottom: 20px;
+    }
+    
+    .viewer {
+      width: 320px;
+      margin: auto;
+      perspective: 1200px;
+    }
+    
+    .viewer img {
+      width: 100%;
+      border-radius: 12px;
+      transition: transform 0.6s ease;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+    
+    .controls {
+      margin-top: 20px;
+    }
+    
+    .controls button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      background: #e6c200;
+      color: #6b1d2a;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    .controls button:hover {
+      transform: scale(1.1);
+    }
+    </style>
+    
+    <script>
+    let images = [
+      {% for block in section.blocks %}
+        {% if block.settings.image %}
+          "{{ block.settings.image | image_url }}",
+        {% endif %}
+      {% endfor %}
+    ];
+    
+    let index = 0;
+    let page = document.getElementById("page");
+    
+    function nextPage(){
+      if(index < images.length - 1){
+        page.style.transform = "rotateY(-90deg)";
+        setTimeout(()=>{
+          index++;
+          page.src = images[index];
+          page.style.transform = "rotateY(0)";
+        },300);
+      }
+    }
+    
+    function prevPage(){
+      if(index > 0){
+        page.style.transform = "rotateY(90deg)";
+        setTimeout(()=>{
+          index--;
+          page.src = images[index];
+          page.style.transform = "rotateY(0)";
+        },300);
+      }
+    }
+    </script>
+    
+    {% schema %}
+    {
+      "name": "Custom Flipbook",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "عنوان المجلة",
+          "default": "📖 مجلتي"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "page",
+          "name": "صفحة",
+          "settings": [
+            {
+              "type": "image_picker",
+              "id": "image",
+              "label": "صورة الصفحة"
+            }
+          ]
+        }
+      ],
+      "max_blocks": 20,
+      "presets": [
+        {
+          "name": "Custom Flipbook"
+        }
+      ]
+    }
+    {% endschema %}
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-flipbook-container-{{ ai_gen_id }} {
+    display: block;
+    text-align: center;
+    padding: 50px 20px;
+    background-color: {{ block.settings.background_color }};
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+  }
+
+  .ai-flipbook-title-{{ ai_gen_id }} {
+    color: {{ block.settings.title_color }};
+    margin-bottom: 30px;
+    font-size: {{ block.settings.title_size }}px;
+  }
+
+  .ai-flipbook-viewer-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: {{ block.settings.viewer_width }}px;
+    margin: 0 auto;
+    perspective: 1200px;
+    position: relative;
+  }
+
+  .ai-flipbook-page-{{ ai_gen_id }} {
+    width: 100%;
+    border-radius: {{ block.settings.page_border_radius }}px;
+    transition: transform 0.6s ease;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    display: block;
+  }
+
+  .ai-flipbook-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background-color: #f4f4f4;
+    border-radius: {{ block.settings.page_border_radius }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-flipbook-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 400px;
+  }
+
+  .ai-flipbook-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-flipbook-controls-{{ ai_gen_id }} {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .ai-flipbook-button-{{ ai_gen_id }} {
+    padding: 12px 24px;
+    border: none;
+    background-color: {{ block.settings.button_color }};
+    color: {{ block.settings.button_text_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    font-size: 18px;
+    min-width: 50px;
+  }
+
+  .ai-flipbook-button-{{ ai_gen_id }}:hover {
+    transform: scale(1.1);
+    background-color: {{ block.settings.button_hover_color }};
+  }
+
+  .ai-flipbook-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .ai-flipbook-button-{{ ai_gen_id }}:disabled:hover {
+    transform: none;
+    background-color: {{ block.settings.button_color }};
+  }
+
+  .ai-flipbook-counter-{{ ai_gen_id }} {
+    font-size: 16px;
+    color: {{ block.settings.title_color }};
+    min-width: 60px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-flipbook-container-{{ ai_gen_id }} {
+      padding: 30px 15px;
+    }
+
+    .ai-flipbook-title-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.title_size }}px * 0.8);
+    }
+
+    .ai-flipbook-button-{{ ai_gen_id }} {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  }
+{% endstyle %}
+
+<flipbook-viewer-{{ ai_gen_id }}
+  class="ai-flipbook-container-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.title != blank %}
+    <h2 class="ai-flipbook-title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+  {% endif %}
+
+  <div class="ai-flipbook-viewer-{{ ai_gen_id }}">
+    {% if block.settings.pages.size > 0 %}
+      <img
+        id="ai-flipbook-page-{{ ai_gen_id }}"
+        class="ai-flipbook-page-{{ ai_gen_id }}"
+        src="{{ block.settings.pages.first | image_url: width: 1000 }}"
+        alt="صفحة 1"
+        loading="lazy"
+      >
+    {% else %}
+      <div class="ai-flipbook-placeholder-{{ ai_gen_id }}">
+        {{ 'image' | placeholder_svg_tag }}
+        <div class="ai-flipbook-empty-state-{{ ai_gen_id }}">
+          أضف صور للمجلة
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="ai-flipbook-controls-{{ ai_gen_id }}">
+    <button
+      id="ai-flipbook-prev-{{ ai_gen_id }}"
+      class="ai-flipbook-button-{{ ai_gen_id }}"
+      aria-label="الصفحة السابقة"
+    >
+      ←
+    </button>
+    <span
+      id="ai-flipbook-counter-{{ ai_gen_id }}"
+      class="ai-flipbook-counter-{{ ai_gen_id }}"
+    ></span>
+    <button
+      id="ai-flipbook-next-{{ ai_gen_id }}"
+      class="ai-flipbook-button-{{ ai_gen_id }}"
+      aria-label="الصفحة التالية"
+    >
+      →
+    </button>
+  </div>
+</flipbook-viewer-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class FlipbookViewer{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.images = [
+          {% for image in block.settings.pages %}
+            {% if image %}
+              "{{ image | image_url: width: 1000 }}",
+            {% endif %}
+          {% endfor %}
+        ];
+        this.currentIndex = 0;
+      }
+
+      connectedCallback() {
+        this.pageElement = document.getElementById('ai-flipbook-page-{{ ai_gen_id }}');
+        this.prevButton = document.getElementById('ai-flipbook-prev-{{ ai_gen_id }}');
+        this.nextButton = document.getElementById('ai-flipbook-next-{{ ai_gen_id }}');
+        this.counterElement = document.getElementById('ai-flipbook-counter-{{ ai_gen_id }}');
+
+        if (this.images.length === 0) {
+          return;
+        }
+
+        this.updateCounter();
+        this.updateButtons();
+
+        this.prevButton.addEventListener('click', () => this.prevPage());
+        this.nextButton.addEventListener('click', () => this.nextPage());
+      }
+
+      nextPage() {
+        if (this.currentIndex < this.images.length - 1) {
+          this.pageElement.style.transform = 'rotateY(-90deg)';
+          setTimeout(() => {
+            this.currentIndex++;
+            this.pageElement.src = this.images[this.currentIndex];
+            this.pageElement.alt = 'صفحة ' + (this.currentIndex + 1);
+            this.pageElement.style.transform = 'rotateY(0)';
+            this.updateCounter();
+            this.updateButtons();
+          }, 300);
+        }
+      }
+
+      prevPage() {
+        if (this.currentIndex > 0) {
+          this.pageElement.style.transform = 'rotateY(90deg)';
+          setTimeout(() => {
+            this.currentIndex--;
+            this.pageElement.src = this.images[this.currentIndex];
+            this.pageElement.alt = 'صفحة ' + (this.currentIndex + 1);
+            this.pageElement.style.transform = 'rotateY(0)';
+            this.updateCounter();
+            this.updateButtons();
+          }, 300);
+        }
+      }
+
+      updateCounter() {
+        if (this.counterElement && this.images.length > 0) {
+          this.counterElement.textContent = (this.currentIndex + 1) + ' / ' + this.images.length;
+        }
+      }
+
+      updateButtons() {
+        if (this.prevButton) {
+          this.prevButton.disabled = this.currentIndex === 0;
+        }
+        if (this.nextButton) {
+          this.nextButton.disabled = this.currentIndex === this.images.length - 1;
+        }
+      }
+    }
+
+    customElements.define('flipbook-viewer-{{ ai_gen_id }}', FlipbookViewer{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Flipbook viewer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Title",
+      "default": "📖 مجلتي"
+    },
+    {
+      "type": "image_picker",
+      "id": "pages",
+      "label": "Magazine pages"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f4efe6"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#6b1d2a"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Title size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "viewer_width",
+      "label": "Viewer width",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "page_border_radius",
+      "label": "Page border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button color",
+      "default": "#e6c200"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button hover color",
+      "default": "#d4b000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#6b1d2a"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Button border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "Flipbook viewer"
+    }
+  ]
+}
+{% endschema %}

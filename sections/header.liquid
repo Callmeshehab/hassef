@@ -1,0 +1,1883 @@
+<link rel="stylesheet" href="{{ 'component-list-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-cart-notification.css' | asset_url }}" media="print" onload="this.media='all'">
+
+{%- if settings.predictive_search_enabled -%}
+  <link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+
+{%- if section.settings.menu_type_desktop == 'mega' -%}
+  <link rel="stylesheet" href="{{ 'component-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+
+<script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+.cart-drawer,
+.drawer {
+  position: fixed;
+  top: 0 !important;
+  right: 0;
+  height: 100vh;
+  z-index: 9999;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.12);
+}
+.cart-drawer .drawer__inner,
+.drawer__inner {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  margin-top: 0 !important;
+  box-shadow: none !important;
+}
+.cart-drawer__header {
+  border-bottom: 1px solid var(--hf-border, rgba(0,0,0,0.08)) !important;
+}
+#CartDrawer-Overlay {
+  background: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(4px);
+}
+.section-header,
+.hf-header {
+  z-index: 10000 !important;
+}
+.cart-drawer .drawer__inner {
+  background: var(--hf-bg, #f5f2ec) !important;
+}
+.hf-header {
+  --hf-bg:              {{ section.settings.header_bg }};
+  --hf-border:          {{ section.settings.header_border }};
+  --hf-logo-color:      {{ section.settings.logo_color }};
+  --hf-nav-color:       {{ section.settings.nav_color }};
+  --hf-nav-hover-bg:    {{ section.settings.nav_hover_bg }};
+  --hf-btn-login-bg:    {{ section.settings.btn_login_bg }};
+  --hf-btn-login-text:  {{ section.settings.btn_login_text }};
+  --hf-btn-login-border:{{ section.settings.btn_login_border }};
+  --hf-btn-cart-bg:     {{ section.settings.btn_cart_bg }};
+  --hf-btn-cart-text:   {{ section.settings.btn_cart_text }};
+  --hf-badge-bg:        {{ section.settings.badge_bg }};
+  --hf-badge-text:      {{ section.settings.badge_text }};
+  --hf-logo-size-desktop: {{ section.settings.logo_size_desktop }}px;
+  --hf-logo-size-mobile:  {{ section.settings.logo_size_mobile }}px;
+  --hf-header-radius:   {{ section.settings.btn_radius }}px;
+}
+.section-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  margin-bottom: {{ section.settings.margin_bottom | times: 0.75 | round: 0 }}px;
+}
+@media screen and (min-width: 750px) {
+  .section-header { margin-bottom: {{ section.settings.margin_bottom }}px; }
+}
+{%- endstyle -%}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+/* ══════════════════════════════════════════════════════
+   CSS CUSTOM PROPERTIES
+══════════════════════════════════════════════════════ */
+:root {
+  --hf-transition: cubic-bezier(0.4, 0, 0.2, 1);
+  --hf-duration: 0.55s;
+  --hf-blur: 0px;
+  --hf-bg-opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════
+   BASE HEADER
+══════════════════════════════════════════════════════ */
+.hf-header {
+  background: rgba(245, 242, 236, var(--hf-bg-opacity));
+  backdrop-filter: blur(var(--hf-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--hf-blur)) saturate(180%);
+  border-bottom: 1px solid var(--hf-border, rgba(0,0,0,0.08));
+  font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  direction: rtl !important;
+  position: relative;
+  will-change: backdrop-filter, background;
+  transition:
+    background var(--hf-duration) var(--hf-transition),
+    border-color var(--hf-duration) var(--hf-transition),
+    padding-bottom var(--hf-duration) var(--hf-transition);
+}
+
+/* ══════════════════════════════════════════════════════
+   TOP ROW
+══════════════════════════════════════════════════════ */
+.hf-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  gap: 10px;
+  direction: rtl;
+  height: 60px;
+  transition: height var(--hf-duration) var(--hf-transition),
+              padding var(--hf-duration) var(--hf-transition);
+}
+html[dir="ltr"] .hf-header__top { direction: ltr; }
+
+.hf-header__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+html[dir="ltr"] .hf-header__right { direction: ltr; }
+
+.hf-header__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+html[dir="ltr"] .hf-header__left { direction: ltr; }
+
+/* ══════════════════════════════════════════════════════
+   HAMBURGER (mobile, appears on scroll only)
+══════════════════════════════════════════════════════ */
+.hf-hamburger {
+  display: none; /* hidden by default on all sizes */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  gap: 0;
+  border-radius: 8px;
+  transition: background 0.18s;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.hf-hamburger:hover { background: rgba(0,0,0,0.06); }
+
+.hf-hamburger__line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--hf-logo-color, #111);
+  border-radius: 2px;
+  position: absolute;
+  transition:
+    transform 0.35s var(--hf-transition),
+    opacity 0.25s var(--hf-transition);
+}
+
+.hf-hamburger__line:nth-child(1) { transform: translateY(-4px); }
+.hf-hamburger__line:nth-child(2) { transform: translateY(4px); }
+
+/* X state */
+.hf-hamburger.is-open .hf-hamburger__line:nth-child(1) {
+  transform: rotate(45deg) translateY(0);
+}
+.hf-hamburger.is-open .hf-hamburger__line:nth-child(2) {
+  transform: rotate(-45deg) translateY(0);
+}
+
+/* ══════════════════════════════════════════════════════
+   LOGO
+══════════════════════════════════════════════════════ */
+.hf-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--hf-logo-color, #111);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Default logo image */
+.hf-logo-img-default {
+  height: var(--hf-logo-size-desktop, 36px);
+  width: auto;
+  display: block;
+  transition:
+    opacity var(--hf-duration) var(--hf-transition),
+    transform var(--hf-duration) var(--hf-transition);
+  transform-origin: right center;
+  will-change: opacity, transform;
+}
+
+/* Scrolled logo image */
+.hf-logo-img-scrolled {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) scale(0.7);
+  opacity: 0;
+  pointer-events: none;
+  display: block;
+  width: auto;
+  transition:
+    opacity var(--hf-duration) var(--hf-transition),
+    transform var(--hf-duration) var(--hf-transition);
+  will-change: opacity, transform;
+}
+
+/* Text fallback overlay (when no scrolled logo image) */
+.hf-logo-text-overlay {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) scale(0.85);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--hf-logo-color, #111);
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  transition:
+    opacity var(--hf-duration) var(--hf-transition),
+    transform var(--hf-duration) var(--hf-transition);
+  will-change: opacity, transform;
+}
+
+html[dir="ltr"] .hf-logo-img-default { transform-origin: left center; }
+html[dir="ltr"] .hf-logo-text-overlay,
+html[dir="ltr"] .hf-logo-img-scrolled { right: auto; left: 0; }
+
+@media screen and (max-width: 749px) {
+  .hf-logo-img-default { height: var(--hf-logo-size-mobile, 28px); }
+}
+
+/* ══════════════════════════════════════════════════════
+   SEARCH BUTTON
+══════════════════════════════════════════════════════ */
+.hf-search-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #444;
+  border-radius: 10px;
+  transition: background 0.18s, transform 0.15s, color var(--hf-duration) var(--hf-transition);
+  flex-shrink: 0;
+}
+
+.hf-search-btn:hover { background: rgba(0,0,0,0.06); transform: scale(1.08); }
+.hf-search-btn:active { transform: scale(0.94); }
+.hf-search-btn.active { background: rgba(0,0,0,0.1); }
+
+.hf-search-btn svg {
+  width: 21px; height: 21px;
+  stroke: currentColor; fill: none; stroke-width: 1.8;
+  transition: stroke-width var(--hf-duration) var(--hf-transition);
+}
+
+/* ══════════════════════════════════════════════════════
+   LOGIN BUTTON
+══════════════════════════════════════════════════════ */
+.hf-btn-login {
+  display: inline-flex;
+  align-items: center;
+  background: var(--hf-btn-login-bg, #fff);
+  color: var(--hf-btn-login-text, #111);
+  border: 1.5px solid var(--hf-btn-login-border, rgba(0,0,0,0.18));
+  border-radius: var(--hf-header-radius, 12px);
+  padding: 8px 16px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    border-color 0.18s,
+    transform 0.15s,
+    opacity var(--hf-duration) var(--hf-transition),
+    max-width var(--hf-duration) var(--hf-transition),
+    padding var(--hf-duration) var(--hf-transition),
+    margin var(--hf-duration) var(--hf-transition);
+  overflow: hidden;
+  max-width: 140px;
+}
+
+.hf-btn-login:hover { border-color: #111; transform: translateY(-1px); }
+.hf-btn-login:active { transform: translateY(0) scale(0.97); }
+
+/* ══════════════════════════════════════════════════════
+   CART BUTTON
+══════════════════════════════════════════════════════ */
+.hf-btn-subscribe {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--hf-btn-cart-bg, #111);
+  color: var(--hf-btn-cart-text, #fff);
+  border: 1.5px solid transparent;
+  border-radius: var(--hf-header-radius, 12px);
+  padding: 9px 16px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    filter 0.18s,
+    transform 0.15s,
+    box-shadow 0.18s,
+    background var(--hf-duration) var(--hf-transition),
+    border-color var(--hf-duration) var(--hf-transition),
+    color var(--hf-duration) var(--hf-transition),
+    padding var(--hf-duration) var(--hf-transition),
+    gap var(--hf-duration) var(--hf-transition);
+  position: relative;
+}
+
+.hf-btn-subscribe:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+.hf-btn-subscribe:active { transform: translateY(0) scale(0.97); }
+.hf-btn-subscribe svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* Cart text */
+.hf-cart-text {
+  display: inline-block;
+  max-width: 80px;
+  opacity: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    max-width var(--hf-duration) var(--hf-transition),
+    opacity 0.35s var(--hf-transition),
+    margin var(--hf-duration) var(--hf-transition);
+}
+
+/* ══════════════════════════════════════════════════════
+   CART BADGE
+══════════════════════════════════════════════════════ */
+.hf-cart-count {
+  background: var(--hf-badge-bg, #c8a030);
+  color: var(--hf-badge-text, #fff);
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  will-change: transform;
+}
+
+@keyframes hf-badge-pop {
+  0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+  60%  { transform: scale(1.35) rotate(4deg); opacity: 1; }
+  80%  { transform: scale(0.9) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes hf-badge-bounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.5) rotate(8deg); }
+  55%  { transform: scale(0.88) rotate(-4deg); }
+  75%  { transform: scale(1.15) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes hf-badge-hide {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+.hf-cart-count.is-new     { animation: hf-badge-pop 0.45s var(--hf-transition) forwards; }
+.hf-cart-count.is-updated { animation: hf-badge-bounce 0.4s var(--hf-transition) forwards; }
+.hf-cart-count.is-hiding  { animation: hf-badge-hide 0.25s ease forwards; }
+
+/* ══════════════════════════════════════════════════════
+   DESKTOP NAVIGATION
+══════════════════════════════════════════════════════ */
+.hf-header__nav {
+  border-top: 1px solid var(--hf-border, rgba(0,0,0,0.07));
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  direction: rtl;
+  /* Animation properties */
+  transition:
+    top var(--hf-duration) var(--hf-transition),
+    left var(--hf-duration) var(--hf-transition),
+    right var(--hf-duration) var(--hf-transition),
+    transform var(--hf-duration) var(--hf-transition),
+    opacity var(--hf-duration) var(--hf-transition),
+    border-color var(--hf-duration) var(--hf-transition),
+    padding var(--hf-duration) var(--hf-transition),
+    margin-bottom var(--hf-duration) var(--hf-transition);
+  will-change: transform, opacity;
+  position: relative;
+  z-index: 1;
+  /* Ensure no height collapse using height animation instead of display */
+  max-height: 50px;
+  overflow: hidden;
+  transition:
+    transform var(--hf-duration) var(--hf-transition),
+    opacity var(--hf-duration) var(--hf-transition),
+    border-color var(--hf-duration) var(--hf-transition),
+    max-height var(--hf-duration) var(--hf-transition);
+}
+
+html[dir="ltr"] .hf-header__nav,
+[dir="ltr"] .hf-header__nav { direction: ltr !important; }
+.hf-header__nav::-webkit-scrollbar { display: none; }
+
+.hf-nav-link {
+  display: inline-block;
+  text-decoration: none;
+  color: var(--hf-nav-color, #555);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s, transform 0.15s;
+  flex-shrink: 0;
+  position: relative;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.hf-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  inset-inline-start: 12px;
+  inset-inline-end: 12px;
+  height: 2px;
+  background: var(--hf-logo-color, #111);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: transform 0.22s var(--hf-transition);
+  transform-origin: center;
+}
+
+.hf-nav-link:hover { color: #111; background: var(--hf-nav-hover-bg, rgba(0,0,0,0.05)); }
+.hf-nav-link:hover::after { transform: scaleX(1); }
+.hf-nav-link.active { color: #111; font-weight: 700; background: var(--hf-nav-hover-bg, rgba(0,0,0,0.06)); }
+.hf-nav-link.active::after { transform: scaleX(1); }
+
+/* ══════════════════════════════════════════════════════
+   HIDE ORIGINAL SHOPIFY HEADER
+══════════════════════════════════════════════════════ */
+.header-wrapper .header,
+.header-wrapper .header * { display: none !important; }
+.header-wrapper {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   SEARCH OVERLAY
+══════════════════════════════════════════════════════ */
+.hf-search-overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.2s ease, transform 0.2s var(--hf-transition);
+}
+.hf-search-overlay.open {
+  pointer-events: all;
+  opacity: 1;
+  transform: translateY(0);
+}
+.hf-search-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.hf-search-overlay.open .hf-search-backdrop {
+  opacity: 1;
+  pointer-events: all;
+}
+.hf-search-panel {
+  background: var(--hf-bg, #f5f2ec);
+  border-bottom: 1px solid var(--hf-border, rgba(0,0,0,0.1));
+  box-shadow: 0 8px 28px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
+  padding: 14px 18px 18px;
+}
+.hf-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  direction: rtl;
+}
+html[dir="ltr"] .hf-search-row,
+[dir="ltr"] .hf-search-row { direction: ltr; }
+
+.hf-search-field-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 50px;
+  padding: 0 16px 0 20px;
+  height: 52px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+  transition: all 0.3s ease;
+}
+.hf-search-field-wrap:focus-within {
+  border-color: var(--hf-logo-color, #111);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+.hf-search-field-wrap svg {
+  width: 18px; height: 18px;
+  stroke: #aaa; fill: none; stroke-width: 1.8;
+  flex-shrink: 0;
+}
+.hf-search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  color: #111;
+  direction: rtl;
+  text-align: right;
+}
+html[dir="ltr"] .hf-search-input,
+[dir="ltr"] .hf-search-input { direction: ltr; text-align: left; }
+.hf-search-input::placeholder { color: #bbb; }
+
+.hf-search-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  font-size: 17px;
+  line-height: 1;
+  padding: 0;
+  display: none;
+  transition: color 0.15s;
+}
+.hf-search-clear-btn:hover { color: #555; }
+.hf-search-clear-btn.visible { display: block; }
+
+.hf-search-close-btn {
+  background: #f0f0f0;
+  border: none;
+  cursor: pointer;
+  border-radius: 50px;
+  padding: 0 22px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.hf-search-close-btn:hover { background: #e0e0e0; color: #000; transform: translateY(-1px); }
+
+.hf-search-divider { height: 1px; background: var(--hf-border, rgba(0,0,0,0.07)); margin: 14px 0; }
+
+.hf-search-results-wrap {
+  max-height: 55vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.1) transparent;
+}
+.hf-search-results-wrap::-webkit-scrollbar { width: 4px; }
+.hf-search-results-wrap::-webkit-scrollbar-track { background: transparent; }
+.hf-search-results-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+.hf-results-section { margin-bottom: 18px; }
+.hf-results-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #aaa;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.hf-product-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 11px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+.hf-product-item:hover { background: rgba(0,0,0,0.04); }
+.hf-product-thumb {
+  width: 44px; height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #eee;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.hf-product-info { flex: 1; min-width: 0; }
+.hf-product-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hf-product-price {
+  font-size: 12px;
+  color: var(--hf-badge-bg, #c8a030);
+  font-weight: 700;
+  margin-top: 2px;
+}
+.hf-view-all-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: #111;
+  color: #fff;
+  border-radius: 11px;
+  text-decoration: none;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.15s, transform 0.15s;
+}
+.hf-view-all-btn:hover { background: #333; transform: translateY(-1px); }
+
+.hf-cats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  direction: rtl;
+}
+html[dir="ltr"] .hf-cats-grid,
+[dir="ltr"] .hf-cats-grid { direction: ltr; }
+
+.hf-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 50px;
+  padding: 6px 13px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.hf-cat-chip:hover { background: #111; color: #fff; border-color: #111; transform: translateY(-1px); }
+
+.hf-artists-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  direction: rtl;
+}
+html[dir="ltr"] .hf-artists-row,
+[dir="ltr"] .hf-artists-row { direction: ltr; }
+.hf-artists-row::-webkit-scrollbar { display: none; }
+
+.hf-artist-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform 0.18s;
+}
+.hf-artist-item:hover { transform: translateY(-2px); }
+
+.hf-artist-img {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0,0,0,0.07);
+  background: #ddd;
+  transition: border-color 0.18s;
+}
+.hf-artist-item:hover .hf-artist-img { border-color: var(--hf-logo-color, #111); }
+
+.hf-artist-name {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #444;
+  text-align: center;
+  max-width: 58px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hf-search-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 26px 0;
+  color: #aaa;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+.hf-spinner {
+  width: 17px; height: 17px;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-top-color: #666;
+  border-radius: 50%;
+  animation: hf-spin 0.7s linear infinite;
+}
+@keyframes hf-spin { to { transform: rotate(360deg); } }
+
+.hf-search-empty {
+  text-align: center;
+  padding: 22px 0;
+  color: #bbb;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.hf-coll-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  direction: rtl;
+}
+html[dir="ltr"] .hf-coll-chips,
+[dir="ltr"] .hf-coll-chips { direction: ltr; }
+
+.hf-coll-chip {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.hf-coll-chip:hover { background: rgba(0,0,0,0.08); color: #111; }
+
+/* ══════════════════════════════════════════════════════
+   MOBILE SIDE DRAWER (menu)
+══════════════════════════════════════════════════════ */
+.hf-mobile-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 19999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s var(--hf-transition);
+}
+.hf-mobile-drawer-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.hf-mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 78%;
+  max-width: 320px;
+  z-index: 20000;
+  background: rgba(245, 242, 236, 0.88);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border-left: 1px solid rgba(0,0,0,0.08);
+  box-shadow: -8px 0 32px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.42s var(--hf-transition);
+  overflow-y: auto;
+  will-change: transform;
+}
+
+html[dir="ltr"] .hf-mobile-drawer {
+  left: 0;
+  right: auto;
+  transform: translateX(-100%);
+  border-left: none;
+  border-right: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 8px 0 32px rgba(0,0,0,0.12);
+}
+
+.hf-mobile-drawer.open {
+  transform: translateX(0);
+}
+
+.hf-mobile-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+
+.hf-mobile-drawer__close {
+  background: rgba(0,0,0,0.06);
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-size: 16px;
+  transition: background 0.18s;
+}
+.hf-mobile-drawer__close:hover { background: rgba(0,0,0,0.12); }
+
+.hf-mobile-drawer__nav {
+  padding: 12px 0;
+  flex: 1;
+}
+
+.hf-mobile-drawer__link {
+  display: block;
+  text-decoration: none;
+  color: var(--hf-nav-color, #444);
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 20px;
+  transition: background 0.15s, color 0.15s;
+  direction: rtl;
+  text-align: right;
+  border-radius: 10px;
+  margin: 1px 8px;
+}
+.hf-mobile-drawer__link:hover { background: rgba(0,0,0,0.05); color: #111; }
+.hf-mobile-drawer__link.active { color: #111; font-weight: 700; background: rgba(0,0,0,0.06); }
+
+html[dir="ltr"] .hf-mobile-drawer__link { direction: ltr; text-align: left; }
+
+.hf-mobile-drawer__footer {
+  padding: 16px 18px;
+  border-top: 1px solid rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ══════════════════════════════════════════════════════
+   SCROLLED STATE — DESKTOP
+══════════════════════════════════════════════════════ */
+
+/* Desktop: nav slides up into top row */
+@media screen and (min-width: 750px) {
+  .hf-header {
+    padding-bottom: var(--hf-nav-row-height, 50px);
+  }
+
+  .hf-header__nav {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    max-height: var(--hf-nav-row-height, 50px);
+  }
+
+  .hf-header--scrolled .hf-header__top {
+    height: 54px;
+    padding: 6px 18px;
+  }
+
+  .hf-header--scrolled {
+    padding-bottom: 0;
+  }
+
+  /* Nav slides into the top row beside the logo without changing layout spacing */
+  .hf-header--scrolled .hf-header__nav {
+    top: 50%;
+    left: calc(var(--hf-header-end-width, 0px) + 18px);
+    right: calc(var(--hf-header-start-width, 0px) + 24px);
+    padding: 0;
+    transform: translateY(-50%);
+    opacity: 1;
+    max-height: 44px;
+    pointer-events: auto;
+    border-top-color: transparent;
+  }
+
+  html[dir="ltr"] .hf-header--scrolled .hf-header__nav {
+    left: calc(var(--hf-header-start-width, 0px) + 24px);
+    right: calc(var(--hf-header-end-width, 0px) + 18px);
+  }
+
+  /* Login fades out */
+  .hf-header--scrolled .hf-btn-login {
+    opacity: 0;
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin: 0;
+    border-width: 0;
+    pointer-events: none;
+  }
+
+  /* Cart becomes icon-only */
+  .hf-header--scrolled .hf-btn-subscribe {
+    background: transparent;
+    color: var(--hf-logo-color, #111);
+    border-color: rgba(0,0,0,0.1);
+    padding: 8px 10px;
+    gap: 4px;
+  }
+
+  .hf-header--scrolled .hf-cart-text {
+    max-width: 0;
+    opacity: 0;
+    margin: 0;
+  }
+
+  /* Default logo fades out, scrolled logo fades in */
+  .hf-header--scrolled .hf-logo-img-default {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+
+  .hf-header--scrolled .hf-logo-img-scrolled,
+  .hf-header--scrolled .hf-logo-text-overlay {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    pointer-events: auto;
+  }
+
+  /* Search becomes borderless */
+  .hf-header--scrolled .hf-search-btn {
+    background: transparent;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   SCROLLED STATE — MOBILE
+══════════════════════════════════════════════════════ */
+@media screen and (max-width: 749px) {
+
+  .hf-header--scrolled .hf-header__top {
+    height: 44px;
+    padding: 4px 12px;
+  }
+
+  /* Nav fades and slides down slightly — NO display:none */
+  .hf-header--scrolled .hf-header__nav {
+    transform: translateY(6px);
+    opacity: 0;
+    max-height: 0;
+    pointer-events: none;
+    border-top-color: transparent;
+  }
+
+  /* Login fades out */
+  .hf-header--scrolled .hf-btn-login {
+    opacity: 0;
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin: 0;
+    border-width: 0;
+    pointer-events: none;
+  }
+
+  /* Cart becomes icon-only */
+  .hf-header--scrolled .hf-btn-subscribe {
+    background: transparent;
+    color: var(--hf-logo-color, #111);
+    border-color: transparent;
+    padding: 6px 8px;
+    gap: 3px;
+    box-shadow: none !important;
+  }
+  .hf-header--scrolled .hf-btn-subscribe:hover {
+    filter: none;
+    transform: none;
+  }
+
+  .hf-header--scrolled .hf-cart-text {
+    max-width: 0;
+    opacity: 0;
+    margin: 0;
+  }
+
+  /* Search borderless on mobile scroll */
+  .hf-header--scrolled .hf-search-btn {
+    background: transparent;
+  }
+  .hf-header--scrolled .hf-search-btn svg {
+    stroke-width: 1.6;
+  }
+
+  /* Logo transitions */
+  .hf-header--scrolled .hf-logo-img-default {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+  .hf-header--scrolled .hf-logo-img-scrolled,
+  .hf-header--scrolled .hf-logo-text-overlay {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    pointer-events: auto;
+  }
+
+  /* Hamburger: only visible on mobile after scroll */
+  .hf-header--scrolled .hf-hamburger {
+    display: flex;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   GLASS EFFECT (dynamic, controlled by JS)
+══════════════════════════════════════════════════════ */
+/* Applied inline via JS for dynamic blur */
+</style>
+
+<!-- ════ Header HTML ════ -->
+<div class="hf-header" id="hfHeader">
+
+  <div class="hf-header__top">
+
+    <!-- RIGHT: hamburger (mobile/scroll only) + logo + search -->
+    <div class="hf-header__right">
+
+      <!-- Hamburger: only shows on mobile after scroll -->
+      <button class="hf-hamburger" id="hfHamburger" aria-label="القائمة" aria-expanded="false">
+        <span class="hf-hamburger__line"></span>
+        <span class="hf-hamburger__line"></span>
+      </button>
+
+      <a href="{{ routes.root_url }}" class="hf-logo">
+        {%- if settings.logo != blank -%}
+          {{ settings.logo | image_url: width: 400 | image_tag: class: 'hf-logo-img-default', loading: 'eager', alt: shop.name }}
+
+          {%- if section.settings.scrolled_logo != blank -%}
+            {{ section.settings.scrolled_logo | image_url: width: 300 | image_tag: class: 'hf-logo-img-scrolled', loading: 'eager', alt: shop.name, style: 'height:' | append: section.settings.logo_size_desktop | append: 'px' }}
+          {%- else -%}
+            <span class="hf-logo-text-overlay" data-ar="{{ shop.name }}" data-ltr="{{ section.settings.logo_text_ltr | default: shop.name }}">
+              {{ shop.name }}
+            </span>
+          {%- endif -%}
+
+        {%- elsif section.settings.logo_text_ltr != blank -%}
+          <span class="hf-logo-text" data-ar="{{ shop.name }}" data-ltr="{{ section.settings.logo_text_ltr }}">
+            {{ shop.name }}
+          </span>
+        {%- else -%}
+          {{ shop.name }}
+        {%- endif -%}
+      </a>
+
+      {%- unless section.settings.hide_search -%}
+        <button class="hf-search-btn" id="hfSearchToggle" aria-label="بحث / Search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+        </button>
+      {%- endunless -%}
+    </div>
+
+    <!-- LEFT: login + cart -->
+    <div class="hf-header__left">
+
+      {%- unless section.settings.hide_login -%}
+        {%- if shop.customer_accounts_enabled -%}
+          <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="hf-btn-login">
+            {%- if customer -%}
+              {{ 'customer.account.title' | t | default: 'حسابي' }}
+            {%- else -%}
+              {{ 'customer.login.title' | t | replace: 'Translation missing: ar.customer.login.title', 'تسجيل الدخول' }}
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+      {%- endunless -%}
+
+      {%- unless section.settings.hide_cart -%}
+        <a href="{{ routes.cart_url }}" class="hf-btn-subscribe" id="hfCartBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="hf-cart-text">{{ section.settings.cart_label | default: 'السلة' }}</span>
+          {%- if cart.item_count > 0 -%}
+            <span class="hf-cart-count" id="hfCartCount">{{ cart.item_count }}</span>
+          {%- else -%}
+            <span class="hf-cart-count" id="hfCartCount" style="display:none">0</span>
+          {%- endif -%}
+        </a>
+      {%- endunless -%}
+
+    </div>
+  </div>
+
+  {%- unless section.settings.hide_nav -%}
+    <nav class="hf-header__nav" id="hfNav" aria-label="القائمة الرئيسية">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}" class="hf-nav-link{% if link.active %} active{% endif %}">
+          {{ link.title }}
+        </a>
+      {%- endfor -%}
+    </nav>
+  {%- endunless -%}
+
+</div>
+
+<!-- ════ Mobile Side Drawer ════ -->
+<div class="hf-mobile-drawer-overlay" id="hfDrawerOverlay" aria-hidden="true"></div>
+<aside class="hf-mobile-drawer" id="hfMobileDrawer" aria-label="القائمة الجانبية" role="dialog">
+  <div class="hf-mobile-drawer__header">
+    <span style="font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:15px;color:#111;">
+      {{ shop.name }}
+    </span>
+    <button class="hf-mobile-drawer__close" id="hfDrawerClose" aria-label="إغلاق">✕</button>
+  </div>
+  <nav class="hf-mobile-drawer__nav">
+    {%- for link in linklists[section.settings.menu].links -%}
+      <a href="{{ link.url }}" class="hf-mobile-drawer__link{% if link.active %} active{% endif %}">
+        {{ link.title }}
+      </a>
+    {%- endfor -%}
+  </nav>
+  <div class="hf-mobile-drawer__footer">
+    {%- if shop.customer_accounts_enabled -%}
+      <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+         style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#444;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;font-weight:600;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,0.04);">
+        {{ 'customer.login.title' | t | replace: 'Translation missing: ar.customer.login.title', 'تسجيل الدخول' }}
+      </a>
+    {%- endif -%}
+  </div>
+</aside>
+
+<!-- ════ Scroll + Glass JS ════ -->
+<script>
+(function () {
+  'use strict';
+
+  const header   = document.getElementById('hfHeader');
+  const headerStart = header ? header.querySelector('.hf-header__right') : null;
+  const headerEnd = header ? header.querySelector('.hf-header__left') : null;
+  const nav = document.getElementById('hfNav');
+  const hamburger = document.getElementById('hfHamburger');
+  const drawer   = document.getElementById('hfMobileDrawer');
+  const overlay  = document.getElementById('hfDrawerOverlay');
+  const drawerClose = document.getElementById('hfDrawerClose');
+
+  if (!header) return;
+
+  /* ── Dynamic Glass Effect ── */
+  const BG_COLOR = '{{ section.settings.header_bg | default: "#f5f2ec" }}';
+  const TARGET_OPACITY = {{ section.settings.glass_opacity | default: 82 }} / 100;
+  const MAX_BLUR = {{ section.settings.glass_blur | default: 20 }};
+  const SATURATE = {{ section.settings.glass_saturate | default: 180 }};
+
+  function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
+      : { r: 245, g: 242, b: 236 };
+  }
+
+  const rgb = hexToRgb(BG_COLOR);
+
+  function syncHeaderMetrics() {
+    if (!header || !headerStart || !headerEnd || !nav || window.innerWidth < 750) return;
+    header.style.setProperty('--hf-header-start-width', `${Math.ceil(headerStart.getBoundingClientRect().width)}px`);
+    header.style.setProperty('--hf-header-end-width', `${Math.ceil(headerEnd.getBoundingClientRect().width)}px`);
+    header.style.setProperty('--hf-nav-row-height', `${Math.ceil(nav.getBoundingClientRect().height || 50)}px`);
+  }
+
+  function applyGlass(scrollY) {
+    const ratio  = Math.min(scrollY / 200, 1);           // 0→1 over 200px
+    const blur   = (ratio * MAX_BLUR).toFixed(1);
+    const opacity = (1 - ratio * (1 - TARGET_OPACITY)).toFixed(3);
+    header.style.background    = `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`;
+    header.style.backdropFilter        = `blur(${blur}px) saturate(${SATURATE}%)`;
+    header.style.webkitBackdropFilter  = `blur(${blur}px) saturate(${SATURATE}%)`;
+  }
+
+  /* ── Scroll Handler ── */
+  const SCROLL_THRESHOLD = 20;
+  let ticking = false;
+  let isScrolled = false;
+
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(function () {
+        const sy = window.scrollY;
+        applyGlass(sy);
+
+        if (sy > SCROLL_THRESHOLD && !isScrolled) {
+          isScrolled = true;
+          header.classList.add('hf-header--scrolled');
+        } else if (sy <= SCROLL_THRESHOLD && isScrolled) {
+          isScrolled = false;
+          header.classList.remove('hf-header--scrolled');
+          /* Reset glass to solid */
+          header.style.background = '';
+          header.style.backdropFilter = '';
+          header.style.webkitBackdropFilter = '';
+          /* Close drawer if open */
+          if (drawerOpen) closeDrawer();
+        }
+        syncHeaderMetrics();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', syncHeaderMetrics, { passive: true });
+  window.addEventListener('load', syncHeaderMetrics);
+  syncHeaderMetrics();
+  onScroll();
+
+  /* ── Drawer ── */
+  let drawerOpen = false;
+
+  function openDrawer() {
+    drawerOpen = true;
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    hamburger.classList.add('is-open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    if (!drawerOpen) return;
+    drawerOpen = false;
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    hamburger.classList.remove('is-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  if (hamburger) {
+    hamburger.addEventListener('click', function (e) {
+      e.preventDefault();
+      drawerOpen ? closeDrawer() : openDrawer();
+    });
+  }
+
+  if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+  if (overlay) overlay.addEventListener('click', closeDrawer);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && drawerOpen) closeDrawer();
+  });
+
+  /* ── Auto-scroll nav & drag-to-scroll ── */
+  (function () {
+    const nav = document.getElementById('hfNav');
+    if (!nav) return;
+
+    const activeLink = nav.querySelector('.hf-nav-link.active') || nav.querySelector('.hf-nav-link');
+    if (activeLink) {
+      requestAnimationFrame(function () {
+        activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    }
+
+    let isDown = false, startX, scrollLeft, isDragging = false;
+    if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
+      nav.style.cursor = 'grab';
+    }
+
+    nav.addEventListener('mousedown', function (e) {
+      isDown = true; isDragging = false;
+      nav.style.cursor = 'grabbing';
+      nav.style.scrollBehavior = 'auto';
+      startX = e.pageX - nav.offsetLeft;
+      scrollLeft = nav.scrollLeft;
+    });
+    nav.addEventListener('mouseleave', function () {
+      if (!isDown) return;
+      isDown = false;
+      nav.style.cursor = window.matchMedia && window.matchMedia('(pointer: fine)').matches ? 'grab' : '';
+      nav.style.scrollBehavior = '';
+    });
+    nav.addEventListener('mouseup', function () {
+      isDown = false;
+      nav.style.cursor = window.matchMedia && window.matchMedia('(pointer: fine)').matches ? 'grab' : '';
+      nav.style.scrollBehavior = '';
+    });
+    nav.addEventListener('mousemove', function (e) {
+      if (!isDown) return;
+      e.preventDefault();
+      isDragging = true;
+      const x = e.pageX - nav.offsetLeft;
+      nav.scrollLeft = scrollLeft - (x - startX) * 1.5;
+    });
+    nav.querySelectorAll('.hf-nav-link').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        if (isDragging) { e.preventDefault(); e.stopPropagation(); }
+      });
+    });
+  })();
+
+  /* ── Logo text LTR/RTL ── */
+  (function () {
+    const logoText = document.querySelector('.hf-logo-text');
+    if (!logoText) return;
+    function updateLogoText() {
+      const isLTR = document.documentElement.dir === 'ltr';
+      logoText.textContent = isLTR ? (logoText.dataset.ltr || logoText.dataset.ar) : logoText.dataset.ar;
+    }
+    updateLogoText();
+    new MutationObserver(updateLogoText).observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
+  })();
+
+})();
+</script>
+
+<!-- ════ Search Overlay ════ -->
+{%- unless section.settings.hide_search -%}
+<div class="hf-search-overlay" id="hfSearchOverlay" role="dialog" aria-modal="true" aria-label="بحث">
+  <div class="hf-search-backdrop" id="hfSearchBackdrop"></div>
+  <div class="hf-search-panel">
+    <div class="hf-search-row">
+      <div class="hf-search-field-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+        <input
+          class="hf-search-input"
+          id="hfSearchInput"
+          type="search"
+          placeholder="{{ section.settings.search_placeholder | default: 'ابحث عن منتج أو قسم...' }}"
+          autocomplete="off"
+          autocorrect="off"
+          aria-label="بحث"
+        >
+        <button class="hf-search-clear-btn" id="hfClearBtn" aria-label="مسح">✕</button>
+      </div>
+      <button type="button" class="hf-search-close-btn" id="hfCloseSearch">إلغاء</button>
+    </div>
+    <div class="hf-search-results-wrap" id="hfResultsWrap"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CFG = {
+    enablePredictive: {{ section.settings.enable_predictive_search | json }},
+    showCategories:   {{ section.settings.show_categories_section | json }},
+    showArtists:      {{ section.settings.show_artists_section | json }},
+    categoriesTitle:  {{ section.settings.categories_title | default: 'الأقسام' | json }},
+    artistsTitle:     {{ section.settings.artists_title | default: 'الفنانين' | json }},
+    productsTitle:    {{ section.settings.products_title | default: 'منتجات مقترحة' | json }},
+    currency:         {{ localization.country.currency.iso_code | json }},
+    categories: [
+      {%- for i in (1..10) -%}
+        {%- assign t_key = 'category_title_' | append: i -%}
+        {%- assign u_key = 'category_url_' | append: i -%}
+        {%- if section.settings[t_key] != blank -%}
+          { title: {{ section.settings[t_key] | json }}, url: {{ section.settings[u_key] | default: '#' | json }} }
+          {%- unless forloop.last -%},{%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ].filter(Boolean),
+    artists: [
+      {%- for coll in section.settings.artist_collections -%}
+        {%- if coll != blank -%}
+          { title: {{ coll.title | json }}, url: {{ coll.url | json }}, image: {{ coll.image | image_url: width: 120 | json }} }{% unless forloop.last %},{% endunless %}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  };
+
+  const toggleBtn   = document.getElementById('hfSearchToggle');
+  const searchOverlay = document.getElementById('hfSearchOverlay');
+  const backdrop    = document.getElementById('hfSearchBackdrop');
+  const input       = document.getElementById('hfSearchInput');
+  const clearBtn    = document.getElementById('hfClearBtn');
+  const closeBtn    = document.getElementById('hfCloseSearch');
+  const resultsWrap = document.getElementById('hfResultsWrap');
+  const hfHeader    = document.getElementById('hfHeader');
+
+  /* ── Animated Placeholder ── */
+  const suggestionsRaw = {{ section.settings.search_suggestions | default: "روايات تاريخية, تطوير الذات, أدب مترجم, أشرطة كاسيت" | json }};
+  const suggestions = suggestionsRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+
+  if (suggestions.length > 0 && input) {
+    let si = 0, ci = 0, deleting = false, speed = 100;
+    const prefix = 'ابحث عن ';
+    function type() {
+      const word = suggestions[si] || '';
+      if (!deleting && ci <= word.length) {
+        input.setAttribute('placeholder', prefix + word.substring(0, ci++));
+        speed = Math.random() * 50 + 50;
+      } else if (deleting && ci >= 0) {
+        input.setAttribute('placeholder', prefix + word.substring(0, ci--));
+        speed = 30;
+      }
+      if (ci === word.length + 1) { deleting = true; speed = 2000; }
+      else if (ci === -1) { deleting = false; si = (si + 1) % suggestions.length; speed = 300; ci = 0; }
+      setTimeout(type, speed);
+    }
+    setTimeout(type, 1000);
+  }
+
+  if (!toggleBtn || !searchOverlay || !input) return;
+
+  let isOpen = false, debounceTimer = null, lastQuery = '';
+
+  function positionOverlay() {
+    if (hfHeader) searchOverlay.style.top = hfHeader.getBoundingClientRect().bottom + 'px';
+  }
+
+  function openSearch() {
+    if (isOpen) return;
+    isOpen = true;
+    positionOverlay();
+    searchOverlay.classList.add('open');
+    toggleBtn.classList.add('active');
+    setTimeout(function(){ input.focus(); }, 80);
+    renderDefault();
+  }
+
+  function closeSearch() {
+    if (!isOpen) return;
+    isOpen = false;
+    searchOverlay.classList.remove('open');
+    toggleBtn.classList.remove('active');
+    input.value = '';
+    clearBtn.classList.remove('visible');
+    lastQuery = '';
+  }
+
+  async function fetchPredictive(q) {
+    try {
+      const res = await fetch(`/search/suggest.json?q=${encodeURIComponent(q)}&resources[type]=product,collection&resources[limit]=6&resources[options][unavailable_products]=hide&resources[options][fields]=title,product_type,vendor,price,variants,images`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch { return null; }
+  }
+
+  function renderDefault() {
+    let html = '';
+    if (CFG.showCategories && CFG.categories.length) {
+      html += `<div class="hf-results-section"><div class="hf-results-label">${CFG.categoriesTitle}</div><div class="hf-cats-grid">`;
+      CFG.categories.forEach(function(cat) { html += `<a href="${cat.url}" class="hf-cat-chip">${cat.title}</a>`; });
+      html += `</div></div>`;
+    }
+    if (CFG.showArtists && CFG.artists.length) {
+      html += `<div class="hf-results-section"><div class="hf-results-label">${CFG.artistsTitle}</div><div class="hf-artists-row">`;
+      CFG.artists.forEach(function(a) {
+        const imgTag = a.image ? `<img src="${a.image}" alt="${a.title}" class="hf-artist-img" loading="lazy">` : `<div class="hf-artist-img"></div>`;
+        html += `<a href="${a.url}" class="hf-artist-item">${imgTag}<span class="hf-artist-name">${a.title}</span></a>`;
+      });
+      html += `</div></div>`;
+    }
+    resultsWrap.innerHTML = html || '';
+  }
+
+  function formatPrice(cents) {
+    try { return (parseInt(cents) / 100).toFixed(2) + ' ' + (CFG.currency || 'EGP'); } catch { return ''; }
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+  }
+
+  function renderResults(data, q) {
+    let html = '';
+    const products    = (data && data.resources && (data.resources.results || {}).products)    || (data && data.resources && data.resources.products)    || [];
+    const collections = (data && data.resources && (data.resources.results || {}).collections) || (data && data.resources && data.resources.collections) || [];
+
+    if (CFG.enablePredictive && products.length) {
+      html += `<div class="hf-results-section"><div class="hf-results-label">${CFG.productsTitle}</div>`;
+      products.forEach(function(p) {
+        const img = p.images && p.images[0] ? p.images[0] : '';
+        const price = p.price ? formatPrice(p.price) : '';
+        const imgTag = img ? `<img src="${img}" alt="${escHtml(p.title)}" class="hf-product-thumb" loading="lazy">` : `<div class="hf-product-thumb"></div>`;
+        html += `<a href="${p.url}" class="hf-product-item">${imgTag}<div class="hf-product-info"><div class="hf-product-title">${escHtml(p.title)}</div>${price ? `<div class="hf-product-price">${price}</div>` : ''}</div></a>`;
+      });
+      html += `</div>`;
+    }
+
+    if (collections.length) {
+      html += `<div class="hf-results-section"><div class="hf-results-label">الأقسام</div><div class="hf-coll-chips">`;
+      collections.forEach(function(c){ html += `<a href="${c.url}" class="hf-coll-chip">${escHtml(c.title)}</a>`; });
+      html += `</div></div>`;
+    }
+
+    if (!products.length && !collections.length) {
+      html += `<div class="hf-search-empty">لا توجد نتائج لـ «${escHtml(q)}»</div>`;
+    }
+
+    html += `<a href="/search?q=${encodeURIComponent(q)}" class="hf-view-all-btn">عرض كل نتائج «${escHtml(q)}»</a>`;
+
+    if (CFG.showCategories && CFG.categories.length) {
+      html += `<div class="hf-search-divider"></div><div class="hf-results-section"><div class="hf-results-label">${CFG.categoriesTitle}</div><div class="hf-cats-grid">`;
+      CFG.categories.forEach(function(cat){ html += `<a href="${cat.url}" class="hf-cat-chip">${cat.title}</a>`; });
+      html += `</div></div>`;
+    }
+
+    if (CFG.showArtists && CFG.artists.length) {
+      html += `<div class="hf-results-section"><div class="hf-results-label">${CFG.artistsTitle}</div><div class="hf-artists-row">`;
+      CFG.artists.forEach(function(a) {
+        const imgTag = a.image ? `<img src="${a.image}" alt="${a.title}" class="hf-artist-img" loading="lazy">` : `<div class="hf-artist-img"></div>`;
+        html += `<a href="${a.url}" class="hf-artist-item">${imgTag}<span class="hf-artist-name">${a.title}</span></a>`;
+      });
+      html += `</div></div>`;
+    }
+
+    resultsWrap.innerHTML = html;
+  }
+
+  function handleInput() {
+    const q = input.value.trim();
+    clearBtn.classList.toggle('visible', q.length > 0);
+    clearTimeout(debounceTimer);
+    if (q.length < 2) { renderDefault(); lastQuery = ''; return; }
+    if (q === lastQuery) return;
+
+    if (CFG.enablePredictive) {
+      resultsWrap.innerHTML = `<div class="hf-search-loading"><div class="hf-spinner"></div> جاري البحث…</div>`;
+      debounceTimer = setTimeout(async function () {
+        lastQuery = q;
+        const data = await fetchPredictive(q);
+        renderResults(data || {}, q);
+      }, 260);
+    } else {
+      resultsWrap.innerHTML = `<a href="/search?q=${encodeURIComponent(q)}" class="hf-view-all-btn">عرض نتائج «${escHtml(q)}»</a>`;
+    }
+  }
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+      window.location.href = '/search?q=' + encodeURIComponent(this.value.trim());
+    }
+  });
+
+  toggleBtn.addEventListener('click', function (e) { e.preventDefault(); isOpen ? closeSearch() : openSearch(); });
+  closeBtn.addEventListener('click', closeSearch);
+  backdrop.addEventListener('click', closeSearch);
+  clearBtn.addEventListener('click', function () {
+    input.value = '';
+    clearBtn.classList.remove('visible');
+    lastQuery = '';
+    renderDefault();
+    input.focus();
+  });
+  input.addEventListener('input', handleInput);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) closeSearch(); });
+  window.addEventListener('scroll', positionOverlay, { passive: true });
+  window.addEventListener('resize', positionOverlay, { passive: true });
+
+})();
+</script>
+{%- endunless -%}
+
+<!-- ════ Ghost Header (for Shopify JS) ════ -->
+<div style="display:none">
+  <div class="header-wrapper color-{{ section.settings.color_scheme }} gradient">
+    <header class="header page-width">
+      <div id="cart-icon-bubble"></div>
+    </header>
+  </div>
+</div>
+
+{%- if settings.cart_type == 'notification' -%}
+  {%- render 'cart-notification', color_scheme: section.settings.color_scheme, desktop_menu_type: section.settings.menu_type_desktop -%}
+{%- endif -%}
+
+{% javascript %}
+class StickyHeader extends HTMLElement {
+  constructor() { super(); }
+  connectedCallback() {
+    this.header = document.querySelector('.section-header');
+    this.headerIsAlwaysSticky = this.getAttribute('data-sticky-type') === 'always' || this.getAttribute('data-sticky-type') === 'reduce-logo-size';
+    this.headerBounds = {};
+    this.setHeaderHeight();
+    window.matchMedia('(max-width: 990px)').addEventListener('change', this.setHeaderHeight.bind(this));
+    if (this.headerIsAlwaysSticky) this.header.classList.add('shopify-section-header-sticky');
+    this.currentScrollTop = 0;
+    this.preventReveal = false;
+    this.onScrollHandler = this.onScroll.bind(this);
+    this.hideHeaderOnScrollUp = () => (this.preventReveal = true);
+    this.addEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+    window.addEventListener('scroll', this.onScrollHandler, false);
+    this.createObserver();
+  }
+  setHeaderHeight() {
+    document.documentElement.style.setProperty('--header-height', `${this.header.offsetHeight}px`);
+  }
+  disconnectedCallback() {
+    this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+    window.removeEventListener('scroll', this.onScrollHandler);
+  }
+  createObserver() {
+    let observer = new IntersectionObserver((entries) => {
+      this.headerBounds = entries[0].intersectionRect;
+      observer.disconnect();
+    });
+    observer.observe(this.header);
+  }
+  onScroll() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+      this.header.classList.add('scrolled-past-header');
+      if (!this.preventHide) requestAnimationFrame(this.hide.bind(this));
+    } else if (scrollTop < this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+      this.header.classList.add('scrolled-past-header');
+      if (!this.preventReveal) requestAnimationFrame(this.reveal.bind(this));
+      else {
+        window.clearTimeout(this.isScrolling);
+        this.isScrolling = setTimeout(() => { this.preventReveal = false; }, 66);
+        requestAnimationFrame(this.hide.bind(this));
+      }
+    } else if (scrollTop <= this.headerBounds.top) {
+      this.header.classList.remove('scrolled-past-header');
+      requestAnimationFrame(this.reset.bind(this));
+    }
+    this.currentScrollTop = scrollTop;
+  }
+  hide() { if (this.headerIsAlwaysSticky) return; this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky'); }
+  reveal() { if (this.headerIsAlwaysSticky) return; this.header.classList.add('shopify-section-header-sticky', 'animate'); this.header.classList.remove('shopify-section-header-hidden'); }
+  reset() { if (this.headerIsAlwaysSticky) return; this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-header-sticky', 'animate'); }
+}
+customElements.define('sticky-header', StickyHeader);
+{% endjavascript %}
+
+<!-- ════ Cart Badge Live Update ════ -->
+<script>
+(function () {
+  'use strict';
+  const badge = document.getElementById('hfCartCount');
+  if (!badge) return;
+  let currentCount = parseInt(badge.textContent) || 0;
+
+  function updateBadge(newCount) {
+    if (newCount === currentCount) return;
+    const wasHidden = currentCount === 0;
+    const willHide  = newCount === 0;
+    currentCount = newCount;
+    badge.classList.remove('is-new', 'is-updated', 'is-hiding');
+    if (willHide) {
+      badge.classList.add('is-hiding');
+      setTimeout(function () { badge.style.display = 'none'; badge.textContent = '0'; }, 260);
+    } else {
+      badge.style.display = '';
+      void badge.offsetWidth;
+      badge.textContent = newCount;
+      badge.classList.add(wasHidden ? 'is-new' : 'is-updated');
+    }
+  }
+
+  function refreshCartCount() {
+    fetch('/cart.js', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (cart) { updateBadge(cart.item_count); })
+      .catch(function () {});
+  }
+
+  if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
+    subscribe(PUB_SUB_EVENTS.cartUpdate, function (event) {
+      if (event.cartData && typeof event.cartData.item_count === 'number') {
+        updateBadge(event.cartData.item_count);
+      } else {
+        setTimeout(refreshCartCount, 300);
+      }
+    });
+  }
+
+  document.addEventListener('cart:updated', function (e) {
+    if (e.detail && e.detail.cart && typeof e.detail.cart.item_count === 'number') {
+      updateBadge(e.detail.cart.item_count);
+    } else {
+      setTimeout(refreshCartCount, 300);
+    }
+  });
+
+  document.addEventListener('cart:refresh', function () { setTimeout(refreshCartCount, 300); });
+
+  var shopifyBubble = document.getElementById('cart-icon-bubble');
+  if (shopifyBubble) {
+    new MutationObserver(function () { setTimeout(refreshCartCount, 200); })
+      .observe(shopifyBubble, { childList: true, subtree: true, characterData: true });
+  }
+
+  var cartNotif = document.getElementById('cart-notification');
+  if (cartNotif) {
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        if (m.attributeName === 'class' && cartNotif.classList.contains('active')) {
+          setTimeout(refreshCartCount, 400);
+        }
+      });
+    }).observe(cartNotif, { attributes: true, attributeFilter: ['class'] });
+  }
+})();
+</script>
+
+<!-- ════ Schema ════ -->
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": {{ shop.name | json }},
+  {% if settings.logo %}"logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},{% endif %}
+  "url": {{ request.origin | append: page.url | json }}
+}
+</script>
+
+{% schema %}
+{
+  "name": "الحصيف — هيدر",
+  "class": "section-header",
+  "settings": [
+    { "type": "header", "content": "🎨 الألوان" },
+    { "type": "color", "id": "header_bg", "label": "خلفية الهيدر", "default": "#f5f2ec" },
+    { "type": "color", "id": "header_border", "label": "لون الحدود", "default": "#e0dbd0" },
+    { "type": "color", "id": "logo_color", "label": "لون اسم المتجر", "default": "#111111" },
+    { "type": "color", "id": "nav_color", "label": "لون روابط القائمة", "default": "#555555" },
+    { "type": "color", "id": "nav_hover_bg", "label": "خلفية hover", "default": "#ebe7df" },
+
+    { "type": "header", "content": "✨ التأثير الزجاجي (عند التمرير)" },
+    { "type": "range", "id": "glass_opacity", "label": "الشفافية (Opacity)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 82 },
+    { "type": "range", "id": "glass_blur", "label": "درجة البلور (Blur)", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 20 },
+    { "type": "range", "id": "glass_saturate", "label": "وهج الألوان (Saturate)", "min": 100, "max": 300, "step": 10, "unit": "%", "default": 180 },
+
+    { "type": "header", "content": "🔘 زر الدخول" },
+    { "type": "color", "id": "btn_login_bg", "label": "خلفية", "default": "#ffffff" },
+    { "type": "color", "id": "btn_login_text", "label": "نص", "default": "#111111" },
+    { "type": "color", "id": "btn_login_border", "label": "حدود", "default": "#cccccc" },
+
+    { "type": "header", "content": "🛒 زر السلة" },
+    { "type": "color", "id": "btn_cart_bg", "label": "خلفية", "default": "#111111" },
+    { "type": "color", "id": "btn_cart_text", "label": "نص", "default": "#ffffff" },
+    { "type": "text", "id": "cart_label", "label": "نص الزر", "default": "السلة" },
+
+    { "type": "header", "content": "🔴 شارة العدد" },
+    { "type": "color", "id": "badge_bg", "label": "خلفية", "default": "#c8a030" },
+    { "type": "color", "id": "badge_text", "label": "نص", "default": "#ffffff" },
+
+    { "type": "header", "content": "📐 الأبعاد" },
+    { "type": "range", "id": "logo_size_desktop", "label": "حجم الشعار — ديسكتوب", "min": 20, "max": 80, "step": 2, "unit": "px", "default": 36 },
+    { "type": "range", "id": "logo_size_mobile", "label": "حجم الشعار — موبايل", "min": 16, "max": 60, "step": 2, "unit": "px", "default": 28 },
+    { "type": "range", "id": "btn_radius", "label": "استدارة الأزرار", "min": 0, "max": 50, "step": 2, "unit": "px", "default": 12 },
+
+    { "type": "header", "content": "🖼 الشعار" },
+    { "type": "text", "id": "logo_text_ltr", "label": "نص الشعار بالإنجليزي (اختياري)", "info": "يظهر فقط عند تغيير اللغة للإنجليزي أو الفرنسي" },
+    { "type": "image_picker", "id": "scrolled_logo", "label": "شعار الـ Scrolled (اختياري)", "info": "شعار مصغّر أو مبسّط يظهر عند التمرير. إن تُرك فارغاً يظهر اسم المتجر نصاً." },
+
+    { "type": "header", "content": "👁 إخفاء عناصر" },
+    { "type": "checkbox", "id": "hide_search", "label": "إخفاء زر البحث", "default": false },
+    { "type": "checkbox", "id": "hide_login", "label": "إخفاء زر الدخول", "default": false },
+    { "type": "checkbox", "id": "hide_cart", "label": "إخفاء زر السلة", "default": false },
+    { "type": "checkbox", "id": "hide_nav", "label": "إخفاء القائمة", "default": false },
+
+    { "type": "header", "content": "⚙️ إعدادات عامة" },
+    { "type": "link_list", "id": "menu", "default": "main-menu", "label": "القائمة الرئيسية" },
+
+    { "type": "header", "content": "🔍 إعدادات البحث" },
+    { "type": "text", "id": "search_placeholder", "label": "نص البحث التوضيحي (الأساسي)", "default": "ابحث عن منتج أو قسم..." },
+    { "type": "textarea", "id": "search_suggestions", "label": "اقتراحات البحث المتحركة (مفصولة بفاصلة)", "default": "روايات تاريخية, تطوير الذات, أدب مترجم, أشرطة كاسيت" },
+    { "type": "checkbox", "id": "enable_predictive_search", "label": "تفعيل البحث التنبؤي", "default": true },
+    { "type": "text", "id": "products_title", "label": "عنوان قسم المنتجات", "default": "منتجات مقترحة" },
+
+    { "type": "header", "content": "📋 الأقسام في البحث (حتى 10)" },
+    { "type": "checkbox", "id": "show_categories_section", "label": "إظهار قسم الأقسام", "default": true },
+    { "type": "text", "id": "categories_title", "label": "عنوان قسم الأقسام", "default": "الأقسام" },
+
+    { "type": "text", "id": "category_title_1", "label": "قسم 1 — الاسم" },
+    { "type": "url",  "id": "category_url_1",   "label": "قسم 1 — الرابط" },
+    { "type": "text", "id": "category_title_2", "label": "قسم 2 — الاسم" },
+    { "type": "url",  "id": "category_url_2",   "label": "قسم 2 — الرابط" },
+    { "type": "text", "id": "category_title_3", "label": "قسم 3 — الاسم" },
+    { "type": "url",  "id": "category_url_3",   "label": "قسم 3 — الرابط" },
+    { "type": "text", "id": "category_title_4", "label": "قسم 4 — الاسم" },
+    { "type": "url",  "id": "category_url_4",   "label": "قسم 4 — الرابط" },
+    { "type": "text", "id": "category_title_5", "label": "قسم 5 — الاسم" },
+    { "type": "url",  "id": "category_url_5",   "label": "قسم 5 — الرابط" },
+    { "type": "text", "id": "category_title_6", "label": "قسم 6 — الاسم" },
+    { "type": "url",  "id": "category_url_6",   "label": "قسم 6 — الرابط" },
+    { "type": "text", "id": "category_title_7", "label": "قسم 7 — الاسم" },
+    { "type": "url",  "id": "category_url_7",   "label": "قسم 7 — الرابط" },
+    { "type": "text", "id": "category_title_8", "label": "قسم 8 — الاسم" },
+    { "type": "url",  "id": "category_url_8",   "label": "قسم 8 — الرابط" },
+    { "type": "text", "id": "category_title_9", "label": "قسم 9 — الاسم" },
+    { "type": "url",  "id": "category_url_9",   "label": "قسم 9 — الرابط" },
+    { "type": "text", "id": "category_title_10", "label": "قسم 10 — الاسم" },
+    { "type": "url",  "id": "category_url_10",   "label": "قسم 10 — الرابط" },
+
+    { "type": "header", "content": "🎤 الفنانين في البحث (حتى 10)" },
+    { "type": "checkbox", "id": "show_artists_section", "label": "إظهار قسم الفنانين", "default": true },
+    { "type": "text", "id": "artists_title", "label": "عنوان قسم الفنانين", "default": "الفنانين" },
+    { "type": "collection_list", "id": "artist_collections", "label": "كوليكشنات الفنانين (حتى 10)", "limit": 10 },
+
+    { "type": "header", "content": "⚙️ إعدادات متقدمة" },
+    { "type": "select", "id": "sticky_header_type", "options": [
+      { "value": "none", "label": "ثابت" },
+      { "value": "on-scroll-up", "label": "يظهر عند الرجوع" },
+      { "value": "always", "label": "دائماً مثبّت" }
+    ], "default": "always", "label": "سلوك التمرير" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "نظام الألوان", "default": "scheme-1" },
+    { "type": "range", "id": "margin_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "مسافة أسفل الهيدر", "default": 0 },
+    { "type": "select", "id": "logo_position", "options": [
+      { "value": "middle-left", "label": "وسط يسار" },
+      { "value": "middle-center", "label": "وسط منتصف" }
+    ], "default": "middle-left", "label": "موضع الشعار" },
+    { "type": "select", "id": "menu_type_desktop", "options": [
+      { "value": "dropdown", "label": "قائمة منسدلة" },
+      { "value": "drawer", "label": "درج جانبي" }
+    ], "default": "dropdown", "label": "نوع القائمة" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1298 @@
+{% doc %}
+  @prompt
+    بما أنك تريد صياغة يفهمها مساعد الذكاء الاصطناعي في شوبيفاي (مثل Shopify Sidekick أو عند تعديل الكود البرمجي)، إليك النص باللغة العربية بأسلوب "المواصفات التقنية" (Technical Specifications) لضمان تنفيذ كل التفاصيل بدقة:الموضوع: إنشاء قسم مخصص (Custom Section) لمشغل فيديو بتصميم تلفزيون كلاسيكي
+    المطلوب: بناء قسم (Section) باستخدام Liquid و CSS و JavaScript يحاكي شكل التلفاز مع تحكم كامل في الأبعاد والخصائص.
+    1. هيكل التلفاز الخارجي (The TV Frame)
+     Ratio).
+    • وضعية المحتوى: خيار لاختيار وضعية الفيديو داخل الشاشة (احتواء/Contain) أو (امتلاء/Cover).
+    2. إعد• الإطار الخارجي: إطار يحيط بالمشغل مع إمكانية التحكم في (العرض، الارتفاع، سمك الإطار من كل جهة، والألوان).
+    • الشاشة الداخلي: مشغل فيديو مدمج يحيط به إطار نحيف غامق اللون مع إمكانية التحكم في سرعة حركته وألوانه ونسبة العرض (Aspec
+    tادات مشغل الفيديو
+    • الخصائص الأساسية: دعم (الكتم، التشغيل التلقائي، التنقل التلقائي بين الفيديوهات).
+    • التوافق: إضافة خاصية playsinline لمنع التكبير التلقائي في متصفح سفاري (Safari).
+    • المصادر: إمكانية رفع حتى 15 فيديو من ملفات الجهاز أو عبر روابط خارجية.
+    3. وحدة التحكم السفلية (Main Controls)
+    • الترتيب (من اليمين لليسار): [زر التشغيل/الإيقاف] ثم [زر التكبير] ثم [زر الصوت/الكتم].
+     التحكم، شكل وحجم الأيقونات داخل ال• مؤشر مستوى الصوت (Volume Slider):
+    • استخدام عنصر <input type="range"> حقيقي مع زر سحب دائري بحجم 14px.
+    • التصميم: الجزء الممتلئ باللون #ff8c42 والجزء الفارغ باللون #444.
+    • التفاعل: تحديث الخلفية ديناميكياً باستخدام JavaScript (linear-gradient) ليعمل على Chrome و Safari.
+    • الربط: عند وصول المؤشر للصفر يتم تفعيل الكتم تلقائياً، والعكس عند ضغط زر الكتم.
+    • التخصيص: التحكم في سمك وحد
+    ةأزرار، وخيار لإخفاء الوحدة بالكامل.
+    4. نظام التنقل والصور المصغرة (Navigation & Thumbnails)
+    • أزرار التنقل الجانبية: زرين في منتصف الإطار الخارجي (يمين ويسار) للتنقل بين الفيديوهات مع تحكم كامل بموضعهم (حتى خارج حدود التلفاز)، حجمهم، وأيقوناتهم.
+    • معرض الصور المصغرة (أسفل التلفاز):
+    • يجب أن تُستخرج الصور المصغرة من الفيديو نفسه.
+    • أزرار تنقل خاصة بالصور (يمين ويسار) مع التحكم في أبعادها وموضعها الأفقي.
+    • الفيديو النشط: تمييز إطار الفيديو الذي يعمل حالياً بلون مختلف عن البقية.
+    • التفاعل: إمكانية السحب (Swipe) للتصفح أو الضغط للتشغيل.
+    5. إصلاحات وتحسينات (Fixes)
+    • إصلاح مشكلة شريط الصوت (Volume Control) ليكون ظاهراً وتفاعلياً تماماً للزائر.
+    • خيار لإخفاء الصور المصغرة أو الأزرار في أي وقت من إعدادات القسم., بدي ازرار التنقل الجانبيه تكون على اطار التلفاز فوق يمين ويسار في منتصفهم, بدي خيارات للتحكم في نسبة عرض التلفاز على سطح الموبايل وكمان ارتفاع وعرض المشغل بالتفصيل وايضا خيار يمكن ازالته لعرض نسبه التقدم للفيديو على نفس شكل التحكم مسار التحكم في مستوى الصوت ويكون اسفل شاشه التلفاز مباشره فوق وحده التحكم وكمان الصور المصغره بالاسفل لا تعرض اي صوره من الفيديو اصلح هذا حيث يجب ان تعرض الصور المصغره صوره عشوائيه من الفيديو  وايضاً ازرار التنقل التي في قسم الصور المصغره لا تعمل يجب ان تستخدم ايضا للتنقل بين الفيديوهات وايضا لعرض بقيه الصور المصغره عند الوصول لآخر صوره وايضا  امكانيه تصفح الصور المصغره بالسحب  واضف امكانيه إضافه شعار في الاطار العلوي او الاطار السفلي واضف تأثير انعكاس زجاجي زي اللي في التلفزيونات على سطح الشاشه, ازرار التنقل بين الفيديوهات التي في قسم الصور المصغره لا تعمل في التنقل عند الضغط عليها اصلح هذا وضيف تاثير انعكاس زجاجي على سطح الشاشه كخيار ايضا كل هذا بدون تغيير الشكل الخاص بالتلفاز او اي شيء فقط اصلح الأخطاء وخيارات لإعدادات المشغل زي إظهار أدوات الحكم وخيار لمنع التكبير التلقائي للفيديوهات عند تشغيلها وخيارات للتحكم في طول وعرض الشكل العام بالتفصيل للتلفاز واجعل حركة مؤشر حركة تقدم الفيديو يعمل بسلاسة لان هناك تقطيع فيه عند تحريكه لا أريد هذي التغييرات تؤثر على شكل التلفاز او اي شيء فيه فقط عدل وصلح, حلو بدي تزيل الازرار اللي في قسم الصور المصغره وتضيف زرين نفس شكل ووظيفه الازرار الجانبيه وأحركهم بحريه على طول القسم كله , بدي لا نوصل على آخر صوره معروضه من الصور المصغره ونضغط زر التنقل لتشغيل اللي بعده  تتحرك القائمه لتظهر الصور المصغره الجديده واضف خيار لإخفاء الازرار التي في قسم الصور المصغره كل هذا دون تغيير اي شيء آخر بالكود ولا شكل اي شيء فقط صلح وعدل, اضف خيار لمنع التكبير إبقاء الفيديو فقط في حدود التلفاز , المشغل المدمج لا يعمل أبدا وكمان الصور المصغره مخفيه بالاسفل , ممتاز ولكن اصلح مشغل الفيديوهات لأنه تالف وحتى لا يعرض الصور المصغره بالاسفل اعد برمجته 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-tv-player-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    max-width: {{ block.settings.tv_max_width }}px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .ai-tv-frame-{{ ai_gen_id }} {
+    position: relative;
+    background: {{ block.settings.frame_color }};
+    border-radius: {{ block.settings.frame_border_radius }}px;
+    padding: {{ block.settings.frame_padding_top }}px {{ block.settings.frame_padding_right }}px {{ block.settings.frame_padding_bottom }}px {{ block.settings.frame_padding_left }}px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-tv-screen-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: {{ block.settings.screen_aspect_ratio }}%;
+    background: #000;
+    border: {{ block.settings.screen_border_thickness }}px solid {{ block.settings.screen_border_color }};
+    border-radius: {{ block.settings.screen_border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-tv-screen-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ai-tv-video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: {{ block.settings.video_object_fit }};
+    display: block;
+  }
+
+  {% if block.settings.show_glass_reflection %}
+  .ai-tv-glass-reflection-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  {% endif %}
+
+  .ai-tv-progress-bar-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: #444;
+    z-index: 3;
+    {% unless block.settings.show_progress_bar %}
+    display: none;
+    {% endunless %}
+  }
+
+  .ai-tv-progress-fill-{{ ai_gen_id }} {
+    height: 100%;
+    background: #ff8c42;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  .ai-tv-controls-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: {{ block.settings.controls_gap }}px;
+    margin-top: {{ block.settings.controls_margin_top }}px;
+    padding: {{ block.settings.controls_padding }}px;
+    background: {{ block.settings.controls_bg_color }};
+    border-radius: {{ block.settings.controls_border_radius }}px;
+    {% if block.settings.hide_controls %}
+    display: none;
+    {% endif %}
+  }
+
+  .ai-tv-control-btn-{{ ai_gen_id }} {
+    width: {{ block.settings.control_button_size }}px;
+    height: {{ block.settings.control_button_size }}px;
+    background: {{ block.settings.control_button_bg }};
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .ai-tv-control-btn-{{ ai_gen_id }}:hover {
+    transform: scale(1.1);
+  }
+
+  .ai-tv-control-btn-{{ ai_gen_id }} svg {
+    width: {{ block.settings.control_icon_size }}px;
+    height: {{ block.settings.control_icon_size }}px;
+    fill: {{ block.settings.control_icon_color }};
+  }
+
+  .ai-tv-volume-control-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ai-tv-volume-slider-{{ ai_gen_id }} {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100px;
+    height: 6px;
+    background: linear-gradient(to right, #ff8c42 0%, #ff8c42 100%, #444 100%, #444 100%);
+    border-radius: 3px;
+    outline: none;
+  }
+
+  .ai-tv-volume-slider-{{ ai_gen_id }}::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #ff8c42;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .ai-tv-volume-slider-{{ ai_gen_id }}::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: #ff8c42;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+
+  .ai-tv-nav-btn-{{ ai_gen_id }} {
+    position: absolute;
+    top: {{ block.settings.nav_button_vertical_position }}%;
+    transform: translateY(-50%);
+    width: {{ block.settings.nav_button_size }}px;
+    height: {{ block.settings.nav_button_size }}px;
+    background: {{ block.settings.nav_button_bg }};
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s;
+  }
+
+  .ai-tv-nav-btn-{{ ai_gen_id }}:hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .ai-tv-nav-btn-{{ ai_gen_id }} svg {
+    width: {{ block.settings.nav_icon_size }}px;
+    height: {{ block.settings.nav_icon_size }}px;
+    fill: {{ block.settings.nav_icon_color }};
+  }
+
+  .ai-tv-nav-btn-prev-{{ ai_gen_id }} {
+    left: {{ block.settings.nav_button_horizontal_offset }}px;
+  }
+
+  .ai-tv-nav-btn-next-{{ ai_gen_id }} {
+    right: {{ block.settings.nav_button_horizontal_offset }}px;
+  }
+
+  .ai-tv-thumbnails-{{ ai_gen_id }} {
+    margin-top: 30px;
+    position: relative;
+    {% if block.settings.hide_thumbnails %}
+    display: none;
+    {% endif %}
+  }
+
+  .ai-tv-thumbnails-wrapper-{{ ai_gen_id }} {
+    overflow: hidden;
+    position: relative;
+    padding: 0 60px;
+  }
+
+  .ai-tv-thumbnails-track-{{ ai_gen_id }} {
+    display: flex;
+    gap: 15px;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-tv-thumbnail-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: {{ block.settings.thumbnail_width }}px;
+    height: {{ block.settings.thumbnail_height }}px;
+    border: 3px solid {{ block.settings.thumbnail_border_color }};
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    position: relative;
+    background: #1a1a1a;
+  }
+
+  .ai-tv-thumbnail-{{ ai_gen_id }}.active {
+    border-color: {{ block.settings.thumbnail_active_border_color }};
+  }
+
+  .ai-tv-thumbnail-img-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-tv-thumb-nav-btn-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: {{ block.settings.nav_button_size }}px;
+    height: {{ block.settings.nav_button_size }}px;
+    background: {{ block.settings.nav_button_bg }};
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    transition: transform 0.2s;
+    {% if block.settings.hide_thumbnail_nav_buttons %}
+    display: none;
+    {% endif %}
+  }
+
+  .ai-tv-thumb-nav-btn-{{ ai_gen_id }}:hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .ai-tv-thumb-nav-btn-{{ ai_gen_id }} svg {
+    width: {{ block.settings.nav_icon_size }}px;
+    height: {{ block.settings.nav_icon_size }}px;
+    fill: {{ block.settings.nav_icon_color }};
+  }
+
+  .ai-tv-thumb-nav-prev-{{ ai_gen_id }} {
+    left: {{ block.settings.thumb_nav_horizontal_offset }}px;
+  }
+
+  .ai-tv-thumb-nav-next-{{ ai_gen_id }} {
+    right: {{ block.settings.thumb_nav_horizontal_offset }}px;
+  }
+
+  .ai-tv-logo-{{ ai_gen_id }} {
+    position: absolute;
+    z-index: 5;
+    max-width: {{ block.settings.logo_max_width }}px;
+    {% if block.settings.logo_position == 'top' %}
+    top: {{ block.settings.logo_offset }}px;
+    left: 50%;
+    transform: translateX(-50%);
+    {% else %}
+    bottom: {{ block.settings.logo_offset }}px;
+    left: 50%;
+    transform: translateX(-50%);
+    {% endif %}
+  }
+
+  .ai-tv-logo-{{ ai_gen_id }} img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-tv-player-{{ ai_gen_id }} {
+      max-width: {{ block.settings.tv_mobile_width }}%;
+    }
+
+    .ai-tv-screen-wrapper-{{ ai_gen_id }} {
+      padding-bottom: {{ block.settings.mobile_aspect_ratio }}%;
+    }
+
+    .ai-tv-nav-btn-{{ ai_gen_id }} {
+      width: {{ block.settings.nav_button_size | times: 0.8 }}px;
+      height: {{ block.settings.nav_button_size | times: 0.8 }}px;
+    }
+
+    .ai-tv-thumbnail-{{ ai_gen_id }} {
+      width: {{ block.settings.thumbnail_width | times: 0.8 }}px;
+      height: {{ block.settings.thumbnail_height | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<retro-tv-player-{{ ai_gen_id }} class="ai-tv-player-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-tv-frame-{{ ai_gen_id }}">
+    {% if block.settings.logo %}
+      <div class="ai-tv-logo-{{ ai_gen_id }}">
+        <img src="{{ block.settings.logo | image_url: width: 400 }}" alt="Logo">
+      </div>
+    {% endif %}
+
+    <button class="ai-tv-nav-btn-{{ ai_gen_id }} ai-tv-nav-btn-prev-{{ ai_gen_id }}" data-action="prev">
+      <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+
+    <button class="ai-tv-nav-btn-{{ ai_gen_id }} ai-tv-nav-btn-next-{{ ai_gen_id }}" data-action="next">
+      <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </button>
+
+    <div class="ai-tv-screen-wrapper-{{ ai_gen_id }}">
+      <div class="ai-tv-screen-{{ ai_gen_id }}">
+        <video
+          class="ai-tv-video-{{ ai_gen_id }}"
+          {% if block.settings.muted %}muted{% endif %}
+          {% if block.settings.playsinline %}playsinline{% endif %}
+          {% if block.settings.show_controls %}controls{% endif %}
+        ></video>
+        {% if block.settings.show_glass_reflection %}
+          <div class="ai-tv-glass-reflection-{{ ai_gen_id }}"></div>
+        {% endif %}
+      </div>
+      <div class="ai-tv-progress-bar-{{ ai_gen_id }}">
+        <div class="ai-tv-progress-fill-{{ ai_gen_id }}"></div>
+      </div>
+    </div>
+
+    <div class="ai-tv-controls-{{ ai_gen_id }}">
+      <button class="ai-tv-control-btn-{{ ai_gen_id }}" data-action="play">
+        <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="pause-icon" style="display:none;" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+      </button>
+      <button class="ai-tv-control-btn-{{ ai_gen_id }}" data-action="fullscreen">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+      <div class="ai-tv-volume-control-{{ ai_gen_id }}">
+        <button class="ai-tv-control-btn-{{ ai_gen_id }}" data-action="mute">
+          <svg class="volume-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          <svg class="mute-icon" style="display:none;" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+        </button>
+        <input type="range" class="ai-tv-volume-slider-{{ ai_gen_id }}" min="0" max="100" value="100">
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-tv-thumbnails-{{ ai_gen_id }}">
+    <button class="ai-tv-thumb-nav-btn-{{ ai_gen_id }} ai-tv-thumb-nav-prev-{{ ai_gen_id }}" data-action="thumb-prev">
+      <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <button class="ai-tv-thumb-nav-btn-{{ ai_gen_id }} ai-tv-thumb-nav-next-{{ ai_gen_id }}" data-action="thumb-next">
+      <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </button>
+    <div class="ai-tv-thumbnails-wrapper-{{ ai_gen_id }}">
+      <div class="ai-tv-thumbnails-track-{{ ai_gen_id }}"></div>
+    </div>
+  </div>
+</retro-tv-player-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  class RetroTVPlayer{{ ai_gen_id }} extends HTMLElement {
+    constructor() {
+      super();
+      this.videos = [];
+      this.currentIndex = 0;
+      this.thumbnailOffset = 0;
+      this.isPlaying = false;
+    }
+
+    connectedCallback() {
+      this.loadVideos();
+      this.setupElements();
+      this.setupEventListeners();
+      
+      if (this.videos.length > 0) {
+        this.loadVideo(0);
+        this.createThumbnails();
+      }
+    }
+
+    loadVideos() {
+      {% for i in (1..15) %}
+        {% assign video_key = 'video_' | append: i %}
+        {% assign video_url_key = 'video_url_' | append: i %}
+        {% assign video = block.settings[video_key] %}
+        {% assign video_url = block.settings[video_url_key] %}
+        
+        {% if video or video_url %}
+          this.videos.push({
+            {% if video %}
+              src: {{ video.sources[0].url | json }},
+              preview: {{ video.preview_image.src | image_url: width: 300 | json }}
+            {% elsif video_url %}
+              src: {{ video_url | json }},
+              preview: null
+            {% endif %}
+          });
+        {% endif %}
+      {% endfor %}
+    }
+
+    setupElements() {
+      this.videoElement = this.querySelector('.ai-tv-video-{{ ai_gen_id }}');
+      this.playBtn = this.querySelector('[data-action="play"]');
+      this.muteBtn = this.querySelector('[data-action="mute"]');
+      this.fullscreenBtn = this.querySelector('[data-action="fullscreen"]');
+      this.volumeSlider = this.querySelector('.ai-tv-volume-slider-{{ ai_gen_id }}');
+      this.progressFill = this.querySelector('.ai-tv-progress-fill-{{ ai_gen_id }}');
+      this.thumbnailsTrack = this.querySelector('.ai-tv-thumbnails-track-{{ ai_gen_id }}');
+      this.prevBtn = this.querySelector('.ai-tv-nav-btn-prev-{{ ai_gen_id }}');
+      this.nextBtn = this.querySelector('.ai-tv-nav-btn-next-{{ ai_gen_id }}');
+      this.thumbPrevBtn = this.querySelector('.ai-tv-thumb-nav-prev-{{ ai_gen_id }}');
+      this.thumbNextBtn = this.querySelector('.ai-tv-thumb-nav-next-{{ ai_gen_id }}');
+      this.playIcon = this.playBtn.querySelector('.play-icon');
+      this.pauseIcon = this.playBtn.querySelector('.pause-icon');
+      this.volumeIcon = this.muteBtn.querySelector('.volume-icon');
+      this.muteIcon = this.muteBtn.querySelector('.mute-icon');
+    }
+
+    setupEventListeners() {
+      this.playBtn.addEventListener('click', () => this.togglePlay());
+      this.muteBtn.addEventListener('click', () => this.toggleMute());
+      this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+      this.volumeSlider.addEventListener('input', (e) => this.updateVolume(e));
+      
+      this.videoElement.addEventListener('timeupdate', () => this.updateProgress());
+      this.videoElement.addEventListener('ended', () => this.handleVideoEnd());
+      this.videoElement.addEventListener('play', () => this.onPlay());
+      this.videoElement.addEventListener('pause', () => this.onPause());
+      
+      this.prevBtn.addEventListener('click', () => this.navigate(-1));
+      this.nextBtn.addEventListener('click', () => this.navigate(1));
+      this.thumbPrevBtn.addEventListener('click', () => this.navigateThumbnails(-1));
+      this.thumbNextBtn.addEventListener('click', () => this.navigateThumbnails(1));
+      
+      this.setupTouchSwipe();
+      this.updateVolumeSliderBackground();
+    }
+
+    loadVideo(index) {
+      if (index < 0 || index >= this.videos.length) return;
+      
+      this.currentIndex = index;
+      const video = this.videos[index];
+      
+      this.videoElement.src = video.src;
+      this.videoElement.load();
+      
+      {% if block.settings.autoplay %}
+      setTimeout(() => {
+        this.videoElement.play().catch(err => {
+          console.log('Autoplay prevented');
+        });
+      }, 100);
+      {% endif %}
+
+      this.updateThumbnailsActive();
+    }
+
+    togglePlay() {
+      if (this.videoElement.paused) {
+        this.videoElement.play();
+      } else {
+        this.videoElement.pause();
+      }
+    }
+
+    onPlay() {
+      this.isPlaying = true;
+      this.playIcon.style.display = 'none';
+      this.pauseIcon.style.display = 'block';
+    }
+
+    onPause() {
+      this.isPlaying = false;
+      this.playIcon.style.display = 'block';
+      this.pauseIcon.style.display = 'none';
+    }
+
+    toggleMute() {
+      this.videoElement.muted = !this.videoElement.muted;
+      if (this.videoElement.muted) {
+        this.volumeIcon.style.display = 'none';
+        this.muteIcon.style.display = 'block';
+        this.volumeSlider.value = 0;
+      } else {
+        this.volumeIcon.style.display = 'block';
+        this.muteIcon.style.display = 'none';
+        this.volumeSlider.value = this.videoElement.volume * 100;
+      }
+      this.updateVolumeSliderBackground();
+    }
+
+    toggleFullscreen() {
+      const screenWrapper = this.querySelector('.ai-tv-screen-wrapper-{{ ai_gen_id }}');
+      if (!document.fullscreenElement) {
+        if (screenWrapper.requestFullscreen) {
+          screenWrapper.requestFullscreen();
+        } else if (screenWrapper.webkitRequestFullscreen) {
+          screenWrapper.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    updateVolume(e) {
+      const volume = e.target.value / 100;
+      this.videoElement.volume = volume;
+      this.videoElement.muted = volume === 0;
+      
+      if (volume === 0) {
+        this.volumeIcon.style.display = 'none';
+        this.muteIcon.style.display = 'block';
+      } else {
+        this.volumeIcon.style.display = 'block';
+        this.muteIcon.style.display = 'none';
+      }
+      
+      this.updateVolumeSliderBackground();
+    }
+
+    updateVolumeSliderBackground() {
+      const value = this.volumeSlider.value;
+      this.volumeSlider.style.background = `linear-gradient(to right, #ff8c42 0%, #ff8c42 ${value}%, #444 ${value}%, #444 100%)`;
+    }
+
+    updateProgress() {
+      if (this.videoElement.duration) {
+        const percentage = (this.videoElement.currentTime / this.videoElement.duration) * 100;
+        this.progressFill.style.width = percentage + '%';
+      }
+    }
+
+    handleVideoEnd() {
+      {% if block.settings.loop %}
+      this.navigate(1);
+      {% else %}
+      this.onPause();
+      {% endif %}
+    }
+
+    navigate(direction) {
+      let newIndex = this.currentIndex + direction;
+      if (newIndex < 0) newIndex = this.videos.length - 1;
+      if (newIndex >= this.videos.length) newIndex = 0;
+      this.loadVideo(newIndex);
+    }
+
+    createThumbnails() {
+      if (!this.thumbnailsTrack) return;
+      
+      this.thumbnailsTrack.innerHTML = '';
+      
+      this.videos.forEach((video, index) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'ai-tv-thumbnail-{{ ai_gen_id }}';
+        if (index === 0) thumb.classList.add('active');
+        
+        if (video.preview) {
+          const img = document.createElement('img');
+          img.className = 'ai-tv-thumbnail-img-{{ ai_gen_id }}';
+          img.src = video.preview;
+          img.alt = 'Video ' + (index + 1);
+          thumb.appendChild(img);
+        } else {
+          const tempVideo = document.createElement('video');
+          tempVideo.className = 'ai-tv-thumbnail-img-{{ ai_gen_id }}';
+          tempVideo.src = video.src;
+          tempVideo.muted = true;
+          tempVideo.preload = 'metadata';
+          tempVideo.currentTime = 1;
+          thumb.appendChild(tempVideo);
+        }
+        
+        thumb.addEventListener('click', () => this.loadVideo(index));
+        this.thumbnailsTrack.appendChild(thumb);
+      });
+    }
+
+    updateThumbnailsActive() {
+      const thumbnails = this.querySelectorAll('.ai-tv-thumbnail-{{ ai_gen_id }}');
+      thumbnails.forEach((thumb, index) => {
+        if (index === this.currentIndex) {
+          thumb.classList.add('active');
+        } else {
+          thumb.classList.remove('active');
+        }
+      });
+    }
+
+    navigateThumbnails(direction) {
+      const thumbnails = this.querySelectorAll('.ai-tv-thumbnail-{{ ai_gen_id }}');
+      const totalThumbnails = thumbnails.length;
+      
+      if (totalThumbnails === 0) return;
+      
+      this.thumbnailOffset += direction;
+      
+      if (this.thumbnailOffset < 0) {
+        this.thumbnailOffset = 0;
+      }
+      
+      const maxOffset = Math.max(0, totalThumbnails - 4);
+      if (this.thumbnailOffset > maxOffset) {
+        this.thumbnailOffset = maxOffset;
+      }
+      
+      const thumbWidth = {{ block.settings.thumbnail_width }} + 15;
+      this.thumbnailsTrack.style.transform = `translateX(-${this.thumbnailOffset * thumbWidth}px)`;
+      
+      if (direction > 0 && this.currentIndex < totalThumbnails - 1) {
+        this.navigate(1);
+      } else if (direction < 0 && this.currentIndex > 0) {
+        this.navigate(-1);
+      }
+    }
+
+    setupTouchSwipe() {
+      let startX = 0;
+      const wrapper = this.querySelector('.ai-tv-thumbnails-wrapper-{{ ai_gen_id }}');
+      
+      if (!wrapper) return;
+      
+      wrapper.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+      });
+      
+      wrapper.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX;
+        const diff = startX - endX;
+        
+        if (Math.abs(diff) > 50) {
+          if (diff > 0) {
+            this.navigateThumbnails(1);
+          } else {
+            this.navigateThumbnails(-1);
+          }
+        }
+      });
+    }
+  }
+
+  customElements.define('retro-tv-player-{{ ai_gen_id }}', RetroTVPlayer{{ ai_gen_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "تلفزيون كلاسيكي",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "أبعاد التلفاز"
+    },
+    {
+      "type": "range",
+      "id": "tv_max_width",
+      "label": "العرض الأقصى",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "tv_mobile_width",
+      "label": "عرض الموبايل",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 95
+    },
+    {
+      "type": "header",
+      "content": "إطار التلفاز"
+    },
+    {
+      "type": "color",
+      "id": "frame_color",
+      "label": "لون الإطار",
+      "default": "#2c2c2c"
+    },
+    {
+      "type": "range",
+      "id": "frame_border_radius",
+      "label": "انحناء الزوايا",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "frame_padding_top",
+      "label": "سمك أعلى",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "frame_padding_right",
+      "label": "سمك يمين",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "frame_padding_bottom",
+      "label": "سمك أسفل",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "frame_padding_left",
+      "label": "سمك يسار",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "الشاشة"
+    },
+    {
+      "type": "range",
+      "id": "screen_aspect_ratio",
+      "label": "نسبة العرض",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "mobile_aspect_ratio",
+      "label": "نسبة موبايل",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "screen_border_thickness",
+      "label": "سمك إطار الشاشة",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "screen_border_color",
+      "label": "لون إطار الشاشة",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "screen_border_radius",
+      "label": "انحناء الشاشة",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "video_object_fit",
+      "label": "وضعية الفيديو",
+      "options": [
+        { "value": "contain", "label": "احتواء" },
+        { "value": "cover", "label": "امتلاء" }
+      ],
+      "default": "contain"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_glass_reflection",
+      "label": "انعكاس زجاجي",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "إعدادات المشغل"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تشغيل تلقائي",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "كتم الصوت",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "تكرار تلقائي",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "playsinline",
+      "label": "منع التكبير",
+      "default": true,
+      "info": "يمنع التكبير على Safari"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "أدوات أصلية",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "شريط التقدم"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "إظهار شريط التقدم",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "وحدة التحكم"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_controls",
+      "label": "إخفاء التحكم",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "controls_margin_top",
+      "label": "مسافة من الشاشة",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "controls_padding",
+      "label": "حشو داخلي",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "controls_gap",
+      "label": "مسافة بين الأزرار",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "controls_bg_color",
+      "label": "لون الخلفية",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "controls_border_radius",
+      "label": "انحناء الزوايا",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "control_button_size",
+      "label": "حجم الأزرار",
+      "min": 30,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "control_button_bg",
+      "label": "لون خلفية الأزرار",
+      "default": "#ff8c42"
+    },
+    {
+      "type": "range",
+      "id": "control_icon_size",
+      "label": "حجم الأيقونات",
+      "min": 15,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "control_icon_color",
+      "label": "لون الأيقونات",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "أزرار التنقل"
+    },
+    {
+      "type": "range",
+      "id": "nav_button_size",
+      "label": "حجم الأزرار",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "color",
+      "id": "nav_button_bg",
+      "label": "لون الخلفية",
+      "default": "#ff8c42"
+    },
+    {
+      "type": "range",
+      "id": "nav_icon_size",
+      "label": "حجم الأيقونات",
+      "min": 15,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "nav_icon_color",
+      "label": "لون الأيقونات",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "nav_button_vertical_position",
+      "label": "موضع عمودي",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "nav_button_horizontal_offset",
+      "label": "إزاحة أفقية",
+      "min": -100,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "الصور المصغرة"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_thumbnails",
+      "label": "إخفاء الصور",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_width",
+      "label": "عرض الصورة",
+      "min": 80,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_height",
+      "label": "ارتفاع الصورة",
+      "min": 60,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "color",
+      "id": "thumbnail_border_color",
+      "label": "لون الإطار",
+      "default": "#444444"
+    },
+    {
+      "type": "color",
+      "id": "thumbnail_active_border_color",
+      "label": "لون الإطار النشط",
+      "default": "#ff8c42"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_thumbnail_nav_buttons",
+      "label": "إخفاء أزرار التنقل",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "thumb_nav_horizontal_offset",
+      "label": "إزاحة الأزرار",
+      "min": -100,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": -30
+    },
+    {
+      "type": "header",
+      "content": "الشعار"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "صورة الشعار"
+    },
+    {
+      "type": "select",
+      "id": "logo_position",
+      "label": "موضع الشعار",
+      "options": [
+        { "value": "top", "label": "أعلى" },
+        { "value": "bottom", "label": "أسفل" }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "range",
+      "id": "logo_max_width",
+      "label": "عرض الشعار",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "logo_offset",
+      "label": "مسافة من الحافة",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "الفيديوهات"
+    },
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "فيديو 1"
+    },
+    {
+      "type": "url",
+      "id": "video_url_1",
+      "label": "رابط فيديو 1"
+    },
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "فيديو 2"
+    },
+    {
+      "type": "url",
+      "id": "video_url_2",
+      "label": "رابط فيديو 2"
+    },
+    {
+      "type": "video",
+      "id": "video_3",
+      "label": "فيديو 3"
+    },
+    {
+      "type": "url",
+      "id": "video_url_3",
+      "label": "رابط فيديو 3"
+    },
+    {
+      "type": "video",
+      "id": "video_4",
+      "label": "فيديو 4"
+    },
+    {
+      "type": "url",
+      "id": "video_url_4",
+      "label": "رابط فيديو 4"
+    },
+    {
+      "type": "video",
+      "id": "video_5",
+      "label": "فيديو 5"
+    },
+    {
+      "type": "url",
+      "id": "video_url_5",
+      "label": "رابط فيديو 5"
+    },
+    {
+      "type": "video",
+      "id": "video_6",
+      "label": "فيديو 6"
+    },
+    {
+      "type": "url",
+      "id": "video_url_6",
+      "label": "رابط فيديو 6"
+    },
+    {
+      "type": "video",
+      "id": "video_7",
+      "label": "فيديو 7"
+    },
+    {
+      "type": "url",
+      "id": "video_url_7",
+      "label": "رابط فيديو 7"
+    },
+    {
+      "type": "video",
+      "id": "video_8",
+      "label": "فيديو 8"
+    },
+    {
+      "type": "url",
+      "id": "video_url_8",
+      "label": "رابط فيديو 8"
+    },
+    {
+      "type": "video",
+      "id": "video_9",
+      "label": "فيديو 9"
+    },
+    {
+      "type": "url",
+      "id": "video_url_9",
+      "label": "رابط فيديو 9"
+    },
+    {
+      "type": "video",
+      "id": "video_10",
+      "label": "فيديو 10"
+    },
+    {
+      "type": "url",
+      "id": "video_url_10",
+      "label": "رابط فيديو 10"
+    },
+    {
+      "type": "video",
+      "id": "video_11",
+      "label": "فيديو 11"
+    },
+    {
+      "type": "url",
+      "id": "video_url_11",
+      "label": "رابط فيديو 11"
+    },
+    {
+      "type": "video",
+      "id": "video_12",
+      "label": "فيديو 12"
+    },
+    {
+      "type": "url",
+      "id": "video_url_12",
+      "label": "رابط فيديو 12"
+    },
+    {
+      "type": "video",
+      "id": "video_13",
+      "label": "فيديو 13"
+    },
+    {
+      "type": "url",
+      "id": "video_url_13",
+      "label": "رابط فيديو 13"
+    },
+    {
+      "type": "video",
+      "id": "video_14",
+      "label": "فيديو 14"
+    },
+    {
+      "type": "url",
+      "id": "video_url_14",
+      "label": "رابط فيديو 14"
+    },
+    {
+      "type": "video",
+      "id": "video_15",
+      "label": "فيديو 15"
+    },
+    {
+      "type": "url",
+      "id": "video_url_15",
+      "label": "رابط فيديو 15"
+    }
+  ],
+  "presets": [
+    {
+      "name": "تلفزيون كلاسيكي"
+    }
+  ]
+}
+{% endschema %}

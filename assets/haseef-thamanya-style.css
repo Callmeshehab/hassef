@@ -1,0 +1,193 @@
+/* ============================================================
+   الحصيف — هيدر بستايل ثمانية
+   الصق في نهاية base.css
+   ============================================================ */
+
+/* ── إخفاء الهيدر الأصلي على الموبايل والديسكتوب ── */
+.header-wrapper .header {
+  display: none !important;
+}
+
+/* ── الهيدر الجديد ── */
+.hf-header {
+  background: #f5f2ec;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  direction: rtl;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* الصف الأول: شعار + أزرار */
+.hf-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  gap: 16px;
+}
+
+/* يمين: شعار + بحث */
+.hf-header__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hf-logo {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.hf-logo img {
+  height: 36px;
+  width: auto;
+  display: block;
+  transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.hf-logo:hover img {
+  transform: scale(1.07);
+}
+
+.hf-search-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  border-radius: 8px;
+  transition: background 0.18s;
+}
+.hf-search-btn:hover { background: rgba(0,0,0,0.06); }
+.hf-search-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+/* يسار: أزرار */
+.hf-header__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* زر الدخول — outline */
+.hf-btn-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  color: #111;
+  border: 1.5px solid rgba(0,0,0,0.18);
+  border-radius: 12px;
+  padding: 9px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.2s, background 0.2s;
+}
+.hf-btn-login:hover {
+  border-color: #111;
+  background: #f9f9f9;
+}
+
+/* زر الاشتراك / السلة — filled أسود */
+.hf-btn-subscribe {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s;
+  position: relative;
+}
+.hf-btn-subscribe:hover {
+  background: #222;
+  transform: translateY(-1px);
+}
+
+/* رقم السلة */
+.hf-cart-count {
+  background: #c8a030;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── الصف الثاني: القائمة الأفقية الثابتة ── */
+.hf-header__nav {
+  border-top: 1px solid rgba(0,0,0,0.07);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hf-header__nav::-webkit-scrollbar { display: none; }
+
+.hf-nav-link {
+  display: inline-block;
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: color 0.18s, background 0.18s;
+  flex-shrink: 0;
+}
+.hf-nav-link:hover {
+  color: #111;
+  background: rgba(0,0,0,0.05);
+}
+.hf-nav-link.active {
+  color: #111;
+  font-weight: 700;
+  background: rgba(0,0,0,0.06);
+}
+
+/* ── إخفاء القائمة القديمة ── */
+header-drawer,
+.header__inline-menu,
+.header__search,
+.header__icons {
+  display: none !important;
+}
+
+/* ── موبايل ── */
+@media screen and (max-width: 749px) {
+  .hf-header__top {
+    padding: 12px 16px;
+  }
+  .hf-logo img { height: 30px; }
+  .hf-btn-login { padding: 8px 14px; font-size: 13px; }
+  .hf-btn-subscribe { padding: 9px 16px; font-size: 13px; }
+  .hf-header__nav { padding: 0 12px; }
+  .hf-nav-link { font-size: 13px; padding: 10px 12px; }
+}

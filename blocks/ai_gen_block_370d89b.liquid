@@ -1,0 +1,1047 @@
+{% doc %}
+  @prompt
+    بدي مكان لعرض صور ارفعهم من الجهاز مع خيار تقليب تلقائي واضافه نحو ١٠ صور مع امكانيه السحب للتصفح ويكون المكان بإطار وألوان متناسقه مع الصفحة وكمان خيارات للتحكم في العرض والارتفاع وخيارات لشكل حركة السحب,  خيار لإخفاء ازرار التنقل وخيار لإيقاف التنقل التلقائي وخيار لاضافه طار داخلي حول الصوره نفسها  وخيارات للتحكم في سمك الاطار وعرضه والألوان وخيارات للتحكم في النقاط السفليه مع امكانيه اخفائها , خيار لتحريك الازرار الجانبيه افقيا وخيار لتحديد عرض النقاط بالاسفل , خيار لإخفاء الاطار الخارجي, اضف خيار لاضافه نص اسفل الصور تماما يعني لكل صوره امكانيه إضافه نص زي caption بطريقه أنيقه تتناسق مع الصفحة, النص مش ظاهر اسفل الصوره واريد للنص خيارات زي نوع الخط وسمك وألوانه بدي يكون اسفل الصوره مباشر داخل الاطار الخارجي مع امكانيه ليكون اسفل الاطار الخارجي
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-image-carousel-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-image-carousel-container-{{ ai_gen_id }} {
+    position: relative;
+    {% if block.settings.show_outer_border %}
+      background-color: {{ block.settings.background_color }};
+      border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+      border-radius: {{ block.settings.border_radius }}px;
+      padding: {{ block.settings.padding }}px;
+    {% endif %}
+    overflow: hidden;
+  }
+
+  .ai-image-carousel-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.carousel_height }}px;
+    overflow: hidden;
+    border-radius: {{ block.settings.image_border_radius }}px;
+  }
+
+  .ai-image-carousel-track-{{ ai_gen_id }} {
+    display: flex;
+    height: 100%;
+    transition: transform {{ block.settings.transition_duration }}s {{ block.settings.transition_style }};
+    cursor: grab;
+    user-select: none;
+  }
+
+  .ai-image-carousel-track-{{ ai_gen_id }}.dragging {
+    cursor: grabbing;
+    transition: none;
+  }
+
+  .ai-image-carousel-slide-{{ ai_gen_id }} {
+    flex: 0 0 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: {{ block.settings.image_inner_padding }}px;
+  }
+
+  .ai-image-carousel-image-wrapper-{{ ai_gen_id }} {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .ai-image-carousel-slide-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: {{ block.settings.image_fit }};
+    border-radius: {{ block.settings.image_border_radius }}px;
+    {% if block.settings.show_image_border %}
+      border: {{ block.settings.image_border_thickness }}px solid {{ block.settings.image_border_color }};
+    {% endif %}
+  }
+
+  .ai-image-carousel-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: {{ block.settings.image_border_radius }}px;
+  }
+
+  .ai-image-carousel-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 300px;
+  }
+
+  .ai-image-carousel-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-image-carousel-caption-inline-{{ ai_gen_id }} {
+    {% if block.settings.show_captions and block.settings.caption_position == 'inside' %}
+      display: block;
+      margin-top: {{ block.settings.caption_spacing }}px;
+    {% else %}
+      display: none;
+    {% endif %}
+    text-align: {{ block.settings.caption_alignment }};
+    color: {{ block.settings.caption_text_color }};
+    font-size: {{ block.settings.caption_font_size }}px;
+    font-family: {{ block.settings.caption_font.family }}, {{ block.settings.caption_font.fallback_families }};
+    font-weight: {{ block.settings.caption_font.weight }};
+    font-style: {{ block.settings.caption_font.style }};
+    line-height: 1.5;
+    padding: {{ block.settings.caption_padding }}px;
+    {% if block.settings.show_caption_background %}
+      background-color: {{ block.settings.caption_bg_color }};
+      border-radius: {{ block.settings.caption_border_radius }}px;
+    {% endif %}
+  }
+
+  .ai-image-carousel-nav-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: {{ block.settings.nav_button_color }};
+    color: {{ block.settings.nav_button_icon_color }};
+    border: none;
+    width: {{ block.settings.nav_button_size }}px;
+    height: {{ block.settings.nav_button_size }}px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: {% if block.settings.show_nav_buttons %}flex{% else %}none{% endif %};
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-image-carousel-nav-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-image-carousel-nav-{{ ai_gen_id }}--prev {
+    left: {{ block.settings.nav_button_horizontal_position }}px;
+  }
+
+  .ai-image-carousel-nav-{{ ai_gen_id }}--next {
+    right: {{ block.settings.nav_button_horizontal_position }}px;
+  }
+
+  .ai-image-carousel-caption-wrapper-{{ ai_gen_id }} {
+    {% if block.settings.show_captions and block.settings.caption_position == 'outside' %}
+      display: block;
+      margin-top: {{ block.settings.caption_spacing }}px;
+      text-align: {{ block.settings.caption_alignment }};
+    {% else %}
+      display: none;
+    {% endif %}
+  }
+
+  .ai-image-carousel-caption-{{ ai_gen_id }} {
+    display: none;
+    color: {{ block.settings.caption_text_color }};
+    font-size: {{ block.settings.caption_font_size }}px;
+    font-family: {{ block.settings.caption_font.family }}, {{ block.settings.caption_font.fallback_families }};
+    font-weight: {{ block.settings.caption_font.weight }};
+    font-style: {{ block.settings.caption_font.style }};
+    line-height: 1.5;
+    padding: {{ block.settings.caption_padding }}px;
+    {% if block.settings.show_caption_background %}
+      background-color: {{ block.settings.caption_bg_color }};
+      border-radius: {{ block.settings.caption_border_radius }}px;
+      display: inline-block;
+    {% endif %}
+  }
+
+  .ai-image-carousel-caption-{{ ai_gen_id }}.active {
+    display: block;
+  }
+
+  .ai-image-carousel-dots-{{ ai_gen_id }} {
+    display: {% if block.settings.show_dots %}flex{% else %}none{% endif %};
+    justify-content: center;
+    gap: {{ block.settings.dots_spacing }}px;
+    margin-top: 16px;
+    width: {{ block.settings.dots_width_percent }}%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ai-image-carousel-dot-{{ ai_gen_id }} {
+    width: {{ block.settings.dot_size }}px;
+    height: {{ block.settings.dot_size }}px;
+    border-radius: 50%;
+    background-color: {{ block.settings.dot_color }};
+    opacity: {{ block.settings.dot_inactive_opacity | divided_by: 100.0 }};
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-image-carousel-dot-{{ ai_gen_id }}.active {
+    opacity: {{ block.settings.dot_active_opacity | divided_by: 100.0 }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-image-carousel-wrapper-{{ ai_gen_id }} {
+      height: {{ block.settings.carousel_height | times: 0.7 }}px;
+    }
+
+    .ai-image-carousel-caption-{{ ai_gen_id }},
+    .ai-image-carousel-caption-inline-{{ ai_gen_id }} {
+      font-size: {{ block.settings.caption_font_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<image-carousel-{{ ai_gen_id }}
+  class="ai-image-carousel-{{ ai_gen_id }}"
+  data-autoplay="{{ block.settings.autoplay }}"
+  data-autoplay-speed="{{ block.settings.autoplay_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-image-carousel-container-{{ ai_gen_id }}">
+    <div class="ai-image-carousel-wrapper-{{ ai_gen_id }}">
+      <div class="ai-image-carousel-track-{{ ai_gen_id }}">
+        {% liquid
+          assign has_images = false
+          for i in (1..10)
+            assign image_key = 'image_' | append: i
+            if block.settings[image_key] != blank
+              assign has_images = true
+              break
+            endif
+          endfor
+        %}
+
+        {% if has_images %}
+          {% for i in (1..10) %}
+            {% liquid
+              assign image_key = 'image_' | append: i
+              assign caption_key = 'caption_' | append: i
+              assign image = block.settings[image_key]
+              assign caption = block.settings[caption_key]
+            %}
+            {% if image != blank %}
+              <div class="ai-image-carousel-slide-{{ ai_gen_id }}">
+                <div class="ai-image-carousel-image-wrapper-{{ ai_gen_id }}">
+                  <img
+                    src="{{ image | image_url: width: 2000 }}"
+                    alt="{{ image.alt | escape }}"
+                    loading="lazy"
+                    width="{{ image.width }}"
+                    height="{{ image.height }}"
+                  >
+                </div>
+                {% if caption != blank %}
+                  <div class="ai-image-carousel-caption-inline-{{ ai_gen_id }}">
+                    {{ caption }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <div class="ai-image-carousel-slide-{{ ai_gen_id }}">
+            <div class="ai-image-carousel-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+              <div class="ai-image-carousel-empty-state-{{ ai_gen_id }}">
+                أضف صورك هنا
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if has_images %}
+        <button
+          class="ai-image-carousel-nav-{{ ai_gen_id }} ai-image-carousel-nav-{{ ai_gen_id }}--prev"
+          aria-label="الصورة السابقة"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button
+          class="ai-image-carousel-nav-{{ ai_gen_id }} ai-image-carousel-nav-{{ ai_gen_id }}--next"
+          aria-label="الصورة التالية"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      {% endif %}
+    </div>
+
+    {% if has_images %}
+      <div class="ai-image-carousel-dots-{{ ai_gen_id }}"></div>
+
+      <div class="ai-image-carousel-caption-wrapper-{{ ai_gen_id }}">
+        {% for i in (1..10) %}
+          {% liquid
+            assign image_key = 'image_' | append: i
+            assign caption_key = 'caption_' | append: i
+            assign image = block.settings[image_key]
+            assign caption = block.settings[caption_key]
+          %}
+          {% if image != blank and caption != blank %}
+            <div 
+              class="ai-image-carousel-caption-{{ ai_gen_id }} ai-image-carousel-caption-{{ ai_gen_id }}-{{ i }}"
+              data-caption-index="{{ forloop.index0 }}"
+            >
+              {{ caption }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</image-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ImageCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.isDragging = false;
+        this.startPos = 0;
+        this.currentTranslate = 0;
+        this.prevTranslate = 0;
+        this.autoplayInterval = null;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-image-carousel-track-{{ ai_gen_id }}');
+        this.slides = this.querySelectorAll('.ai-image-carousel-slide-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-image-carousel-nav-{{ ai_gen_id }}--prev');
+        this.nextButton = this.querySelector('.ai-image-carousel-nav-{{ ai_gen_id }}--next');
+        this.dotsContainer = this.querySelector('.ai-image-carousel-dots-{{ ai_gen_id }}');
+        this.captions = this.querySelectorAll('.ai-image-carousel-caption-{{ ai_gen_id }}');
+
+        if (this.slides.length <= 1) return;
+
+        this.createDots();
+        this.setupEventListeners();
+        this.updateCaptions();
+
+        if (this.dataset.autoplay === 'true') {
+          this.startAutoplay();
+        }
+      }
+
+      createDots() {
+        this.slides.forEach((_, index) => {
+          const dot = document.createElement('button');
+          dot.classList.add('ai-image-carousel-dot-{{ ai_gen_id }}');
+          if (index === 0) dot.classList.add('active');
+          dot.setAttribute('aria-label', `الذهاب إلى الصورة ${index + 1}`);
+          dot.addEventListener('click', () => this.goToSlide(index));
+          this.dotsContainer.appendChild(dot);
+        });
+        this.dots = this.querySelectorAll('.ai-image-carousel-dot-{{ ai_gen_id }}');
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.prevSlide());
+        }
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.nextSlide());
+        }
+
+        this.track.addEventListener('mousedown', this.dragStart.bind(this));
+        this.track.addEventListener('touchstart', this.dragStart.bind(this));
+        this.track.addEventListener('mouseup', this.dragEnd.bind(this));
+        this.track.addEventListener('touchend', this.dragEnd.bind(this));
+        this.track.addEventListener('mouseleave', this.dragEnd.bind(this));
+        this.track.addEventListener('mousemove', this.drag.bind(this));
+        this.track.addEventListener('touchmove', this.drag.bind(this));
+      }
+
+      dragStart(event) {
+        this.isDragging = true;
+        this.startPos = this.getPositionX(event);
+        this.track.classList.add('dragging');
+        this.stopAutoplay();
+      }
+
+      drag(event) {
+        if (!this.isDragging) return;
+        const currentPosition = this.getPositionX(event);
+        this.currentTranslate = this.prevTranslate + currentPosition - this.startPos;
+      }
+
+      dragEnd() {
+        if (!this.isDragging) return;
+        this.isDragging = false;
+        this.track.classList.remove('dragging');
+
+        const movedBy = this.currentTranslate - this.prevTranslate;
+
+        if (movedBy < -50 && this.currentIndex < this.slides.length - 1) {
+          this.currentIndex++;
+        }
+
+        if (movedBy > 50 && this.currentIndex > 0) {
+          this.currentIndex--;
+        }
+
+        this.setPositionByIndex();
+
+        if (this.dataset.autoplay === 'true') {
+          this.startAutoplay();
+        }
+      }
+
+      getPositionX(event) {
+        return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+      }
+
+      setPositionByIndex() {
+        this.currentTranslate = this.currentIndex * -100;
+        this.prevTranslate = this.currentTranslate;
+        this.track.style.transform = `translateX(${this.currentTranslate}%)`;
+        this.updateDots();
+        this.updateCaptions();
+      }
+
+      updateDots() {
+        if (!this.dots) return;
+        this.dots.forEach((dot, index) => {
+          if (index === this.currentIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      updateCaptions() {
+        if (!this.captions || this.captions.length === 0) return;
+        
+        this.captions.forEach((caption) => {
+          caption.classList.remove('active');
+        });
+
+        const activeCaption = this.querySelector(
+          `.ai-image-carousel-caption-{{ ai_gen_id }}-${this.currentIndex + 1}`
+        );
+        
+        if (activeCaption) {
+          activeCaption.classList.add('active');
+        }
+      }
+
+      goToSlide(index) {
+        this.currentIndex = index;
+        this.setPositionByIndex();
+        this.stopAutoplay();
+        if (this.dataset.autoplay === 'true') {
+          this.startAutoplay();
+        }
+      }
+
+      nextSlide() {
+        if (this.currentIndex < this.slides.length - 1) {
+          this.currentIndex++;
+        } else {
+          this.currentIndex = 0;
+        }
+        this.setPositionByIndex();
+      }
+
+      prevSlide() {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+        } else {
+          this.currentIndex = this.slides.length - 1;
+        }
+        this.setPositionByIndex();
+      }
+
+      startAutoplay() {
+        this.stopAutoplay();
+        const speed = parseInt(this.dataset.autoplaySpeed) * 1000;
+        this.autoplayInterval = setInterval(() => {
+          this.nextSlide();
+        }, speed);
+      }
+
+      stopAutoplay() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+          this.autoplayInterval = null;
+        }
+      }
+
+      disconnectedCallback() {
+        this.stopAutoplay();
+      }
+    }
+
+    customElements.define('image-carousel-{{ ai_gen_id }}', ImageCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "معرض صور متحرك",
+  "settings": [
+    {
+      "type": "header",
+      "content": "الصور"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "صورة 1"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_1",
+      "label": "نص صورة 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "صورة 2"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_2",
+      "label": "نص صورة 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "صورة 3"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_3",
+      "label": "نص صورة 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "صورة 4"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_4",
+      "label": "نص صورة 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_5",
+      "label": "صورة 5"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_5",
+      "label": "نص صورة 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_6",
+      "label": "صورة 6"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_6",
+      "label": "نص صورة 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_7",
+      "label": "صورة 7"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_7",
+      "label": "نص صورة 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_8",
+      "label": "صورة 8"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_8",
+      "label": "نص صورة 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_9",
+      "label": "صورة 9"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_9",
+      "label": "نص صورة 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_10",
+      "label": "صورة 10"
+    },
+    {
+      "type": "textarea",
+      "id": "caption_10",
+      "label": "نص صورة 10"
+    },
+    {
+      "type": "header",
+      "content": "التقليب التلقائي"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "تفعيل التقليب التلقائي",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "ث",
+      "label": "سرعة التقليب",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "الأبعاد"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض سطح المكتب",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "carousel_height",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "ارتفاع المعرض",
+      "default": 500
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "ملاءمة الصورة",
+      "options": [
+        {
+          "value": "cover",
+          "label": "تغطية كاملة"
+        },
+        {
+          "value": "contain",
+          "label": "احتواء كامل"
+        },
+        {
+          "value": "fill",
+          "label": "ملء"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "header",
+      "content": "حركة الانتقال"
+    },
+    {
+      "type": "select",
+      "id": "transition_style",
+      "label": "نمط الحركة",
+      "options": [
+        {
+          "value": "ease",
+          "label": "سلس"
+        },
+        {
+          "value": "ease-in",
+          "label": "سلس عند البداية"
+        },
+        {
+          "value": "ease-out",
+          "label": "سلس عند النهاية"
+        },
+        {
+          "value": "ease-in-out",
+          "label": "سلس عند البداية والنهاية"
+        },
+        {
+          "value": "linear",
+          "label": "خطي"
+        }
+      ],
+      "default": "ease"
+    },
+    {
+      "type": "range",
+      "id": "transition_duration",
+      "min": 0,
+      "max": 2,
+      "step": 0.1,
+      "unit": "ث",
+      "label": "مدة الانتقال",
+      "default": 0.5
+    },
+    {
+      "type": "header",
+      "content": "الإطار الخارجي"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_outer_border",
+      "label": "إظهار الإطار الخارجي",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "لون الإطار",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك الإطار",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "انحناء الإطار",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "المسافة الداخلية",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "إطار الصورة"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_border",
+      "label": "إظهار إطار حول الصورة",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "image_border_color",
+      "label": "لون إطار الصورة",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "image_border_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "سمك إطار الصورة",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "انحناء الصورة",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "image_inner_padding",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "مسافة داخلية حول الصورة",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "أزرار التنقل"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nav_buttons",
+      "label": "إظهار أزرار التنقل",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "nav_button_size",
+      "min": 30,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "حجم زر التنقل",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "nav_button_horizontal_position",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "موضع الأزرار الأفقي",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "nav_button_color",
+      "label": "لون زر التنقل",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_icon_color",
+      "label": "لون أيقونة التنقل",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "النصوص التوضيحية"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_captions",
+      "label": "إظهار النصوص",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "caption_position",
+      "label": "موضع النص",
+      "options": [
+        {
+          "value": "inside",
+          "label": "داخل الإطار (أسفل الصورة)"
+        },
+        {
+          "value": "outside",
+          "label": "خارج الإطار (أسفل المعرض)"
+        }
+      ],
+      "default": "inside"
+    },
+    {
+      "type": "select",
+      "id": "caption_alignment",
+      "label": "محاذاة النص",
+      "options": [
+        {
+          "value": "left",
+          "label": "يسار"
+        },
+        {
+          "value": "center",
+          "label": "وسط"
+        },
+        {
+          "value": "right",
+          "label": "يمين"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "font_picker",
+      "id": "caption_font",
+      "label": "نوع الخط",
+      "default": "archivo_n4"
+    },
+    {
+      "type": "range",
+      "id": "caption_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "حجم الخط",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "caption_spacing",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "المسافة من الصورة",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "caption_padding",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "المسافة الداخلية",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "caption_text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_caption_background",
+      "label": "إظهار خلفية النص",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "caption_bg_color",
+      "label": "لون خلفية النص",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "range",
+      "id": "caption_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "انحناء خلفية النص",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "النقاط السفلية"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "إظهار النقاط",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 6,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "حجم النقطة",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "dots_spacing",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "المسافة بين النقاط",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "dots_width_percent",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "عرض منطقة النقاط",
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "لون النقاط",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "dot_active_opacity",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "شفافية النقطة النشطة",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "dot_inactive_opacity",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "label": "شفافية النقطة غير النشطة",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "معرض صور متحرك"
+    }
+  ]
+}
+{% endschema %}

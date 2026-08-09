@@ -1,0 +1,285 @@
+{% comment %}
+  Renders cart notification
+
+  Accepts:
+  - color_scheme: {String} sets the color scheme of the notification (optional)
+  - desktop_menu_type: {String} passes the desktop menu type which allows us to use the right css class (optional)
+
+  Usage:
+  {% render 'cart-notification' %}
+{% endcomment %}
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    function calculateHeaderHeight() {
+      const header = document.querySelector('.hf-header');
+      if (header) {
+        document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
+      }
+    }
+    calculateHeaderHeight();
+    window.addEventListener('resize', calculateHeaderHeight);
+    
+    // Also observe the header for size changes (like announcement bar closing)
+    const header = document.querySelector('.hf-header');
+    if (header && typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(calculateHeaderHeight).observe(header);
+    }
+  });
+
+  // Calculate immediately if available
+  const hfHeaderImmediate = document.querySelector('.hf-header');
+  if (hfHeaderImmediate) {
+    document.documentElement.style.setProperty('--header-height', hfHeaderImmediate.offsetHeight + 'px');
+  }
+
+  // Click outside to close fallback
+  document.addEventListener('click', function(event) {
+    const notification = document.querySelector('cart-notification');
+    if (!notification || !notification.classList.contains('active')) return;
+    
+    // If we click somewhere that is NOT inside the popup itself, and NOT the cart button
+    if (!event.target.closest('.cart-notification') && !event.target.closest('form[action*="/cart/add"]') && !event.target.closest('.cart-icon-bubble')) {
+      notification.classList.remove('active', 'animate');
+    }
+  });
+</script>
+
+<cart-notification>
+  <div class="cart-notification-wrapper{% if desktop_menu_type != 'drawer' %} page-width{% endif %}">
+    <div
+      id="cart-notification"
+      class="cart-notification focus-inset{% if color_scheme %} color-{{ color_scheme }} gradient{% endif %}"
+      aria-modal="true"
+      aria-label="{{ 'general.cart.item_added' | t }}"
+      role="dialog"
+      tabindex="-1"
+    >
+      <div class="cart-notification__header">
+        <h2 class="cart-notification__heading caption-large text-body">
+          {{- 'icon-checkmark.svg' | inline_asset_content -}}
+          {{ 'general.cart.item_added' | t | replace: 'Translation missing: ar.general.cart.item_added', 'تم إضافة المنتج للسلة' }}
+        </h2>
+        <button
+          type="button"
+          class="cart-notification__close modal__close-button link link--text focus-inset"
+          aria-label="{{ 'accessibility.close' | t }}"
+          onclick="this.closest('cart-notification').classList.remove('active', 'animate')"
+        >
+          <span class="svg-wrapper">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+      <div id="cart-notification-product" class="cart-notification-product"></div>
+      <div class="cart-notification__links">
+        <a
+          href="{{ routes.cart_url }}"
+          id="cart-notification-button"
+          class="button button--secondary button--full-width"
+        >
+          <span class="button-label-cart-view">{{ 'general.cart.view_empty_cart' | t | replace: 'Translation missing: ar.general.cart.view_empty_cart', 'عرض السلة' | replace: 'Translation missing: ar.general.cart.view', 'عرض السلة' }}</span>
+        </a>
+        <form action="{{ routes.cart_url }}" method="post" id="cart-notification-form">
+          <button class="button button--primary button--full-width" name="checkout">
+            {{ 'sections.cart.checkout' | t | replace: 'Translation missing: ar.sections.cart.checkout', 'إتمام الشراء' }}
+          </button>
+        </form>
+        <button type="button" class="link button-label" onclick="this.closest('cart-notification').classList.remove('active', 'animate')">{{ 'general.continue_shopping' | t | replace: 'Translation missing: ar.general.continue_shopping', 'متابعة التسوق' }}</button>
+      </div>
+    </div>
+  </div>
+</cart-notification>
+
+<style>
+  /* ── Override Dawn's default cart-notification positioning ── */
+  /* The default CSS hides notification with translateY(-100%), visibility:hidden, z-index:-1 */
+  /* We need to override ALL of these for our custom header */
+
+  cart-notification {
+    display: block !important;
+    position: fixed !important;
+    top: calc(var(--header-height, 0px) - 1px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10002 !important;
+    pointer-events: none;
+  }
+
+  cart-notification .cart-notification-wrapper {
+    position: relative !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding: 0 1rem !important;
+  }
+
+  /* Override the base hidden state */
+  cart-notification .cart-notification {
+    position: relative !important;
+    transform: translateY(-110%) !important;
+    visibility: hidden !important;
+    z-index: 10002 !important;
+    transition: transform 0.3s ease, visibility 0s 0.3s !important;
+    pointer-events: auto;
+    max-width: 360px !important;
+    width: 100% !important;
+    background: rgb(var(--color-background, 255,255,255)) !important;
+    background-color: var(--hf-bg, #f5f2ec) !important;
+    border: 1px solid var(--hf-border, rgba(0,0,0,0.08)) !important;
+    border-top: none !important;
+    padding: 20px 24px !important;
+  }
+
+  /* When animate class is added */
+  cart-notification.animate .cart-notification,
+  cart-notification .cart-notification.animate {
+    transition: transform 0.3s ease, visibility 0s 0.3s !important;
+  }
+
+  /* When active - slide down and become visible */
+  cart-notification.active .cart-notification,
+  cart-notification .cart-notification.active {
+    transform: translateY(0) !important;
+    visibility: visible !important;
+    transition: transform 0.35s ease, visibility 0s !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+    border-radius: 0 0 12px 12px !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    cart-notification .cart-notification {
+      max-width: 100% !important;
+    }
+  }
+
+  /* ── Fix Layout and RTL for items ── */
+  cart-notification .cart-notification {
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* Force vertical stacking of multiple items instead of side-by-side */
+  cart-notification .cart-notification-product {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    max-height: 45vh;
+    overflow-y: auto;
+    padding-right: 5px; /* space for scrollbar */
+  }
+
+  /* Custom styling for scrollbar to be elegant */
+  cart-notification .cart-notification-product::-webkit-scrollbar {
+    width: 4px;
+  }
+  cart-notification .cart-notification-product::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  cart-notification .cart-notification-product::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 4px;
+  }
+  cart-notification .cart-notification-product::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.25);
+  }
+
+  /* Fix individual cart item layout */
+  cart-notification .cart-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    width: 100%;
+    padding: 10px;
+    background: rgba(0,0,0,0.02);
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  cart-notification .cart-notification-product__image {
+    flex-shrink: 0;
+    margin: 0 !important; /* ensure dawn css doesn't overwrite it */
+  }
+
+  cart-notification .cart-notification-product__image img {
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  cart-notification .cart-notification-product__name {
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    line-height: 1.4;
+  }
+
+  cart-notification .cart-notification-product__price {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+
+  cart-notification .product-option {
+    font-size: 12px;
+    color: #555;
+    display: flex;
+    gap: 5px;
+  }
+
+  cart-notification .cart-notification__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  cart-notification .cart-notification__heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 15px;
+    margin: 0;
+  }
+
+  cart-notification .cart-notification__heading .icon-checkmark {
+    margin: 0 !important;
+    width: 18px;
+    height: 18px;
+  }
+
+  cart-notification .cart-notification__close {
+    margin: 0 !important;
+    padding: 5px !important;
+    width: auto !important;
+    height: auto !important;
+    cursor: pointer;
+  }
+
+  cart-notification .cart-notification__links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+  }
+  
+  cart-notification .cart-notification__links > * {
+    margin-top: 0 !important;
+  }
+
+  /* Make close button cleaner */
+  cart-notification .cart-notification__close .svg-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    background: #eae7db;
+    border-radius: 50%;
+  }
+
+  cart-notification .cart-notification__close svg {
+    width: 12px;
+    height: 12px;
+  }
+</style>

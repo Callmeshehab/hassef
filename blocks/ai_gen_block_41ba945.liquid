@@ -1,0 +1,642 @@
+{% doc %}
+  @prompt
+    بار متحرك يأخذ طابع الريترو لتصفح أقسام الكاسيت المختلفه , حلو بس بدي كل بار متحرك اقدر اعدل النص واربط فيه القسم المراد وإمكانيه تغيير الصوره المصغره بجانب النص , بدي تضيف قسم آخر وكمان امكانيه التحكم في سرعتهن , بدي خيارات اكثر للتحكم في النصوص
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-retro-cassette-bar-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, {{ block.settings.background_color_1 }} 0%, {{ block.settings.background_color_2 }} 100%);
+    padding: {{ block.settings.bar_padding }}px 0;
+    position: relative;
+    border-top: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+    border-bottom: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+  }
+
+  .ai-retro-cassette-bar__track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.item_spacing }}px;
+    animation: ai-retro-scroll-{{ ai_gen_id }} {{ block.settings.scroll_speed }}s linear infinite;
+    will-change: transform;
+  }
+
+  .ai-retro-cassette-bar-{{ ai_gen_id }}:hover .ai-retro-cassette-bar__track-{{ ai_gen_id }} {
+    animation-play-state: paused;
+  }
+
+  @keyframes ai-retro-scroll-{{ ai_gen_id }} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .ai-retro-cassette-bar__item-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ block.settings.text_image_gap }}px;
+    padding: {{ block.settings.item_padding }}px {{ block.settings.item_padding | times: 1.5 }}px;
+    background-color: {{ block.settings.item_background }};
+    border: {{ block.settings.item_border_thickness }}px solid {{ block.settings.item_border_color }};
+    border-radius: {{ block.settings.item_border_radius }}px;
+    box-shadow: {{ block.settings.shadow_x }}px {{ block.settings.shadow_y }}px {{ block.settings.shadow_blur }}px {{ block.settings.shadow_color }};
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .ai-retro-cassette-bar__item-{{ ai_gen_id }}:hover {
+    transform: translateY(-3px);
+    box-shadow: {{ block.settings.shadow_x | times: 1.5 }}px {{ block.settings.shadow_y | times: 1.5 }}px {{ block.settings.shadow_blur | times: 1.5 }}px {{ block.settings.shadow_color }};
+  }
+
+  .ai-retro-cassette-bar__image-{{ ai_gen_id }} {
+    width: {{ block.settings.image_size }}px;
+    height: {{ block.settings.image_size }}px;
+    object-fit: cover;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    flex-shrink: 0;
+  }
+
+  .ai-retro-cassette-bar__image-placeholder-{{ ai_gen_id }} {
+    width: {{ block.settings.image_size }}px;
+    height: {{ block.settings.image_size }}px;
+    background-color: {{ block.settings.placeholder_bg }};
+    border-radius: {{ block.settings.image_border_radius }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ai-retro-cassette-bar__image-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-retro-cassette-bar__text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    font-weight: {{ block.settings.text_weight }};
+    letter-spacing: {{ block.settings.letter_spacing }}px;
+    text-transform: {{ block.settings.text_transform }};
+    font-style: {{ block.settings.text_style }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-retro-cassette-bar__text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size | times: 0.85 }}px;
+    }
+
+    .ai-retro-cassette-bar__image-{{ ai_gen_id }},
+    .ai-retro-cassette-bar__image-placeholder-{{ ai_gen_id }} {
+      width: {{ block.settings.image_size | times: 0.8 }}px;
+      height: {{ block.settings.image_size | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<retro-cassette-bar-{{ ai_gen_id }} class="ai-retro-cassette-bar-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-retro-cassette-bar__track-{{ ai_gen_id }}">
+    {% for i in (1..2) %}
+      {% for j in (1..6) %}
+        {% liquid
+          assign item_enabled_key = 'item_' | append: j | append: '_enabled'
+          assign item_text_key = 'item_' | append: j | append: '_text'
+          assign item_link_key = 'item_' | append: j | append: '_link'
+          assign item_image_key = 'item_' | append: j | append: '_image'
+
+          assign item_enabled = block.settings[item_enabled_key]
+          assign item_text = block.settings[item_text_key]
+          assign item_link = block.settings[item_link_key]
+          assign item_image = block.settings[item_image_key]
+        %}
+
+        {% if item_enabled %}
+          <a
+            href="{{ item_link }}"
+            class="ai-retro-cassette-bar__item-{{ ai_gen_id }}"
+          >
+            {% if item_image %}
+              <img
+                src="{{ item_image | image_url: width: 200 }}"
+                alt="{{ item_text | escape }}"
+                class="ai-retro-cassette-bar__image-{{ ai_gen_id }}"
+                loading="lazy"
+                width="200"
+                height="200"
+              >
+            {% else %}
+              <div class="ai-retro-cassette-bar__image-placeholder-{{ ai_gen_id }}">
+                {{ 'image' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+            <span class="ai-retro-cassette-bar__text-{{ ai_gen_id }}">{{ item_text }}</span>
+          </a>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+</retro-cassette-bar-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class RetroCassetteBar{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-retro-cassette-bar__track-{{ ai_gen_id }}');
+        this.setupAnimation();
+      }
+
+      setupAnimation() {
+        if (!this.track) return;
+
+        const items = this.track.querySelectorAll('.ai-retro-cassette-bar__item-{{ ai_gen_id }}');
+        if (items.length === 0) return;
+
+        this.track.addEventListener('mouseenter', () => {
+          this.track.style.animationPlayState = 'paused';
+        });
+
+        this.track.addEventListener('mouseleave', () => {
+          this.track.style.animationPlayState = 'running';
+        });
+      }
+    }
+
+    customElements.define('retro-cassette-bar-{{ ai_gen_id }}', RetroCassetteBar{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "شريط كاسيت ريترو",
+  "settings": [
+    {
+      "type": "header",
+      "content": "العنصر 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_1_enabled",
+      "label": "تفعيل العنصر 1",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "item_1_text",
+      "label": "النص",
+      "default": "كاسيتات كلاسيكية"
+    },
+    {
+      "type": "url",
+      "id": "item_1_link",
+      "label": "الرابط"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_1_image",
+      "label": "الصورة المصغرة"
+    },
+    {
+      "type": "header",
+      "content": "العنصر 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_2_enabled",
+      "label": "تفعيل العنصر 2",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "item_2_text",
+      "label": "النص",
+      "default": "موسيقى الثمانينات"
+    },
+    {
+      "type": "url",
+      "id": "item_2_link",
+      "label": "الرابط"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_2_image",
+      "label": "الصورة المصغرة"
+    },
+    {
+      "type": "header",
+      "content": "العنصر 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_3_enabled",
+      "label": "تفعيل العنصر 3",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "item_3_text",
+      "label": "النص",
+      "default": "أغاني عربية قديمة"
+    },
+    {
+      "type": "url",
+      "id": "item_3_link",
+      "label": "الرابط"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_3_image",
+      "label": "الصورة المصغرة"
+    },
+    {
+      "type": "header",
+      "content": "العنصر 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_4_enabled",
+      "label": "تفعيل العنصر 4",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "item_4_text",
+      "label": "النص",
+      "default": "روك كلاسيك"
+    },
+    {
+      "type": "url",
+      "id": "item_4_link",
+      "label": "الرابط"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_4_image",
+      "label": "الصورة المصغرة"
+    },
+    {
+      "type": "header",
+      "content": "العنصر 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_5_enabled",
+      "label": "تفعيل العنصر 5",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "item_5_text",
+      "label": "النص",
+      "default": "جاز وبلوز"
+    },
+    {
+      "type": "url",
+      "id": "item_5_link",
+      "label": "الرابط"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_5_image",
+      "label": "الصورة المصغرة"
+    },
+    {
+      "type": "header",
+      "content": "العنصر 6"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_6_enabled",
+      "label": "تفعيل العنصر 6",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "item_6_text",
+      "label": "النص",
+      "default": "ديسكو وفانك"
+    },
+    {
+      "type": "url",
+      "id": "item_6_link",
+      "label": "الرابط"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_6_image",
+      "label": "الصورة المصغرة"
+    },
+    {
+      "type": "header",
+      "content": "إعدادات الحركة"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "سرعة التمرير",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "s",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "label": "المسافة بين العناصر",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "تنسيق النص"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "حجم النص",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "text_weight",
+      "label": "وزن النص",
+      "options": [
+        {
+          "value": "300",
+          "label": "خفيف"
+        },
+        {
+          "value": "400",
+          "label": "عادي"
+        },
+        {
+          "value": "500",
+          "label": "متوسط"
+        },
+        {
+          "value": "600",
+          "label": "نصف سميك"
+        },
+        {
+          "value": "700",
+          "label": "سميك"
+        },
+        {
+          "value": "800",
+          "label": "سميك جداً"
+        }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "تحويل النص",
+      "options": [
+        {
+          "value": "none",
+          "label": "بدون"
+        },
+        {
+          "value": "uppercase",
+          "label": "أحرف كبيرة"
+        },
+        {
+          "value": "lowercase",
+          "label": "أحرف صغيرة"
+        },
+        {
+          "value": "capitalize",
+          "label": "أول حرف كبير"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "label": "نمط النص",
+      "options": [
+        {
+          "value": "normal",
+          "label": "عادي"
+        },
+        {
+          "value": "italic",
+          "label": "مائل"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "المسافة بين الأحرف",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "تنسيق الصورة"
+    },
+    {
+      "type": "range",
+      "id": "image_size",
+      "label": "حجم الصورة",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "استدارة زوايا الصورة",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "text_image_gap",
+      "label": "المسافة بين النص والصورة",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "placeholder_bg",
+      "label": "لون خلفية الصورة الافتراضية",
+      "default": "#f2efdd"
+    },
+    {
+      "type": "header",
+      "content": "تنسيق الشريط"
+    },
+    {
+      "type": "color",
+      "id": "background_color_1",
+      "label": "لون الخلفية 1",
+      "default": "#910f3f"
+    },
+    {
+      "type": "color",
+      "id": "background_color_2",
+      "label": "لون الخلفية 2",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "bar_padding",
+      "label": "حشوة الشريط",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "label": "سمك الحدود",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "لون الحدود",
+      "default": "#f9e547"
+    },
+    {
+      "type": "header",
+      "content": "تنسيق العناصر"
+    },
+    {
+      "type": "color",
+      "id": "item_background",
+      "label": "لون خلفية العنصر",
+      "default": "#faf9e1"
+    },
+    {
+      "type": "range",
+      "id": "item_padding",
+      "label": "حشوة العنصر",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "item_border_thickness",
+      "label": "سمك حدود العنصر",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "item_border_color",
+      "label": "لون حدود العنصر",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "item_border_radius",
+      "label": "استدارة زوايا العنصر",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "الظل"
+    },
+    {
+      "type": "range",
+      "id": "shadow_x",
+      "label": "الإزاحة الأفقية",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "shadow_y",
+      "label": "الإزاحة العمودية",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "label": "ضبابية الظل",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "لون الظل",
+      "default": "#3d081b"
+    }
+  ],
+  "presets": [
+    {
+      "name": "شريط كاسيت ريترو"
+    }
+  ]
+}
+{% endschema %}
