@@ -5,7 +5,11 @@
 {% endcomment %}
 
 {%- assign section_id = section.id | replace: '_', '' | replace: '-', '' | downcase -%}
-{%- assign is_rtl = request.locale.iso_code | default: 'ar' -%}
+{%- assign locale_code = request.locale.iso_code | downcase | split: '-' | first | default: 'ar' -%}
+{%- assign is_rtl = false -%}
+{%- if 'ar,he,fa,ur' contains locale_code -%}
+  {%- assign is_rtl = true -%}
+{%- endif -%}
 
 {% style %}
 /* ── MAIN SECTION WRAPPER ── */
@@ -17,7 +21,8 @@
   padding: {{ section.settings.padding_vertical }}px {{ section.settings.padding_horizontal }}px;
   background-color: {{ section.settings.section_bg_color }};
   box-sizing: border-box;
-  direction: {{ request.locale.iso_code | default: 'ar' | replace: 'ar', 'rtl' | replace: 'en', 'ltr' }};
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %} !important;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
@@ -74,6 +79,7 @@
 .wp-carousel-container-{{ section_id }} {
   position: relative;
   width: 100%;
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
 }
 
 .wp-track-{{ section_id }} {
@@ -86,6 +92,7 @@
   scrollbar-width: none;
   padding: 4px 0 12px;
   align-items: stretch;
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
 }
 
 .wp-track-{{ section_id }}::-webkit-scrollbar {
@@ -225,20 +232,23 @@
   flex-direction: column;
   gap: 2px;
   margin-bottom: 6px;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
 }
 
 .wp-product-title-{{ section_id }} {
-  font-size: {{ section.settings.card_title_size }}px;
-  font-weight: 700;
-  color: #171717;
-  margin: 0;
-  line-height: 1.3;
+  font-size: {{ section.settings.card_title_size }}px !important;
+  font-weight: 700 !important;
+  color: #171717 !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
   opacity: 1 !important;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
+  display: -webkit-box !important;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  visibility: visible !important;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
 }
 
 .wp-product-img-wrap-{{ section_id }} {
@@ -266,16 +276,19 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 6px;
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
 }
 
 .wp-product-price-{{ section_id }} {
-  font-size: {{ section.settings.card_price_size }}px;
-  font-weight: 700;
-  color: #171717;
+  font-size: {{ section.settings.card_price_size }}px !important;
+  font-weight: 700 !important;
+  color: #171717 !important;
   display: flex;
   align-items: baseline;
   gap: 4px;
   opacity: 1 !important;
+  visibility: visible !important;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
 }
 
 .wp-product-compare-{{ section_id }} {
@@ -428,20 +441,25 @@
 {%- assign img6 = section.settings.image_6 -%}
 
 {%- comment -%} High Contrast Text Colors per product card {%- endcomment -%}
-{%- assign txt_c1 = section.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c2 = section.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c3 = section.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c4 = section.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c5 = section.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c6 = section.settings.card_text_color | default: '#171717' -%}
+{%- assign raw_card_text = section.settings.card_text_color | default: '#171717' -%}
+{%- if raw_card_text == blank or raw_card_text == 'transparent' or raw_card_text == '#ffffff' or raw_card_text == '#fff' -%}
+  {%- assign raw_card_text = '#171717' -%}
+{%- endif -%}
+
+{%- assign txt_c1 = raw_card_text -%}
+{%- assign txt_c2 = raw_card_text -%}
+{%- assign txt_c3 = raw_card_text -%}
+{%- assign txt_c4 = raw_card_text -%}
+{%- assign txt_c5 = raw_card_text -%}
+{%- assign txt_c6 = raw_card_text -%}
 
 {%- if section.settings.enable_auto_colors -%}
-  {%- assign txt_c1 = section.settings.color_1 | default: '#5B171C' -%}
-  {%- assign txt_c2 = section.settings.color_2 | default: '#263A50' -%}
-  {%- assign txt_c3 = section.settings.color_3 | default: '#596044' -%}
-  {%- assign txt_c4 = section.settings.color_4 | default: '#B88632' -%}
-  {%- assign txt_c5 = section.settings.color_5 | default: '#52716F' -%}
-  {%- assign txt_c6 = section.settings.color_1 | default: '#5B171C' -%}
+  {%- if section.settings.color_1 != blank and section.settings.color_1 != '#ffffff' -%}{%- assign txt_c1 = section.settings.color_1 -%}{%- endif -%}
+  {%- if section.settings.color_2 != blank and section.settings.color_2 != '#ffffff' -%}{%- assign txt_c2 = section.settings.color_2 -%}{%- endif -%}
+  {%- if section.settings.color_3 != blank and section.settings.color_3 != '#ffffff' -%}{%- assign txt_c3 = section.settings.color_3 -%}{%- endif -%}
+  {%- if section.settings.color_4 != blank and section.settings.color_4 != '#ffffff' -%}{%- assign txt_c4 = section.settings.color_4 -%}{%- endif -%}
+  {%- if section.settings.color_5 != blank and section.settings.color_5 != '#ffffff' -%}{%- assign txt_c5 = section.settings.color_5 -%}{%- endif -%}
+  {%- if section.settings.color_1 != blank and section.settings.color_1 != '#ffffff' -%}{%- assign txt_c6 = section.settings.color_1 -%}{%- endif -%}
 {%- endif -%}
 
 <div class="weekly-picks-{{ section_id }}" id="WeeklyPicks-{{ section_id }}">
@@ -716,7 +734,7 @@
         <a href="{{ section.settings.collection_url | default: '#' }}" class="wp-browse-btn-{{ section_id }}">
           <div class="wp-browse-circle-{{ section_id }}">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              {% if is_rtl == 'ar' %}
+              {% if is_rtl %}
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               {% else %}
                 <path d="M5 12h14M12 5l7 7-7 7"/>

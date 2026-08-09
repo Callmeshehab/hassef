@@ -5,7 +5,11 @@
 {% enddoc %}
 
 {%- assign ai_gen_id = block.id | replace: '_', '' | downcase -%}
-{%- assign is_rtl = request.locale.iso_code | default: 'ar' -%}
+{%- assign locale_code = request.locale.iso_code | downcase | split: '-' | first | default: 'ar' -%}
+{%- assign is_rtl = false -%}
+{%- if 'ar,he,fa,ur' contains locale_code -%}
+  {%- assign is_rtl = true -%}
+{%- endif -%}
 
 {% style %}
 /* ── MAIN BLOCK WRAPPER ── */
@@ -18,7 +22,8 @@
   background-color: {{ block.settings.background_color }};
   border-radius: {{ block.settings.block_radius }}px;
   box-sizing: border-box;
-  direction: {{ request.locale.iso_code | default: 'ar' | replace: 'ar', 'rtl' | replace: 'en', 'ltr' }};
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %} !important;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
@@ -75,6 +80,7 @@
 .wp-carousel-container-{{ ai_gen_id }} {
   position: relative;
   width: 100%;
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
 }
 
 .wp-track-{{ ai_gen_id }} {
@@ -87,6 +93,7 @@
   scrollbar-width: none;
   padding: 4px 0 12px;
   align-items: stretch;
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
 }
 
 .wp-track-{{ ai_gen_id }}::-webkit-scrollbar {
@@ -226,6 +233,7 @@
   flex-direction: column;
   gap: 2px;
   margin-bottom: 6px;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
 }
 
 .wp-product-title-{{ ai_gen_id }} {
@@ -241,6 +249,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   visibility: visible !important;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
 }
 
 .wp-product-img-wrap-{{ ai_gen_id }} {
@@ -268,6 +277,7 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 6px;
+  direction: {% if is_rtl %}rtl{% else %}ltr{% endif %};
 }
 
 .wp-product-price-{{ ai_gen_id }} {
@@ -279,6 +289,7 @@
   gap: 4px;
   opacity: 1 !important;
   visibility: visible !important;
+  text-align: {% if is_rtl %}right{% else %}left{% endif %} !important;
 }
 
 .wp-product-compare-{{ ai_gen_id }} {
@@ -431,20 +442,25 @@
 {%- assign img6 = block.settings.image_6 -%}
 
 {%- comment -%} High Contrast Text Colors per product card {%- endcomment -%}
-{%- assign txt_c1 = block.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c2 = block.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c3 = block.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c4 = block.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c5 = block.settings.card_text_color | default: '#171717' -%}
-{%- assign txt_c6 = block.settings.card_text_color | default: '#171717' -%}
+{%- assign raw_card_text = block.settings.card_text_color | default: '#171717' -%}
+{%- if raw_card_text == blank or raw_card_text == 'transparent' or raw_card_text == '#ffffff' or raw_card_text == '#fff' -%}
+  {%- assign raw_card_text = '#171717' -%}
+{%- endif -%}
+
+{%- assign txt_c1 = raw_card_text -%}
+{%- assign txt_c2 = raw_card_text -%}
+{%- assign txt_c3 = raw_card_text -%}
+{%- assign txt_c4 = raw_card_text -%}
+{%- assign txt_c5 = raw_card_text -%}
+{%- assign txt_c6 = raw_card_text -%}
 
 {%- if block.settings.enable_auto_colors -%}
-  {%- assign txt_c1 = block.settings.color_1 | default: '#5B171C' -%}
-  {%- assign txt_c2 = block.settings.color_2 | default: '#263A50' -%}
-  {%- assign txt_c3 = block.settings.color_3 | default: '#596044' -%}
-  {%- assign txt_c4 = block.settings.color_4 | default: '#B88632' -%}
-  {%- assign txt_c5 = block.settings.color_5 | default: '#52716F' -%}
-  {%- assign txt_c6 = block.settings.color_1 | default: '#5B171C' -%}
+  {%- if block.settings.color_1 != blank and block.settings.color_1 != '#ffffff' -%}{%- assign txt_c1 = block.settings.color_1 -%}{%- endif -%}
+  {%- if block.settings.color_2 != blank and block.settings.color_2 != '#ffffff' -%}{%- assign txt_c2 = block.settings.color_2 -%}{%- endif -%}
+  {%- if block.settings.color_3 != blank and block.settings.color_3 != '#ffffff' -%}{%- assign txt_c3 = block.settings.color_3 -%}{%- endif -%}
+  {%- if block.settings.color_4 != blank and block.settings.color_4 != '#ffffff' -%}{%- assign txt_c4 = block.settings.color_4 -%}{%- endif -%}
+  {%- if block.settings.color_5 != blank and block.settings.color_5 != '#ffffff' -%}{%- assign txt_c5 = block.settings.color_5 -%}{%- endif -%}
+  {%- if block.settings.color_1 != blank and block.settings.color_1 != '#ffffff' -%}{%- assign txt_c6 = block.settings.color_1 -%}{%- endif -%}
 {%- endif -%}
 
 <div class="wp-block-{{ ai_gen_id }}" id="WpBlock-{{ ai_gen_id }}">
@@ -713,7 +729,7 @@
         <a href="{{ block.settings.collection_url | default: '#' }}" class="wp-browse-btn-{{ ai_gen_id }}">
           <div class="wp-browse-circle-{{ ai_gen_id }}">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              {% if is_rtl == 'ar' %}
+              {% if is_rtl %}
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               {% else %}
                 <path d="M5 12h14M12 5l7 7-7 7"/>
