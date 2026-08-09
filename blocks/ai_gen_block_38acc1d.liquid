@@ -408,45 +408,156 @@
   <div class="wp-carousel-container-{{ ai_gen_id }}">
     <div class="wp-track-{{ ai_gen_id }}" id="WpTrack-{{ ai_gen_id }}">
       
-      {%- assign products_list = block.settings.products -%}
-      {%- assign total_products = products_list.size | default: 0 -%}
-      
-      {%- comment -%} Determine number of slides (each slide takes 2 products) {%- endcomment -%}
-      {%- assign slide_count = 1 -%}
-      {%- if total_products > 0 -%}
-        {%- assign slide_count = total_products | divided_by: 2 -%}
-        {%- assign rem = total_products | modulo: 2 -%}
-        {%- if rem > 0 -%}{%- assign slide_count = slide_count | plus: 1 -%}{%- endif -%}
-      {%- endif -%}
+      {%- if block.settings.products != blank and block.settings.products.count > 0 -%}
 
-      {%- for s in (1..slide_count) -%}
-        {%- assign idx1 = s | minus: 1 | times: 2 -%}
-        {%- assign idx2 = idx1 | plus: 1 -%}
-        
-        {%- if total_products > 0 -%}
-          {%- assign p1 = products_list[idx1] -%}
-          {%- assign p2 = products_list[idx2] -%}
-        {%- else -%}
-          {%- assign p1 = nil -%}
-          {%- assign p2 = nil -%}
-        {%- endif -%}
-
-        {%- comment -%} Auto Color Palette calculation {%- endcomment -%}
-        {%- assign color_idx = s | minus: 1 | modulo: 5 -%}
-        {%- assign card_bg = block.settings.fixed_card_bg -%}
-        {%- if block.settings.enable_auto_colors -%}
-          {%- case color_idx -%}
-            {%- when 0 -%}{%- assign card_bg = block.settings.color_1 -%}
-            {%- when 1 -%}{%- assign card_bg = block.settings.color_2 -%}
-            {%- when 2 -%}{%- assign card_bg = block.settings.color_3 -%}
-            {%- when 3 -%}{%- assign card_bg = block.settings.color_4 -%}
-            {%- when 4 -%}{%- assign card_bg = block.settings.color_5 -%}
-          {%- endcase -%}
-        {%- endif -%}
-
-        <div class="wp-slide-{{ ai_gen_id }}">
+        {%- for product in block.settings.products -%}
+          {%- assign mod2 = forloop.index0 | modulo: 2 -%}
           
-          {%- comment -%} 1) LARGE EDITORIAL CARD {%- endcomment -%}
+          {%- if mod2 == 0 -%}
+            {%- assign s_idx = forloop.index0 | divided_by: 2 -%}
+            {%- assign color_idx = s_idx | modulo: 5 -%}
+            {%- assign card_bg = block.settings.fixed_card_bg -%}
+            {%- if block.settings.enable_auto_colors -%}
+              {%- case color_idx -%}
+                {%- when 0 -%}{%- assign card_bg = block.settings.color_1 -%}
+                {%- when 1 -%}{%- assign card_bg = block.settings.color_2 -%}
+                {%- when 2 -%}{%- assign card_bg = block.settings.color_3 -%}
+                {%- when 3 -%}{%- assign card_bg = block.settings.color_4 -%}
+                {%- when 4 -%}{%- assign card_bg = block.settings.color_5 -%}
+              {%- endcase -%}
+            {%- endif -%}
+
+            <div class="wp-slide-{{ ai_gen_id }}">
+              
+              {%- comment -%} 1) LARGE EDITORIAL CARD {%- endcomment -%}
+              <a
+                href="{{ block.settings.editorial_cta_url | default: '#' }}"
+                class="wp-editorial-card-{{ ai_gen_id }}"
+                style="
+                  background-color: {{ block.settings.editorial_bg_color | default: '#5B171C' }};
+                  color: {{ block.settings.editorial_text_color | default: '#ffffff' }};
+                  {% if block.settings.editorial_bg_image != blank %}background-image: url('{{ block.settings.editorial_bg_image | image_url: width: 800 }}');{% endif %}
+                "
+              >
+                {%- if block.settings.overlay_opacity > 0 -%}
+                  <div
+                    class="wp-editorial-overlay-{{ ai_gen_id }}"
+                    style="background: {{ block.settings.overlay_color | default: '#000000' }}; opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};"
+                  ></div>
+                {%- endif -%}
+
+                <div class="wp-editorial-content-{{ ai_gen_id }}">
+                  {%- if block.settings.editorial_label != blank -%}
+                    <span class="wp-editorial-label-{{ ai_gen_id }}">{{ block.settings.editorial_label }}</span>
+                  {%- endif -%}
+                  {%- if block.settings.editorial_heading != blank -%}
+                    <h3 class="wp-editorial-heading-{{ ai_gen_id }}">{{ block.settings.editorial_heading }}</h3>
+                  {%- endif -%}
+                  {%- if block.settings.editorial_desc != blank -%}
+                    <p class="wp-editorial-desc-{{ ai_gen_id }}">{{ block.settings.editorial_desc }}</p>
+                  {%- endif -%}
+                </div>
+
+                {%- if block.settings.editorial_image != blank -%}
+                  <div class="wp-editorial-img-wrap-{{ ai_gen_id }}">
+                    <img
+                      src="{{ block.settings.editorial_image | image_url: width: 600 }}"
+                      alt="{{ block.settings.editorial_heading | escape }}"
+                      class="wp-editorial-img-{{ ai_gen_id }}"
+                      loading="lazy"
+                    >
+                  </div>
+                {%- endif -%}
+
+                {%- if block.settings.editorial_cta_text != blank -%}
+                  <div class="wp-editorial-cta-{{ ai_gen_id }}" style="color: {{ block.settings.editorial_accent_color | default: '#ffffff' }}">
+                    {{ block.settings.editorial_cta_text }}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+                  </div>
+                {%- endif -%}
+              </a>
+
+              {%- comment -%} 2) STACKED PRODUCTS COLUMN {%- endcomment -%}
+              <div class="wp-products-col-{{ ai_gen_id }}">
+          {%- endif -%}
+
+                {%- comment -%} RENDER SELECTED PRODUCT CARD {%- endcomment -%}
+                <div
+                  class="wp-product-card-{{ ai_gen_id }}"
+                  style="background-color: {{ card_bg | default: '#ffffff' }};"
+                >
+                  <a href="{{ product.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
+                    <div class="wp-product-header-{{ ai_gen_id }}">
+                      <h4 class="wp-product-title-{{ ai_gen_id }}">{{ product.title }}</h4>
+                      <div class="wp-product-meta-{{ ai_gen_id }}">
+                        {%- if block.settings.show_vendor and product.vendor != blank -%}
+                          <span>{{ product.vendor }}</span>
+                        {%- endif -%}
+                        {%- if block.settings.show_year -%}
+                          {%- assign p_year = product.metafields.custom.year | default: product.metafields.my_fields.year | default: product.published_at | date: '%Y' -%}
+                          {%- if p_year != blank -%}
+                            <span>• {{ p_year }}</span>
+                          {%- endif -%}
+                        {%- endif -%}
+                      </div>
+                    </div>
+
+                    <div class="wp-product-img-wrap-{{ ai_gen_id }}">
+                      {%- if product.featured_image -%}
+                        <img
+                          src="{{ product.featured_image | image_url: width: 400 }}"
+                          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                          class="wp-product-img-{{ ai_gen_id }}"
+                          loading="lazy"
+                          width="400"
+                          height="400"
+                        >
+                      {%- elsif product.images.first -%}
+                        <img
+                          src="{{ product.images.first | image_url: width: 400 }}"
+                          alt="{{ product.title | escape }}"
+                          class="wp-product-img-{{ ai_gen_id }}"
+                          loading="lazy"
+                          width="400"
+                          height="400"
+                        >
+                      {%- else -%}
+                        {{ 'product-1' | placeholder_svg_tag }}
+                      {%- endif -%}
+                    </div>
+
+                    <div class="wp-product-footer-{{ ai_gen_id }}">
+                      <div class="wp-product-price-{{ ai_gen_id }}">
+                        {{ product.price | money }}
+                        {%- if product.compare_at_price > product.price -%}
+                          <span class="wp-product-compare-{{ ai_gen_id }}">{{ product.compare_at_price | money }}</span>
+                        {%- endif -%}
+                      </div>
+                  </a>
+                      {%- if block.settings.show_add_button -%}
+                        {%- assign v_id = product.first_available_variant.id | default: product.variants.first.id -%}
+                        <button
+                          type="button"
+                          class="wp-add-btn-{{ ai_gen_id }}"
+                          data-variant-id="{{ v_id }}"
+                          aria-label="إضافة للسلة"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                      {%- endif -%}
+                    </div>
+                </div>
+
+          {%- if mod2 == 1 or forloop.last -%}
+              </div> <!-- end .wp-products-col -->
+            </div> <!-- end .wp-slide -->
+          {%- endif -%}
+
+        {%- endfor -%}
+
+      {%- else -%}
+        {%- comment -%} Demonstration Placeholders if no products are selected in Customizer {%- endcomment -%}
+        <div class="wp-slide-{{ ai_gen_id }}">
           <a
             href="{{ block.settings.editorial_cta_url | default: '#' }}"
             class="wp-editorial-card-{{ ai_gen_id }}"
@@ -456,13 +567,6 @@
               {% if block.settings.editorial_bg_image != blank %}background-image: url('{{ block.settings.editorial_bg_image | image_url: width: 800 }}');{% endif %}
             "
           >
-            {%- if block.settings.overlay_opacity > 0 -%}
-              <div
-                class="wp-editorial-overlay-{{ ai_gen_id }}"
-                style="background: {{ block.settings.overlay_color | default: '#000000' }}; opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};"
-              ></div>
-            {%- endif -%}
-
             <div class="wp-editorial-content-{{ ai_gen_id }}">
               {%- if block.settings.editorial_label != blank -%}
                 <span class="wp-editorial-label-{{ ai_gen_id }}">{{ block.settings.editorial_label }}</span>
@@ -474,18 +578,6 @@
                 <p class="wp-editorial-desc-{{ ai_gen_id }}">{{ block.settings.editorial_desc }}</p>
               {%- endif -%}
             </div>
-
-            {%- if block.settings.editorial_image != blank -%}
-              <div class="wp-editorial-img-wrap-{{ ai_gen_id }}">
-                <img
-                  src="{{ block.settings.editorial_image | image_url: width: 600 }}"
-                  alt="{{ block.settings.editorial_heading | escape }}"
-                  class="wp-editorial-img-{{ ai_gen_id }}"
-                  loading="lazy"
-                >
-              </div>
-            {%- endif -%}
-
             {%- if block.settings.editorial_cta_text != blank -%}
               <div class="wp-editorial-cta-{{ ai_gen_id }}" style="color: {{ block.settings.editorial_accent_color | default: '#ffffff' }}">
                 {{ block.settings.editorial_cta_text }}
@@ -494,120 +586,46 @@
             {%- endif -%}
           </a>
 
-          {%- comment -%} 2) STACKED PRODUCTS COLUMN {%- endcomment -%}
           <div class="wp-products-col-{{ ai_gen_id }}">
-            
             {%- for k in (1..2) -%}
-              {%- if k == 1 -%}
-                {%- assign current_p = p1 -%}
-              {%- else -%}
-                {%- assign current_p = p2 -%}
-              {%- endif -%}
-
-              <div
-                class="wp-product-card-{{ ai_gen_id }}"
-                style="background-color: {{ card_bg | default: '#ffffff' }};"
-              >
-                {%- if current_p != blank and current_p.title != blank -%}
-                  <a href="{{ current_p.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
-                    <div class="wp-product-header-{{ ai_gen_id }}">
-                      <h4 class="wp-product-title-{{ ai_gen_id }}">{{ current_p.title }}</h4>
-                      <div class="wp-product-meta-{{ ai_gen_id }}">
-                        {%- if block.settings.show_vendor and current_p.vendor != blank -%}
-                          <span>{{ current_p.vendor }}</span>
-                        {%- endif -%}
-                        {%- if block.settings.show_year -%}
-                          {%- assign p_year = current_p.metafields.custom.year | default: current_p.metafields.my_fields.year | default: current_p.published_at | date: '%Y' -%}
-                          {%- if p_year != blank -%}
-                            <span>• {{ p_year }}</span>
-                          {%- endif -%}
-                        {%- endif -%}
-                      </div>
-                    </div>
-
-                    <div class="wp-product-img-wrap-{{ ai_gen_id }}">
-                      {%- if current_p.featured_image -%}
-                        <img
-                          src="{{ current_p.featured_image | image_url: width: 400 }}"
-                          alt="{{ current_p.featured_image.alt | default: current_p.title | escape }}"
-                          class="wp-product-img-{{ ai_gen_id }}"
-                          loading="lazy"
-                          width="400"
-                          height="400"
-                        >
-                      {%- elsif current_p.images.first -%}
-                        <img
-                          src="{{ current_p.images.first | image_url: width: 400 }}"
-                          alt="{{ current_p.title | escape }}"
-                          class="wp-product-img-{{ ai_gen_id }}"
-                          loading="lazy"
-                          width="400"
-                          height="400"
-                        >
-                      {%- else -%}
-                        {{ 'product-1' | placeholder_svg_tag: 'wp-product-img-' | append: ai_gen_id }}
-                      {%- endif -%}
-                    </div>
-
-                    <div class="wp-product-footer-{{ ai_gen_id }}">
-                      <div class="wp-product-price-{{ ai_gen_id }}">
-                        {{ current_p.price | money }}
-                        {%- if current_p.compare_at_price > current_p.price -%}
-                          <span class="wp-product-compare-{{ ai_gen_id }}">{{ current_p.compare_at_price | money }}</span>
-                        {%- endif -%}
-                      </div>
-                  </a>
-                      {%- if block.settings.show_add_button -%}
-                        {%- assign v_id = current_p.first_available_variant.id | default: current_p.variants.first.id -%}
-                        <button
-                          type="button"
-                          class="wp-add-btn-{{ ai_gen_id }}"
-                          data-variant-id="{{ v_id }}"
-                          aria-label="إضافة للسلة"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        </button>
-                      {%- endif -%}
-                    </div>
-
-                {%- else -%}
-                  {%- comment -%} Placeholder when no product chosen {%- endcomment -%}
-                  <div class="wp-product-header-{{ ai_gen_id }}">
-                    <h4 class="wp-product-title-{{ ai_gen_id }}">اسم المنتج {{ k }}</h4>
-                    <div class="wp-product-meta-{{ ai_gen_id }}">نجيب محفوظ • 1978</div>
-                  </div>
-                  <div class="wp-product-img-wrap-{{ ai_gen_id }}">
-                    {{ 'product-1' | placeholder_svg_tag }}
-                  </div>
-                  <div class="wp-product-footer-{{ ai_gen_id }}">
-                    <div class="wp-product-price-{{ ai_gen_id }}">350 ج.م</div>
-                    <button type="button" class="wp-add-btn-{{ ai_gen_id }}">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    </button>
-                  </div>
-                {%- endif -%}
+              <div class="wp-product-card-{{ ai_gen_id }}" style="background-color: {{ block.settings.color_1 | default: '#FAF9F5' }};">
+                <div class="wp-product-header-{{ ai_gen_id }}">
+                  <h4 class="wp-product-title-{{ ai_gen_id }}">اختر المنتجات من القائمة جانباً {{ k }}</h4>
+                  <div class="wp-product-meta-{{ ai_gen_id }}">الحصيف • 1978</div>
+                </div>
+                <div class="wp-product-img-wrap-{{ ai_gen_id }}">
+                  {{ 'product-1' | placeholder_svg_tag }}
+                </div>
+                <div class="wp-product-footer-{{ ai_gen_id }}">
+                  <div class="wp-product-price-{{ ai_gen_id }}">350 ج.م</div>
+                  <button type="button" class="wp-add-btn-{{ ai_gen_id }}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
               </div>
-
             {%- endfor -%}
-
           </div>
-
         </div>
-
-      {%- endfor -%}
+      {%- endif -%}
 
     </div>
 
-    {%- if block.settings.show_dots and slide_count > 1 -%}
+    {%- if block.settings.show_dots -%}
       <div class="wp-dots-{{ ai_gen_id }}" id="WpDots-{{ ai_gen_id }}">
-        {%- for s in (1..slide_count) -%}
-          <button
-            type="button"
-            class="wp-dot-{{ ai_gen_id }}{% if forloop.first %} is-active{% endif %}"
-            data-index="{{ forloop.index0 }}"
-            aria-label="Slide {{ forloop.index }}"
-          ></button>
-        {%- endfor -%}
+        {%- assign total_p = block.settings.products.count | default: 2 -%}
+        {%- assign total_slides = total_p | divided_by: 2 -%}
+        {%- assign rem = total_p | modulo: 2 -%}
+        {%- if rem > 0 -%}{%- assign total_slides = total_slides | plus: 1 -%}{%- endif -%}
+        {%- if total_slides > 1 -%}
+          {%- for s in (1..total_slides) -%}
+            <button
+              type="button"
+              class="wp-dot-{{ ai_gen_id }}{% if forloop.first %} is-active{% endif %}"
+              data-index="{{ forloop.index0 }}"
+              aria-label="Slide {{ forloop.index }}"
+            ></button>
+          {%- endfor -%}
+        {%- endif -%}
       </div>
     {%- endif -%}
 
