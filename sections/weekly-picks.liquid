@@ -92,7 +92,7 @@
   display: none;
 }
 
-/* ── LARGE EDITORIAL CARD (Appears ONLY ONCE at the start) ── */
+/* ── LARGE EDITORIAL CARD (Renders ONLY ONCE at start) ── */
 .wp-editorial-card-{{ section_id }} {
   flex: 0 0 {{ section.settings.editorial_width }}px;
   width: {{ section.settings.editorial_width }}px;
@@ -224,14 +224,16 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .wp-product-title-{{ section_id }} {
   font-size: {{ section.settings.card_title_size }}px;
   font-weight: 700;
+  color: #171717;
   margin: 0;
   line-height: 1.3;
+  opacity: 1 !important;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -263,15 +265,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .wp-product-price-{{ section_id }} {
   font-size: {{ section.settings.card_price_size }}px;
   font-weight: 700;
+  color: #171717;
   display: flex;
   align-items: baseline;
   gap: 4px;
+  opacity: 1 !important;
 }
 
 .wp-product-compare-{{ section_id }} {
@@ -282,8 +286,8 @@
 }
 
 .wp-add-btn-{{ section_id }} {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.12);
   background: #ffffff;
@@ -315,62 +319,58 @@
   border-color: #22c55e;
 }
 
-/* ── BROWSE MORE CARD (Centered Circular Icon Button at End) ── */
+/* ── FRAMELESS CIRCULAR BROWSE MORE BUTTON AT END ── */
 .wp-browse-col-{{ section_id }} {
-  flex: 0 0 160px;
-  width: 160px;
+  flex: 0 0 110px;
+  width: 110px;
   scroll-snap-align: start;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.wp-browse-card-{{ section_id }} {
-  width: 100%;
-  height: 100%;
-  border-radius: {{ section.settings.card_border_radius }}px;
-  padding: 24px 16px;
-  box-sizing: border-box;
+.wp-browse-btn-{{ section_id }} {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
   text-decoration: none;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px dashed rgba(0, 0, 0, 0.15);
-  color: {{ section.settings.accent_color }};
-  transition: transform 0.3s ease, background 0.3s ease;
+  background: transparent;
+  border: none;
+  gap: 8px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.3s ease;
 }
 
-.wp-browse-card-{{ section_id }}:hover {
-  transform: scale(1.04);
-  background: rgba(0, 0, 0, 0.06);
+.wp-browse-btn-{{ section_id }}:hover {
+  transform: scale(1.08);
 }
 
 .wp-browse-circle-{{ section_id }} {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: {{ section.settings.accent_color }};
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
-.wp-browse-card-{{ section_id }}:hover .wp-browse-circle-{{ section_id }} {
-  transform: scale(1.1);
+.wp-browse-btn-{{ section_id }}:hover .wp-browse-circle-{{ section_id }} {
+  background: #171717;
+  transform: scale(1.06);
 }
 
 .wp-browse-title-{{ section_id }} {
   font-size: 13px;
   font-weight: 700;
+  color: {{ section.settings.accent_color }};
   margin: 0;
-  color: #171717;
+  white-space: nowrap;
 }
 
 /* ── PAGINATION DOTS ── */
@@ -427,21 +427,21 @@
 {%- assign img5 = section.settings.image_5 -%}
 {%- assign img6 = section.settings.image_6 -%}
 
-{%- comment -%} Automatic Text Color Cycling per product card {%- endcomment -%}
-{%- assign txt_c1 = section.settings.card_text_color -%}
-{%- assign txt_c2 = section.settings.card_text_color -%}
-{%- assign txt_c3 = section.settings.card_text_color -%}
-{%- assign txt_c4 = section.settings.card_text_color -%}
-{%- assign txt_c5 = section.settings.card_text_color -%}
-{%- assign txt_c6 = section.settings.card_text_color -%}
+{%- comment -%} High Contrast Text Colors per product card {%- endcomment -%}
+{%- assign txt_c1 = section.settings.card_text_color | default: '#171717' -%}
+{%- assign txt_c2 = section.settings.card_text_color | default: '#171717' -%}
+{%- assign txt_c3 = section.settings.card_text_color | default: '#171717' -%}
+{%- assign txt_c4 = section.settings.card_text_color | default: '#171717' -%}
+{%- assign txt_c5 = section.settings.card_text_color | default: '#171717' -%}
+{%- assign txt_c6 = section.settings.card_text_color | default: '#171717' -%}
 
 {%- if section.settings.enable_auto_colors -%}
-  {%- assign txt_c1 = section.settings.color_1 -%}
-  {%- assign txt_c2 = section.settings.color_2 -%}
-  {%- assign txt_c3 = section.settings.color_3 -%}
-  {%- assign txt_c4 = section.settings.color_4 -%}
-  {%- assign txt_c5 = section.settings.color_5 -%}
-  {%- assign txt_c6 = section.settings.color_1 -%}
+  {%- assign txt_c1 = section.settings.color_1 | default: '#5B171C' -%}
+  {%- assign txt_c2 = section.settings.color_2 | default: '#263A50' -%}
+  {%- assign txt_c3 = section.settings.color_3 | default: '#596044' -%}
+  {%- assign txt_c4 = section.settings.color_4 | default: '#B88632' -%}
+  {%- assign txt_c5 = section.settings.color_5 | default: '#52716F' -%}
+  {%- assign txt_c6 = section.settings.color_1 | default: '#5B171C' -%}
 {%- endif -%}
 
 <div class="weekly-picks-{{ section_id }}" id="WeeklyPicks-{{ section_id }}">
@@ -466,7 +466,7 @@
   <div class="wp-carousel-container-{{ section_id }}">
     <div class="wp-track-{{ section_id }}" id="WpTrack-{{ section_id }}">
       
-      <!-- 1) EDITORIAL LARGE CARD (Renders ONLY ONCE at the start) -->
+      <!-- 1) EDITORIAL LARGE CARD (Renders ONLY ONCE at start) -->
       <a
         href="{{ section.settings.editorial_cta_url | default: '#' }}"
         class="wp-editorial-card-{{ section_id }}"
@@ -711,9 +711,9 @@
         </div>
       {%- endif -%}
 
-      <!-- 5) BROWSE MORE CARD (Centered Circular Icon Button at End) -->
+      <!-- 5) FRAMELESS CIRCULAR BROWSE MORE BUTTON AT END -->
       <div class="wp-browse-col-{{ section_id }}">
-        <a href="{{ section.settings.collection_url | default: '#' }}" class="wp-browse-card-{{ section_id }}">
+        <a href="{{ section.settings.collection_url | default: '#' }}" class="wp-browse-btn-{{ section_id }}">
           <div class="wp-browse-circle-{{ section_id }}">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               {% if is_rtl == 'ar' %}
@@ -1073,7 +1073,7 @@
       "type": "checkbox",
       "id": "enable_auto_colors",
       "label": "تغيير لون النص لكل بطاقة بشكل دوري",
-      "default": true
+      "default": false
     },
     {
       "type": "color",

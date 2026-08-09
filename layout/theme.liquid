@@ -111,6 +111,15 @@
         background-color: rgb(var(--color-background));
       }
 
+      html[dir="rtl"], html[dir="rtl"] body {
+        direction: rtl;
+        text-align: right;
+      }
+      html[dir="ltr"], html[dir="ltr"] body {
+        direction: ltr;
+        text-align: left;
+      }
+
       :root {
         --font-display: 'Noto Naskh Arabic', serif;
         --font-body:    'IBM Plex Sans Arabic', sans-serif;
