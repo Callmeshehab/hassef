@@ -1,6 +1,535 @@
+{% doc %}
+  @prompt
+    بدي بار لعرض المنتجات بشكل ذكي انيق لطيف بنفس تصاميم ابل
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-product-bar-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+    background: {{ block.settings.background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    padding: {{ block.settings.padding }}px;
+    overflow: hidden;
+  }
+
+  .ai-product-bar-container-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-product-bar-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.gap }}px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ai-product-card-{{ ai_gen_id }} {
+    flex: 0 0 {{ block.settings.card_width }}px;
+    background: {{ block.settings.card_background }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+
+  .ai-product-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-product-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+    background: #f5f5f7;
+  }
+
+  .ai-product-image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ai-product-card-{{ ai_gen_id }}:hover .ai-product-image-{{ ai_gen_id }} {
+    transform: scale(1.05);
+  }
+
+  .ai-product-image-placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f5f5f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-product-image-placeholder-{{ ai_gen_id }} svg {
+    width: 50%;
+    height: 50%;
+    opacity: 0.3;
+  }
+
+  .ai-product-info-{{ ai_gen_id }} {
+    padding: {{ block.settings.card_padding }}px;
+  }
+
+  .ai-product-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 600;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 8px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .ai-product-price-{{ ai_gen_id }} {
+    font-size: {{ block.settings.price_size }}px;
+    color: {{ block.settings.price_color }};
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .ai-product-price-compare-{{ ai_gen_id }} {
+    text-decoration: line-through;
+    opacity: 0.6;
+    margin-left: 8px;
+    font-size: {{ block.settings.price_size | times: 0.9 }}px;
+  }
+
+  .ai-nav-button-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: {{ block.settings.nav_button_color }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-product-bar-{{ ai_gen_id }}:hover .ai-nav-button-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .ai-nav-button-{{ ai_gen_id }}:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-nav-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-nav-button-{{ ai_gen_id }}:disabled:hover {
+    transform: translateY(-50%) scale(1);
+  }
+
+  .ai-nav-button-prev-{{ ai_gen_id }} {
+    left: 12px;
+  }
+
+  .ai-nav-button-next-{{ ai_gen_id }} {
+    right: 12px;
+  }
+
+  .ai-nav-button-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+    stroke: {{ block.settings.nav_icon_color }};
+    stroke-width: 2;
+  }
+
+  .ai-product-bar-empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: #86868b;
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-product-bar-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-product-card-{{ ai_gen_id }} {
+      flex: 0 0 {{ block.settings.card_width | times: 0.8 }}px;
+    }
+
+    .ai-nav-button-{{ ai_gen_id }} {
+      opacity: 1;
+    }
+  }
+{% endstyle %}
+
+<product-bar-{{ ai_gen_id }} class="ai-product-bar-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.products.count > 0 %}
+    <div class="ai-product-bar-container-{{ ai_gen_id }}">
+      <button
+        class="ai-nav-button-{{ ai_gen_id }} ai-nav-button-prev-{{ ai_gen_id }}"
+        aria-label="السابق"
+        data-direction="prev"
+      >
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M15 18L9 12L15 6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="ai-product-bar-wrapper-{{ ai_gen_id }}">
+        {% for product in block.settings.products %}
+          <a href="{{ product.url }}" class="ai-product-card-{{ ai_gen_id }}">
+            <div class="ai-product-image-wrapper-{{ ai_gen_id }}">
+              {% if product.featured_image %}
+                <img
+                  src="{{ product.featured_image | image_url: width: 600 }}"
+                  alt="{{ product.featured_image.alt | escape }}"
+                  class="ai-product-image-{{ ai_gen_id }}"
+                  loading="lazy"
+                  width="600"
+                  height="600"
+                >
+              {% else %}
+                <div class="ai-product-image-placeholder-{{ ai_gen_id }}">
+                  {{ 'product-1' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+            </div>
+            <div class="ai-product-info-{{ ai_gen_id }}">
+              <h3 class="ai-product-title-{{ ai_gen_id }}">{{ product.title }}</h3>
+              <div class="ai-product-price-{{ ai_gen_id }}">
+                {{ product.price | money }}
+                {% if product.compare_at_price > product.price %}
+                  <span class="ai-product-price-compare-{{ ai_gen_id }}">
+                    {{ product.compare_at_price | money }}
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+
+      <button
+        class="ai-nav-button-{{ ai_gen_id }} ai-nav-button-next-{{ ai_gen_id }}"
+        aria-label="التالي"
+        data-direction="next"
+      >
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M9 18L15 12L9 6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  {% else %}
+    <div class="ai-product-bar-empty-{{ ai_gen_id }}">
+      قم بإضافة منتجات لعرضها في الشريط
+    </div>
+  {% endif %}
+</product-bar-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ProductBar{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.cardWidth = {{ block.settings.card_width }};
+        this.gap = {{ block.settings.gap }};
+        this.visibleCards = {{ block.settings.visible_cards }};
+      }
+
+      connectedCallback() {
+        this.wrapper = this.querySelector('.ai-product-bar-wrapper-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-nav-button-prev-{{ ai_gen_id }}');
+        this.nextButton = this.querySelector('.ai-nav-button-next-{{ ai_gen_id }}');
+        this.cards = this.querySelectorAll('.ai-product-card-{{ ai_gen_id }}');
+
+        if (!this.wrapper || this.cards.length === 0) return;
+
+        this.totalCards = this.cards.length;
+        this.maxIndex = Math.max(0, this.totalCards - this.visibleCards);
+
+        this.setupEventListeners();
+        this.updateButtons();
+        this.handleResize();
+
+        window.addEventListener('resize', () => this.handleResize());
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.navigate('prev'));
+        }
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.navigate('next'));
+        }
+
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        this.wrapper.addEventListener('touchstart', (e) => {
+          startX = e.touches[0].clientX;
+          isDragging = true;
+        });
+
+        this.wrapper.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          currentX = e.touches[0].clientX;
+        });
+
+        this.wrapper.addEventListener('touchend', () => {
+          if (!isDragging) return;
+          const diff = startX - currentX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+              this.navigate('next');
+            } else {
+              this.navigate('prev');
+            }
+          }
+          isDragging = false;
+        });
+      }
+
+      handleResize() {
+        if (window.innerWidth <= 749) {
+          this.cardWidth = {{ block.settings.card_width | times: 0.8 }};
+          this.visibleCards = Math.min(2, this.totalCards);
+        } else {
+          this.cardWidth = {{ block.settings.card_width }};
+          this.visibleCards = Math.min({{ block.settings.visible_cards }}, this.totalCards);
+        }
+        this.maxIndex = Math.max(0, this.totalCards - this.visibleCards);
+        this.currentIndex = Math.min(this.currentIndex, this.maxIndex);
+        this.updatePosition();
+        this.updateButtons();
+      }
+
+      navigate(direction) {
+        if (direction === 'next' && this.currentIndex < this.maxIndex) {
+          this.currentIndex++;
+        } else if (direction === 'prev' && this.currentIndex > 0) {
+          this.currentIndex--;
+        }
+        this.updatePosition();
+        this.updateButtons();
+      }
+
+      updatePosition() {
+        const offset = -(this.currentIndex * (this.cardWidth + this.gap));
+        this.wrapper.style.transform = `translateX(${offset}px)`;
+      }
+
+      updateButtons() {
+        if (this.prevButton) {
+          this.prevButton.disabled = this.currentIndex === 0;
+        }
+        if (this.nextButton) {
+          this.nextButton.disabled = this.currentIndex >= this.maxIndex;
+        }
+      }
+    }
+
+    customElements.define('product-bar-{{ ai_gen_id }}', ProductBar{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "شريط المنتجات",
+  "settings": [
+    {
+      "type": "header",
+      "content": "المنتجات"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "المنتجات",
+      "limit": 12
+    },
+    {
+      "type": "range",
+      "id": "visible_cards",
+      "label": "عدد المنتجات المرئية",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "عرض الشريط",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "تصميم البطاقة"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "عرض البطاقة",
+      "min": 200,
+      "max": 400,
+      "step": 20,
+      "unit": "px",
+      "default": 280
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "المسافة بين البطاقات",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "حشوة البطاقة",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "استدارة حواف البطاقة",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "خلفية البطاقة",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "النصوص"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "حجم العنوان",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "label": "حجم السعر",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "لون النص",
+      "default": "#1d1d1f"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "لون السعر",
+      "default": "#1d1d1f"
+    },
+    {
+      "type": "header",
+      "content": "التصميم العام"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "الحشوة الداخلية",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "استدارة الحواف",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "لون الخلفية",
+      "default": "#f5f5f7"
+    },
+    {
+      "type": "header",
+      "content": "أزرار التنقل"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_color",
+      "label": "لون الزر",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_icon_color",
+      "label": "لون الأيقونة",
+      "default": "#1d1d1f"
+    }
+  ],
+  "presets": [
+    {
+      "name": "شريط المنتجات"
+    }
+  ]
+}
 {% endschema %}
