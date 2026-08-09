@@ -428,12 +428,17 @@ html[dir="ltr"] .hf-logo-img-scrolled { right: auto; left: 0; }
 /* Arabic: nav starts from right */
 html[dir="rtl"] .hf-header__nav {
   direction: rtl;
+  justify-content: flex-start;
+}
+html[dir="rtl"] .hf-header__nav .hf-nav-link:first-child {
+  margin-right: 0;
 }
 
 /* English: nav starts from left */
 html[dir="ltr"] .hf-header__nav,
 [dir="ltr"] .hf-header__nav {
   direction: ltr;
+  justify-content: flex-start;
 }
 .hf-header__nav::-webkit-scrollbar { display: none; }
 
