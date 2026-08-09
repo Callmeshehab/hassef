@@ -397,6 +397,31 @@
       transform: translateY(-2px);
     }
 
+    .header-login-btn {
+      background: var(--color-surface);
+      color: var(--color-secondary);
+      border: 2px solid var(--color-border);
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-accent);
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 2px 2px 0px var(--color-border-dark);
+      text-decoration: none;
+    }
+
+    .header-login-btn:hover {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 4px 4px 0px var(--color-secondary);
+    }
+
     .cart-badge {
       position: absolute;
       top: -4px;
@@ -1004,8 +1029,101 @@
     }
 
     .category-count {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--color-text-muted);
+    }
+
+    /* ==========================================================================
+       SECTION: 🛍️ FEATURED PRODUCTS GRID (شريط عرض المنتجات)
+       ========================================================================== */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 24px;
+    }
+
+    .product-card {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 8px 8px 0px var(--color-border-dark);
+      border-color: var(--color-primary);
+    }
+
+    .product-tag-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--color-accent);
+      color: var(--color-secondary);
+      font-family: var(--font-accent);
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-secondary);
+      z-index: 3;
+    }
+
+    .product-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: #f5f2ec;
+      position: relative;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .product-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-thumb img {
+      transform: scale(1.08);
+    }
+
+    .product-details {
+      padding: 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-title {
+      font-family: var(--font-accent);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-secondary);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .product-stars {
+      color: #f59e0b;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px dashed var(--color-border);
     }
 
     /* ==========================================================================
@@ -1804,9 +1922,10 @@
           <button class="icon-btn" onclick="toggleSearchOverlay()" title="البحث الحثيث">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
-          <button class="icon-btn" onclick="openToast('حساب المستخدم: مسجل كضيف')" title="حسابي">
-            <i class="fa-regular fa-user"></i>
-          </button>
+          <a href="#login" class="header-login-btn" onclick="openToast('صفحة تسجيل الدخول (Shopify Customer Login)'); return false;">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>تسجيل الدخول</span>
+          </a>
           <button class="icon-btn" onclick="toggleCartDrawer()" title="سلة التسوق">
             <i class="fa-solid fa-bag-shopping"></i>
             <span class="cart-badge" id="cartCountBadge">0</span>
@@ -2209,10 +2328,12 @@
     ];
 
     const FEATURED_PRODUCTS = [
-      { id: 201, title: "مشغل كاسيت ريترو خشبي يدوي", price: 340, stars: 5, img: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=400&q=80" },
-      { id: 202, title: "فاصل كتب نحاسي مذهب بنقوش عربية", price: 65, stars: 5, img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80" },
-      { id: 203, title: "حقيبة الحصيف القماشية لحمل الأشرطة", price: 85, stars: 4, img: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80" },
-      { id: 204, title: "حافظة كاسيتات جلدية تتسع لـ 24 شريط", price: 160, stars: 5, img: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400&q=80" }
+      { id: 201, tag: "🔥 الأكثر مبيعاً", title: "مشغل كاسيت ريترو خشبي عالي الدقة", price: 340, stars: 5, img: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=400&q=80" },
+      { id: 202, tag: "✨ جديد", title: "فاصل كتب نحاسي مذهب بنقوش عربية", price: 65, stars: 5, img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80" },
+      { id: 203, tag: "🏷️ خصم خاص", title: "حقيبة الحصيف القماشية التراثية لحمل الأشرطة", price: 85, stars: 4, img: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80" },
+      { id: 204, tag: "⭐ موصى به", title: "حافظة كاسيتات جلدية فاخرة تتسع لـ 24 شريط", price: 160, stars: 5, img: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400&q=80" },
+      { id: 205, tag: "📻 كلاسيك", title: "مكبر صوت ستيريو محمول بتصميم إذاعي قديم", price: 290, stars: 5, img: "https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80" },
+      { id: 206, tag: "🖋️ فاخر", title: "مجموعة أقلام حبر كلاسيكية ومذكرة الحصيف", price: 110, stars: 5, img: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=400&q=80" }
     ];
 
     // State Variables
@@ -2347,6 +2468,7 @@
       const grid = document.getElementById('featuredProductsGrid');
       grid.innerHTML = FEATURED_PRODUCTS.map(p => `
         <div class="product-card">
+          <span class="product-tag-badge">${p.tag}</span>
           <div class="product-thumb">
             <img src="${p.img}" alt="${p.title}">
           </div>
@@ -2358,7 +2480,7 @@
             <div class="product-footer">
               <span class="price-tag">${p.price} ر.س</span>
               <button class="add-to-cart-btn" onclick="addToCart(${p.id}, '${p.title.replace(/'/g, "\\'")}', ${p.price}, '${p.img}')">
-                <i class="fa-solid fa-cart-plus"></i> إضافة
+                <i class="fa-solid fa-cart-plus"></i> أضف للسلة
               </button>
             </div>
           </div>

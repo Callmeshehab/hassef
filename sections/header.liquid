@@ -1135,7 +1135,11 @@ html[dir="ltr"] .hf-mobile-drawer__link { direction: ltr; text-align: left; }
             {%- if customer -%}
               {{ 'customer.account.title' | t | default: 'حسابي' }}
             {%- else -%}
-              {{ 'customer.login.title' | t | replace: 'Translation missing: ar.customer.login.title', 'تسجيل الدخول' }}
+              {%- assign login_lbl = 'customer.login.title' | t -%}
+              {%- if login_lbl contains 'missing' or login_lbl contains 't:' or login_lbl contains 'customer.login' -%}
+                {%- assign login_lbl = 'تسجيل الدخول' -%}
+              {%- endif -%}
+              {{ login_lbl }}
             {%- endif -%}
           </a>
         {%- endif -%}
@@ -1192,7 +1196,11 @@ html[dir="ltr"] .hf-mobile-drawer__link { direction: ltr; text-align: left; }
     {%- if shop.customer_accounts_enabled -%}
       <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
          style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#444;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;font-weight:600;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,0.04);">
-        {{ 'customer.login.title' | t | replace: 'Translation missing: ar.customer.login.title', 'تسجيل الدخول' }}
+        {%- assign mob_login_lbl = 'customer.login.title' | t -%}
+        {%- if mob_login_lbl contains 'missing' or mob_login_lbl contains 't:' or mob_login_lbl contains 'customer.login' -%}
+          {%- assign mob_login_lbl = 'تسجيل الدخول' -%}
+        {%- endif -%}
+        {{ mob_login_lbl }}
       </a>
     {%- endif -%}
   </div>
