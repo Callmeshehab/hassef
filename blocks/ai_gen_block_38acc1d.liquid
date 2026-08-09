@@ -49,7 +49,7 @@
 }
 
 .wp-title-{{ ai_gen_id }} {
-  font-size: {{ block.settings.title_size }}px;
+  font-size: {{ block.settings.block_title_size }}px;
   font-weight: 700;
   color: {{ block.settings.title_color }};
   margin: 0;
@@ -271,7 +271,7 @@
 
 .wp-product-img-wrap-{{ ai_gen_id }} {
   width: 100%;
-  height: 80px;
+  height: 85px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -409,10 +409,10 @@
     <div class="wp-track-{{ ai_gen_id }}" id="WpTrack-{{ ai_gen_id }}">
       
       {%- assign products_list = block.settings.products -%}
-      {%- assign total_products = products_list.count -%}
+      {%- assign total_products = products_list.size | default: 0 -%}
       
       {%- comment -%} Determine number of slides (each slide takes 2 products) {%- endcomment -%}
-      {%- assign slide_count = 2 -%}
+      {%- assign slide_count = 1 -%}
       {%- if total_products > 0 -%}
         {%- assign slide_count = total_products | divided_by: 2 -%}
         {%- assign rem = total_products | modulo: 2 -%}
@@ -422,8 +422,14 @@
       {%- for s in (1..slide_count) -%}
         {%- assign idx1 = s | minus: 1 | times: 2 -%}
         {%- assign idx2 = idx1 | plus: 1 -%}
-        {%- assign p1 = products_list[idx1] -%}
-        {%- assign p2 = products_list[idx2] -%}
+        
+        {%- if total_products > 0 -%}
+          {%- assign p1 = products_list[idx1] -%}
+          {%- assign p2 = products_list[idx2] -%}
+        {%- else -%}
+          {%- assign p1 = nil -%}
+          {%- assign p2 = nil -%}
+        {%- endif -%}
 
         {%- comment -%} Auto Color Palette calculation {%- endcomment -%}
         {%- assign color_idx = s | minus: 1 | modulo: 5 -%}
@@ -502,7 +508,7 @@
                 class="wp-product-card-{{ ai_gen_id }}"
                 style="background-color: {{ card_bg | default: '#ffffff' }};"
               >
-                {%- if current_p != blank -%}
+                {%- if current_p != blank and current_p.title != blank -%}
                   <a href="{{ current_p.url }}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
                     <div class="wp-product-header-{{ ai_gen_id }}">
                       <h4 class="wp-product-title-{{ ai_gen_id }}">{{ current_p.title }}</h4>
@@ -523,12 +529,23 @@
                       {%- if current_p.featured_image -%}
                         <img
                           src="{{ current_p.featured_image | image_url: width: 400 }}"
+                          alt="{{ current_p.featured_image.alt | default: current_p.title | escape }}"
+                          class="wp-product-img-{{ ai_gen_id }}"
+                          loading="lazy"
+                          width="400"
+                          height="400"
+                        >
+                      {%- elsif current_p.images.first -%}
+                        <img
+                          src="{{ current_p.images.first | image_url: width: 400 }}"
                           alt="{{ current_p.title | escape }}"
                           class="wp-product-img-{{ ai_gen_id }}"
                           loading="lazy"
+                          width="400"
+                          height="400"
                         >
                       {%- else -%}
-                        {{ 'product-1' | placeholder_svg_tag }}
+                        {{ 'product-1' | placeholder_svg_tag: 'wp-product-img-' | append: ai_gen_id }}
                       {%- endif -%}
                     </div>
 
@@ -541,10 +558,11 @@
                       </div>
                   </a>
                       {%- if block.settings.show_add_button -%}
+                        {%- assign v_id = current_p.first_available_variant.id | default: current_p.variants.first.id -%}
                         <button
                           type="button"
                           class="wp-add-btn-{{ ai_gen_id }}"
-                          data-variant-id="{{ current_p.first_available_variant.id }}"
+                          data-variant-id="{{ v_id }}"
                           aria-label="إضافة للسلة"
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -705,7 +723,7 @@
     },
     {
       "type": "range",
-      "id": "title_size",
+      "id": "block_title_size",
       "label": "حجم العنوان الرئيسي",
       "min": 20,
       "max": 48,
