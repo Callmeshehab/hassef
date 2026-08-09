@@ -1,0 +1,37 @@
+/* =========================================
+   HASEEF — TRUE RTL HEADER
+========================================= */
+
+html[dir="rtl"] .hf-header,
+html[dir="rtl"] .hf-header * {
+  direction: rtl;
+}
+
+html[dir="rtl"] .hf-header__top {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+}
+
+html[dir="rtl"] .hf-header__nav {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .hf-header__nav a,
+html[dir="rtl"] .hf-header__nav button {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Navigation starts from the right */
+html[dir="rtl"] .hf-header__nav {
+  flex-direction: row !important;
+}
+
+/* Keep Arabic header controls in their intended positions */
+html[dir="rtl"] .hf-header__top > * {
+  direction: rtl;
+}
