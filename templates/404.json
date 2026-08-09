@@ -31,7 +31,11 @@
             "collection_url": "",
             "products": [
               "أسطوانة-ساحر-العود-كاظم-الساهر",
-              "أم-كلثوم"
+              "أم-كلثوم",
+              "باك-خاص-لمحبي-الراب",
+              "باك-راي-فينتاج",
+              "باك-كلاسيكيات-الراي",
+              "باك-مزيج-قديم"
             ],
             "editorial_label": "مختارات هذا الأسبوع",
             "editorial_heading": "أشياء تستحق أن تُحفظ.",
@@ -65,7 +69,7 @@
             "padding_horizontal": 16,
             "margin_top": 16,
             "margin_bottom": 16,
-            "background_color": "#F2EFDD",
+            "background_color": "#f2efdd",
             "block_radius": 24
           },
           "blocks": {}
