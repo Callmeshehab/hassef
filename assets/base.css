@@ -3253,3 +3253,32 @@ product-modal .media-gallery__counter,
 cart-notification {
   z-index: 9997 !important;
 }
+/* =========================================
+   HASEEF — Global RTL
+========================================= */
+
+html {
+  direction: rtl;
+}
+
+body {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Shopify sections */
+.shopify-section {
+  direction: rtl;
+}
+
+/* Containers */
+.page-width,
+.section,
+.section-inner {
+  direction: rtl;
+}
+
+/* Flex / Grid */
+[dir="rtl"] {
+  direction: rtl;
+}
