@@ -34,6 +34,148 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  /* ============================================================
+     Elegant / Apple-style overrides for this section only
+     ============================================================ */
+
+  .section-{{ section.id }}-padding {
+    background: #fbfbfd;
+  }
+
+  /* Calmer sort / filter bar */
+  .section-{{ section.id }}-padding .facets,
+  .section-{{ section.id }}-padding .facets-vertical-sort {
+    border: none;
+    box-shadow: none;
+  }
+
+  .section-{{ section.id }}-padding .facet-filters__label,
+  .section-{{ section.id }}-padding .product-count__text,
+  .section-{{ section.id }}-padding .facet-filters__sort {
+    color: #6e6e73;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  /* Roomier grid */
+  .section-{{ section.id }}-padding .product-grid {
+    row-gap: 64px;
+    column-gap: 32px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding .product-grid {
+      row-gap: 80px;
+      column-gap: 40px;
+    }
+  }
+
+  /* Strip the card down: no border, no shadow, no colored surface */
+  .section-{{ section.id }}-padding .card,
+  .section-{{ section.id }}-padding .card--card,
+  .section-{{ section.id }}-padding .card--standard {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .section-{{ section.id }}-padding .card__inner {
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Soft, quiet image surface */
+  .section-{{ section.id }}-padding .card__media,
+  .section-{{ section.id }}-padding .media {
+    background: #f5f5f7;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .section-{{ section.id }}-padding .card__media img,
+  .section-{{ section.id }}-padding .media img {
+    transition: transform 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+    mix-blend-mode: multiply;
+  }
+
+  .section-{{ section.id }}-padding .card:hover .card__media img,
+  .section-{{ section.id }}-padding .card:hover .media img {
+    transform: scale(1.035);
+  }
+
+  /* Quiet, centered typography */
+  .section-{{ section.id }}-padding .card__information {
+    padding: 20px 8px 0;
+    text-align: center;
+  }
+
+  .section-{{ section.id }}-padding .card__heading {
+    margin-bottom: 6px;
+  }
+
+  .section-{{ section.id }}-padding .card__heading a {
+    font-size: 1.7rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #1d1d1f;
+  }
+
+  .section-{{ section.id }}-padding .price,
+  .section-{{ section.id }}-padding .price__regular,
+  .section-{{ section.id }}-padding .price-item {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #6e6e73;
+  }
+
+  .section-{{ section.id }}-padding .card-information .caption {
+    color: #86868b;
+  }
+
+  /* Ghost / minimal add-to-cart, revealed on hover, not shouting */
+  .section-{{ section.id }}-padding .quick-add {
+    text-align: center;
+  }
+
+  .section-{{ section.id }}-padding .quick-add__submit,
+  .section-{{ section.id }}-padding .card .button {
+    margin-top: 16px;
+    background: transparent;
+    border: 1px solid #1d1d1f;
+    color: #1d1d1f;
+    border-radius: 980px;
+    font-size: 1.3rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    padding: 10px 26px;
+    box-shadow: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.25s ease, color 0.25s ease;
+  }
+
+  .section-{{ section.id }}-padding .card:hover .quick-add__submit,
+  .section-{{ section.id }}-padding .card:hover .card .button,
+  .section-{{ section.id }}-padding .card:focus-within .quick-add__submit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-{{ section.id }}-padding .quick-add__submit:hover,
+  .section-{{ section.id }}-padding .card .button:hover {
+    background: #1d1d1f;
+    color: #ffffff;
+  }
+
+  /* Always show the button on touch devices, since hover doesn't exist */
+  @media (hover: none) {
+    .section-{{ section.id }}-padding .quick-add__submit,
+    .section-{{ section.id }}-padding .card .button {
+      opacity: 1;
+      transform: none;
+    }
+  }
 {%- endstyle -%}
 
 <div class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}">
