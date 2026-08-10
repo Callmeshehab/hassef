@@ -106,8 +106,8 @@
 
 /* ── LARGE EDITORIAL CARD (Renders ONLY ONCE at start) ── */
 .wp-editorial-card-{{ ai_gen_id }} {
-  flex: 0 0 {{ block.settings.editorial_width }}px;
-  width: {{ block.settings.editorial_width }}px;
+  flex: 0 0 calc({{ block.settings.editorial_width }}px - {{ block.settings.carousel_right_offset }}px);
+  width: calc({{ block.settings.editorial_width }}px - {{ block.settings.carousel_right_offset }}px);
   scroll-snap-align: start;
   position: relative;
   border-radius: {{ block.settings.card_radius }}px;
