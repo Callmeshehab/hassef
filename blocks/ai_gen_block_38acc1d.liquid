@@ -15,10 +15,22 @@
 /* ── MAIN BLOCK WRAPPER ── */
 .wp-block-{{ ai_gen_id }} {
   display: block;
-  width: {{ block.settings.block_width_percent }}%;
+  width: 100%;
   max-width: 100%;
-  margin: {{ block.settings.margin_top }}px auto {{ block.settings.margin_bottom }}px;
-  padding: {{ block.settings.padding_vertical }}px {{ block.settings.padding_horizontal }}px;
+
+  margin-top: {{ block.settings.margin_top }}px;
+  margin-right: 0;
+  margin-bottom: {{ block.settings.margin_bottom }}px;
+  margin-left: 0;
+
+  padding-top: {{ block.settings.padding_vertical }}px;
+  padding-right: {{ block.settings.carousel_right_offset }}px;
+  padding-bottom: {{ block.settings.padding_vertical }}px;
+  padding-left: 0;
+
+  background-color: {{ block.settings.background_color }};
+  border-radius: {{ block.settings.block_radius }}px;
+  box-sizing: border-box;
   background-color: {{ block.settings.background_color }};
   border-radius: {{ block.settings.block_radius }}px;
   box-sizing: border-box;
