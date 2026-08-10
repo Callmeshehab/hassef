@@ -254,66 +254,7 @@
   justify-content: center;
   margin: 10px 0;
 }
-/* ── MINIMAL VINTAGE SVG ── */
 
-.wp-vintage-scene-wrap-{{ ai_gen_id }} {
-  width: 100%;
-  height: 145px;
-  margin: 5px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-}
-
-.wp-vintage-scene-{{ ai_gen_id }} {
-  width: 245px;
-  height: 170px;
-  overflow: visible;
-}
-
-.wp-minimal-record-{{ ai_gen_id }} {
-  transform-origin: center;
-  animation: minimal-record-{{ ai_gen_id }} 7s linear infinite;
-}
-
-.wp-minimal-cassette-{{ ai_gen_id }} {
-  animation: minimal-cassette-{{ ai_gen_id }} 4.5s ease-in-out infinite;
-}
-
-.wp-minimal-player-{{ ai_gen_id }} {
-  animation: minimal-player-{{ ai_gen_id }} 4.5s ease-in-out infinite;
-}
-
-@keyframes minimal-record-{{ ai_gen_id }} {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes minimal-cassette-{{ ai_gen_id }} {
-  0%, 100% {
-    transform: translateY(3px);
-  }
-
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes minimal-player-{{ ai_gen_id }} {
-  0%, 100% {
-    transform: translateY(2px);
-  }
-
-  50% {
-    transform: translateY(-3px);
-  }
-}
 
 /* ── STACKED PRODUCTS COLUMN (2 Products Stacked) ── */
 .wp-products-col-{{ ai_gen_id }} {
