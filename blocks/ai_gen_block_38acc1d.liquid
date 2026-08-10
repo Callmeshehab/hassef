@@ -254,7 +254,130 @@
   justify-content: center;
   margin: 10px 0;
 }
+/* ── MINIMAL VINTAGE SVG ── */
 
+.wp-vintage-scene-wrap-{{ ai_gen_id }} {
+  height: 155px;
+  margin: 4px 0;
+  overflow: visible;
+}
+
+.wp-vintage-scene-{{ ai_gen_id }} {
+  width: 250px;
+  height: 185px;
+  overflow: visible;
+}
+
+
+/* Box lid */
+.wp-vintage-box-lid-{{ ai_gen_id }} {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: wp-box-lid-{{ ai_gen_id }} 4.5s ease-in-out infinite;
+}
+
+
+/* Cassette */
+.wp-vintage-cassette-{{ ai_gen_id }} {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wp-cassette-{{ ai_gen_id }} 4.5s ease-in-out infinite;
+}
+
+
+/* Cassette player */
+.wp-vintage-player-{{ ai_gen_id }} {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wp-player-{{ ai_gen_id }} 4.5s ease-in-out infinite;
+}
+
+
+/* Vinyl */
+.wp-vintage-record-{{ ai_gen_id }} {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    wp-record-float-{{ ai_gen_id }} 4.5s ease-in-out infinite,
+    wp-record-spin-{{ ai_gen_id }} 8s linear infinite;
+}
+
+
+@keyframes wp-box-lid-{{ ai_gen_id }} {
+
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+
+  20%, 72% {
+    transform: rotate(-7deg);
+  }
+
+}
+
+
+@keyframes wp-cassette-{{ ai_gen_id }} {
+
+  0%, 100% {
+    transform: translateY(8px) rotate(-2deg);
+  }
+
+  25%, 70% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+
+}
+
+
+@keyframes wp-player-{{ ai_gen_id }} {
+
+  0%, 100% {
+    transform: translateY(5px);
+  }
+
+  30%, 70% {
+    transform: translateY(-6px);
+  }
+
+}
+
+
+@keyframes wp-record-float-{{ ai_gen_id }} {
+
+  0%, 100% {
+    transform: translateY(6px) rotate(-3deg);
+  }
+
+  30%, 70% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+
+}
+
+
+@keyframes wp-record-spin-{{ ai_gen_id }} {
+
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 360deg;
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .wp-vintage-box-lid-{{ ai_gen_id }},
+  .wp-vintage-cassette-{{ ai_gen_id }},
+  .wp-vintage-player-{{ ai_gen_id }},
+  .wp-vintage-record-{{ ai_gen_id }} {
+    animation: none;
+  }
+
+}
 .wp-editorial-img-{{ ai_gen_id }} {
   max-width: 85%;
   max-height: 150px;
