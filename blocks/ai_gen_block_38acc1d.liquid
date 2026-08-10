@@ -613,17 +613,186 @@
             <p class="wp-editorial-desc-{{ ai_gen_id }}">{{ block.settings.editorial_desc }}</p>
           {%- endif -%}
         </div>
+<div class="wp-editorial-img-wrap-{{ ai_gen_id }} wp-vintage-scene-wrap-{{ ai_gen_id }}">
 
-        {%- if block.settings.editorial_image != blank -%}
-          <div class="wp-editorial-img-wrap-{{ ai_gen_id }}">
-            <img
-              src="{{ block.settings.editorial_image | image_url: width: 600 }}"
-              alt="{{ block.settings.editorial_heading | escape }}"
-              class="wp-editorial-img-{{ ai_gen_id }}"
-              loading="lazy"
-            >
-          </div>
-        {%- endif -%}
+  <svg
+    class="wp-vintage-scene-{{ ai_gen_id }}"
+    viewBox="0 0 320 240"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+
+    <!-- Vinyl Record -->
+    <g class="wp-vintage-record-{{ ai_gen_id }}">
+      <circle cx="88" cy="100" r="38"
+        fill="#111"
+        stroke="#292929"
+        stroke-width="2"/>
+
+      <circle cx="88" cy="100" r="27"
+        fill="none"
+        stroke="#333"
+        stroke-width="1"/>
+
+      <circle cx="88" cy="100" r="10"
+        fill="#7A1E2B"/>
+
+      <circle cx="88" cy="100" r="3"
+        fill="#D6B56D"/>
+    </g>
+
+
+    <!-- Cassette -->
+    <g class="wp-vintage-cassette-{{ ai_gen_id }}">
+      <rect
+        x="105"
+        y="55"
+        width="76"
+        height="48"
+        rx="6"
+        fill="#171717"
+        stroke="#D6B56D"
+        stroke-width="2"
+      />
+
+      <rect
+        x="113"
+        y="64"
+        width="60"
+        height="28"
+        rx="3"
+        fill="#292929"
+      />
+
+      <circle
+        cx="126"
+        cy="78"
+        r="7"
+        fill="#080808"
+        stroke="#B89A5A"
+        stroke-width="1.5"
+      />
+
+      <circle
+        cx="160"
+        cy="78"
+        r="7"
+        fill="#080808"
+        stroke="#B89A5A"
+        stroke-width="1.5"
+      />
+
+      <path
+        d="M133 69 L153 69 L148 87 L138 87 Z"
+        fill="#B89A5A"
+        opacity=".8"
+      />
+    </g>
+
+
+    <!-- Cassette Player -->
+    <g class="wp-vintage-player-{{ ai_gen_id }}">
+      <rect
+        x="190"
+        y="48"
+        width="58"
+        height="88"
+        rx="8"
+        fill="#171717"
+        stroke="#D6B56D"
+        stroke-width="2"
+      />
+
+      <rect
+        x="198"
+        y="62"
+        width="42"
+        height="32"
+        rx="4"
+        fill="#090909"
+        stroke="#555"
+      />
+
+      <circle
+        cx="210"
+        cy="78"
+        r="6"
+        fill="#111"
+        stroke="#B89A5A"
+        stroke-width="1.5"
+      />
+
+      <circle
+        cx="228"
+        cy="78"
+        r="6"
+        fill="#111"
+        stroke="#B89A5A"
+        stroke-width="1.5"
+      />
+
+      <line
+        x1="202"
+        y1="108"
+        x2="236"
+        y2="108"
+        stroke="#B89A5A"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <circle cx="207" cy="120" r="3" fill="#B89A5A"/>
+      <circle cx="220" cy="120" r="3" fill="#555"/>
+      <circle cx="233" cy="120" r="3" fill="#555"/>
+    </g>
+
+
+    <!-- Black Minimal Box -->
+    <g class="wp-vintage-box-{{ ai_gen_id }}">
+
+      <!-- Box body -->
+      <path
+        d="M58 130 L255 130 L244 198 L70 198 Z"
+        fill="#111"
+        stroke="#222"
+        stroke-width="2"
+      />
+
+      <!-- Small gold detail -->
+      <rect
+        x="145"
+        y="157"
+        width="28"
+        height="5"
+        rx="2.5"
+        fill="#D6B56D"
+      />
+
+      <!-- Box Lid -->
+      <g class="wp-vintage-box-lid-{{ ai_gen_id }}">
+        <path
+          d="M58 130 L75 88 L238 88 L255 130 Z"
+          fill="#151515"
+          stroke="#292929"
+          stroke-width="2"
+        />
+
+        <line
+          x1="75"
+          y1="88"
+          x2="238"
+          y2="88"
+          stroke="#D6B56D"
+          stroke-width="2"
+          opacity=".7"
+        />
+      </g>
+
+    </g>
+
+  </svg>
+
+</div>
 
         {%- if block.settings.editorial_cta_text != blank -%}
           <div class="wp-editorial-cta-{{ ai_gen_id }}" style="color: {{ block.settings.editorial_accent_color | default: '#ffffff' }}">
