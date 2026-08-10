@@ -90,7 +90,12 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 4px 0 12px;
+
+  padding-top: 4px;
+  padding-right: {{ block.settings.carousel_right_offset }}px;
+  padding-bottom: 12px;
+  padding-left: 0;
+
   align-items: stretch;
   /* Direction inherited */
 }
@@ -1247,6 +1252,16 @@
       "unit": "px",
       "default": 20
     },
+    {
+  "type": "range",
+  "id": "carousel_right_offset",
+  "label": "إزاحة الكارد من اليمين",
+  "min": 0,
+  "max": 40,
+  "step": 2,
+  "unit": "px",
+  "default": 8
+},
     {
       "type": "range",
       "id": "card_radius",
