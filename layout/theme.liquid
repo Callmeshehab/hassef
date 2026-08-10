@@ -325,6 +325,36 @@
     flex-direction: row-reverse;
   }
 </style>
+<style>
+  [dir="rtl"] * {
+    direction: rtl;
+  }
+  
+  [dir="rtl"] .header__menu-item,
+  [dir="rtl"] .list-menu,
+  [dir="rtl"] .list-menu__item,
+  [dir="rtl"] header nav ul,
+  [dir="rtl"] header nav li {
+    text-align: right;
+  }
+
+  [dir="rtl"] header nav ul,
+  [dir="rtl"] .header__menu {
+    justify-content: flex-end;
+  }
+
+  [dir="rtl"] .card,
+  [dir="rtl"] .card__content,
+  [dir="rtl"] .card-information,
+  [dir="rtl"] .price {
+    text-align: right;
+  }
+
+  [dir="rtl"] .slider,
+  [dir="rtl"] .grid {
+    direction: rtl;
+  }
+</style>
 
   </head>
 
