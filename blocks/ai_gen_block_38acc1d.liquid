@@ -782,41 +782,92 @@
   
   if (!track) return;
 
-  // Pagination Dots Sync (RTL Safe using IntersectionObserver & scrollIntoView)
-  if (dotsContainer) {
-    const dots = Array.from(dotsContainer.querySelectorAll('.wp-dot-' + blockId));
-    const slides = Array.from(track.children).filter(child => 
-      child.classList.contains('wp-editorial-card-' + blockId) || 
-      child.classList.contains('wp-products-col-' + blockId)
-    );
-    
-    // 1. Click to scroll
-    dots.forEach((dot, idx) => {
+// Smart Pagination Dots - RTL/LTR + Touch/Mouse Scroll Safe
+if (dotsContainer) {
+  const dots = Array.from(
+    dotsContainer.querySelectorAll('.wp-dot-' + blockId)
+  );
+
+  const slides = Array.from(track.children).filter(child =>
+    child.classList.contains('wp-editorial-card-' + blockId) ||
+    child.classList.contains('wp-products-col-' + blockId)
+  );
+
+  if (slides.length && dots.length) {
+
+    let ticking = false;
+
+    function getSlidePosition(slide) {
+      const trackRect = track.getBoundingClientRect();
+      const slideRect = slide.getBoundingClientRect();
+
+      // Distance of slide from the visible start edge
+      if (document.documentElement.dir === 'rtl') {
+        return Math.abs(trackRect.right - slideRect.right);
+      }
+
+      return Math.abs(slideRect.left - trackRect.left);
+    }
+
+    function updateActiveDot() {
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      slides.forEach((slide, index) => {
+        const distance = getSlidePosition(slide);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('is-active', index === closestIndex);
+      });
+
+      ticking = false;
+    }
+
+    function requestUpdate() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateActiveDot);
+        ticking = true;
+      }
+    }
+
+    // Update immediately while dragging / swiping
+    track.addEventListener('scroll', requestUpdate, {
+      passive: true
+    });
+
+    // Update after resize
+    window.addEventListener('resize', requestUpdate);
+
+    // Clicking a dot
+    dots.forEach((dot, index) => {
       dot.addEventListener('click', () => {
-        if (slides[idx]) {
-          slides[idx].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-        }
+        const slide = slides[index];
+
+        if (!slide) return;
+
+        slide.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'start',
+          block: 'nearest'
+        });
+
+        // Update immediately
+        dots.forEach((d, i) => {
+          d.classList.toggle('is-active', i === index);
+        });
       });
     });
 
-    // 2. Observe scrolling to update dots
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const slideIdx = slides.indexOf(entry.target);
-          if (slideIdx !== -1 && dots[slideIdx]) {
-            dots.forEach(d => d.classList.remove('is-active'));
-            dots[slideIdx].classList.add('is-active');
-          }
-        }
-      });
-    }, {
-      root: track,
-      threshold: 0.5 // trigger when 50% of the slide is visible
-    });
-
-    slides.forEach(slide => observer.observe(slide));
+    // Initial state
+    updateActiveDot();
   }
+}
 
   // AJAX Add to Cart Buttons
   const addButtons = document.querySelectorAll('#WpBlock-' + blockId + ' .wp-add-btn-' + blockId);
