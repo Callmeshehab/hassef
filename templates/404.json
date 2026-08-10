@@ -104,7 +104,7 @@
             "block_width_percent": 100,
             "card_gap": 14,
             "slide_gap": 12,
-            "carousel_right_offset": 24,
+            "carousel_right_offset": 17,
             "card_radius": 18,
             "editorial_padding": 20,
             "show_dots": true,
