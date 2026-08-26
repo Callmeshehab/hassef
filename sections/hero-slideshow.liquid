@@ -1,64 +1,76 @@
 {% comment %} Hero Cinematic Slideshow Section {% endcomment %}
 
-{%- if section.blocks.size > 0 -%}
 <div class="hs-hero" id="HeroSlideshow-{{ section.id }}">
-
   <!-- الشرائح -->
   <div class="hs-track" id="hs-track-{{ section.id }}">
-    {%- for block in section.blocks -%}
-      <div class="hs-slide{% if forloop.first %} hs-slide--active{% endif %}" id="hs-slide-{{ section.id }}-{{ forloop.index }}" {{ block.shopify_attributes }}>
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hs-slide{% if forloop.first %} hs-slide--active{% endif %}" id="hs-slide-{{ section.id }}-{{ forloop.index }}" {{ block.shopify_attributes }}>
 
-        <!-- الصورة الخلفية -->
-        {%- if block.settings.image != blank -%}
-          <div class="hs-slide__bg">
-            <img
-              src="{{ block.settings.image | image_url: width: 1600 }}"
-              srcset="
-                {{ block.settings.image | image_url: width: 750 }} 750w,
-                {{ block.settings.image | image_url: width: 1100 }} 1100w,
-                {{ block.settings.image | image_url: width: 1600 }} 1600w
-              "
-              sizes="100vw"
-              alt="{{ block.settings.image.alt | escape }}"
-              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-            >
-          </div>
-        {%- else -%}
-          <div class="hs-slide__bg hs-slide__bg--placeholder">
-            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
-          </div>
-        {%- endif -%}
-
-        <!-- تدرج لوني داكن -->
-        <div class="hs-slide__overlay"></div>
-
-        <!-- المحتوى النصي -->
-        <div class="hs-slide__content page-width">
-          {%- if block.settings.label != blank -%}
-            <p class="hs-slide__label">{{ block.settings.label }}</p>
-          {%- endif -%}
-          {%- if block.settings.title != blank -%}
-            <h2 class="hs-slide__title">{{ block.settings.title }}</h2>
-          {%- endif -%}
-          {%- if block.settings.description != blank -%}
-            <p class="hs-slide__desc">{{ block.settings.description }}</p>
-          {%- endif -%}
-          {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
-            <div class="hs-slide__actions">
-              <a href="{{ block.settings.button_link }}" class="hs-btn hs-btn--primary">
-                {{ block.settings.button_label }}
-              </a>
-              {%- if block.settings.button2_label != blank and block.settings.button2_link != blank -%}
-                <a href="{{ block.settings.button2_link }}" class="hs-btn hs-btn--ghost">
-                  {{ block.settings.button2_label }}
-                </a>
-              {%- endif -%}
+          <!-- الصورة الخلفية -->
+          {%- if block.settings.image != blank -%}
+            <div class="hs-slide__bg">
+              <img
+                src="{{ block.settings.image | image_url: width: 1600 }}"
+                srcset="
+                  {{ block.settings.image | image_url: width: 750 }} 750w,
+                  {{ block.settings.image | image_url: width: 1100 }} 1100w,
+                  {{ block.settings.image | image_url: width: 1600 }} 1600w
+                "
+                sizes="100vw"
+                alt="{{ block.settings.image.alt | escape }}"
+                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              >
+            </div>
+          {%- else -%}
+            <div class="hs-slide__bg hs-slide__bg--placeholder">
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
             </div>
           {%- endif -%}
-        </div>
 
+          <!-- تدرج لوني داكن -->
+          <div class="hs-slide__overlay"></div>
+
+          <!-- المحتوى النصي -->
+          <div class="hs-slide__content page-width">
+            {%- if block.settings.label != blank -%}
+              <p class="hs-slide__label">{{ block.settings.label }}</p>
+            {%- endif -%}
+            {%- if block.settings.title != blank -%}
+              <h2 class="hs-slide__title">{{ block.settings.title }}</h2>
+            {%- endif -%}
+            {%- if block.settings.description != blank -%}
+              <p class="hs-slide__desc">{{ block.settings.description }}</p>
+            {%- endif -%}
+            {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
+              <div class="hs-slide__actions">
+                <a href="{{ block.settings.button_link }}" class="hs-btn hs-btn--primary">
+                  {{ block.settings.button_label }}
+                </a>
+                {%- if block.settings.button2_label != blank and block.settings.button2_link != blank -%}
+                  <a href="{{ block.settings.button2_link }}" class="hs-btn hs-btn--ghost">
+                    {{ block.settings.button2_label }}
+                  </a>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <!-- الشريحة الافتراضية عند البداية -->
+      <div class="hs-slide hs-slide--active">
+        <div class="hs-slide__bg hs-slide__bg--placeholder">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+        <div class="hs-slide__overlay"></div>
+        <div class="hs-slide__content page-width">
+          <h2 class="hs-slide__title">عنوان الشريحة</h2>
+          <p class="hs-slide__desc">قم بإضافة شرائح من مخصص القالب لتخصيص هذا القسم.</p>
+        </div>
       </div>
-    {%- endfor -%}
+    {%- endif -%}
   </div>
 
   <!-- أزرار التنقل (يمين / يسار) -->
@@ -85,7 +97,6 @@
       {%- endfor -%}
     </div>
   {%- endif -%}
-
 </div>
 
 <style>
@@ -103,14 +114,12 @@
   direction: rtl;
 }
 
-/* Track */
 .hs-track {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-/* Slide */
 .hs-slide {
   position: absolute;
   inset: 0;
@@ -123,7 +132,6 @@
   pointer-events: auto;
 }
 
-/* Background image */
 .hs-slide__bg {
   position: absolute;
   inset: 0;
@@ -141,7 +149,6 @@
   height: 100%;
 }
 
-/* Gradient overlay – darker on the text side (RTL = right) */
 .hs-slide__overlay {
   position: absolute;
   inset: 0;
@@ -153,7 +160,6 @@
   );
 }
 
-/* Content */
 .hs-slide__content {
   position: absolute;
   inset: 0;
@@ -193,7 +199,6 @@
   max-width: 46ch;
 }
 
-/* Buttons */
 .hs-slide__actions {
   display: flex;
   gap: 1rem;
@@ -224,7 +229,6 @@
   border: 1px solid rgba(255,255,255,.3);
 }
 
-/* Nav arrows */
 .hs-nav {
   position: absolute;
   top: 50%;
@@ -249,7 +253,6 @@
 .hs-nav--prev { right: 1.5rem; }
 .hs-nav--next { left: 1.5rem; }
 
-/* Dots */
 .hs-dots {
   position: absolute;
   bottom: 2rem;
@@ -274,7 +277,6 @@
   width: 5rem;
 }
 
-/* Mobile */
 @media screen and (max-width: 749px) {
   .hs-hero { height: 55vh; min-height: 280px; }
   .hs-slide__content { max-width: 100%; padding: 2rem 1.5rem 7rem; }
@@ -289,7 +291,7 @@
 <script>
 (function() {
   var sectionId = '{{ section.id }}';
-  var total     = {{ section.blocks.size }};
+  var total     = {{ section.blocks.size | default: 1 }};
   var current   = 0;
   var timer     = null;
   var AUTO      = {{ section.settings.auto_rotate | default: true }} === true;
@@ -317,13 +319,11 @@
     startAuto();
   }
 
-  /* Arrows */
   var btnPrev = document.getElementById('hs-prev-' + sectionId);
   var btnNext = document.getElementById('hs-next-' + sectionId);
   if (btnPrev) btnPrev.addEventListener('click', function() { prev(); resetAuto(); });
   if (btnNext) btnNext.addEventListener('click', function() { next(); resetAuto(); });
 
-  /* Dots */
   dots().forEach(function(dot) {
     dot.addEventListener('click', function() {
       goTo(parseInt(this.dataset.index));
@@ -331,7 +331,6 @@
     });
   });
 
-  /* Touch / Swipe */
   var hero = document.getElementById('HeroSlideshow-' + sectionId);
   var touchX = null;
   if (hero) {
@@ -347,13 +346,15 @@
   startAuto();
 })();
 </script>
-{%- endif -%}
 
 {% schema %}
 {
   "name": "Hero Slideshow",
-  "class": "section",
   "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
   "settings": [
     {
       "type": "select",
@@ -387,6 +388,7 @@
     {
       "type": "slide",
       "name": "شريحة",
+      "limit": 8,
       "settings": [
         {
           "type": "image_picker",
@@ -396,8 +398,7 @@
         {
           "type": "text",
           "id": "label",
-          "label": "تصنيف صغير (اختياري)",
-          "placeholder": "مثال: 🔥 الأكثر مبيعاً هذا الأسبوع"
+          "label": "تصنيف صغير (اختياري)"
         },
         {
           "type": "text",
@@ -441,7 +442,6 @@
         { "type": "slide" }
       ]
     }
-  ],
-  "max_blocks": 8
+  ]
 }
 {% endschema %}
