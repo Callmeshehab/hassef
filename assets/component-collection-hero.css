@@ -101,7 +101,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
   margin-top: 1.5rem;
 }
 
@@ -123,38 +123,48 @@
 }
 
 .collection-hero__subcategories .button {
-  padding: 0.6rem 1.8rem;
+  padding: 0.5rem 1.4rem;
   min-height: auto;
   flex-shrink: 0;
   white-space: nowrap;
   border-radius: 10rem;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   border: none;
 }
 
-/* ── Arrow buttons ── */
+/* ── Arrow buttons: small, ghost, transparent ── */
 .collection-hero__subcategories-wrapper .slider-button {
   flex-shrink: 0;
   opacity: 1;
-  transition: opacity 0.2s ease;
-  background: rgba(var(--color-background), 0.9);
+  transition: opacity 0.25s ease, color 0.2s ease;
+  background: transparent;
+  border: none;
   border-radius: 50%;
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  border: 1px solid rgba(var(--color-foreground), 0.1);
   cursor: pointer;
+  color: rgba(var(--color-foreground), 0.55);
+}
+
+.collection-hero__subcategories-wrapper .slider-button:hover {
+  color: rgba(var(--color-foreground), 1);
 }
 
 .collection-hero__subcategories-wrapper .slider-button.disabled {
-  opacity: 0.2;
+  opacity: 0.18;
   pointer-events: none;
 }
 
-/* rotate prev caret for RTL sites */
+.collection-hero__subcategories-wrapper .slider-button svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: block;
+}
+
 html[dir="rtl"] .collection-hero__subcategories-wrapper .slider-button--prev .icon-caret {
   transform: rotate(90deg);
 }

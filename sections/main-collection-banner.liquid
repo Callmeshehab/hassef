@@ -24,20 +24,23 @@
       {%- if section.settings.subcategories_menu != blank -%}
         {%- assign slider_id = 'subcats-' | append: section.id -%}
         <div class="collection-hero__subcategories-wrapper">
+
+          <!-- زر الاتجاه الأيمن -->
           <button
             type="button"
-            class="slider-button slider-button--prev"
-            id="{{ slider_id }}-prev"
-            aria-label="السابق"
-            onclick="subcatScroll('{{ slider_id }}', -1)"
+            class="slider-button slider-button--right"
+            id="{{ slider_id }}-right"
+            aria-label="يميناً"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <!-- سهم يمين → -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </button>
 
           <ul
             class="collection-hero__subcategories list-unstyled"
             id="{{ slider_id }}"
-            onscroll="subcatUpdateArrows('{{ slider_id }}')"
           >
             {%- for link in section.settings.subcategories_menu.links -%}
               <li>
@@ -48,47 +51,61 @@
             {%- endfor -%}
           </ul>
 
+          <!-- زر الاتجاه الأيسر -->
           <button
             type="button"
-            class="slider-button slider-button--next"
-            id="{{ slider_id }}-next"
-            aria-label="التالي"
-            onclick="subcatScroll('{{ slider_id }}', 1)"
+            class="slider-button slider-button--left"
+            id="{{ slider_id }}-left"
+            aria-label="يساراً"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <!-- سهم يسار ← -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
           </button>
         </div>
 
         <script>
           (function() {
-            function subcatScroll(id, dir) {
-              var el = document.getElementById(id);
-              if (!el) return;
-              el.scrollBy({ left: dir * 200, behavior: 'smooth' });
-            }
-            function subcatUpdateArrows(id) {
-              var el = document.getElementById(id);
-              if (!el) return;
-              var prev = document.getElementById(id + '-prev');
-              var next = document.getElementById(id + '-next');
-              var isRTL = document.documentElement.dir === 'rtl';
-              var atStart, atEnd;
-              if (isRTL) {
-                atStart = el.scrollLeft >= -2;
-                atEnd   = el.scrollLeft <= -(el.scrollWidth - el.clientWidth) + 2;
-              } else {
-                atStart = el.scrollLeft <= 2;
-                atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
-              }
-              if (prev) prev.classList.toggle('disabled', atStart);
-              if (next) next.classList.toggle('disabled', atEnd);
-            }
-            window.subcatScroll = subcatScroll;
-            window.subcatUpdateArrows = subcatUpdateArrows;
+            var sid    = '{{ slider_id }}';
+            var list   = document.getElementById(sid);
+            var btnR   = document.getElementById(sid + '-right');
+            var btnL   = document.getElementById(sid + '-left');
+            var STEP   = 200;
 
-            document.addEventListener('DOMContentLoaded', function() {
-              subcatUpdateArrows('{{ slider_id }}');
-            });
+            function scrollList(px) {
+              if (!list) return;
+              list.scrollBy({ left: px, behavior: 'smooth' });
+              /* أعطِ وقتاً للتمرير ثم حدّث الأزرار */
+              setTimeout(function() { updateBtns(); }, 350);
+            }
+
+            function updateBtns() {
+              if (!list) return;
+              var sl      = list.scrollLeft;
+              var maxScroll = list.scrollWidth - list.clientWidth;
+              /* Chrome RTL → scrollLeft يبدأ من 0 ويذهب سالباً */
+              var atRight = sl >= -2;
+              var atLeft  = sl <= -(maxScroll) + 2;
+              /* LTR fallback */
+              if (document.documentElement.dir !== 'rtl') {
+                atRight = sl + list.clientWidth >= list.scrollWidth - 2;
+                atLeft  = sl <= 2;
+              }
+              if (btnR) btnR.classList.toggle('disabled', atRight);
+              if (btnL) btnL.classList.toggle('disabled', atLeft);
+            }
+
+            if (btnR) btnR.addEventListener('click', function() { scrollList(STEP); });
+            if (btnL) btnL.addEventListener('click', function() { scrollList(-STEP); });
+            if (list)  list.addEventListener('scroll', updateBtns);
+
+            /* تهيئة عند التحميل */
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', updateBtns);
+            } else {
+              updateBtns();
+            }
           })();
         </script>
       {%- endif -%}
