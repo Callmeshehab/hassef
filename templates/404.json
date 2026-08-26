@@ -16,9 +16,6 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/IMG_0330_2017c8ae-08c0-427b-8c5b-e8435cb0f3ed.jpg",
-            "image_size": "cover",
-            "image_position": "center center",
-            "image_bg_color": "#000000",
             "content_vertical": "bottom",
             "content_horizontal": "right",
             "label": "",
@@ -42,9 +39,6 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/1.jpg",
-            "image_size": "cover",
-            "image_position": "center center",
-            "image_bg_color": "#000000",
             "content_vertical": "center",
             "content_horizontal": "right",
             "label": "",
@@ -67,9 +61,6 @@
         "slide_TXTMh9": {
           "type": "slide",
           "settings": {
-            "image_size": "cover",
-            "image_position": "center center",
-            "image_bg_color": "#000000",
             "content_vertical": "center",
             "content_horizontal": "right",
             "label": "",
@@ -97,7 +88,16 @@
       ],
       "name": "Hero Slideshow",
       "settings": {
-        "height": "small",
+        "height_mode": "vh",
+        "desktop_height": 370,
+        "desktop_vh": 40,
+        "full_width": true,
+        "mobile_height_mode": "vh",
+        "mobile_height": 230,
+        "mobile_vh": 30,
+        "image_fit": "contain",
+        "image_position": "top center",
+        "image_bg_color": "#F2EFDD",
         "auto_rotate": false,
         "autoplay_speed": 5
       }
