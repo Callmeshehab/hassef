@@ -31,7 +31,7 @@
             aria-label="السابق"
             onclick="subcatScroll('{{ slider_id }}', -1)"
           >
-            {%- render 'icon-caret' -%}
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
 
           <ul
@@ -55,7 +55,7 @@
             aria-label="التالي"
             onclick="subcatScroll('{{ slider_id }}', 1)"
           >
-            {%- render 'icon-caret' -%}
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
         </div>
 
@@ -71,13 +71,14 @@
               if (!el) return;
               var prev = document.getElementById(id + '-prev');
               var next = document.getElementById(id + '-next');
-              var atStart = el.scrollLeft <= 2;
-              var atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
-              /* RTL: flip logic */
               var isRTL = document.documentElement.dir === 'rtl';
+              var atStart, atEnd;
               if (isRTL) {
                 atStart = el.scrollLeft >= -2;
                 atEnd   = el.scrollLeft <= -(el.scrollWidth - el.clientWidth) + 2;
+              } else {
+                atStart = el.scrollLeft <= 2;
+                atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
               }
               if (prev) prev.classList.toggle('disabled', atStart);
               if (next) next.classList.toggle('disabled', atEnd);
@@ -85,7 +86,6 @@
             window.subcatScroll = subcatScroll;
             window.subcatUpdateArrows = subcatUpdateArrows;
 
-            /* init on load */
             document.addEventListener('DOMContentLoaded', function() {
               subcatUpdateArrows('{{ slider_id }}');
             });
