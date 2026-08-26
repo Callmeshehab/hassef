@@ -355,6 +355,7 @@
   "disabled_on": {
     "groups": ["header", "footer"]
   },
+  "max_blocks": 10,
   "settings": [
     {
       "type": "select",
@@ -370,14 +371,14 @@
     {
       "type": "checkbox",
       "id": "auto_rotate",
-      "label": "تشغيل تلقائي",
+      "label": "تشغيل تلقائي للشرائح",
       "default": true
     },
     {
       "type": "range",
       "id": "autoplay_speed",
-      "label": "سرعة التشغيل (ثواني)",
-      "min": 3,
+      "label": "سرعة الانتقال بين الشرائح (بالثواني)",
+      "min": 1,
       "max": 9,
       "step": 1,
       "default": 5,
@@ -388,7 +389,7 @@
     {
       "type": "slide",
       "name": "شريحة",
-      "limit": 8,
+      "limit": 10,
       "settings": [
         {
           "type": "image_picker",
