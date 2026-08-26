@@ -16,32 +16,84 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/IMG_0330_2017c8ae-08c0-427b-8c5b-e8435cb0f3ed.jpg",
+            "image_size": "cover",
+            "image_position": "center center",
+            "image_bg_color": "#000000",
+            "content_vertical": "bottom",
+            "content_horizontal": "right",
             "label": "",
             "title": "",
             "description": "",
             "button_label": "اكتشف الآن",
+            "button_collection": "",
             "button_link": "",
+            "btn1_style": "solid",
+            "btn1_color": "#ffffff",
+            "btn1_text_color": "#111111",
             "button2_label": "",
-            "button2_link": ""
+            "button2_collection": "",
+            "button2_link": "",
+            "btn2_style": "ghost",
+            "btn2_color": "#ffffff",
+            "btn2_text_color": "#ffffff"
           }
         },
         "slide_hPyHYf": {
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/1.jpg",
+            "image_size": "cover",
+            "image_position": "center center",
+            "image_bg_color": "#000000",
+            "content_vertical": "center",
+            "content_horizontal": "right",
             "label": "",
             "title": "",
             "description": "",
             "button_label": "اكتشف الآن",
+            "button_collection": "frontpage",
             "button_link": "",
+            "btn1_style": "ghost",
+            "btn1_color": "#ffffff",
+            "btn1_text_color": "#111111",
             "button2_label": "",
-            "button2_link": ""
+            "button2_collection": "",
+            "button2_link": "",
+            "btn2_style": "ghost",
+            "btn2_color": "#ffffff",
+            "btn2_text_color": "#ffffff"
+          }
+        },
+        "slide_TXTMh9": {
+          "type": "slide",
+          "settings": {
+            "image_size": "cover",
+            "image_position": "center center",
+            "image_bg_color": "#000000",
+            "content_vertical": "center",
+            "content_horizontal": "right",
+            "label": "",
+            "title": "",
+            "description": "",
+            "button_label": "اكتشف الآن",
+            "button_collection": "",
+            "button_link": "",
+            "btn1_style": "solid",
+            "btn1_color": "#ffffff",
+            "btn1_text_color": "#111111",
+            "button2_label": "",
+            "button2_collection": "",
+            "button2_link": "",
+            "btn2_style": "ghost",
+            "btn2_color": "#ffffff",
+            "btn2_text_color": "#ffffff"
           }
         }
       },
       "block_order": [
         "slide_kxf4QB",
-        "slide_hPyHYf"
+        "slide_hPyHYf",
+        "slide_TXTMh9"
       ],
       "name": "Hero Slideshow",
       "settings": {
