@@ -295,7 +295,7 @@
   var current   = 0;
   var timer     = null;
   var AUTO      = {{ section.settings.auto_rotate | default: true }} === true;
-  var SPEED     = {{ section.settings.autoplay_speed | default: 5000 }};
+  var SPEED     = ({{ section.settings.autoplay_speed | default: 5 }}) * 1000;
 
   function slides()  { return document.querySelectorAll('#HeroSlideshow-' + sectionId + ' .hs-slide'); }
   function dots()    { return document.querySelectorAll('#hs-dots-' + sectionId + ' .hs-dot'); }
@@ -376,12 +376,12 @@
     {
       "type": "range",
       "id": "autoplay_speed",
-      "label": "سرعة التشغيل (ثانية)",
-      "min": 3000,
-      "max": 10000,
-      "step": 1000,
-      "default": 5000,
-      "unit": "ms"
+      "label": "سرعة التشغيل (ثواني)",
+      "min": 3,
+      "max": 9,
+      "step": 1,
+      "default": 5,
+      "unit": "s"
     }
   ],
   "blocks": [
