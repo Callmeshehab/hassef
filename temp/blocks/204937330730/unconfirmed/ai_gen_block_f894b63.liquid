@@ -1,6 +1,361 @@
+{% doc %}
+  @prompt
+    أريد إضافة **Hero Image Slider / Carousel** إلى الصفحة الرئيسية لموقعي، ويكون التصميم والسلوك قريبًا جدًا من الشكل الموجود في الصورة المرفقة.
+    
+    ### 1. الشكل والتصميم
+    
+    * إنشاء قسم Hero كبير بعرض الصفحة في أعلى الموقع.
+    * كل Slide يعرض صورة خلفية كبيرة بجودة عالية.
+    * الصورة تكون ممتدة داخل القسم مع `cover` مع الحفاظ على تناسبها.
+    * إضافة تدرج داكن فوق الصورة، خصوصًا من الجهة التي يظهر فيها النص، حتى يكون النص واضحًا.
+    * التصميم يكون Modern / Cinematic / Premium، مشابه لواجهات منصات الأفلام الحديثة.
+    * زوايا القسم تكون دائرية بشكل خفيف إذا كان ذلك متوافقًا مع تصميم الموقع.
+    * الانتقال بين الصور يكون Smooth واحترافي بدون تقطيع أو وميض.
+    
+    ### 2. نظام السلايدر
+    
+    أريد أن تكون الصور قابلة للإدارة بالكامل من لوحة الإعدادات، بحيث أستطيع:
+    
+    * رفع صورة جديدة للسلايدر.
+    * اختيار الصور الموجودة بالفعل.
+    * حذف أي صورة.
+    * تغيير ترتيب الصور بالسحب والإفلات Drag & Drop.
+    * تفعيل أو تعطيل أي Slide بدون حذفه.
+    * تحديد مدة عرض كل صورة قبل الانتقال للصورة التالية.
+    * إمكانية تحديد مدة عامة لجميع الصور، مثل:
+    
+      * 3 ثوانٍ
+      * 5 ثوانٍ
+      * 10 ثوانٍ
+      * 15 ثانية
+      * أو إدخال مدة مخصصة بالثواني.
+    * حفظ الإعدادات بحيث تستمر بعد إعادة تحميل الموقع.
+    
+    ### 3. التنقل التلقائي
+    
+    السلايدر يجب أن يعمل تلقائيًا:
+    
+    `Slide 1 → Slide 2 → Slide 3 → Slide 4 → ثم العودة إلى Slide 1`
+    
+    بعد انتهاء المدة المحددة في الإعدادات.
+    
+    يجب أن يكون الانتقال:
+    
+    * Smooth
+    * Fade أو انتقال سينمائي ناعم.
+    * بدون إعادة تحميل الصفحة.
+    * بدون توقف أو تقطيع.
+    * Loop بشكل مستمر.
+    
+    وأريد أن يتوقف الـ autoplay مؤقتًا إذا قام المستخدم بالتفاعل مع السلايدر، ثم يمكن استئنافه حسب التصميم.
+    
+    ### 4. مؤشرات التنقل
+    
+    في أسفل الـ Hero أريد إضافة **Navigation Indicators** مشابهة تمامًا لفكرة الموجودة في الصورة المرفقة:
+    
+    `━━━━  ━━  ━━  ━━`
+    
+    * كل مؤشر يمثل صورة واحدة.
+    * المؤشر الخاص بالصورة الحالية يكون واضحًا/أطول من البقية.
+    * المؤشرات غير النشطة تكون أقصر وأقل وضوحًا.
+    * عند الانتقال إلى Slide أخرى يتغير المؤشر الحالي بسلاسة.
+    * يمكن الضغط على أي مؤشر للانتقال مباشرة إلى الصورة المرتبطة به.
+    * عند إضافة أو حذف الصور من لوحة الإدارة يتم تحديث عدد المؤشرات تلقائيًا.
+    
+    ### 5. إعدادات الإدارة
+    
+    أريد قسمًا واضحًا في لوحة التحكم باسم مثل:
+    
+    **Hero Slider Settings**
+    
+    ويحتوي على:
+    
+    * Enable / Disable Slider
+    * Upload Images
+    * Select Existing Images
+    * Reorder Slides
+    * Delete Slide
+    * Enable / Disable Slide
+    * Slide Duration
+    * Transition Type
+    * Transition Speed
+    * Autoplay On / Off
+    
+    ويجب أن تظهر معاينة Preview أثناء تعديل السلايدر في لوحة التحكم إن أمكن.
+    
+    ### 6. Responsive
+    
+    التصميم يجب أن يكون Responsive بالكامل:
+    
+    * Desktop
+    * Laptop
+    * Tablet
+    * Mobile
+    
+    وعلى الهاتف يجب أن يتم ضبط موضع الصورة تلقائيًا حتى لا يتم قص العنصر المهم من الصورة.
+    
+    ### 7. الأداء
+    
+    مهم جدًا أن يكون السلايدر خفيفًا وسريعًا:
+    
+    * Lazy loading للصور غير الظاهرة.
+    * تحميل الصورة الأولى بسرعة لأنها Above the Fold.
+    * عدم تحميل جميع الصور بأعلى جودة في نفس الوقت.
+    * عدم التسبب في بطء الصفحة.
+    * استخدام caching مناسب.
+    * منع Layout Shift قدر الإمكان.
+    
+    ### 8. متطلبات مهمة
+    
+    لا أريد مجرد Slider ثابت داخل الكود.
+    
+    أريد **نظام إدارة حقيقي** بحيث أي شخص لديه صلاحية الإدارة يستطيع تغيير الصور والمدة والترتيب من لوحة التحكم بدون تعديل الكود.
+    
+    احرص على أن يكون الـ Slider منفصلًا عن باقي مكونات الصفحة قدر الإمكان حتى لا يؤثر تعديل السلايدر على بقية الموقع.
+    
+    ### 9. المرجع البصري
+    
+    استخدم الصورة المرفقة كـ **Visual Reference** للتصميم.
+    
+    المطلوب تقليد فكرة:
+    
+    * Hero كبير بصورة خلفية.
+    * Overlay داكن.
+    * مؤشرات صغيرة أسفل الصورة.
+    * المؤشر النشط أطول من باقي المؤشرات.
+    * انتقال سينمائي سلس.
+    * مظهر Premium وحديث.
+    
+    لكن لا تنسخ أي محتوى أو شعارات أو نصوص موجودة في الصورة؛ المطلوب هو **نفس أسلوب الـ UI والـ interaction** فقط.
+    
+    قبل التنفيذ، افحص بنية المشروع الحالية واستخدم الـ components والـ styling system الموجودين بدل إنشاء نظام منفصل إذا كان بالإمكان دمجه بشكل نظيف.
+    
+    تأكد أيضًا من أن السلايدر يعمل بشكل صحيح بعد:
+    
+    * إضافة صورة.
+    * حذف صورة.
+    * تغيير ترتيب الصور.
+    * تغيير مدة الانتقال.
+    * تعطيل/تفعيل Slide.
+    * إعادة تحميل الصفحة.
+    * فتح الموقع من جهاز الهاتف.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-hero-slider-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    height: {{ block.settings.hero_height }}px;
+    overflow: hidden;
+    border-radius: {{ block.settings.corner_radius }}px;
+    background: #3d081b;
+    direction: rtl;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity {{ block.settings.transition_speed }}s ease, visibility {{ block.settings.transition_speed }}s ease;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__image,
+  .ai-hero-slider-{{ ai_gen_id }}__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__placeholder {
+    background: #3d081b;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__placeholder svg {
+    width: 100%;
+    height: 100%;
+    opacity: .35;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(20, 4, 12, {{ block.settings.overlay_opacity | divided_by: 100.0 }}) 0%, rgba(20, 4, 12, .35) 55%, rgba(20, 4, 12, .08) 100%);
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__content {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    right: {{ block.settings.content_offset }}%;
+    transform: translateY(-50%);
+    max-width: 540px;
+    color: {{ block.settings.text_color }};
+    text-align: right;
+  }
+
+  .ai-hero-slider-{{ ai_gen_id }}__heading { margin: 0 0 12px; font-size: {{ block.settings.heading_size }}px; line-height: 1.1; }
+  .ai-hero-slider-{{ ai_gen_id }}__text { margin: 0 0 22px; font-size: 18px; line-height: 1.6; }
+  .ai-hero-slider-{{ ai_gen_id }}__link { display: inline-block; padding: 12px 24px; border-radius: {{ block.settings.button_radius }}px; background: {{ block.settings.button_color }}; color: {{ block.settings.button_text_color }}; text-decoration: none; font-weight: 700; }
+  .ai-hero-slider-{{ ai_gen_id }}__dots { position: absolute; z-index: 3; right: {{ block.settings.content_offset }}%; bottom: 24px; display: flex; gap: 8px; align-items: center; }
+  .ai-hero-slider-{{ ai_gen_id }}__dot { width: 22px; height: 4px; padding: 0; border: 0; border-radius: 4px; background: rgba(255,255,255,.55); cursor: pointer; transition: width .25s ease, background .25s ease; }
+  .ai-hero-slider-{{ ai_gen_id }}__dot.is-active { width: 58px; background: {{ block.settings.indicator_color }}; }
+
+  @media screen and (max-width: 749px) {
+    .ai-hero-slider-{{ ai_gen_id }} { height: {{ block.settings.mobile_height }}px; }
+    .ai-hero-slider-{{ ai_gen_id }}__image { object-position: {{ block.settings.mobile_position }}; }
+    .ai-hero-slider-{{ ai_gen_id }}__content { right: 7%; left: 7%; max-width: none; }
+    .ai-hero-slider-{{ ai_gen_id }}__heading { font-size: {{ block.settings.mobile_heading_size }}px; }
+    .ai-hero-slider-{{ ai_gen_id }}__text { font-size: 15px; }
+    .ai-hero-slider-{{ ai_gen_id }}__dots { right: 7%; bottom: 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-hero-slider-{{ ai_gen_id }}__slide, .ai-hero-slider-{{ ai_gen_id }}__dot { transition: none; }
+  }
+{% endstyle %}
+
+<hero-slider-{{ ai_gen_id }} class="ai-hero-slider-{{ ai_gen_id }}" {{ block.shopify_attributes }} data-autoplay="{{ block.settings.autoplay }}" data-duration="{{ block.settings.slide_duration | times: 1000 }}">
+  <div class="ai-hero-slider-{{ ai_gen_id }}__track">
+    {% for i in (1..5) %}
+      {% liquid
+        assign image_key = 'slide_' | append: i | append: '_image'
+        assign title_key = 'slide_' | append: i | append: '_title'
+        assign text_key = 'slide_' | append: i | append: '_text'
+        assign link_key = 'slide_' | append: i | append: '_link'
+        assign enabled_key = 'slide_' | append: i | append: '_enabled'
+        assign image = block.settings[image_key]
+      %}
+      {% if block.settings[enabled_key] and image != blank %}
+        <div class="ai-hero-slider-{{ ai_gen_id }}__slide{% if forloop.first %} is-active{% endif %}" data-slide-index="{{ forloop.index0 }}">
+          <img class="ai-hero-slider-{{ ai_gen_id }}__image" src="{{ image | image_url: width: 2000 }}" alt="{{ image.alt | escape }}" width="{{ image.width }}" height="{{ image.height }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+          <div class="ai-hero-slider-{{ ai_gen_id }}__overlay"></div>
+          <div class="ai-hero-slider-{{ ai_gen_id }}__content">
+            {% if block.settings[title_key] != blank %}<h2 class="ai-hero-slider-{{ ai_gen_id }}__heading">{{ block.settings[title_key] }}</h2>{% endif %}
+            {% if block.settings[text_key] != blank %}<div class="ai-hero-slider-{{ ai_gen_id }}__text">{{ block.settings[text_key] }}</div>{% endif %}
+            {% if block.settings[link_key] != blank %}<a class="ai-hero-slider-{{ ai_gen_id }}__link" href="{{ block.settings[link_key] }}">{{ block.settings.button_label }}</a>{% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div class="ai-hero-slider-{{ ai_gen_id }}__dots" role="tablist" aria-label="التنقل بين الشرائح">
+    {% assign dot_index = 0 %}
+    {% for i in (1..5) %}
+      {% assign enabled_key = 'slide_' | append: i | append: '_enabled' %}
+      {% assign image_key = 'slide_' | append: i | append: '_image' %}
+      {% if block.settings[enabled_key] and block.settings[image_key] != blank %}
+        <button class="ai-hero-slider-{{ ai_gen_id }}__dot{% if dot_index == 0 %} is-active{% endif %}" type="button" data-dot-index="{{ dot_index }}" role="tab" aria-label="الشريحة {{ dot_index | plus: 1 }}" aria-selected="{% if dot_index == 0 %}true{% else %}false{% endif %}"></button>
+        {% assign dot_index = dot_index | plus: 1 %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</hero-slider-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class HeroSlider{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        this.slides = Array.from(this.querySelectorAll('.ai-hero-slider-{{ ai_gen_id }}__slide'));
+        this.dots = Array.from(this.querySelectorAll('.ai-hero-slider-{{ ai_gen_id }}__dot'));
+        this.index = 0;
+        this.timer = null;
+        if (this.slides.length < 2) return;
+        this.dots.forEach((dot) => dot.addEventListener('click', () => { this.show(Number(dot.dataset.dotIndex)); this.pause(); }));
+        this.addEventListener('mouseenter', () => this.pause());
+        this.addEventListener('mouseleave', () => this.start());
+        this.addEventListener('focusin', () => this.pause());
+        this.addEventListener('focusout', () => this.start());
+        this.start();
+      }
+      show(next) {
+        this.slides[this.index].classList.remove('is-active');
+        this.dots[this.index].classList.remove('is-active');
+        this.dots[this.index].setAttribute('aria-selected', 'false');
+        this.index = next % this.slides.length;
+        this.slides[this.index].classList.add('is-active');
+        this.dots[this.index].classList.add('is-active');
+        this.dots[this.index].setAttribute('aria-selected', 'true');
+      }
+      start() { if (this.dataset.autoplay === 'true') { this.pause(); this.timer = setInterval(() => this.show(this.index + 1), Number(this.dataset.duration)); } }
+      pause() { if (this.timer) clearInterval(this.timer); this.timer = null; }
+    }
+    if (!customElements.get('hero-slider-{{ ai_gen_id }}')) customElements.define('hero-slider-{{ ai_gen_id }}', HeroSlider{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Hero image slider",
+  "tag": null,
+  "class": "hero-slider-block",
+  "settings": [
+    {"type":"checkbox","id":"autoplay","label":"تشغيل تلقائي","default":true},
+    {"type":"range","id":"slide_duration","label":"مدة الشريحة","min":3,"max":15,"step":1,"unit":"ث","default":5},
+    {"type":"range","id":"transition_speed","label":"سرعة الانتقال","min":1,"max":10,"step":1,"unit":"ث","default":2},
+    {"type":"range","id":"desktop_width_percent","label":"عرض سطح المكتب","min":50,"max":100,"step":5,"unit":"%","default":100},
+    {"type":"range","id":"hero_height","label":"ارتفاع سطح المكتب","min":300,"max":800,"step":50,"unit":"px","default":600},
+    {"type":"range","id":"mobile_height","label":"ارتفاع الهاتف","min":300,"max":700,"step":50,"unit":"px","default":500},
+    {"type":"select","id":"mobile_position","label":"موضع الصورة للهاتف","options":[{"value":"center","label":"وسط"},{"value":"right center","label":"يمين"},{"value":"left center","label":"يسار"}],"default":"center"},
+    {"type":"range","id":"content_offset","label":"إزاحة المحتوى","min":5,"max":30,"step":5,"unit":"%","default":10},
+    {"type":"range","id":"corner_radius","label":"استدارة الزوايا","min":0,"max":40,"step":2,"unit":"px","default":12},
+    {"type":"range","id":"overlay_opacity","label":"قوة التدرج","min":40,"max":90,"step":5,"unit":"%","default":70},
+    {"type":"range","id":"heading_size","label":"حجم العنوان","min":24,"max":72,"step":4,"unit":"px","default":48},
+    {"type":"range","id":"mobile_heading_size","label":"حجم العنوان للهاتف","min":20,"max":48,"step":4,"unit":"px","default":32},
+    {"type":"text","id":"button_label","label":"نص الزر","default":"اكتشف المزيد"},
+    {"type":"color","id":"text_color","label":"لون النص","default":"#FFFFFF"},
+    {"type":"color","id":"button_color","label":"لون الزر","default":"#910F3F"},
+    {"type":"color","id":"button_text_color","label":"لون نص الزر","default":"#FFFFFF"},
+    {"type":"color","id":"indicator_color","label":"لون المؤشر","default":"#F9E547"},
+    {"type":"range","id":"button_radius","label":"استدارة الزر","min":0,"max":40,"step":2,"unit":"px","default":40},
+    {"type":"header","content":"الشريحة الأولى"},
+    {"type":"checkbox","id":"slide_1_enabled","label":"تفعيل الشريحة الأولى","default":true},
+    {"type":"image_picker","id":"slide_1_image","label":"الصورة الأولى"},
+    {"type":"text","id":"slide_1_title","label":"العنوان الأول","default":"اكتشف مجموعتنا الجديدة"},
+    {"type":"textarea","id":"slide_1_text","label":"النص الأول","default":"تصميم راقٍ وتجربة استثنائية."},
+    {"type":"url","id":"slide_1_link","label":"رابط الشريحة الأولى"},
+    {"type":"header","content":"الشريحة الثانية"},
+    {"type":"checkbox","id":"slide_2_enabled","label":"تفعيل الشريحة الثانية","default":true},
+    {"type":"image_picker","id":"slide_2_image","label":"الصورة الثانية"},
+    {"type":"text","id":"slide_2_title","label":"العنوان الثاني","default":"اختيارات مميزة لك"},
+    {"type":"textarea","id":"slide_2_text","label":"النص الثاني","default":"تفاصيل صُممت لتناسب ذوقك."},
+    {"type":"url","id":"slide_2_link","label":"رابط الشريحة الثانية"},
+    {"type":"header","content":"الشريحة الثالثة"},
+    {"type":"checkbox","id":"slide_3_enabled","label":"تفعيل الشريحة الثالثة","default":true},
+    {"type":"image_picker","id":"slide_3_image","label":"الصورة الثالثة"},
+    {"type":"text","id":"slide_3_title","label":"العنوان الثالث","default":"أناقة تدوم"},
+    {"type":"textarea","id":"slide_3_text","label":"النص الثالث","default":"تسوق بثقة من متجر الحصيف."},
+    {"type":"url","id":"slide_3_link","label":"رابط الشريحة الثالثة"},
+    {"type":"header","content":"الشريحة الرابعة"},
+    {"type":"checkbox","id":"slide_4_enabled","label":"تفعيل الشريحة الرابعة","default":false},
+    {"type":"image_picker","id":"slide_4_image","label":"الصورة الرابعة"},
+    {"type":"text","id":"slide_4_title","label":"العنوان الرابع","default":"عرض خاص"},
+    {"type":"textarea","id":"slide_4_text","label":"النص الرابع","default":"فرصتك لاختيار ما تحب."},
+    {"type":"url","id":"slide_4_link","label":"رابط الشريحة الرابعة"},
+    {"type":"header","content":"الشريحة الخامسة"},
+    {"type":"checkbox","id":"slide_5_enabled","label":"تفعيل الشريحة الخامسة","default":false},
+    {"type":"image_picker","id":"slide_5_image","label":"الصورة الخامسة"},
+    {"type":"text","id":"slide_5_title","label":"العنوان الخامس","default":"ابدأ الآن"},
+    {"type":"textarea","id":"slide_5_text","label":"النص الخامس","default":"استكشف المنتجات المتاحة اليوم."},
+    {"type":"url","id":"slide_5_link","label":"رابط الشريحة الخامسة"}
+  ],
+  "presets": [{"name":"Hero image slider"}]
+}
 {% endschema %}
