@@ -1,12 +1,56 @@
 {% comment %} Hero Cinematic Slideshow Section {% endcomment %}
 
-<div class="hs-hero" id="HeroSlideshow-{{ section.id }}">
+{%- style -%}
+  #HeroSlideshow-{{ section.id }} {
+    {%- if section.settings.height_mode == 'adapt' and section.blocks.first.settings.image != blank -%}
+      height: auto;
+      aspect-ratio: {{ section.blocks.first.settings.image.aspect_ratio }};
+      min-height: 250px;
+    {%- elsif section.settings.height_mode == 'custom' -%}
+      height: {{ section.settings.desktop_height }}px;
+    {%- elsif section.settings.height_mode == 'vh' -%}
+      height: {{ section.settings.desktop_vh }}vh;
+    {%- else -%}
+      height: 70vh;
+    {%- endif -%}
+  }
 
+  @media screen and (max-width: 749px) {
+    #HeroSlideshow-{{ section.id }} {
+      {%- if section.settings.mobile_height_mode == 'adapt' and section.blocks.first.settings.image != blank -%}
+        height: auto;
+        aspect-ratio: {{ section.blocks.first.settings.image.aspect_ratio }};
+        min-height: 200px;
+      {%- elsif section.settings.mobile_height_mode == 'custom' -%}
+        height: {{ section.settings.mobile_height }}px !important;
+      {%- elsif section.settings.mobile_height_mode == 'vh' -%}
+        height: {{ section.settings.mobile_vh }}vh !important;
+      {%- else -%}
+        height: 55vh !important;
+      {%- endif -%}
+    }
+  }
+
+  #HeroSlideshow-{{ section.id }} .hs-slide__bg img,
+  #HeroSlideshow-{{ section.id }} .hs-placeholder {
+    object-fit: {{ section.settings.image_fit | default: 'cover' }};
+    object-position: {{ section.settings.image_position | default: 'center center' }};
+  }
+
+  {%- if section.settings.image_fit == 'contain' -%}
+    #HeroSlideshow-{{ section.id }} .hs-slide__bg {
+      background-color: {{ section.settings.image_bg_color | default: '#000000' }};
+    }
+  {%- endif -%}
+{%- endstyle -%}
+
+<div class="hs-hero{% unless section.settings.full_width %} page-width{% endunless %}" id="HeroSlideshow-{{ section.id }}">
   <div class="hs-track">
+
     {%- if section.blocks.size > 0 -%}
       {%- for block in section.blocks -%}
 
-        {%- comment -%} حساب رابط الزر الأول {%- endcomment -%}
+        {%- comment -%} رابط الزر الأول {%- endcomment -%}
         {%- if block.settings.button_collection != blank -%}
           {%- assign btn1_url = block.settings.button_collection.url -%}
         {%- elsif block.settings.button_link != blank -%}
@@ -15,6 +59,7 @@
           {%- assign btn1_url = '' -%}
         {%- endif -%}
 
+        {%- comment -%} رابط الزر الثاني {%- endcomment -%}
         {%- if block.settings.button2_collection != blank -%}
           {%- assign btn2_url = block.settings.button2_collection.url -%}
         {%- elsif block.settings.button2_link != blank -%}
@@ -23,8 +68,33 @@
           {%- assign btn2_url = '' -%}
         {%- endif -%}
 
-        <div class="hs-slide{% if forloop.first %} hs-slide--active{% endif %}" {{ block.shopify_attributes }}>
+        {%- comment -%} موضع المحتوى {%- endcomment -%}
+        {%- assign cv = block.settings.content_vertical | default: 'center' -%}
+        {%- assign ch = block.settings.content_horizontal | default: 'right' -%}
 
+        {%- if cv == 'top' -%}{%- assign v_val = 'flex-start' -%}
+        {%- elsif cv == 'bottom' -%}{%- assign v_val = 'flex-end' -%}
+        {%- else -%}{%- assign v_val = 'center' -%}
+        {%- endif -%}
+
+        {%- if ch == 'left' -%}{%- assign h_val = 'flex-start' -%}
+        {%- elsif ch == 'center' -%}{%- assign h_val = 'center' -%}
+        {%- else -%}{%- assign h_val = 'flex-end' -%}
+        {%- endif -%}
+
+        {%- assign b1_style = block.settings.btn1_style | default: 'solid' -%}
+        {%- assign b1_color = block.settings.btn1_color | default: '#ffffff' -%}
+        {%- assign b1_txt   = block.settings.btn1_text_color | default: '#111111' -%}
+
+        {%- assign b2_style = block.settings.btn2_style | default: 'ghost' -%}
+        {%- assign b2_color = block.settings.btn2_color | default: '#ffffff' -%}
+        {%- assign b2_txt   = block.settings.btn2_text_color | default: '#ffffff' -%}
+
+        <div
+          class="hs-slide{% if forloop.first %} hs-slide--active{% endif %}"
+          {{ block.shopify_attributes }}
+        >
+          <!-- الصورة -->
           <div class="hs-slide__bg">
             {%- if block.settings.image != blank -%}
               <img
@@ -43,10 +113,18 @@
             {%- endif -%}
           </div>
 
+          <!-- التدرج -->
           <div class="hs-slide__overlay"></div>
 
-          <div class="hs-slide__content">
-            <div class="hs-slide__inner">
+          <!-- المحتوى -->
+          <div class="hs-slide__content" style="
+            align-items: {{ h_val }};
+            justify-content: {{ v_val }};
+            padding-top: {% if cv == 'top' %}5rem{% else %}3rem{% endif %};
+            padding-bottom: {% if cv == 'bottom' %}5rem{% else %}3rem{% endif %};
+          ">
+            <div class="hs-slide__inner" style="text-align: {% if ch == 'left' %}left{% elsif ch == 'center' %}center{% else %}right{% endif %};">
+
               {%- if block.settings.label != blank -%}
                 <p class="hs-slide__label">{{ block.settings.label }}</p>
               {%- endif -%}
@@ -59,51 +137,74 @@
                 <p class="hs-slide__desc">{{ block.settings.description }}</p>
               {%- endif -%}
 
-              {%- if block.settings.button_label != blank and btn1_url != '' -%}
-                <div class="hs-slide__actions">
-                  <a href="{{ btn1_url }}" class="hs-btn hs-btn--primary">
-                    {{ block.settings.button_label }}
-                  </a>
-                  {%- if block.settings.button2_label != blank and btn2_url != '' -%}
-                    <a href="{{ btn2_url }}" class="hs-btn hs-btn--ghost">
-                      {{ block.settings.button2_label }}
-                    </a>
+              <!-- أزرار -->
+              {%- if block.settings.button_label != blank or block.settings.button2_label != blank -%}
+                <div class="hs-slide__actions" style="justify-content: {% if ch == 'left' %}flex-start{% elsif ch == 'center' %}center{% else %}flex-end{% endif %};">
+
+                  {%- if block.settings.button_label != blank and btn1_url != '' -%}
+                    {%- if b1_style == 'ghost' -%}
+                      <a href="{{ btn1_url }}" class="hs-btn" style="
+                        background: transparent;
+                        color: {{ b1_color }};
+                        border: 2px solid {{ b1_color }};
+                        backdrop-filter: blur(6px);
+                      ">{{ block.settings.button_label }}</a>
+                    {%- else -%}
+                      <a href="{{ btn1_url }}" class="hs-btn" style="
+                        background: {{ b1_color }};
+                        color: {{ b1_txt }};
+                        border: 2px solid {{ b1_color }};
+                      ">{{ block.settings.button_label }}</a>
+                    {%- endif -%}
                   {%- endif -%}
+
+                  {%- if block.settings.button2_label != blank and btn2_url != '' -%}
+                    {%- if b2_style == 'ghost' -%}
+                      <a href="{{ btn2_url }}" class="hs-btn" style="
+                        background: transparent;
+                        color: {{ b2_color }};
+                        border: 2px solid {{ b2_color }};
+                        backdrop-filter: blur(6px);
+                      ">{{ block.settings.button2_label }}</a>
+                    {%- else -%}
+                      <a href="{{ btn2_url }}" class="hs-btn" style="
+                        background: {{ b2_color }};
+                        color: {{ b2_txt }};
+                        border: 2px solid {{ b2_color }};
+                      ">{{ block.settings.button2_label }}</a>
+                    {%- endif -%}
+                  {%- endif -%}
+
                 </div>
               {%- endif -%}
+
             </div>
           </div>
-
         </div>
+
       {%- endfor -%}
     {%- else -%}
       <div class="hs-slide hs-slide--active">
-        <div class="hs-slide__bg">
-          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hs-placeholder' }}
-        </div>
+        <div class="hs-slide__bg">{{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hs-placeholder' }}</div>
         <div class="hs-slide__overlay"></div>
-        <div class="hs-slide__content">
-          <div class="hs-slide__inner">
+        <div class="hs-slide__content" style="align-items:flex-end;justify-content:center;">
+          <div class="hs-slide__inner" style="text-align:right;">
             <h2 class="hs-slide__title">أضف شريحة من مخصص القالب</h2>
-            <p class="hs-slide__desc">اضغط على "إضافة شريحة" لتخصيص هذا القسم بصورك ونصوصك</p>
+            <p class="hs-slide__desc">اضغط على "إضافة شريحة" لتخصيص هذا القسم</p>
           </div>
         </div>
       </div>
     {%- endif -%}
+
   </div>
 
   {%- if section.blocks.size > 1 -%}
     <button class="hs-nav hs-nav--prev" id="hs-prev-{{ section.id }}" aria-label="السابق">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 18 15 12 9 6"></polyline>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
     </button>
     <button class="hs-nav hs-nav--next" id="hs-next-{{ section.id }}" aria-label="التالي">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
     </button>
-
     <div class="hs-dots" id="hs-dots-{{ section.id }}">
       {%- for block in section.blocks -%}
         <button class="hs-dot{% if forloop.first %} hs-dot--active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="الشريحة {{ forloop.index }}"></button>
@@ -119,194 +220,107 @@
   width: 100%;
   overflow: hidden;
   background: #111;
-  height: {% if section.settings.height == 'small' %}50vh{% elsif section.settings.height == 'large' %}90vh{% else %}70vh{% endif %};
-  min-height: 360px;
-  max-height: 860px;
   direction: rtl;
 }
+.hs-track { position: absolute; inset: 0; }
 
-.hs-track {
-  position: absolute;
-  inset: 0;
-}
-
-/* ── Slides ── */
 .hs-slide {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   opacity: 0;
   transition: opacity 0.8s ease;
   pointer-events: none;
 }
-.hs-slide--active {
-  opacity: 1;
-  pointer-events: auto;
-}
+.hs-slide--active { opacity: 1; pointer-events: auto; }
 
-/* ── Background ── */
-.hs-slide__bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
+.hs-slide__bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 .hs-slide__bg img,
 .hs-placeholder {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  width: 100%; height: 100%;
   display: block;
 }
 
-/* ── Overlay ── */
 .hs-slide__overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    to left,
-    rgba(0,0,0,0.82) 0%,
-    rgba(0,0,0,0.50) 40%,
-    rgba(0,0,0,0.10) 100%
-  );
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(0,0,0,.04) 0%, rgba(0,0,0,.55) 100%);
 }
 
-/* ── Content ── */
 .hs-slide__content {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  pointer-events: none;
-}
-.hs-slide__inner {
-  width: 100%;
-  max-width: 560px;
-  padding: 3rem 4% 3rem 2%;
+  position: absolute; inset: 0; z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  padding: 3rem 5%;
+  pointer-events: none;
+}
+
+.hs-slide__inner {
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
   pointer-events: auto;
-  text-align: right;
 }
 
 .hs-slide__label {
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  color: rgba(255,255,255,.7);
-  margin: 0 0 .8rem;
-  text-transform: uppercase;
+  font-size: 1.2rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.75);
+  margin: 0 0 .7rem;
 }
 
 .hs-slide__title {
-  font-size: clamp(2.6rem, 4.5vw, 5.4rem);
-  font-weight: 800;
-  line-height: 1.15;
-  color: #fff;
-  margin: 0 0 1rem;
+  font-size: clamp(2.4rem, 4.5vw, 5.2rem);
+  font-weight: 800; line-height: 1.15;
+  color: #fff; margin: 0 0 1rem;
   text-shadow: 0 2px 20px rgba(0,0,0,.5);
 }
 
 .hs-slide__desc {
   font-size: clamp(1.3rem, 1.5vw, 1.6rem);
-  color: rgba(255,255,255,.82);
-  line-height: 1.7;
-  margin: 0 0 2rem;
+  color: rgba(255,255,255,.85); line-height: 1.7;
+  margin: 0 0 1.8rem;
 }
 
-/* ── Action Buttons ── */
 .hs-slide__actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.hs-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: .85rem 2.4rem;
-  border-radius: 10rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
-  white-space: nowrap;
-  border: none;
-}
-.hs-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 20px rgba(0,0,0,.25);
-}
-.hs-btn--primary {
-  background: #fff;
-  color: #111;
-}
-.hs-btn--ghost {
-  background: rgba(255,255,255,.15);
-  color: #fff;
-  border: 2px solid rgba(255,255,255,.5);
-  backdrop-filter: blur(6px);
+  display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
 }
 
-/* ── Nav Arrows ── */
+.hs-btn {
+  display: inline-flex; align-items: center;
+  padding: .85rem 2.4rem; border-radius: 10rem;
+  font-size: 1.4rem; font-weight: 600;
+  text-decoration: none; cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  white-space: nowrap;
+}
+.hs-btn:hover { transform: scale(1.04); box-shadow: 0 4px 18px rgba(0,0,0,.25); }
+
 .hs-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: 4.4rem;
-  height: 4.4rem;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255,255,255,.15);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .2s;
-  opacity: .75;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 10; width: 4.4rem; height: 4.4rem;
+  border-radius: 50%; border: none;
+  background: rgba(255,255,255,.15); backdrop-filter: blur(8px);
+  color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; opacity: .8;
 }
 .hs-nav:hover { background: rgba(255,255,255,.3); opacity: 1; }
 .hs-nav svg { width: 2.2rem; height: 2.2rem; }
 .hs-nav--prev { right: 1.6rem; }
 .hs-nav--next { left: 1.6rem; }
 
-/* ── Dots ── */
 .hs-dots {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
+  position: absolute; bottom: 1.8rem; left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: .6rem;
-  z-index: 10;
+  display: flex; gap: .6rem; z-index: 10;
 }
 .hs-dot {
-  width: 3rem;
-  height: .4rem;
-  border-radius: 10rem;
-  background: rgba(255,255,255,.35);
-  border: none;
-  cursor: pointer;
-  transition: background .3s, width .3s;
-  padding: 0;
+  width: 3rem; height: .4rem; border-radius: 10rem;
+  background: rgba(255,255,255,.35); border: none;
+  cursor: pointer; transition: background .3s, width .3s; padding: 0;
 }
 .hs-dot--active { background: #fff; width: 5rem; }
 
-/* ── Mobile ── */
 @media screen and (max-width: 749px) {
-  .hs-hero { height: 58vh; }
-  .hs-slide__overlay {
-    background: linear-gradient(to top, rgba(0,0,0,.88) 0%, rgba(0,0,0,.3) 55%, transparent 100%);
-  }
-  .hs-slide__content { align-items: flex-end; justify-content: flex-end; }
-  .hs-slide__inner { max-width: 100%; padding: 2rem 1.6rem 6rem; }
+  .hs-slide__inner { max-width: 100%; }
   .hs-nav { display: none; }
 }
 </style>
@@ -315,49 +329,39 @@
 (function() {
   var sid   = '{{ section.id }}';
   var total = {{ section.blocks.size | default: 1 }};
-  var cur   = 0;
-  var timer = null;
+  var cur   = 0, timer = null;
   var AUTO  = {{ section.settings.auto_rotate | default: true }} === true;
   var SPEED = {{ section.settings.autoplay_speed | default: 5 }} * 1000;
-
-  var hero = document.getElementById('HeroSlideshow-' + sid);
+  var hero  = document.getElementById('HeroSlideshow-' + sid);
   if (!hero) return;
 
-  function allSlides() { return hero.querySelectorAll('.hs-slide'); }
-  function allDots()   { return document.querySelectorAll('#hs-dots-' + sid + ' .hs-dot'); }
+  function slides() { return hero.querySelectorAll('.hs-slide'); }
+  function dots()   { return document.querySelectorAll('#hs-dots-' + sid + ' .hs-dot'); }
 
   function goTo(idx) {
-    allSlides().forEach(function(s, i) { s.classList.toggle('hs-slide--active', i === idx); });
-    allDots().forEach(function(d, i)   { d.classList.toggle('hs-dot--active', i === idx); });
+    slides().forEach(function(s,i){ s.classList.toggle('hs-slide--active', i===idx); });
+    dots().forEach(function(d,i){ d.classList.toggle('hs-dot--active', i===idx); });
     cur = idx;
   }
-
-  function next() { goTo((cur + 1) % total); }
-  function prev() { goTo((cur - 1 + total) % total); }
-
-  function startAuto() {
-    if (!AUTO || total < 2) return;
-    timer = setInterval(next, SPEED);
-  }
+  function next() { goTo((cur+1)%total); }
+  function prev() { goTo((cur-1+total)%total); }
+  function startAuto() { if (AUTO && total>1) timer = setInterval(next, SPEED); }
   function resetAuto() { clearInterval(timer); startAuto(); }
 
-  var btnP = document.getElementById('hs-prev-' + sid);
-  var btnN = document.getElementById('hs-next-' + sid);
-  if (btnP) btnP.addEventListener('click', function() { prev(); resetAuto(); });
-  if (btnN) btnN.addEventListener('click', function() { next(); resetAuto(); });
-
-  allDots().forEach(function(d) {
-    d.addEventListener('click', function() { goTo(+this.dataset.index); resetAuto(); });
-  });
+  var bp = document.getElementById('hs-prev-'+sid);
+  var bn = document.getElementById('hs-next-'+sid);
+  if (bp) bp.addEventListener('click', function(){ prev(); resetAuto(); });
+  if (bn) bn.addEventListener('click', function(){ next(); resetAuto(); });
+  dots().forEach(function(d){ d.addEventListener('click', function(){ goTo(+this.dataset.index); resetAuto(); }); });
 
   var tx = null;
-  hero.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; }, { passive: true });
-  hero.addEventListener('touchend', function(e) {
-    if (tx === null) return;
+  hero.addEventListener('touchstart', function(e){ tx = e.touches[0].clientX; }, {passive:true});
+  hero.addEventListener('touchend', function(e){
+    if (tx===null) return;
     var d = tx - e.changedTouches[0].clientX;
-    if (Math.abs(d) > 40) { d > 0 ? next() : prev(); resetAuto(); }
+    if (Math.abs(d)>40){ d>0 ? next() : prev(); resetAuto(); }
     tx = null;
-  }, { passive: true });
+  }, {passive:true});
 
   startAuto();
 })();
@@ -369,20 +373,127 @@
   "tag": "section",
   "class": "section",
   "max_blocks": 10,
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  },
+  "disabled_on": { "groups": ["header", "footer"] },
   "settings": [
     {
+      "type": "header",
+      "content": "📏 أبعاد القسم (سطح المكتب)"
+    },
+    {
       "type": "select",
-      "id": "height",
-      "label": "ارتفاع القسم",
+      "id": "height_mode",
+      "label": "نمط ارتفاع القسم",
       "options": [
-        { "value": "small",  "label": "صغير (50vh)" },
-        { "value": "medium", "label": "متوسط (70vh)" },
-        { "value": "large",  "label": "كبير (90vh)" }
+        { "value": "custom", "label": "ارتفاع مخصص (بكسل)" },
+        { "value": "vh",     "label": "نسبة مئوية من الشاشة (vh)" },
+        { "value": "adapt",  "label": "ملائمة لأول صورة (Adapt to image)" }
       ],
-      "default": "medium"
+      "default": "custom"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "ارتفاع القسم مخصص (بكسل)",
+      "min": 250,
+      "max": 900,
+      "step": 10,
+      "default": 550,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "desktop_vh",
+      "label": "ارتفاع القسم (نسبة مئوية vh)",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "default": 70,
+      "unit": "%"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "عرض ملء الشاشة (Full Width)",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "📱 أبعاد القسم (الجوال)"
+    },
+    {
+      "type": "select",
+      "id": "mobile_height_mode",
+      "label": "نمط ارتفاع القسم للجوال",
+      "options": [
+        { "value": "custom", "label": "ارتفاع مخصص (بكسل)" },
+        { "value": "vh",     "label": "نسبة مئوية من الشاشة (vh)" },
+        { "value": "adapt",  "label": "ملائمة لأول صورة (Adapt to image)" }
+      ],
+      "default": "custom"
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "ارتفاع القسم بالجوال (بكسل)",
+      "min": 180,
+      "max": 650,
+      "step": 10,
+      "default": 360,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_vh",
+      "label": "ارتفاع القسم بالجوال (نسبة vh)",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "default": 55,
+      "unit": "%"
+    },
+
+    {
+      "type": "header",
+      "content": "🖼️ أبعاد وعرض الصور (على مستوى القسم كامل)"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "طريقة ملاءمة الصور (Object Fit)",
+      "options": [
+        { "value": "cover",   "label": "تغطية كامل المساحة (Cover)" },
+        { "value": "contain", "label": "احتواء الصورة بالكامل (Contain)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "موضع التركيز للصورة (Object Position)",
+      "options": [
+        { "value": "center center", "label": "منتصف" },
+        { "value": "top center",    "label": "أعلى المنتصف" },
+        { "value": "bottom center", "label": "أسفل المنتصف" },
+        { "value": "center right",  "label": "منتصف اليمين" },
+        { "value": "center left",   "label": "منتصف اليسار" },
+        { "value": "top right",     "label": "أعلى اليمين" },
+        { "value": "top left",      "label": "أعلى اليسار" },
+        { "value": "bottom right",  "label": "أسفل اليمين" },
+        { "value": "bottom left",   "label": "أسفل اليسار" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "color",
+      "id": "image_bg_color",
+      "label": "لون خلفية الجوانب (عند اختيار Contain)",
+      "default": "#000000"
+    },
+
+    {
+      "type": "header",
+      "content": "⏱️ التشغيل التلقائي والسرعة"
     },
     {
       "type": "checkbox",
@@ -393,12 +504,8 @@
     {
       "type": "range",
       "id": "autoplay_speed",
-      "label": "سرعة الانتقال بين الشرائح",
-      "min": 1,
-      "max": 9,
-      "step": 1,
-      "default": 5,
-      "unit": "s"
+      "label": "سرعة الانتقال (ثواني)",
+      "min": 1, "max": 9, "step": 1, "default": 5, "unit": "s"
     }
   ],
   "blocks": [
@@ -406,75 +513,82 @@
       "type": "slide",
       "name": "شريحة",
       "settings": [
-        {
-          "type": "header",
-          "content": "📷 الصورة"
-        },
+
+        { "type": "header", "content": "📷 الصورة" },
         {
           "type": "image_picker",
           "id": "image",
           "label": "اختر صورة الشريحة"
         },
+
+        { "type": "header", "content": "📍 موضع النص والأزرار" },
         {
-          "type": "header",
-          "content": "✏️ النص"
+          "type": "select",
+          "id": "content_vertical",
+          "label": "الموضع الرأسي",
+          "options": [
+            { "value": "top",    "label": "أعلى" },
+            { "value": "center", "label": "وسط" },
+            { "value": "bottom", "label": "أسفل" }
+          ],
+          "default": "center"
         },
+        {
+          "type": "select",
+          "id": "content_horizontal",
+          "label": "الموضع الأفقي",
+          "options": [
+            { "value": "right",  "label": "يمين" },
+            { "value": "center", "label": "وسط" },
+            { "value": "left",   "label": "يسار" }
+          ],
+          "default": "right"
+        },
+
+        { "type": "header", "content": "✏️ النصوص" },
         {
           "type": "text",
           "id": "label",
           "label": "تصنيف صغير (اختياري)",
           "info": "مثال: 🔥 الأكثر مبيعاً"
         },
+        { "type": "text",     "id": "title",       "label": "العنوان الرئيسي" },
+        { "type": "textarea", "id": "description",  "label": "وصف قصير" },
+
+        { "type": "header", "content": "🔘 الزر الأول" },
+        { "type": "text", "id": "button_label", "label": "نص الزر", "default": "اكتشف الآن" },
+        { "type": "collection", "id": "button_collection", "label": "كوليكشن (الأولوية)", "info": "يُقدَّم على الرابط اليدوي" },
+        { "type": "url",  "id": "button_link",  "label": "أو رابط يدوي" },
         {
-          "type": "text",
-          "id": "title",
-          "label": "العنوان الرئيسي"
+          "type": "select",
+          "id": "btn1_style",
+          "label": "نمط الزر",
+          "options": [
+            { "value": "solid", "label": "ملوّن" },
+            { "value": "ghost", "label": "شفاف (Ghost)" }
+          ],
+          "default": "solid"
         },
+        { "type": "color", "id": "btn1_color",      "label": "لون الزر / الحدود",  "default": "#ffffff" },
+        { "type": "color", "id": "btn1_text_color",  "label": "لون النص (Solid فقط)", "default": "#111111" },
+
+        { "type": "header", "content": "🔘 الزر الثاني (اختياري)" },
+        { "type": "text", "id": "button2_label", "label": "نص الزر الثاني" },
+        { "type": "collection", "id": "button2_collection", "label": "كوليكشن (الأولوية)" },
+        { "type": "url",  "id": "button2_link",  "label": "أو رابط يدوي" },
         {
-          "type": "textarea",
-          "id": "description",
-          "label": "وصف قصير"
+          "type": "select",
+          "id": "btn2_style",
+          "label": "نمط الزر الثاني",
+          "options": [
+            { "value": "solid", "label": "ملوّن" },
+            { "value": "ghost", "label": "شفاف (Ghost)" }
+          ],
+          "default": "ghost"
         },
-        {
-          "type": "header",
-          "content": "🔗 الزر الأول"
-        },
-        {
-          "type": "text",
-          "id": "button_label",
-          "label": "نص الزر",
-          "default": "اكتشف الآن"
-        },
-        {
-          "type": "collection",
-          "id": "button_collection",
-          "label": "اختر كوليكشن (الأولوية)",
-          "info": "إذا اخترت كوليكشن سيتجاهل الرابط اليدوي"
-        },
-        {
-          "type": "url",
-          "id": "button_link",
-          "label": "أو أدخل رابط يدوياً"
-        },
-        {
-          "type": "header",
-          "content": "🔗 الزر الثاني (اختياري)"
-        },
-        {
-          "type": "text",
-          "id": "button2_label",
-          "label": "نص الزر الثاني"
-        },
-        {
-          "type": "collection",
-          "id": "button2_collection",
-          "label": "اختر كوليكشن (الأولوية)"
-        },
-        {
-          "type": "url",
-          "id": "button2_link",
-          "label": "أو أدخل رابط يدوياً"
-        }
+        { "type": "color", "id": "btn2_color",      "label": "لون الزر / الحدود",  "default": "#ffffff" },
+        { "type": "color", "id": "btn2_text_color",  "label": "لون النص (Solid فقط)", "default": "#ffffff" }
+
       ]
     }
   ],
