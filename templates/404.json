@@ -98,7 +98,7 @@
       "name": "Hero Slideshow",
       "settings": {
         "height": "small",
-        "auto_rotate": true,
+        "auto_rotate": false,
         "autoplay_speed": 5
       }
     },
