@@ -20,6 +20,18 @@
       {%- if section.settings.show_collection_description -%}
         <div class="collection-hero__description rte">{{ collection.description }}</div>
       {%- endif -%}
+
+      {%- if section.settings.subcategories_menu != blank -%}
+        <ul class="collection-hero__subcategories list-unstyled">
+          {%- for link in section.settings.subcategories_menu.links -%}
+            <li>
+              <a href="{{ link.url }}" class="button button--secondary button--small{% if link.active %} button--primary{% endif %}">
+                {{ link.title }}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
     </div>
 
     {%- if section.settings.show_collection_image and collection.image -%}
@@ -71,6 +83,12 @@
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "link_list",
+      "id": "subcategories_menu",
+      "label": "Sub-categories Menu",
+      "info": "Select a menu to display options under the collection title."
     }
   ]
 }
