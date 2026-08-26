@@ -1,4 +1,4 @@
-{%- unless template == 'index' or template == 'cart' or template == 'list-collections' -%}
+{%- if template.name == 'collection' or template.name == 'product' -%}
 <nav class="breadcrumbs page-width" role="navigation" aria-label="breadcrumbs">
   <ol class="breadcrumbs__list">
     <li class="breadcrumbs__item">
@@ -91,4 +91,4 @@
     font-weight: 600;
   }
 </style>
-{%- endunless -%}
+{%- endif -%}
