@@ -22,15 +22,75 @@
       {%- endif -%}
 
       {%- if section.settings.subcategories_menu != blank -%}
-        <ul class="collection-hero__subcategories list-unstyled">
-          {%- for link in section.settings.subcategories_menu.links -%}
-            <li>
-              <a href="{{ link.url }}" class="button button--secondary button--small{% if link.active %} button--primary{% endif %}">
-                {{ link.title }}
-              </a>
-            </li>
-          {%- endfor -%}
-        </ul>
+        {%- assign slider_id = 'subcats-' | append: section.id -%}
+        <div class="collection-hero__subcategories-wrapper">
+          <button
+            type="button"
+            class="slider-button slider-button--prev"
+            id="{{ slider_id }}-prev"
+            aria-label="السابق"
+            onclick="subcatScroll('{{ slider_id }}', -1)"
+          >
+            {%- render 'icon-caret' -%}
+          </button>
+
+          <ul
+            class="collection-hero__subcategories list-unstyled"
+            id="{{ slider_id }}"
+            onscroll="subcatUpdateArrows('{{ slider_id }}')"
+          >
+            {%- for link in section.settings.subcategories_menu.links -%}
+              <li>
+                <a href="{{ link.url }}" class="button button--secondary button--small{% if link.active %} button--primary{% endif %}">
+                  {{ link.title }}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          <button
+            type="button"
+            class="slider-button slider-button--next"
+            id="{{ slider_id }}-next"
+            aria-label="التالي"
+            onclick="subcatScroll('{{ slider_id }}', 1)"
+          >
+            {%- render 'icon-caret' -%}
+          </button>
+        </div>
+
+        <script>
+          (function() {
+            function subcatScroll(id, dir) {
+              var el = document.getElementById(id);
+              if (!el) return;
+              el.scrollBy({ left: dir * 200, behavior: 'smooth' });
+            }
+            function subcatUpdateArrows(id) {
+              var el = document.getElementById(id);
+              if (!el) return;
+              var prev = document.getElementById(id + '-prev');
+              var next = document.getElementById(id + '-next');
+              var atStart = el.scrollLeft <= 2;
+              var atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+              /* RTL: flip logic */
+              var isRTL = document.documentElement.dir === 'rtl';
+              if (isRTL) {
+                atStart = el.scrollLeft >= -2;
+                atEnd   = el.scrollLeft <= -(el.scrollWidth - el.clientWidth) + 2;
+              }
+              if (prev) prev.classList.toggle('disabled', atStart);
+              if (next) next.classList.toggle('disabled', atEnd);
+            }
+            window.subcatScroll = subcatScroll;
+            window.subcatUpdateArrows = subcatUpdateArrows;
+
+            /* init on load */
+            document.addEventListener('DOMContentLoaded', function() {
+              subcatUpdateArrows('{{ slider_id }}');
+            });
+          })();
+        </script>
       {%- endif -%}
     </div>
 
