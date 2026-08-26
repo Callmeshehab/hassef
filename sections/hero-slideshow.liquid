@@ -1,0 +1,447 @@
+{% comment %} Hero Cinematic Slideshow Section {% endcomment %}
+
+{%- if section.blocks.size > 0 -%}
+<div class="hs-hero" id="HeroSlideshow-{{ section.id }}">
+
+  <!-- الشرائح -->
+  <div class="hs-track" id="hs-track-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      <div class="hs-slide{% if forloop.first %} hs-slide--active{% endif %}" id="hs-slide-{{ section.id }}-{{ forloop.index }}" {{ block.shopify_attributes }}>
+
+        <!-- الصورة الخلفية -->
+        {%- if block.settings.image != blank -%}
+          <div class="hs-slide__bg">
+            <img
+              src="{{ block.settings.image | image_url: width: 1600 }}"
+              srcset="
+                {{ block.settings.image | image_url: width: 750 }} 750w,
+                {{ block.settings.image | image_url: width: 1100 }} 1100w,
+                {{ block.settings.image | image_url: width: 1600 }} 1600w
+              "
+              sizes="100vw"
+              alt="{{ block.settings.image.alt | escape }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+            >
+          </div>
+        {%- else -%}
+          <div class="hs-slide__bg hs-slide__bg--placeholder">
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          </div>
+        {%- endif -%}
+
+        <!-- تدرج لوني داكن -->
+        <div class="hs-slide__overlay"></div>
+
+        <!-- المحتوى النصي -->
+        <div class="hs-slide__content page-width">
+          {%- if block.settings.label != blank -%}
+            <p class="hs-slide__label">{{ block.settings.label }}</p>
+          {%- endif -%}
+          {%- if block.settings.title != blank -%}
+            <h2 class="hs-slide__title">{{ block.settings.title }}</h2>
+          {%- endif -%}
+          {%- if block.settings.description != blank -%}
+            <p class="hs-slide__desc">{{ block.settings.description }}</p>
+          {%- endif -%}
+          {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
+            <div class="hs-slide__actions">
+              <a href="{{ block.settings.button_link }}" class="hs-btn hs-btn--primary">
+                {{ block.settings.button_label }}
+              </a>
+              {%- if block.settings.button2_label != blank and block.settings.button2_link != blank -%}
+                <a href="{{ block.settings.button2_link }}" class="hs-btn hs-btn--ghost">
+                  {{ block.settings.button2_label }}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <!-- أزرار التنقل (يمين / يسار) -->
+  {%- if section.blocks.size > 1 -%}
+    <button class="hs-nav hs-nav--prev" id="hs-prev-{{ section.id }}" aria-label="السابق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+    <button class="hs-nav hs-nav--next" id="hs-next-{{ section.id }}" aria-label="التالي">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- نقاط التنقل -->
+    <div class="hs-dots" id="hs-dots-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <button
+          class="hs-dot{% if forloop.first %} hs-dot--active{% endif %}"
+          data-index="{{ forloop.index0 }}"
+          aria-label="الشريحة {{ forloop.index }}"
+        ></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+</div>
+
+<style>
+/* ═══════════════════════════════════════════
+   Hero Slideshow – hassef theme
+═══════════════════════════════════════════ */
+.hs-hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+  height: {% if section.settings.height == 'small' %}50vh{% elsif section.settings.height == 'large' %}90vh{% else %}70vh{% endif %};
+  min-height: 340px;
+  max-height: 860px;
+  direction: rtl;
+}
+
+/* Track */
+.hs-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Slide */
+.hs-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.75s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.hs-slide--active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Background image */
+.hs-slide__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.hs-slide__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.hs-slide__bg--placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Gradient overlay – darker on the text side (RTL = right) */
+.hs-slide__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to left,
+    rgba(0,0,0,0.85) 0%,
+    rgba(0,0,0,0.45) 45%,
+    rgba(0,0,0,0.05) 100%
+  );
+}
+
+/* Content */
+.hs-slide__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 4rem;
+  padding-bottom: 6rem;
+  max-width: min(55%, 640px);
+  text-align: right;
+  right: 0;
+}
+
+.hs-slide__label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.65);
+  margin: 0 0 .8rem;
+}
+
+.hs-slide__title {
+  font-size: clamp(2.4rem, 5vw, 5.6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff;
+  margin: 0 0 1.2rem;
+  text-shadow: 0 2px 24px rgba(0,0,0,.4);
+}
+
+.hs-slide__desc {
+  font-size: clamp(1.3rem, 1.6vw, 1.6rem);
+  color: rgba(255,255,255,.8);
+  line-height: 1.7;
+  margin: 0 0 2rem;
+  max-width: 46ch;
+}
+
+/* Buttons */
+.hs-slide__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.hs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .8rem 2.2rem;
+  border-radius: 10rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .15s, opacity .15s;
+  white-space: nowrap;
+}
+.hs-btn:hover { transform: scale(1.04); }
+.hs-btn--primary {
+  background: #fff;
+  color: #111;
+}
+.hs-btn--ghost {
+  background: rgba(255,255,255,.18);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+/* Nav arrows */
+.hs-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, opacity .2s;
+  opacity: .7;
+}
+.hs-nav:hover { background: rgba(255,255,255,.3); opacity: 1; }
+.hs-nav svg { width: 2rem; height: 2rem; display: block; }
+.hs-nav--prev { right: 1.5rem; }
+.hs-nav--next { left: 1.5rem; }
+
+/* Dots */
+.hs-dots {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: .6rem;
+  z-index: 10;
+}
+.hs-dot {
+  width: 2.8rem;
+  height: .4rem;
+  border-radius: 10rem;
+  background: rgba(255,255,255,.35);
+  border: none;
+  cursor: pointer;
+  transition: background .3s, width .3s;
+  padding: 0;
+}
+.hs-dot--active {
+  background: #fff;
+  width: 5rem;
+}
+
+/* Mobile */
+@media screen and (max-width: 749px) {
+  .hs-hero { height: 55vh; min-height: 280px; }
+  .hs-slide__content { max-width: 100%; padding: 2rem 1.5rem 7rem; }
+  .hs-slide__overlay {
+    background: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.3) 60%, transparent 100%);
+  }
+  .hs-slide__content { justify-content: flex-end; }
+  .hs-nav { display: none; }
+}
+</style>
+
+<script>
+(function() {
+  var sectionId = '{{ section.id }}';
+  var total     = {{ section.blocks.size }};
+  var current   = 0;
+  var timer     = null;
+  var AUTO      = {{ section.settings.auto_rotate | default: true }} === true;
+  var SPEED     = {{ section.settings.autoplay_speed | default: 5000 }};
+
+  function slides()  { return document.querySelectorAll('#HeroSlideshow-' + sectionId + ' .hs-slide'); }
+  function dots()    { return document.querySelectorAll('#hs-dots-' + sectionId + ' .hs-dot'); }
+
+  function goTo(idx) {
+    var sl = slides(), dt = dots();
+    sl.forEach(function(s, i) { s.classList.toggle('hs-slide--active', i === idx); });
+    dt.forEach(function(d, i) { d.classList.toggle('hs-dot--active', i === idx); });
+    current = idx;
+  }
+
+  function next() { goTo((current + 1) % total); }
+  function prev() { goTo((current - 1 + total) % total); }
+
+  function startAuto() {
+    if (!AUTO || total < 2) return;
+    timer = setInterval(next, SPEED);
+  }
+  function resetAuto() {
+    clearInterval(timer);
+    startAuto();
+  }
+
+  /* Arrows */
+  var btnPrev = document.getElementById('hs-prev-' + sectionId);
+  var btnNext = document.getElementById('hs-next-' + sectionId);
+  if (btnPrev) btnPrev.addEventListener('click', function() { prev(); resetAuto(); });
+  if (btnNext) btnNext.addEventListener('click', function() { next(); resetAuto(); });
+
+  /* Dots */
+  dots().forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      goTo(parseInt(this.dataset.index));
+      resetAuto();
+    });
+  });
+
+  /* Touch / Swipe */
+  var hero = document.getElementById('HeroSlideshow-' + sectionId);
+  var touchX = null;
+  if (hero) {
+    hero.addEventListener('touchstart', function(e) { touchX = e.touches[0].clientX; }, { passive: true });
+    hero.addEventListener('touchend', function(e) {
+      if (touchX === null) return;
+      var diff = touchX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) { diff > 0 ? next() : prev(); resetAuto(); }
+      touchX = null;
+    }, { passive: true });
+  }
+
+  startAuto();
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Hero Slideshow",
+  "class": "section",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "height",
+      "label": "ارتفاع القسم",
+      "options": [
+        { "value": "small",  "label": "صغير (50vh)" },
+        { "value": "medium", "label": "متوسط (70vh)" },
+        { "value": "large",  "label": "كبير (90vh)" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "تشغيل تلقائي",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "سرعة التشغيل (ثانية)",
+      "min": 3000,
+      "max": 10000,
+      "step": 1000,
+      "default": 5000,
+      "unit": "ms"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "شريحة",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "الصورة"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "تصنيف صغير (اختياري)",
+          "placeholder": "مثال: 🔥 الأكثر مبيعاً هذا الأسبوع"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "العنوان الرئيسي"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "وصف قصير"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "نص الزر الأول",
+          "default": "اكتشف الآن"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "رابط الزر الأول"
+        },
+        {
+          "type": "text",
+          "id": "button2_label",
+          "label": "نص الزر الثاني (اختياري)"
+        },
+        {
+          "type": "url",
+          "id": "button2_link",
+          "label": "رابط الزر الثاني (اختياري)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Slideshow",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ],
+  "max_blocks": 8
+}
+{% endschema %}

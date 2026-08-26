@@ -1,5 +1,26 @@
 {
   "sections": {
+    "hero_slideshow": {
+      "type": "hero-slideshow",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "label": "🔥 مختارات هذا الأسبوع",
+            "title": "قطع نادرة وقصص مميزة",
+            "description": "أشياء تستحق أن تُحفظ — قطع نادرة وقصص لا تُنسى",
+            "button_label": "اكتشف المنتجات",
+            "button_link": "/collections/all"
+          }
+        }
+      },
+      "block_order": ["slide_1"],
+      "settings": {
+        "height": "medium",
+        "auto_rotate": true,
+        "autoplay_speed": 5000
+      }
+    },
     "slideshow": {
       "type": "slideshow",
       "settings": {
@@ -1509,6 +1530,7 @@
     }
   },
   "order": [
+    "hero_slideshow",
     "slideshow",
     "weekly_picks",
     "17744612421e63ad1c",
