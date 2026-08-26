@@ -1,12 +1,50 @@
 {% comment %} Hero Cinematic Slideshow Section {% endcomment %}
 
 {%- style -%}
-  .hs-hero {
-    height: {% if section.settings.height == 'small' %}50vh{% elsif section.settings.height == 'large' %}90vh{% else %}70vh{% endif %};
+  #HeroSlideshow-{{ section.id }} {
+    {%- if section.settings.height_mode == 'adapt' and section.blocks.first.settings.image != blank -%}
+      height: auto;
+      aspect-ratio: {{ section.blocks.first.settings.image.aspect_ratio }};
+      min-height: 250px;
+    {%- elsif section.settings.height_mode == 'custom' -%}
+      height: {{ section.settings.desktop_height }}px;
+    {%- elsif section.settings.height_mode == 'vh' -%}
+      height: {{ section.settings.desktop_vh }}vh;
+    {%- else -%}
+      height: 70vh;
+    {%- endif -%}
   }
+
+  @media screen and (max-width: 749px) {
+    #HeroSlideshow-{{ section.id }} {
+      {%- if section.settings.mobile_height_mode == 'adapt' and section.blocks.first.settings.image != blank -%}
+        height: auto;
+        aspect-ratio: {{ section.blocks.first.settings.image.aspect_ratio }};
+        min-height: 200px;
+      {%- elsif section.settings.mobile_height_mode == 'custom' -%}
+        height: {{ section.settings.mobile_height }}px !important;
+      {%- elsif section.settings.mobile_height_mode == 'vh' -%}
+        height: {{ section.settings.mobile_vh }}vh !important;
+      {%- else -%}
+        height: 55vh !important;
+      {%- endif -%}
+    }
+  }
+
+  #HeroSlideshow-{{ section.id }} .hs-slide__bg img,
+  #HeroSlideshow-{{ section.id }} .hs-placeholder {
+    object-fit: {{ section.settings.image_fit | default: 'cover' }};
+    object-position: {{ section.settings.image_position | default: 'center center' }};
+  }
+
+  {%- if section.settings.image_fit == 'contain' -%}
+    #HeroSlideshow-{{ section.id }} .hs-slide__bg {
+      background-color: {{ section.settings.image_bg_color | default: '#000000' }};
+    }
+  {%- endif -%}
 {%- endstyle -%}
 
-<div class="hs-hero" id="HeroSlideshow-{{ section.id }}">
+<div class="hs-hero{% unless section.settings.full_width %} page-width{% endunless %}" id="HeroSlideshow-{{ section.id }}">
   <div class="hs-track">
 
     {%- if section.blocks.size > 0 -%}
@@ -30,7 +68,7 @@
           {%- assign btn2_url = '' -%}
         {%- endif -%}
 
-        {%- comment -%} موضع المحتوى (أفقي + رأسي) {%- endcomment -%}
+        {%- comment -%} موضع المحتوى {%- endcomment -%}
         {%- assign cv = block.settings.content_vertical | default: 'center' -%}
         {%- assign ch = block.settings.content_horizontal | default: 'right' -%}
 
@@ -44,12 +82,10 @@
         {%- else -%}{%- assign h_val = 'flex-end' -%}
         {%- endif -%}
 
-        {%- comment -%} ألوان الزر الأول {%- endcomment -%}
         {%- assign b1_style = block.settings.btn1_style | default: 'solid' -%}
         {%- assign b1_color = block.settings.btn1_color | default: '#ffffff' -%}
         {%- assign b1_txt   = block.settings.btn1_text_color | default: '#111111' -%}
 
-        {%- comment -%} ألوان الزر الثاني {%- endcomment -%}
         {%- assign b2_style = block.settings.btn2_style | default: 'ghost' -%}
         {%- assign b2_color = block.settings.btn2_color | default: '#ffffff' -%}
         {%- assign b2_txt   = block.settings.btn2_text_color | default: '#ffffff' -%}
@@ -59,13 +95,7 @@
           {{ block.shopify_attributes }}
         >
           <!-- الصورة -->
-          <div class="hs-slide__bg" style="
-            {%- if block.settings.image_size == 'contain' -%}
-              background-size: contain; background-repeat: no-repeat; background-color: {{ block.settings.image_bg_color | default: '#000' }};
-            {%- else -%}
-              background-size: cover;
-            {%- endif -%}
-          ">
+          <div class="hs-slide__bg">
             {%- if block.settings.image != blank -%}
               <img
                 src="{{ block.settings.image | image_url: width: 1600 }}"
@@ -77,7 +107,6 @@
                 sizes="100vw"
                 alt="{{ block.settings.image.alt | escape }}"
                 loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                style="object-position: {{ block.settings.image_position | default: 'center center' }}; object-fit: {{ block.settings.image_size | default: 'cover' }};"
               >
             {%- else -%}
               {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hs-placeholder' }}
@@ -109,10 +138,10 @@
               {%- endif -%}
 
               <!-- أزرار -->
-              {%- if block.settings.button_label != blank -%}
+              {%- if block.settings.button_label != blank or block.settings.button2_label != blank -%}
                 <div class="hs-slide__actions" style="justify-content: {% if ch == 'left' %}flex-start{% elsif ch == 'center' %}center{% else %}flex-end{% endif %};">
 
-                  {%- if btn1_url != '' -%}
+                  {%- if block.settings.button_label != blank and btn1_url != '' -%}
                     {%- if b1_style == 'ghost' -%}
                       <a href="{{ btn1_url }}" class="hs-btn" style="
                         background: transparent;
@@ -191,8 +220,6 @@
   width: 100%;
   overflow: hidden;
   background: #111;
-  min-height: 360px;
-  max-height: 860px;
   direction: rtl;
 }
 .hs-track { position: absolute; inset: 0; }
@@ -209,7 +236,6 @@
 .hs-slide__bg img,
 .hs-placeholder {
   width: 100%; height: 100%;
-  object-fit: cover;
   display: block;
 }
 
@@ -294,7 +320,6 @@
 .hs-dot--active { background: #fff; width: 5rem; }
 
 @media screen and (max-width: 749px) {
-  .hs-hero { height: 58vh !important; }
   .hs-slide__inner { max-width: 100%; }
   .hs-nav { display: none; }
 }
@@ -351,15 +376,124 @@
   "disabled_on": { "groups": ["header", "footer"] },
   "settings": [
     {
+      "type": "header",
+      "content": "📏 أبعاد القسم (سطح المكتب)"
+    },
+    {
       "type": "select",
-      "id": "height",
-      "label": "ارتفاع القسم",
+      "id": "height_mode",
+      "label": "نمط ارتفاع القسم",
       "options": [
-        { "value": "small",  "label": "صغير – 50%" },
-        { "value": "medium", "label": "متوسط – 70%" },
-        { "value": "large",  "label": "كبير – 90%" }
+        { "value": "custom", "label": "ارتفاع مخصص (بكسل)" },
+        { "value": "vh",     "label": "نسبة مئوية من الشاشة (vh)" },
+        { "value": "adapt",  "label": "ملائمة لأول صورة (Adapt to image)" }
       ],
-      "default": "medium"
+      "default": "custom"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "ارتفاع القسم مخصص (بكسل)",
+      "min": 250,
+      "max": 900,
+      "step": 10,
+      "default": 550,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "desktop_vh",
+      "label": "ارتفاع القسم (نسبة مئوية vh)",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "default": 70,
+      "unit": "%"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "عرض ملء الشاشة (Full Width)",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "📱 أبعاد القسم (الجوال)"
+    },
+    {
+      "type": "select",
+      "id": "mobile_height_mode",
+      "label": "نمط ارتفاع القسم للجوال",
+      "options": [
+        { "value": "custom", "label": "ارتفاع مخصص (بكسل)" },
+        { "value": "vh",     "label": "نسبة مئوية من الشاشة (vh)" },
+        { "value": "adapt",  "label": "ملائمة لأول صورة (Adapt to image)" }
+      ],
+      "default": "custom"
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "ارتفاع القسم بالجوال (بكسل)",
+      "min": 180,
+      "max": 650,
+      "step": 10,
+      "default": 360,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_vh",
+      "label": "ارتفاع القسم بالجوال (نسبة vh)",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "default": 55,
+      "unit": "%"
+    },
+
+    {
+      "type": "header",
+      "content": "🖼️ أبعاد وعرض الصور (على مستوى القسم كامل)"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "طريقة ملاءمة الصور (Object Fit)",
+      "options": [
+        { "value": "cover",   "label": "تغطية كامل المساحة (Cover)" },
+        { "value": "contain", "label": "احتواء الصورة بالكامل (Contain)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "موضع التركيز للصورة (Object Position)",
+      "options": [
+        { "value": "center center", "label": "منتصف" },
+        { "value": "top center",    "label": "أعلى المنتصف" },
+        { "value": "bottom center", "label": "أسفل المنتصف" },
+        { "value": "center right",  "label": "منتصف اليمين" },
+        { "value": "center left",   "label": "منتصف اليسار" },
+        { "value": "top right",     "label": "أعلى اليمين" },
+        { "value": "top left",      "label": "أعلى اليسار" },
+        { "value": "bottom right",  "label": "أسفل اليمين" },
+        { "value": "bottom left",   "label": "أسفل اليسار" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "color",
+      "id": "image_bg_color",
+      "label": "لون خلفية الجوانب (عند اختيار Contain)",
+      "default": "#000000"
+    },
+
+    {
+      "type": "header",
+      "content": "⏱️ التشغيل التلقائي والسرعة"
     },
     {
       "type": "checkbox",
@@ -385,39 +519,6 @@
           "type": "image_picker",
           "id": "image",
           "label": "اختر صورة الشريحة"
-        },
-        {
-          "type": "select",
-          "id": "image_size",
-          "label": "حجم الصورة",
-          "options": [
-            { "value": "cover",   "label": "تغطية كاملة (Cover)" },
-            { "value": "contain", "label": "احتواء كامل (Contain)" }
-          ],
-          "default": "cover"
-        },
-        {
-          "type": "select",
-          "id": "image_position",
-          "label": "موضع الصورة",
-          "options": [
-            { "value": "center center", "label": "مركز" },
-            { "value": "top center",    "label": "أعلى – مركز" },
-            { "value": "bottom center", "label": "أسفل – مركز" },
-            { "value": "center right",  "label": "مركز – يمين" },
-            { "value": "center left",   "label": "مركز – يسار" },
-            { "value": "top right",     "label": "أعلى – يمين" },
-            { "value": "top left",      "label": "أعلى – يسار" },
-            { "value": "bottom right",  "label": "أسفل – يمين" },
-            { "value": "bottom left",   "label": "أسفل – يسار" }
-          ],
-          "default": "center center"
-        },
-        {
-          "type": "color",
-          "id": "image_bg_color",
-          "label": "لون الخلفية (عند Contain)",
-          "default": "#000000"
         },
 
         { "type": "header", "content": "📍 موضع النص والأزرار" },
