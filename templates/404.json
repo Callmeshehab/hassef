@@ -9,6 +9,45 @@
  */
 {
   "sections": {
+    "hero_UzYkFA": {
+      "type": "hero",
+      "blocks": {
+        "slide_kxf4QB": {
+          "type": "slide",
+          "settings": {
+            "label": "",
+            "title": "",
+            "description": "",
+            "button_label": "اكتشف الآن",
+            "button_link": "",
+            "button2_label": "",
+            "button2_link": ""
+          }
+        },
+        "slide_hPyHYf": {
+          "type": "slide",
+          "settings": {
+            "label": "",
+            "title": "",
+            "description": "",
+            "button_label": "اكتشف الآن",
+            "button_link": "",
+            "button2_label": "",
+            "button2_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_kxf4QB",
+        "slide_hPyHYf"
+      ],
+      "name": "Hero Slideshow",
+      "settings": {
+        "height": "small",
+        "auto_rotate": true,
+        "autoplay_speed": 5
+      }
+    },
     "17863038102522361d": {
       "type": "_blocks",
       "blocks": {
@@ -213,6 +252,7 @@
     }
   },
   "order": [
+    "hero_UzYkFA",
     "17863038102522361d"
   ]
 }
